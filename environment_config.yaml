@@ -1,0 +1,19 @@
+attributes:
+  contrail_asnum:
+    value: '65412'
+    label: 'AS Number'
+    description: 'AS number for BGP communication'
+    weight: 10
+    type: "text"
+  contrail_gateways:
+    value: ''
+    label: 'GW IP'
+    description: 'Gateway nodes IP addresses'
+    weight: 20
+    type: "text"
+  contrail_lbaas:
+    type: "checkbox"
+    weight: 30
+    value: false
+    label: "Enable LBaaS feature"
+    description: "Enables LBaaS for Contrail"
