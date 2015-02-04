@@ -4,9 +4,9 @@
 
  http://creativecommons.org/licenses/by/3.0/legalcode
 
-==========================================
+================================================
 Fuel Plugin for Juniper Contrail SDN integration
-==========================================
+================================================
 
 Contrail plugin for Fuel provides the functionality to add Сontrail SDN for
 Mirantis OpenStack as networking backend option.
@@ -21,7 +21,6 @@ Contrail Load-Balancing-as-a-Service feature available through OpenStack Neutron
 Problem description
 ===================
 
-
 Proposed change
 ===============
 
@@ -33,8 +32,8 @@ Alternatives
 
 It also might be implemented as a part of Fuel core, but we decided to make it as
 a plugin for several reasons:
-* Any new additional functionality makes a project and testing more difficult,
-which is an additional risk for the FUEL release.
+
+* Any new additional functionality makes a project and testing more difficult, which is an additional risk for the FUEL release.
 
 Data model impact
 -----------------
@@ -77,16 +76,25 @@ Assignee(s)
 -----------
 
 Primary assignee:
-Oleksandr Martsyniuk <omartsyniuk@mirantis.com> - feature lead, developer
+
+- Oleksandr Martsyniuk <omartsyniuk@mirantis.com> - feature lead, developer
+
 Other contributors:
-Vyacheslav Struk <vstruk@mirantis.com> - developer
+
+- Vyacheslav Struk <vstruk@mirantis.com> - developer
+
 Project manager:
-Andrian Noga <anoga@mirantis.com>
+
+- Andrian Noga <anoga@mirantis.com>
+
 Quality assurance:
-Oleksandr Kosse <okosse@mirantis.com> - qa
-Iryna Vovk <ivovk@mirantis.com> - qa
+
+- Oleksandr Kosse <okosse@mirantis.com> - qa
+- Iryna Vovk <ivovk@mirantis.com> - qa
+
 Docs Lead:
-Irina Povolotskaya <ipovolotskaya@mirantis.com> - technical writer
+
+- Irina Povolotskaya <ipovolotskaya@mirantis.com> - technical writer
 
 Work Items
 ----------
@@ -94,9 +102,11 @@ Work Items
 * Create pre-dev environment and manually deploy Contrail software
 * Create Fuel plugin bundle, which contains deployments scripts, puppet modules and metadata
 * Implement puppet module with the following functions:
+
  - Contrail controllers deployment and initial configuration
  - Mirantis OpenStack controllers configuration
  - vRouter deployment on OpenStack compute nodes
+
 * Test Contrail plugin
 * Create Documentation
 
@@ -111,17 +121,16 @@ Dependencies
 
 Testing
 =======
+
 * Sanity checks including plugin build
 * Syntax check
 * Functional testing
 * Non-functional testing (Destructive and Negative)
 
-
 Documentation Impact
 ====================
 
-* Deployment Guide (how to prepare an env for installation, how to install the plugin,
-how to deploy OpenStack env with the plugin)
+* Deployment Guide (how to prepare an env for installation, how to install the plugin, how to deploy OpenStack env with the plugin)
 * User Guide (which features the plugin provides, how to use them in the deployed OS env)
 * Test Plan
 * Test Report

@@ -1,0 +1,52 @@
+attributes:
+  contrail_asnum:
+    value: '65412'
+    label: 'AS Number'
+    description: 'AS number for BGP communication'
+    weight: 10
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
+  contrail_private_cidr:
+    value: ''
+    label: 'Private network CIDR'
+    description: 'CIDR for private network used in Contrail inter-node communication'
+    weight: 20
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
+  contrail_private_start:
+    value: ''
+    label: 'Private IP range start'
+    description: ''
+    weight: 20
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
+  contrail_private_end:
+    value: ''
+    label: 'Private IP range end'
+    description: ''
+    weight: 20
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
+  contrail_gateways:
+    value: ''
+    label: 'GW IP'
+    description: 'Gateway nodes IP addresses'
+    weight: 20
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
+  contrail_lbaas:
+    type: "checkbox"
+    weight: 30
+    value: false
+    label: "Enable LBaaS feature"
+    description: "Enables LBaaS for Contrail"
