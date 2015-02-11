@@ -1,0 +1,13 @@
+--- hiera.pp.orig	2015-02-26 10:16:48.000000000 +0000
++++ hiera.pp	2015-02-26 10:34:37.504104816 +0000
+@@ -9,8 +9,8 @@
+   'class/%{calling_class}',
+   'module/%{calling_module}',
+   'nodes',
+-  'globals',
+-  'astute'
++  'astute',
++  'globals'
+ ]
+ $astute_data_file    = '/etc/astute.yaml'
+ $hiera_main_config   = '/etc/hiera.yaml'
