@@ -2,6 +2,7 @@
 # Add here any the actions which are required before plugin build
 # like packages building, packages downloading from mirrors and so on.
 # The script should return 0 if there were no errors.
+
 set -eux
 
 ROOT="$(dirname `readlink -f $0`)"
@@ -12,5 +13,9 @@ RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
 
 wget -qO- "${REPO_PATH}" | \
-    tar -C "${MODULES}" --strip-components=3 -zxvf - \
-    stackforge-fuel-library-f43d885/deployment/puppet/{apt,inifile,stdlib}
+      tar -C "${MODULES}" --strip-components=3 -zxvf - \
+      stackforge-fuel-library-f43d885/deployment/puppet/{apt,inifile,stdlib}
+
+#wget -q --directory-prefix "$DEB_REPO" \
+#  http://ru.archive.ubuntu.com/ubuntu/pool/main/i/ipvsadm/ipvsadm_1.25.clean-1ubuntu5_amd64.deb \
+#  http://ru.archive.ubuntu.com/ubuntu/pool/main/k/keepalived/keepalived_1.2.2-3ubuntu1_amd64.deb \
