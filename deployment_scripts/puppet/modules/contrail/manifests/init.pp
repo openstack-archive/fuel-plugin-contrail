@@ -5,7 +5,7 @@ class contrail {
   $node_name = hiera('user_node_name')
 
   case $role {
-    /^*.controller$/: {
+    /^.*controller$/: {
       class { contrail::packages:
         install => ['python-paramiko, contrail-fabric-utils, contrail-setup'],
       }

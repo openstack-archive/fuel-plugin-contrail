@@ -1,0 +1,17 @@
+global_defs {
+        router_id <%= @hostname %>          
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface <%= @ifname %>
+    virtual_router_id 100
+    priority <%= @uid %>
+    advert_int 1
+    auth_type PASS
+    auth_pass contrail
+    virtual_ipaddress {
+        <%= @range_first %>
+    }
+}
+
