@@ -1,0 +1,7 @@
+.tox
+.build
+*.pyc
+*.fp
+build.sh
+deployment_scripts/puppet/modules/inifile
+deployment_scripts/puppet/modules/stdlib

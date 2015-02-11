@@ -1,0 +1,48 @@
+network_scheme:
+  version: 1.1
+  provider: lnx
+  interfaces:
+    eth0:
+    eth1:
+    eth2:
+    eth3:
+    eth4:
+  transformations:
+    - action: add-br
+      name: br-mgmt
+    - action: add-port
+      name: eth3
+      bridge: br-mgmt
+    - action: add-br
+      name: br-ex
+    - action: add-port
+      name: eth1
+      bridge: br-ex
+    - action: add-br
+      name: br-storage
+    - action: add-port
+      name: eth2
+      bridge: br-storage
+#    - actions: add-br
+#      name: br-prv
+  endpoints:
+    br-mgmt:
+      IP:
+        - 192.168.101.3/24
+      gateway: 192.168.101.1
+      gateway-metric: 100
+    br-ex:
+      IP:
+        - 192.168.102.3/24
+      gateway: 192.168.102.1
+    br-storage:
+      IP:
+        - 192.168.103.3/24
+    eth1:
+      IP: none
+  roles:
+    management: br-mgmt
+    private: eth1
+#    fw-admin: br1
+    ex: br-ex
+    storage: br-storage

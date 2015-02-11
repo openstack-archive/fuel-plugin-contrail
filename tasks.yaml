@@ -1,0 +1,22 @@
+# This tasks will be applied on controller nodes,
+# here you can also specify several roles, for example
+# ['cinder', 'compute'] will be applied only on
+# cinder and compute nodes
+- role: ['base-os']
+  stage: pre_deployment
+  type: shell
+  parameters:
+    cmd: ./deploy.sh
+    timeout: 42
+- role: ['controller']
+  stage: post_deployment
+  type: shell
+  parameters:
+    cmd: echo contrail-plugin-post > /tmp/plugin.txt
+    timeout: 42
+- role: ['compute']
+  stage: pre_deployment
+  type: shell
+  parameters:
+    cmd: ./linux_bridges.sh
+    timeout: 42

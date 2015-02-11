@@ -1,0 +1,1 @@
+include fuel-plugin-contrail
