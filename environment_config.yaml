@@ -35,12 +35,6 @@ attributes:
     regex:
       source: '\S'
       error: "Error field cannot be empty"
-  contrail_gateways:
-    value: ''
-    label: 'GW IP'
-    description: 'Gateway nodes IP addresses'
-    weight: 20
-    type: "text"
     regex:
       source: '\S'
       error: "Error field cannot be empty"

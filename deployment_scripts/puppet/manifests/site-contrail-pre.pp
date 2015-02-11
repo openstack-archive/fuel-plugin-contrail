@@ -3,3 +3,5 @@ class { contrail::packages:
   'contrail-fabric-utils','contrail-setup'],
   responsefile => 'contrail.preseed',
 }
+
+include contrail::contrailctl-base-network
