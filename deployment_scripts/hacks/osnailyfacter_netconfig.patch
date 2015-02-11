@@ -1,0 +1,20 @@
+@@ -1,12 +1,12 @@
+ notice('MODULAR: netconfig.pp')
+ 
+-if  hiera('disable_offload') {
+-  L23network::L3::Ifconfig<||> {
+-    ethtool => {
+-      'K' => ['gso off',  'gro off'],
+-    }
+-  }
+-}
++#if  hiera('disable_offload') {
++#  L23network::L3::Ifconfig<||> {
++#    ethtool => {
++#      'K' => ['gso off',  'gro off'],
++#    }
++#  }
++#}
+ 
+ class { 'l23network' :
+   use_ovs => hiera('use_neutron'),
