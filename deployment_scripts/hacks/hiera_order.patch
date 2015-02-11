@@ -1,0 +1,11 @@
+@@ -8,8 +8,8 @@
+   'override/common',
+   'class/%{calling_class}',
+   'module/%{calling_module}',
+-  'globals',
+-  'astute'
++  'astute',
++  'globals'
+ ]
+ $astute_data_file    = '/etc/astute.yaml'
+ $hiera_main_config   = '/etc/hiera.yaml'

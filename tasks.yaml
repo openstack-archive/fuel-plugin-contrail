@@ -2,6 +2,39 @@
 # here you can also specify several roles, for example
 # ['cinder', 'compute'] will be applied only on
 # cinder and compute nodes
+#
+#####################################
+# Development stage hacks
+#
+
+- role: ['base-os']
+  stage: pre_deployment
+  type: shell
+  parameters:
+    cmd: ./dev_stage_hacks.sh
+    timeout: 120
+
+- role: ['compute']
+  stage: pre_deployment
+  type: shell
+  parameters:
+    cmd: ./dev_stage_hacks.sh
+    timeout: 120
+#####################################
+# In case of base-os Hiera must be deployed manually
+- role: ['base-os']
+  stage: pre_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/hiera.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 720
+- role: ['base-os']
+  stage: pre_deployment
+  type: shell
+  parameters:
+    cmd: ln -s /etc/base-os.yaml /etc/astute.yaml
+    timeout: 30
 - role: ['base-os']
   stage: pre_deployment
   type: puppet
