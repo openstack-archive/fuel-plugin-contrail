@@ -1,0 +1,36 @@
+attributes:
+  contrail_asnum:
+    value: '65412'
+    label: 'AS Number'
+    description: 'AS number for BGP communication'
+    weight: 10
+    type: "text"
+  contrail_gateways:
+    value: ''
+    label: 'GW IP'
+    description: 'Gateway nodes IP addresses'
+    weight: 20
+    type: "text"
+  contrail_ip_start:
+    value: '172.19.0.20'
+    label: 'Contrail IP range start'
+    description: 'IP address range for contrail network'
+    weight: 30
+    type: "text"
+  contrail_ip_end:
+    value: '172.19.0.50'
+    label: 'Contrail IP range end'
+    description: 'IP address range for contrail network'
+    weight: 31
+    type: "text"
+  contrail_ip_netmask:
+    value: '24'
+    label: 'IP Range netmask /'
+    weight: 32
+    type: "text"
+  contrail_lbaas:
+    type: "checkbox"
+    weight: 40
+    value: false
+    label: "Enable LBaaS feature"
+    description: "Enables LBaaS for Contrail"
