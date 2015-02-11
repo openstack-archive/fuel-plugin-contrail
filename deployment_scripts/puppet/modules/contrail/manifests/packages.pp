@@ -2,12 +2,13 @@
 #   puppetlabs-apt
 #   puppetlabs-stdlib
 class contrail::packages (
-  $master_ip = hiera('master_ip'),
+  $master_ip,
   $master_port = '8080',
-  $plugin_version = $contrail::settings['metadata']['plugin_version'],
-  $install = undef,
+  $plugin_version,
+  $install,
   $remove = undef,
   $responsefile = undef,
+  $pip_install = undef,
   ) {
 
   class { 'apt': disable_keys => true }
@@ -27,6 +28,13 @@ class contrail::packages (
     packages     => '*',
   }
 
+  define contrail::packages::pip ( $path ){
+    package { $name:
+      provider => pip,
+      ensure   => "${path}/${name}.tar.gz",
+    }
+  }
+  
   if ($responsefile) {
     file { "/var/cache/debconf/${responsefile}" :
       ensure => file,
@@ -46,6 +54,12 @@ class contrail::packages (
     package { $remove:
       ensure     => absent,
       require    => Apt::Source['contrail-from-fuel-master'],
+    }
+  }
+  
+  if ($pip_install) {
+    contrail::packages::pip { $pip_install:
+      path => '/opt/contrail/python_packages'
     }
   }
 
