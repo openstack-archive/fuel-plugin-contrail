@@ -11,6 +11,8 @@ $network_scheme = hiera('network_scheme')
 $uid = hiera('uid')
 $master_ip = hiera('master_ip')
 $node_role = hiera('role')
+$node_name = hiera('user_node_name')
+$nodes= hiera('nodes')
 
 # Network configuration
 prepare_network_config($network_scheme)
@@ -33,5 +35,16 @@ $public_addr=get_ip_from_range($public_first,$public_last,$public_prefix,$uid,'l
 
 $public_if=$settings['contrail_public_if']
 
+$contrail_node_basename='contrail'
+$deployment_node="${contrail_node_basename}-1"
 
+$contrail_node_num = inline_template("<%-
+rv=0
+@nodes.each do |node|
+if node['user_node_name'] =~ /^#{@contrail_node_basename}-.*/
+rv+=1
+end
+end
+-%>
+<%= rv %>")
 }

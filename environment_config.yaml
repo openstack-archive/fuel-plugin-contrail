@@ -18,7 +18,7 @@ attributes:
       source: '\S'
       error: "Error field cannot be empty"
   contrail_private_start:
-    value: '192.168.150.2'
+    value: '192.168.150.5'
     label: 'Private IP range start'
     description: 'First IP address of contrail private network. NOTE: First one will be used as VIP address for controller HA'
     weight: 30
