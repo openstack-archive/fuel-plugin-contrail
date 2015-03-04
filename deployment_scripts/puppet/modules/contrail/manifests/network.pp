@@ -36,10 +36,6 @@ class contrail::network (
         ensure => present,
         content => template("contrail/ifcfg-vhost0.erb");
       }
-      # Remove interface from the bridge
-      exec {"remove_${ifname}":
-        command => "/sbin/brctl delif br-aux ${ifname}"
-      }
     }
   }
 
