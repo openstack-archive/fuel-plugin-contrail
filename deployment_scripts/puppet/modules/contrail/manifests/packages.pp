@@ -1,19 +1,9 @@
-# requires
-#   puppetlabs-apt
-#   puppetlabs-stdlib
 class contrail::packages (
   $install,
   $remove = undef,
   $responsefile = undef,
   $pip_install = undef,
   ) {
-
-  define exec_pip ( $path ){
-    exec { "Install-pip-package-${name}":
-      path     => '/usr/local/bin/:/usr/bin:/bin',
-      command  => "pip install --upgrade --no-deps --index-url='' ${path}/${name}.tar.gz",
-    }
-  }
 
   if ($install) {
     if ($responsefile) {

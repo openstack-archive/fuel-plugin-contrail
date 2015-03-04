@@ -7,6 +7,13 @@ class { 'contrail::network':
   netmask     => $contrail::netmask_short,
 } ->
 
+apt::source { 'contrail-from-fuel-master':
+  location     => "http://${contrail::master_ip}:8080/plugins/contrail-${contrail::plugin_version}/repositories/ubuntu/",
+  release      => '',
+  repos        => '/',
+  include_src  => false,
+} ->
+
 class { contrail::packages:
   install        => 'contrail-openstack-vrouter',
   remove         => ['openvswitch-common','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch',
