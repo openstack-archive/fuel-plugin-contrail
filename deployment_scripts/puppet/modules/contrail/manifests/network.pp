@@ -12,7 +12,8 @@ class contrail::network (
     'base-os':{
       # Remove interface from the bridge
       exec {"remove_${ifname}":
-        command => "/sbin/brctl delif br-aux ${ifname}"
+        command => "/sbin/brctl delif br-aux ${ifname}",
+        returns => [0,1] # Idempotent
       }
       l23network::l3::ifconfig {$ifname:
         interface => $ifname,
@@ -35,10 +36,6 @@ class contrail::network (
       file {"/etc/network/interfaces.d/ifcfg-vhost0":
         ensure => present,
         content => template("contrail/ifcfg-vhost0.erb");
-      }
-      # Remove interface from the bridge
-      exec {"remove_${ifname}":
-        command => "/sbin/brctl delif br-aux ${ifname}"
       }
     }
   }
