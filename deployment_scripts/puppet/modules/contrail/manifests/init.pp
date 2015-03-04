@@ -11,6 +11,7 @@ $network_scheme = hiera('network_scheme')
 $uid = hiera('uid')
 $master_ip = hiera('master_ip')
 $node_role = hiera('role')
+$node_name = hiera('user_node_name')
 
 # Network configuration
 prepare_network_config($network_scheme)

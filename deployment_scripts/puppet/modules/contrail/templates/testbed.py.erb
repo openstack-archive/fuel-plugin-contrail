@@ -1,0 +1,122 @@
+from fabric.api import env
+
+<%-
+nodes=scope.function_hiera(['nodes'])
+keystone=scope.function_hiera(['keystone'])
+os_management_vip=scope.function_hiera(['management_vip'])
+os_public_vip=scope.function_hiera(['public_vip'])
+
+deployment_node_priv_ip=''
+mgm_ip=Array.new
+priv_ip=Array.new
+role_all=[]
+role_ctrl=[]
+role_os=[]
+role_db=[]
+nodes.each do |node|
+case node['role']
+  when 'controller'
+    mgm_ip << node['internal_address']
+    role_all << 'os_ctrl_'+mgm_ip.count.to_s
+    role_os << 'os_ctrl_'+mgm_ip.count.to_s
+  when 'base-os'
+    priv_ip << scope.function_get_ip_from_range([@range_first,@range_last,@netmask_short,node['uid'],'first'])
+    # Also find out a deployment node
+    if node['user_node_name'] == 'Contrail-1'
+      deployment_node_priv_ip=priv_ip.last
+    end
+    role_all << 'c_ctrl_'+priv_ip.count.to_s
+    role_all << 'c_db_'+priv_ip.count.to_s
+
+    role_ctrl << 'c_ctrl_'+priv_ip.count.to_s
+    role_db << 'c_db_'+priv_ip.count.to_s
+  end
+end
+-%>
+
+#Management ip addresses of hosts in the cluster
+<%- mgm_ip.each_with_index do |ip, i| -%>
+os_ctrl_<%= i+1 %> = 'root@<%= ip %>
+<%-   end  -%>
+<%- priv_ip.each_with_index do |ip, i| -%>
+c_ctrl_<%= i+1 %> = 'root@<%= ip %>'
+<%- end -%>
+<%- priv_ip.each_with_index do |ip, i| -%>
+c_db_<%= i+1 %> = 'root@<%= ip %>'
+<%- end -%>
+
+#External routers
+ext_routers = [
+<%-
+gateways=@settings['contrail_gateways'].split(',')
+gateways.each_with_index do |gw, i|
+-%>
+('gateway<%= i+1 %>','<%= gw %>'),
+<%- end -%>
+]
+
+#Autonomous system number
+router_asn = <%= @settings['contrail_asnum'] %>
+
+#Host from which the fab commands are triggered to install and provision
+<%- # According to documentation, deployment node will be named 'Contrail-1' -%>
+<%-
+if not defined?(deployment_node_priv_ip)
+ raise "ERROR: Node named Contrail-1 not found. Cant continue deploy"
+end
+-%>
+deploy_node = 'root@<%= deployment_node_priv_ip %>'
+
+
+#Role definition of the hosts.
+env.roledefs = {
+    'all': <%= role_all.inspect %>,
+    'cfgm': <%= role_ctrl.inspect %>,
+    'openstack': <%= role_os.inspect %>,
+    'control': <%= role_ctrl.inspect %>,
+    'compute': [],
+    'collector': <%= role_ctrl.inspect %>,
+    'webui': <%= role_ctrl.inspect %>,
+    'database': <%= role_db.inspect %>,
+    'build': [deploy_node],
+    'storage-master': [],
+    'storage-compute': [],
+}
+
+#Openstack admin password
+env.openstack_admin_password = 'admin'
+env.password = 'r00tme'
+#Passwords of each host
+env.passwords = {
+<%- role_all.each do |role| -%>
+    <%= role %>: 'r00tme',
+<%- end -%>
+    deploy_node: 'r00tme',
+}
+#For reimage purpose
+env.ostypes = {
+<%- role_all.each do |role| -%>
+    <%= role %>: 'ubuntu',
+<%- end -%>
+}
+env.openstack = {
+    'service_token' : '<%= keystone['admin_token'] %>'
+}
+env.ha = {
+    'internal_vip'   : '<MOS_Controller_MGMT_vip>',
+    'external_vip'   : '<MOS_Controller_PUBLIC_vip>',
+    'contrail_internal_vip'   : '<Contrail_Controller_PRIV_vip>',
+}
+env.ha = {
+   'internal_vip'   : '<%= os_management_vip %>',
+   'external_vip'   : '<%= os_public_vip %>',
+   'contrail_internal_vip'   : '<%= @range_first %>',
+   'contrail_external_vip'   : '<%= @public_last %>',
+}
+
+env.keystone = {
+    'service_tenant': 'services',
+}
+
+multi_tenancy = True
+

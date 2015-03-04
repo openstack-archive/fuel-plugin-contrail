@@ -1,6 +1,3 @@
-# requires
-#   puppetlabs-apt
-#   puppetlabs-stdlib
 class contrail::packages (
   $install,
   $remove = undef,
