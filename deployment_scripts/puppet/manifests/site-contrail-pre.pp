@@ -19,4 +19,9 @@ class { contrail::packages:
                     'contrail-fabric-utils','contrail-setup'],
   pip_install    => ['ecdsa-0.10','Fabric-1.7.0'],
   responsefile   => 'contrail.preseed',
+} ->
+# Workaround for contrail shipped tzdata-java package
+package { 'tzdata':
+  ensure  => '2014e-0ubuntu0.12.04'
 }
+
