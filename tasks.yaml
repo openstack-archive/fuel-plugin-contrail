@@ -9,7 +9,7 @@
   stage: pre_deployment
   type: puppet
   parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/hiera.pp
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/hiera/hiera.pp
     puppet_modules: /etc/puppet/modules
     timeout: 720
 - role: ['base-os']
@@ -23,7 +23,7 @@
   stage: pre_deployment
   type: puppet
   parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig.pp
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp
     puppet_modules: /etc/puppet/modules
     timeout: 720
 - role: ['base-os']
