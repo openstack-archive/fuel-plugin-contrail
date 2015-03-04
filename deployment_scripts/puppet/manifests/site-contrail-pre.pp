@@ -1,3 +1,4 @@
+if hiera('user_node_name') =~ /^contrail-.\d*$/ {
 include contrail
 
 class { 'contrail::network':
@@ -19,4 +20,5 @@ class { contrail::packages:
                     'contrail-fabric-utils','contrail-setup'],
   pip_install    => ['ecdsa-0.10','Fabric-1.7.0'],
   responsefile   => 'contrail.preseed',
+}
 }
