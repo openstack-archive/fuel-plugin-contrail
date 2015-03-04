@@ -15,3 +15,26 @@ DEB_REPO="${ROOT}"/repositories/ubuntu/
 wget -qO- "${REPO_PATH}" | \
       tar -C "${MODULES}" --strip-components=3 -zxvf - \
       stackforge-fuel-library-f43d885/deployment/puppet/{inifile,stdlib}
+#
+# packages required for cassandra and zookeeper:
+deb_packages=('http://us.archive.ubuntu.com/ubuntu/pool/main/p/pcsc-lite/libpcsclite1_1.7.4-2ubuntu2_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/j/java-common/java-common_0.43ubuntu2_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/j/java-common/default-jre-headless_1.6-43ubuntu2_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates-java/ca-certificates-java_20110912ubuntu6_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/c/commons-daemon/libcommons-daemon-java_1.0.8-1_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/c/commons-daemon/jsvc_1.0.8-1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/j/jline/libjline-java_1.0-1_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/libj/libjna-java/libjna-java_3.2.7-4_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/a/apache-log4j1.2/liblog4j1.2-java_1.2.16-3ubuntu1_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/n/netty/libnetty-java_3.2.6.Final-2_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/libs/libslf4j-java/libslf4j-java_1.6.4-1_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/libx/libxml-commons-resolver1.1-java/libxml-commons-resolver1.1-java_1.2-7_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/x/xml-commons-external/libxml-commons-external-java_1.4.01-2_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/libx/libxerces2-java/libxerces2-java_2.11.0-4_all.deb')
+
+for i in "${deb_packages[@]}"
+do
+	file=`echo $i | awk -F '/' '{print $NF}'`
+	if [ ! -f $DEB_REPO$file ];
+	then wget -q $i -O $DEB_REPO$file; fi
+done
