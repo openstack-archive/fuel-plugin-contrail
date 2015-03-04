@@ -1,4 +1,5 @@
 include contrail
+if $contrail::node_name == $contrail::deployment_node {
 
 class { 'contrail::network':
   node_role       => 'base-os',
@@ -19,4 +20,5 @@ class { contrail::packages:
                     'contrail-fabric-utils','contrail-setup'],
   pip_install    => ['ecdsa-0.10','Fabric-1.7.0'],
   responsefile   => 'contrail.preseed',
+}
 }
