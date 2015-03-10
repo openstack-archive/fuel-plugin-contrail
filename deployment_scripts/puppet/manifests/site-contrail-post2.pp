@@ -1,4 +1,11 @@
 include contrail
-if $contrail::node_name == $contrail::deployment_node {
-  
+if $contrail::node_name =~ /^contrail.\d+$/ {
+  class { 'contrail::neutron':
+  } ->
+  class { 'contrail::config':
+    node_role => $contrail::node_role,
+  } ~>
+  class { 'contrail::service':
+    node_role => $contrail::node_role,
+  }
 }
