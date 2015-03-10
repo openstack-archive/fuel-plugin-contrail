@@ -14,7 +14,7 @@ apt::source { 'contrail-from-fuel-master':
   include_src  => false,
 } ->
 
-class { contrail::packages:
+class { contrail::package:
   install        => 'contrail-openstack-vrouter',
   remove         => ['openvswitch-common','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch',
                     'nova-network','nova-api'],

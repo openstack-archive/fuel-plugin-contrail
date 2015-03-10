@@ -6,6 +6,7 @@ $settings = hiera('contrail')
 # TODO
 #$plugin_version = $settings['metadata']['plugin_version']
 $plugin_version = '1.0.0'
+$neutron_plugin_revision='3189155c572e95d4e5eb1b5cf65ee919c6082841'
 
 $network_scheme = hiera('network_scheme')
 $uid = hiera('uid')
