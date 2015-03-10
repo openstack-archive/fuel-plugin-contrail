@@ -3,6 +3,21 @@ class contrail::setup (
   ) {
 
   if $node_name == $contrail::deployment_node {
+    package {'openjdk-6-jre-headless':
+      ensure => present
+    } ->
+    exec {'disable_sslv3':
+        provider  => 'shell',
+        command   => 'echo jdk.tls.disabledAlgorithms=SSLv3 >> /etc/java-6-openjdk/security/java.security',
+    } ->
+    file {'/tmp/ha.py.patch':
+      ensure => file,
+      source => 'puppet:///modules/contrail/ha.py.patch'
+    } ->
+    exec {'ha.py.patch':
+    command => '/usr/bin/patch -f -p0 < /tmp/ha.py.patch'
+    }
+
     # Database installation
     run_fabric { 'install_database': } ->
     run_fabric { 'setup_database': } ->

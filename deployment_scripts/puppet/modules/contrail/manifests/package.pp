@@ -1,4 +1,4 @@
-class contrail::packages (
+class contrail::package (
   $install,
   $remove = undef,
   $responsefile = undef,
