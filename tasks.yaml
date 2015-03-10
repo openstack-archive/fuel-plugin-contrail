@@ -82,6 +82,11 @@
     puppet_manifest: puppet/manifests/site-compute-post.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+- role: ['compute']
+  stage: post_deployment
+  type: reboot
+  parameters:
+    timeout: 720
 - role: ['base-os']
   stage: post_deployment
   type: puppet
@@ -89,10 +94,4 @@
     puppet_manifest: puppet/manifests/site-contrail-post4.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-- role: ['base-os']
-  stage: post_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/site-contrail-post5.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+
