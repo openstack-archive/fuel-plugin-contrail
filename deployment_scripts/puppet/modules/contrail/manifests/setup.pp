@@ -3,6 +3,17 @@ class contrail::setup (
   ) {
 
   if $node_name == $contrail::deployment_node {
+    file_line { 'disable_sslv3':
+      path => '/etc/java-6-openjdk/security/java.security',
+      line => 'jdk.tls.disabledAlgorithms=SSLv3',
+    } ->
+    file {'/tmp/ha.py.patch':
+      ensure => file,
+      source => 'puppet:///modules/contrail/ha.py.patch'
+    } ->
+    exec {'ha.py.patch':
+      command => '/usr/bin/patch -f -p0 < /tmp/ha.py.patch'
+    }
     # Database installation
     run_fabric { 'install_database': } ->
     run_fabric { 'setup_database': } ->
