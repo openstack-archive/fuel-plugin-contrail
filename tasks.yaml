@@ -82,6 +82,13 @@
     puppet_manifest: puppet/manifests/site-compute-post.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+# TODO: Use "type: reboot" when new plugin sdk will be released.
+- role: ['compute']
+  stage: post_deployment
+  type: shell
+  parameters:
+    cmd: '/sbin/reboot'
+    timeout: 720
 - role: ['base-os']
   stage: post_deployment
   type: puppet
@@ -89,10 +96,4 @@
     puppet_manifest: puppet/manifests/site-contrail-post4.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-- role: ['base-os']
-  stage: post_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/site-contrail-post5.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+

@@ -1,0 +1,12 @@
+--- /tmp/keepalived_conf_template.py_orig       2015-03-11 11:42:43.303260933 +0000
++++ /usr/local/lib/python2.7/dist-packages/contrail_provisioning/common/templates/keepalived_conf_template.py   2015-03-11 11:43:22.477893123 +0000
+@@ -40,8 +40,7 @@
+             chk_ctrldatanet_$__vip_str__
+         }
+         track_interface {
+-            $__internal_device__
+-            $__external_device__
++            $__device__
+         }
+ }
+ """)
