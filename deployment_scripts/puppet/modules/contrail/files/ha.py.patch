@@ -1,0 +1,17 @@
+--- ha.py	2015-03-10 22:01:08.309814785 +0300
++++ /opt/contrail/utils/fabfile/tasks/ha.py
+@@ -199,9 +199,12 @@
+ 
+ def setup_keepalived_node(role):
+     """Task to provision VIP for node with keepalived"""
+-    mgmt_ip = hstr_to_ip(env.host_string)
+     self_host = get_control_host_string(env.host_string)
+-    self_ip = hstr_to_ip(self_host)
++
++    # looks like smth messed up several levels below, so vars are swapped and
++    # it's the only way which works
++    self_ip = env.hoststring_mgm_ip[env.host_string]
++    mgmt_ip = env.hoststring_public_ip[env.host_string]
+ 
+     internal_vip = get_openstack_internal_vip()
+     external_vip = get_openstack_external_vip()

@@ -8,6 +8,8 @@ os_public_vip=scope.function_hiera(['public_vip'])
 
 deployment_node_priv_ip=''
 mgm_ip=Array.new
+mgm_ip_baseos=Array.new
+public_ip_baseos=Array.new
 priv_ip=Array.new
 role_all=[]
 role_ctrl=[]
@@ -21,6 +23,8 @@ case node['role']
     role_os << 'os_ctrl_'+mgm_ip.count.to_s
   when 'base-os'
     priv_ip << scope.function_get_ip_from_range([ scope.lookupvar('contrail::private_first'),scope.lookupvar('contrail::private_last'),scope.lookupvar('contrail::netmask_short'),node['uid'],'first'])
+    public_ip_baseos << scope.function_get_ip_from_range([ scope.lookupvar('contrail::public_first'),scope.lookupvar('contrail::public_last'),scope.lookupvar('contrail::public_prefix'),node['uid'],'last'])
+    mgm_ip_baseos << node['internal_address']
     # Also find out a deployment node
     if node['user_node_name'] == scope.lookupvar('contrail::deployment_node')
       deployment_node_priv_ip=priv_ip.last
@@ -44,6 +48,18 @@ c_ctrl_<%= i+1 %> = 'root@<%= ip %>'
 <%- priv_ip.each_with_index do |ip, i| -%>
 c_db_<%= i+1 %> = 'root@<%= ip %>'
 <%- end -%>
+
+env.hoststring_mgm_ip= {
+<%- mgm_ip_baseos.each_with_index do |ip, i| -%>
+c_ctrl_<%= i+1 %> : '<%= ip %>',
+<%- end -%>
+}
+
+env.hoststring_public_ip= {
+<%- public_ip_baseos.each_with_index do |ip, i| -%>
+c_ctrl_<%= i+1 %> : '<%= ip %>',
+<%- end -%>
+}
 
 #External routers
 ext_routers = [
