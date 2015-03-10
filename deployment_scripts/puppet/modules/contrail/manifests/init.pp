@@ -14,6 +14,9 @@ $node_role = hiera('role')
 $node_name = hiera('user_node_name')
 $nodes= hiera('nodes')
 
+$keystone=hiera('keystone')
+$mos_mgmt_vip=hiera('management_vip')
+
 # Network configuration
 prepare_network_config($network_scheme)
 $ifname = get_private_ifname()
