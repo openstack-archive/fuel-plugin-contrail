@@ -14,7 +14,7 @@ class { contrail::ssh:
   password_auth => 'yes',
 } ->
 
-class { contrail::packages:
+class { contrail::package:
   install        => ['python-crypto','python-netaddr','python-paramiko',
                     'contrail-fabric-utils','contrail-setup'],
   pip_install    => ['ecdsa-0.10','Fabric-1.7.0'],
