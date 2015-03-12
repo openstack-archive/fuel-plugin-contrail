@@ -18,4 +18,7 @@ class { contrail::package:
   install        => 'contrail-openstack-vrouter',
   remove         => ['openvswitch-common','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch',
                     'nova-network','nova-api'],
-}
+} ->
+class { 'contrail::config':
+  node_role => $contrail::node_role,
+} 
