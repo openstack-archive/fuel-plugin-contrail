@@ -1,0 +1,25 @@
+[CONTROL-NODE]
+[DEFAULT]
+log_file=/var/log/contrail/contrail-vrouter-agent.log
+log_level=SYS_NOTICE
+log_local=1
+headless_mode=true
+[DISCOVERY]
+server= <%= scope.lookupvar('contrail::public_last') %>
+max_control_nodes=2
+[DNS]
+[HYPERVISOR]
+type=kvm
+[FLOWS]
+[METADATA]
+[NETWORKS]
+control_network_ip=<%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
+[VIRTUAL-HOST-INTERFACE]
+name=vhost0
+ip=<MOS_Compute_PRIVATE_ip_net>
+physical_interface=<%= scope.function_get_private_ifname([]) %>
+gateway=
+[GATEWAY-0]
+[GATEWAY-1]
+[SERVICE-INSTANCE]
+netns_command=/usr/bin/opencontrail-vrouter-netns
