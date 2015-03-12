@@ -15,5 +15,33 @@ class contrail::config ( $node_role ) {
       'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
     }
    }
+   'compute': {
+      nova_config {
+        'DEFAULT/neutron_url': value => "http://${contrail::public_last}:9696";
+        'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
+        'DEFAULT/network_api_class': value=> 'nova_contrail_vif.contrailvif.ContrailNetworkAPI';
+        'DEFAULT/neutron_admin_tenant_name': value=> 'services';
+        'DEFAULT/neutron_admin_username': value=> 'neutron';
+        'DEFAULT/neutron_admin_password': value=> "${contrail::keystone['admin_token']}";
+        'DEFAULT/neutron_url_timeout': value=> '300';
+        'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
+        'DEFAULT/security_group_api': value=> 'neutron';
+      }
+      firewall {'0000 metadata service':
+        source => '168.254.0.0/16',
+        iniface => 'vhost0',
+        action => 'accept'
+      }
+      firewall {'0001 juniper contrail rules ':
+        proto => 'tcp',
+        dport  => ["2049","8085","9090","8102","33617","39704","44177","55970","60663"],
+        action => 'accept'
+      }
+      file {'/etc/contrail/agent_param':
+        ensure => present,
+        content => template('contrail/agent_param.erb'),
+      }
+
+   }
   }
 }
