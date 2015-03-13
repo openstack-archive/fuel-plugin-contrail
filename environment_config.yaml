@@ -39,23 +39,41 @@ attributes:
     value: '192.168.150.1,192.168.150.2'
     label: 'GW IP'
     description: 'Comma separated IP addresses of gateways'
-    weight: 20
+    weight: 50
     type: "text"
     regex:
       source: '\S'
       error: "Error field cannot be empty"
   contrail_public_if:
-    value: 'eth1'
+    value: ''
     label: 'Public interface'
     description: 'Interface must match to Nodes->Configure interfaces->Public'
-    weight: 30
+    weight: 60
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
+  admin_tenant_private_cidr:
+    value: '10.100.0.0/24'
+    label: 'Admin tenant private network CIDR'
+    description: 'CIDR for admin tenant private network'
+    weight: 70
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
+  admin_tenant_public_cidr:
+    value: '10.100.1.0/24'
+    label: 'Admin tenant public network CIDR'
+    description: 'CIDR for admin tenant public network'
+    weight: 80
     type: "text"
     regex:
       source: '\S'
       error: "Error field cannot be empty"
   contrail_lbaas:
     type: "checkbox"
-    weight: 50
+    weight: 90
     value: false
     label: "Enable LBaaS feature"
     description: "Enables LBaaS for Contrail"
