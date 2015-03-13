@@ -28,9 +28,13 @@ class contrail::network (
           interface => $public_if,
           ipaddr    => "${public_addr}/${public_netmask}",
         }
-
       }
-    }
+      # l23network::l3::ifconfig does not brings the interface up. Bug? Check it later
+      exec {"ifup-${public_if}":
+        command => "/sbin/ip link set up dev ${public_if}",
+      }
+     }
+
     'compute':{
       file {'/etc/network/interfaces.d/ifcfg-vhost0':
         ensure => present,
