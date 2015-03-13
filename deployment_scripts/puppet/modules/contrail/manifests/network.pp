@@ -8,18 +8,21 @@ class contrail::network (
   $public_if = undef
   ) {
 
+  # Remove interface from the bridge
+  exec {"remove_${ifname}":
+    command => "/sbin/brctl delif br-aux ${ifname}",
+    returns => [0,1] # Idempotent
+  } ->
+  file { '/etc/network/interfaces.d/ifcfg-br-aux':
+    ensure => absent,
+  } ->
+
   case $node_role {
     'base-os':{
-      # Remove interface from the bridge
-      exec {"remove_${ifname}":
-        command => "/sbin/brctl delif br-aux ${ifname}",
-        returns => [0,1] # Idempotent
-      }
       l23network::l3::ifconfig {$ifname:
         interface => $ifname,
         ipaddr    => "${address}/${netmask}",
       }
-
       # Contrail controller needs public ip anyway
       $public_ip_settings=hiera('public_network_assignment')
       $assign_public=$public_ip_settings['assign_to_all_nodes']
@@ -34,7 +37,6 @@ class contrail::network (
         command => "/sbin/ip link set up dev ${public_if}",
       }
      }
-
     'compute':{
       file {'/etc/network/interfaces.d/ifcfg-vhost0':
         ensure => present,

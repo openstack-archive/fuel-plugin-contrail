@@ -4,4 +4,7 @@ class { 'contrail::config':
 } ~>
 class { 'contrail::service':
   node_role => $contrail::node_role,
+} ->
+class {'contrail::provision':
+  node_role => $contrail::node_role,
 }

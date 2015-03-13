@@ -5,7 +5,7 @@ log_level=SYS_NOTICE
 log_local=1
 headless_mode=true
 [DISCOVERY]
-server= <%= scope.lookupvar('contrail::public_last') %>
+server=<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>
 max_control_nodes=2
 [DNS]
 [HYPERVISOR]
@@ -13,10 +13,10 @@ type=kvm
 [FLOWS]
 [METADATA]
 [NETWORKS]
-control_network_ip=<%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
+control_network_ip=<%= scope.lookupvar('contrail::address') %>
 [VIRTUAL-HOST-INTERFACE]
 name=vhost0
-ip=<MOS_Compute_PRIVATE_ip_net>
+ip=<%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
 physical_interface=<%= scope.function_get_private_ifname([]) %>
 gateway=
 [GATEWAY-0]
