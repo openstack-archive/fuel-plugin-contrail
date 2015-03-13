@@ -17,6 +17,12 @@ $nodes= hiera('nodes')
 $keystone=hiera('keystone')
 $mos_mgmt_vip=hiera('management_vip')
 
+# Contrail settings
+$asnum = $settings['contrail_asnum']
+$admin_token = $keystone['admin_token']
+$admin_tenant_private_cidr = '10.100.0.0/24'
+$admin_tenant_public_cidr = '10.100.1.0/24'
+
 # Network configuration
 prepare_network_config($network_scheme)
 $ifname = get_private_ifname()
