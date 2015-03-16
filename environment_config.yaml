@@ -53,27 +53,3 @@ attributes:
     regex:
       source: '\S'
       error: "Error field cannot be empty"
-  admin_tenant_private_cidr:
-    value: '10.100.0.0/24'
-    label: 'Admin tenant private network CIDR'
-    description: 'CIDR for admin tenant private network'
-    weight: 70
-    type: "text"
-    regex:
-      source: '\S'
-      error: "Error field cannot be empty"
-  admin_tenant_public_cidr:
-    value: '10.100.1.0/24'
-    label: 'Admin tenant public network CIDR'
-    description: 'CIDR for admin tenant public network'
-    weight: 80
-    type: "text"
-    regex:
-      source: '\S'
-      error: "Error field cannot be empty"
-  contrail_lbaas:
-    type: "checkbox"
-    weight: 90
-    value: false
-    label: "Enable LBaaS feature"
-    description: "Enables LBaaS for Contrail"
