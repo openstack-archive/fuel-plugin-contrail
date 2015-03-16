@@ -54,14 +54,14 @@
     puppet_manifest: puppet/manifests/site-contrail-post3.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-- role: ['controller']
+- role: ['primary-controller','controller']
   stage: pre_deployment
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/site-controller-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-- role: ['controller']
+- role: ['primary-controller','controller']
   stage: post_deployment
   type: puppet
   parameters:
