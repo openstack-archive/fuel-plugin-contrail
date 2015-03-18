@@ -1,9 +1,9 @@
 class contrail::config ( $node_role ) {
   case $node_role {
-    'controller','primary_controller': {
+    'controller','primary-controller': {
       nova_config {
         'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
-        'DEFAULT/neutron_url': value => "http://${contrail::public_last}:9696";
+        'DEFAULT/neutron_url': value => "http://${contrail::contrail_mgmt_vip}:9696";
         'DEFAULT/neutron_admin_tenant_name': value=> 'services';
         'DEFAULT/neutron_admin_username': value=> 'neutron';
         'DEFAULT/neutron_admin_password': value=> $contrail::keystone['admin_token'];
@@ -17,7 +17,7 @@ class contrail::config ( $node_role ) {
     }
     'compute': {
       nova_config {
-        'DEFAULT/neutron_url': value => "http://${contrail::public_last}:9696";
+        'DEFAULT/neutron_url': value => "http://${contrail::contrail_mgmt_vip}:9696";
         'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
         'DEFAULT/network_api_class': value=> 'nova_contrail_vif.contrailvif.ContrailNetworkAPI';
         'DEFAULT/neutron_admin_tenant_name': value=> 'services';
