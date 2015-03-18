@@ -4,7 +4,7 @@ class contrail::setup (
 
   if $node_name == $contrail::deployment_node {
     file_line { 'disable_sslv3':
-      path => '/etc/java-6-openjdk/security/java.security',
+      path => '/etc/java-7-openjdk/security/java.security',
       line => 'jdk.tls.disabledAlgorithms=SSLv3',
     } ->
     file {'/tmp/ha.py.patch':
@@ -12,7 +12,8 @@ class contrail::setup (
       source => 'puppet:///modules/contrail/ha.py.patch'
     } ->
     exec {'ha.py.patch':
-    command => '/usr/bin/patch -f -p0 < /tmp/ha.py.patch'
+    command => '/usr/bin/patch /opt/contrail/utils/fabfile/tasks/ha.py /tmp/ha.py.patch',
+    returns => [0,1] # Idempotent behaviour
     } ->
 
     file {'/tmp/keepalived_conf_template.py.patch':
@@ -20,7 +21,8 @@ class contrail::setup (
       source => 'puppet:///modules/contrail/keepalived_conf_template.py.patch'
     } ->
     exec {'keepalived_conf_template.py.patch':
-    command => '/usr/bin/patch -f -p0 < /tmp/keepalived_conf_template.py.patch'
+    command => '/usr/bin/patch /usr/local/lib/python2.7/dist-packages/contrail_provisioning/common/templates/keepalived_conf_template.py /tmp/keepalived_conf_template.py.patch',
+    returns => [0,1] # Idempotent behaviour
     } ->
 
     file {'/tmp/provision.py.patch':
@@ -28,7 +30,8 @@ class contrail::setup (
       source => 'puppet:///modules/contrail/provision.py.patch'
     } ->
     exec {'provision.py.patch':
-    command => '/usr/bin/patch -f -p0 < /tmp/provision.py.patch'
+    command => '/usr/bin/patch /opt/contrail/utils/fabfile/tasks/provision.py /tmp/provision.py.patch',
+    returns => [0,1] # Idempotent behaviour
     } ->
 
     # Database installation
@@ -58,5 +61,7 @@ class contrail::setup (
     run_fabric { 'setup_control': } ->
     run_fabric { 'setup_collector': } ->
     run_fabric { 'setup_webui': }
+
   }
+
 }

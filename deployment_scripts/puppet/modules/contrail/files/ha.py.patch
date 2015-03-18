@@ -1,4 +1,5 @@
---- ha.py	2015-03-10 22:01:08.309814785 +0300
+diff -u /opt/contrail/utils/fabfile/tasks/ha.py /opt/contrail/utils/fabfile/tasks/ha.py
+--- /opt/contrail/utils/fabfile/tasks/ha.py
 +++ /opt/contrail/utils/fabfile/tasks/ha.py
 @@ -199,9 +199,12 @@
  

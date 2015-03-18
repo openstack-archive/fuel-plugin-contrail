@@ -1,3 +1,16 @@
 Package: *
 Pin: release l=Ubuntu
 Pin-Priority: 100
+
+Package: libnss3*
+Pin: version 2:3.15*
+Pin-Priority: 1006
+
+#  contrail-openstack-config requires
+Package: haproxy
+Pin: version 1.5.4-1ppa1~precise
+Pin-Priority: 1006
+
+Package: nodejs
+Pin: version 0.8.15-1contrail1
+Pin-Priority: 1006
