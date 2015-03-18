@@ -1,3 +1,12 @@
 Package: *
 Pin: release l=Ubuntu
 Pin-Priority: 100
+
+Package: libnss3*
+Pin: version 2:3.15*
+Pin-Priority: 1006
+
+Package: tzdata*
+Pin: version 2014e-0ubuntu0.12.04
+Pin-Priority: 1006
+

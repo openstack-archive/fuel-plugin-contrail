@@ -3,6 +3,6 @@
 file {'remove-plugin-aptsource':
   # TODO!
   #path => "/etc/apt/sources.list.d/contrail-{plugin_version}.list",
-  path => '/etc/apt/sources.list.d/contrail-1.0.0.list',
   ensure => absent,
+  path => '/etc/apt/sources.list.d/contrail-1.0.0.list',
 }

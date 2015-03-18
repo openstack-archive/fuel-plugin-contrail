@@ -1,6 +1,7 @@
 include contrail
 if $contrail::node_name =~ /^contrail.\d+$/ {
-  class { contrail::ssh:
+  class { 'contrail::ssh':
     password_auth => 'no',
+    root_login    => 'without-password'
   }
 }

@@ -38,7 +38,7 @@ EOS
       raise Puppet::ParseError, "IP " + rv.to_s + " is out of allowed ip range. " + ip_end.to_s + " is the max"
     end
 
-    return rv
+    return rv.to_s
 
   end
 end
