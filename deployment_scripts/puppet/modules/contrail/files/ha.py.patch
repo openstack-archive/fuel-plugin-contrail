@@ -1,4 +1,5 @@
---- ha.py	2015-03-10 22:01:08.309814785 +0300
+diff -u /opt/contrail/utils/fabfile/tasks/ha.py /opt/contrail/utils/fabfile/tasks/ha.py
+--- /opt/contrail/utils/fabfile/tasks/ha.py
 +++ /opt/contrail/utils/fabfile/tasks/ha.py
 @@ -199,9 +199,12 @@
  
@@ -15,3 +16,17 @@
  
      internal_vip = get_openstack_internal_vip()
      external_vip = get_openstack_external_vip()
+@@ -284,11 +287,11 @@
+                  % (space, server_index, host_ip)
+         if server_index == 1:
+             rabbitmq_server_lines +=\
+-                '%s server rabbit%s %s:5672 weight 200 check inter 2000 rise 2 fall 3\n'\
++                '%s server rabbit%s %s:25672 weight 200 check inter 2000 rise 2 fall 3\n'\
+                  % (space, server_index, host_ip)
+         else:
+             rabbitmq_server_lines +=\
+-                '%s server rabbit%s %s:5672 weight 100 check inter 2000 rise 2 fall 3 backup\n'\
++                '%s server rabbit%s %s:25672 weight 100 check inter 2000 rise 2 fall 3 backup\n'\
+                  % (space, server_index, host_ip)
+         if server_index == 1:
+              mysql_server_lines +=\

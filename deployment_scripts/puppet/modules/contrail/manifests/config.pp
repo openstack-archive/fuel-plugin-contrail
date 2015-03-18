@@ -29,8 +29,8 @@ class contrail::config ( $node_role ) {
       }
 
       $ipv4_file = $operatingsystem ? {
-          "Ubuntu" => '/etc/iptables/rules.v4',
-          "CentOS" => '/etc/sysconfig/iptables',
+          'Ubuntu' => '/etc/iptables/rules.v4',
+          'CentOS' => '/etc/sysconfig/iptables',
       }
 
       exec {'flush_nat':
@@ -49,8 +49,8 @@ class contrail::config ( $node_role ) {
         action => 'accept'
       } ->
 
-      exec { "persist-firewall":
-        command     => "/sbin/iptables-save >> $ipv4_file",
+      exec { 'persist-firewall':
+        command     => "/sbin/iptables-save > ${ipv4_file}",
         user        => 'root',
       }
 
@@ -64,5 +64,81 @@ class contrail::config ( $node_role ) {
       }
 
     }
+
+    'base-os': {
+
+      # Switch neutron and contrail-api to MOS controller's RabbitMQ
+
+      # Contrail-api
+      ini_setting { 'contrail_rabbit_server':
+          ensure  => present,
+          path    => '/etc/contrail/contrail-api.conf',
+          section => 'DEFAULTS',
+          setting => 'rabbit_server',
+          value   => $contrail::rabbit_hosts[0]  # Using first rabbitmq in list. TODO. Make a VIP,w/o proxying. (RMQ VIP does not exists for now). Contrail does not support a server list.
+      } ->
+      ini_setting { 'contrail_rabbit_port':
+          ensure  => present,
+          path    => '/etc/contrail/contrail-api.conf',
+          section => 'DEFAULTS',
+          setting => 'rabbit_port',
+          value   => '5673'
+      } ->
+      ini_setting { 'contrail_rabbit_user':
+          ensure  => present,
+          path    => '/etc/contrail/contrail-api.conf',
+          section => 'DEFAULTS',
+          setting => 'rabbit_user',
+          value   => 'nova'
+      } ->
+      ini_setting { 'contrail_rabbit_password':
+          ensure  => present,
+          path    => '/etc/contrail/contrail-api.conf',
+          section => 'DEFAULTS',
+          setting => 'rabbit_password',
+          value   => $contrail::rabbit_password
+      } ->
+
+      # Neutron
+      ini_setting { 'neutron_rabbit_hosts':
+          ensure  => present,
+          path    => '/etc/neutron/neutron.conf',
+          section => 'DEFAULT',
+          setting => 'rabbit_hosts',
+          value   => $contrail::rabbit_hosts_ports
+      } ->
+      ini_setting { 'neutron_rabbit_host': # Set empty
+          ensure  => present,
+          path    => '/etc/neutron/neutron.conf',
+          section => 'DEFAULT',
+          setting => 'rabbit_host',
+          value   => ''
+      } ->
+      ini_setting { 'neutron_rabbit_port':
+          ensure  => present,
+          path    => '/etc/neutron/neutron.conf',
+          section => 'DEFAULT',
+          setting => 'rabbit_port',
+          value   => '5673'
+      } ->
+      ini_setting { 'neutron_rabbit_userid':
+          ensure  => present,
+          path    => '/etc/neutron/neutron.conf',
+          section => 'DEFAULT',
+          setting => 'rabbit_userid',
+          value   => 'nova'
+      } ->
+      ini_setting { 'neutron_rabbit_password':
+          ensure  => present,
+          path    => '/etc/neutron/neutron.conf',
+          section => 'DEFAULT',
+          setting => 'rabbit_password',
+          value   => $contrail::rabbit_password
+      }
+
+    }
+
+
+
   }
 }

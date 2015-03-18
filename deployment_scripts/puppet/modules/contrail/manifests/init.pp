@@ -52,12 +52,33 @@ $deployment_node="${contrail_node_basename}-1"
 
 $contrail_node_num = inline_template("<%-
 rv=0
-@nodes.each do |node|
-if node['user_node_name'] =~ /^#{@contrail_node_basename}-.*/
-rv+=1
-end
+  @nodes.each do |node|
+    if node['user_node_name'] =~ /^#{@contrail_node_basename}-.*/
+    rv+=1
+  end
 end
 -%>
 <%= rv %>")
+
+# Settings for RabbitMQ on contrail controllers
+$rabbit=hiera('rabbit')
+$rabbit_password=$rabbit['password']
+
+# Returns array of ip addresses
+$rabbit_hosts =
+split(
+  inline_template("<%-
+    rv=Array.new
+    @nodes.each do |node|
+      if node['role'] =~ /^(primary-)?controller$/
+        rv << node['internal_address']
+      end
+    end
+  -%>
+  <%= rv.join(',') %>")
+, ',')
+$tmp_rabbit = join($rabbit_hosts,':5673,')
+$rabbit_hosts_ports = "${tmp_rabbit}:5673"
+
 
 }
