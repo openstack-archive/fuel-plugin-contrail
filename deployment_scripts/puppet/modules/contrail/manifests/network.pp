@@ -36,7 +36,7 @@ class contrail::network (
       exec {"ifup-${public_if}":
         command => "/sbin/ip link set up dev ${public_if}",
       }
-     }
+    }
     'compute':{
       file {'/etc/network/interfaces.d/ifcfg-vhost0':
         ensure => present,

@@ -21,22 +21,28 @@ wget -qO- "${NEUTRON_REPO_PATH}" | \
       tar -C "${MODULES}/contrail/files" --strip-components=3 -zxvf - \
       Juniper-contrail-neutron-plugin-3189155/neutron_plugin_contrail/plugins/opencontrail
 
-#
-# packages required for cassandra and zookeeper:
-deb_packages=('http://us.archive.ubuntu.com/ubuntu/pool/main/p/pcsc-lite/libpcsclite1_1.7.4-2ubuntu2_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/j/java-common/java-common_0.43ubuntu2_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/j/java-common/default-jre-headless_1.6-43ubuntu2_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates-java/ca-certificates-java_20110912ubuntu6_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/universe/c/commons-daemon/libcommons-daemon-java_1.0.8-1_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/universe/c/commons-daemon/jsvc_1.0.8-1_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/j/jline/libjline-java_1.0-1_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/universe/libj/libjna-java/libjna-java_3.2.7-4_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/a/apache-log4j1.2/liblog4j1.2-java_1.2.16-3ubuntu1_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/universe/n/netty/libnetty-java_3.2.6.Final-2_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/universe/libs/libslf4j-java/libslf4j-java_1.6.4-1_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/libx/libxml-commons-resolver1.1-java/libxml-commons-resolver1.1-java_1.2-7_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/x/xml-commons-external/libxml-commons-external-java_1.4.01-2_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/libx/libxerces2-java/libxerces2-java_2.11.0-4_all.deb')
+# from: deb http://en.archive.ubuntu.com/ubuntu/ trusty main universe multiverse
+deb_packages=('http://us.archive.ubuntu.com/ubuntu/pool/main/a/avahi/libavahi-common-data_0.6.31-4ubuntu1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/a/avahi/libavahi-common3_0.6.31-4ubuntu1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/a/avahi/libavahi-client3_0.6.31-4ubuntu1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/c/cups/libcups2_1.7.2-0ubuntu1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/libj/libjpeg-turbo/libjpeg-turbo8_1.3.0-0ubuntu2_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/l/lcms2/liblcms2-2_2.5-0ubuntu4_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/n/nspr/libnspr4_4.10.2-1ubuntu1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/n/nss/libnss3-nssdb_3.15.4-1ubuntu7_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/n/nss/libnss3_3.15.4-1ubuntu7_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/p/pcsc-lite/libpcsclite1_1.8.10-1ubuntu1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/o/openjdk-6/openjdk-6-jre-lib_6b31-1.13.3-1ubuntu1_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates-java/ca-certificates-java_20130815ubuntu1_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2014b-1_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata-java_2014b-1_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/j/java-common/java-common_0.51_all.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/libj/libjpeg8-empty/libjpeg8_8c-2ubuntu8_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/main/n/nss/libnss3-1d_3.15.4-1ubuntu7_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/o/openjdk-6/openjdk-6-jre-headless_6b31-1.13.3-1ubuntu1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/o/openjdk-6/icedtea-6-jre-cacao_6b31-1.13.3-1ubuntu1_amd64.deb'
+'http://us.archive.ubuntu.com/ubuntu/pool/universe/o/openjdk-6/icedtea-6-jre-jamvm_6b31-1.13.3-1ubuntu1_amd64.deb')
+
 
 for i in "${deb_packages[@]}"
 do
@@ -44,3 +50,7 @@ do
 	if [ ! -f $DEB_REPO$file ];
 	then wget -q $i -O $DEB_REPO$file; fi
 done
+
+
+
+

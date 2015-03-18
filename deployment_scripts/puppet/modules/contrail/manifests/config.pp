@@ -29,8 +29,8 @@ class contrail::config ( $node_role ) {
       }
 
       $ipv4_file = $operatingsystem ? {
-          "Ubuntu" => '/etc/iptables/rules.v4',
-          "CentOS" => '/etc/sysconfig/iptables',
+          'Ubuntu' => '/etc/iptables/rules.v4',
+          'CentOS' => '/etc/sysconfig/iptables',
       }
 
       exec {'flush_nat':
@@ -49,8 +49,8 @@ class contrail::config ( $node_role ) {
         action => 'accept'
       } ->
 
-      exec { "persist-firewall":
-        command     => "/sbin/iptables-save >> $ipv4_file",
+      exec { 'persist-firewall':
+        command     => "/sbin/iptables-save > ${ipv4_file}",
         user        => 'root',
       }
 

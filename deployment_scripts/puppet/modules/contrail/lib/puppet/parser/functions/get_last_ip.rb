@@ -17,7 +17,7 @@ EOS
     prefix=args[0].split('/')[1]
     netmask=IPAddr.new('255.255.255.255').mask(prefix)
     broadcast=cidr.|(netmask.~())
-    return broadcast.prev
+    return broadcast.prev.to_s
 
   end
 end

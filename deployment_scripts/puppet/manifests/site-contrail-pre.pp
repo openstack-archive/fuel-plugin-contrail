@@ -10,17 +10,17 @@ class { 'contrail::network':
   public_if       => $contrail::public_if
 } ->
 
-class { contrail::ssh:
+class { 'contrail::ssh':
   password_auth => 'yes',
 } ->
 # Workaround for contrail shipped tzdata-java package
 package { 'tzdata':
-  ensure  => '2014e-0ubuntu0.12.04'
+  ensure  => '2014i-0ubuntu0.14.04'
 } ->
-class { contrail::package:
+class { 'contrail::package':
   install        => ['python-crypto','python-netaddr','python-paramiko',
-                    'openjdk-6-jre-headless',
+                    'ifenslave-2.6','patch','openjdk-6-jre-headless',
                     'contrail-fabric-utils','contrail-setup'],
   pip_install    => ['ecdsa-0.10','Fabric-1.7.0'],
   responsefile   => 'contrail.preseed',
-} 
+}
