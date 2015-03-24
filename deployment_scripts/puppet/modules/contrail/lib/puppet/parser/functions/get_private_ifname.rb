@@ -14,7 +14,7 @@ newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
      end
 
    end
-        return ifname
+        return ifname.to_s
     end
 end
 
