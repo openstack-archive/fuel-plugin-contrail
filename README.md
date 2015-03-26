@@ -1,4 +1,8 @@
-contrail
+Contrail
 ============
+Mirantis Fuel Contrail plugin
 
-Plugin description
+Compatible versions:
+
+- Mirantis Fuel 6.1
+- Juniper Contrail 2.01

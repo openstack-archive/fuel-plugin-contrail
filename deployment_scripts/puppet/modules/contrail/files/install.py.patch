@@ -1,0 +1,13 @@
++++ /opt/contrail/utils/fabfile/tasks/install.py
+@@ -171,10 +171,7 @@
+                 run(cmd)
+
+ def yum_install(rpms, disablerepo = True):
+-    if disablerepo:
+-        cmd = "yum -y --nogpgcheck --disablerepo=* --enablerepo=contrail_install_repo install "
+-    else:
+-        cmd = "yum -y --nogpgcheck install "
++    cmd = "yum -y --nogpgcheck install "
+     os_type = detect_ostype()
+     # redhat platform installs from multiple repos
+     if os_type in ['redhat']:

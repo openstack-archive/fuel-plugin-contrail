@@ -38,7 +38,8 @@ if [ -f "$CENTOS_PKG" ];
     RPM=`mktemp -d`
     cd $RPM
     rpm2cpio $CENTOS_PKG | cpio -id
-    tar -xzvf $RPM/opt/contrail/contrail_packages/contrail_rpms.tgz -C $PLUGIN_PATH/repositories/centos/
+    mkdir -p $PLUGIN_PATH/repositories/centos/Packages
+    tar -xzvf $RPM/opt/contrail/contrail_packages/contrail_rpms.tgz -C $PLUGIN_PATH/repositories/centos/Packages/
     cd $PLUGIN_PATH/repositories/centos/
     createrepo .
   fi
