@@ -3,10 +3,21 @@ class contrail::setup (
   ) {
 
   if $node_name == $contrail::deployment_node {
-    file_line { 'disable_sslv3':
-      path => '/etc/java-7-openjdk/security/java.security',
-      line => 'jdk.tls.disabledAlgorithms=SSLv3',
+
+    $fixpath = $operatingsystem ? {
+      'Ubuntu' => '/usr/local/lib/python2.7/dist-packages/contrail_provisioning/config/quantum_in_keystone_setup.py',
+      'CentOS' => '/usr/lib/python2.6/site-packages/contrail_provisioning/config/quantum_in_keystone_setup.py'
+    }
+
+    file {'/tmp/install.py.patch':
+      ensure => file,
+      source => 'puppet:///modules/contrail/install.py.patch'
     } ->
+    exec {'install.py.patch':
+    command => '/usr/bin/patch /opt/contrail/utils/fabfile/tasks/install.py /tmp/install.py.patch',
+    returns => [0,1] # Idempotent behaviour
+    } ->
+
     file {'/tmp/ha.py.patch':
       ensure => file,
       source => 'puppet:///modules/contrail/ha.py.patch'
@@ -54,7 +65,7 @@ class contrail::setup (
     run_fabric { 'fixup_restart_haproxy_in_collector': } ->
     run_fabric { 'fix-service-tenant-name':
       hostgroup => 'control',
-      command   => "sed -i '49s/service/services/g' /usr/local/lib/python2.7/dist-packages/contrail_provisioning/config/quantum_in_keystone_setup.py",
+      command   => "sed -i '49s/service/services/g' ${fixpath}",
     } ->
     # Setting up the components
     run_fabric { 'setup_cfgm': } ->

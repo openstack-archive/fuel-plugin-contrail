@@ -10,7 +10,8 @@ class contrail::network (
 
   # Remove interface from the bridge
   exec {"remove_${ifname}":
-    command => "/sbin/brctl delif br-aux ${ifname}",
+    path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
+    command => "brctl delif br-aux ${ifname}",
     returns => [0,1] # Idempotent
   } ->
   file { '/etc/network/interfaces.d/ifcfg-br-aux':
@@ -38,9 +39,23 @@ class contrail::network (
       }
     }
     'compute':{
-      file {'/etc/network/interfaces.d/ifcfg-vhost0':
-        ensure => present,
-        content => template('contrail/ifcfg-vhost0.erb');
+      case $operatingsystem
+      {
+          Ubuntu:
+          {
+            file {'/etc/network/interfaces.d/ifcfg-vhost0':
+              ensure => present,
+              content => template('contrail/ubuntu-ifcfg-vhost0.erb');
+            }
+          }
+
+          CentOS:
+          {
+            file {'/etc/sysconfig/network-scripts/ifcfg-vhost0':
+              ensure => present,
+              content => template('contrail/ubuntu-ifcfg-vhost0.erb');
+            }
+          }
       }
     }
     default: { notify { "Node role ${node_role} not supported": } }
