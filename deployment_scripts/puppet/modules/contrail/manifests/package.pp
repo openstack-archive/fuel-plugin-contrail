@@ -1,26 +1,19 @@
 class contrail::package (
   $install,
   $remove = undef,
-  $responsefile = undef,
   $pip_install = undef,
   ) {
 
   if ($install) {
-    if ($responsefile) {
-      file { "/var/cache/debconf/${responsefile}":
+
+    if $operatingsystem == 'Ubuntu' {
+      file { '/etc/apt/preferences.d/contrail-pin-100':
         ensure => file,
-        source => "puppet:///modules/contrail/${responsefile}",
+        source => 'puppet:///modules/contrail/contrail-pin-100',
         before => Package[$install],
       }
-      Package {
-        responsefile => "/var/cache/debconf/${responsefile}",
-      }
     }
-    file { '/etc/apt/preferences.d/contrail-pin-100':
-      ensure => file,
-      source => 'puppet:///modules/contrail/contrail-pin-100',
-      before => Package[$install],
-    }
+
     package { $install:
       ensure  => present,
     }

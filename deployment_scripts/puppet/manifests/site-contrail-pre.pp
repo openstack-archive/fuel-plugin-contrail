@@ -1,5 +1,24 @@
 include contrail
 
+case $operatingsystem
+  {
+    Ubuntu:
+      {
+        $pkgs = ['python-crypto','python-netaddr','python-paramiko','ifenslave-2.6','patch',
+                  'openjdk-7-jre-headless','contrail-fabric-utils','contrail-setup']
+        $tzdata_ver = '2014i-0ubuntu0.14.04'
+        $pip_pkgs = ['ecdsa-0.10','Fabric-1.7.0']
+      }
+
+    CentOS:
+      {
+        $pkgs = ['python-netaddr','python-paramiko','patch',
+                  'java-1.7.0-openjdk','contrail-fabric-utils','contrail-setup']
+        $tzdata_ver = present
+        $pip_pkgs = ['Fabric-1.7.0']
+      }
+  }
+
 class { 'contrail::network':
   node_role       => 'base-os',
   address         => $contrail::address,
@@ -12,15 +31,13 @@ class { 'contrail::network':
 
 class { 'contrail::ssh':
   password_auth => 'yes',
+  root_login => 'yes'
 } ->
 # Workaround for contrail shipped tzdata-java package
 package { 'tzdata':
-  ensure  => '2014i-0ubuntu0.14.04'
+  ensure  => $tzdata_ver
 } ->
 class { 'contrail::package':
-  install        => ['python-crypto','python-netaddr','python-paramiko',
-                    'ifenslave-2.6','patch','openjdk-7-jre-headless',
-                    'contrail-fabric-utils','contrail-setup'],
-  pip_install    => ['ecdsa-0.10','Fabric-1.7.0'],
-  responsefile   => 'contrail.preseed',
+  install        => $pkgs,
+  pip_install    => $pip_pkgs
 }
