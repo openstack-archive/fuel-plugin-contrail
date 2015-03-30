@@ -9,44 +9,7 @@ ROOT="$(dirname `readlink -f $0`)"
 MODULES="${ROOT}"/deployment_scripts/puppet/modules
 mkdir -p "${MODULES}"
 FUEL_REPO_PATH='https://github.com/stackforge/fuel-library/tarball/f43d885914d74fbd062096763222f350f47480e1'
-NEUTRON_REPO_PATH='https://github.com/Juniper/contrail-neutron-plugin/tarball/3189155c572e95d4e5eb1b5cf65ee919c6082841'
-RPM_REPO="${ROOT}"/repositories/centos/
-DEB_REPO="${ROOT}"/repositories/ubuntu/
 
 wget -qO- "${FUEL_REPO_PATH}" | \
       tar -C "${MODULES}" --strip-components=3 -zxvf - \
       stackforge-fuel-library-f43d885/deployment/puppet/{inifile,stdlib}
-
-wget -qO- "${NEUTRON_REPO_PATH}" | \
-      tar -C "${MODULES}/contrail/files" --strip-components=3 -zxvf - \
-      Juniper-contrail-neutron-plugin-3189155/neutron_plugin_contrail/plugins/opencontrail
-
-# from: deb http://en.archive.ubuntu.com/ubuntu/ trusty main universe multiverse
-deb_packages=('http://us.archive.ubuntu.com/ubuntu/pool/main/a/avahi/libavahi-common-data_0.6.31-4ubuntu1_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/a/avahi/libavahi-common3_0.6.31-4ubuntu1_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/a/avahi/libavahi-client3_0.6.31-4ubuntu1_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/c/cups/libcups2_1.7.2-0ubuntu1_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/libj/libjpeg-turbo/libjpeg-turbo8_1.3.0-0ubuntu2_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/l/lcms2/liblcms2-2_2.5-0ubuntu4_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/n/nspr/libnspr4_4.10.2-1ubuntu1_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/n/nss/libnss3-nssdb_3.15.4-1ubuntu7_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/n/nss/libnss3_3.15.4-1ubuntu7_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/p/pcsc-lite/libpcsclite1_1.8.10-1ubuntu1_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates-java/ca-certificates-java_20130815ubuntu1_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata_2014b-1_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/t/tzdata/tzdata-java_2014b-1_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/j/java-common/java-common_0.51_all.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/libj/libjpeg8-empty/libjpeg8_8c-2ubuntu8_amd64.deb'
-'http://us.archive.ubuntu.com/ubuntu/pool/main/n/nss/libnss3-1d_3.15.4-1ubuntu7_amd64.deb'
-'http://en.archive.ubuntu.com/ubuntu/pool/main/o/openjdk-7/openjdk-7-jre-headless_7u51-2.4.6-1ubuntu4_amd64.deb'
-'http://en.archive.ubuntu.com/ubuntu/pool/main/o/openjdk-7/openjdk-7-jre_7u51-2.4.6-1ubuntu4_amd64.deb'
-'http://en.archive.ubuntu.com/ubuntu/pool/main/o/openjdk-7/icedtea-7-jre-jamvm_7u51-2.4.6-1ubuntu4_amd64.deb')
-
-
-for i in "${deb_packages[@]}"
-do
-	file=`echo $i | awk -F '/' '{print $NF}'`
-	if [ ! -f $DEB_REPO$file ];
-	then wget -q $i -O $DEB_REPO$file; fi
-done
-
