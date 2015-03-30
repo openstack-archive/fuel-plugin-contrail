@@ -62,13 +62,6 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 - role: ['primary-controller','controller']
-  stage: pre_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/site-controller-pre.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
-- role: ['primary-controller','controller']
   stage: post_deployment
   type: puppet
   parameters:
