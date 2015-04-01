@@ -8,4 +8,5 @@ deployment_scripts/puppet/modules/stdlib
 deployment_scripts/puppet/modules/contrail/files/opencontrail
 build.sh
 *.fp
+*.rpm
 
