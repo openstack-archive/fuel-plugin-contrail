@@ -1,6 +1,6 @@
 attributes:
   contrail_asnum:
-    value: '65412'
+    value: '64512'
     label: 'AS Number'
     description: 'AS number for BGP communication'
     weight: 10
@@ -9,7 +9,7 @@ attributes:
       source: '\S'
       error: "Error field cannot be empty"
   contrail_private_cidr:
-    value: '192.168.150.0/24'
+    value: '10.109.3.0/24'
     label: 'Private network CIDR'
     description: 'CIDR for private network used in Contrail inter-node communication'
     weight: 20
@@ -18,7 +18,7 @@ attributes:
       source: '\S'
       error: "Error field cannot be empty"
   contrail_private_start:
-    value: '192.168.150.5'
+    value: '10.109.3.5'
     label: 'Private IP range start'
     description: 'First IP address of contrail private network. NOTE: First one will be used as VIP address for controller HA'
     weight: 30
@@ -27,7 +27,7 @@ attributes:
       source: '\S'
       error: "Error field cannot be empty"
   contrail_private_end:
-    value: '192.168.150.254'
+    value: '10.109.3.254'
     label: 'Private IP range end'
     description: 'Last IP address of contrail private network'
     weight: 40
@@ -36,7 +36,7 @@ attributes:
       source: '\S'
       error: "Error field cannot be empty"
   contrail_gateways:
-    value: '192.168.150.1,192.168.150.2'
+    value: '10.109.3.1,10.109.3.2'
     label: 'GW IP'
     description: 'Comma separated IP addresses of gateways'
     weight: 50
