@@ -12,7 +12,7 @@
 
 set -ex
 
-PLUGIN_PATH="/var/www/nailgun/plugins/contrail-1.0.0"
+PLUGIN_PATH="/var/www/nailgun/plugins/contrail-1.0"
 UBUNTU_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.deb'`
 CENTOS_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm'`
 

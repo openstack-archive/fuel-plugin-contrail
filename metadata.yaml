@@ -3,6 +3,7 @@ name: contrail
 # Human-readable name for your plugin
 title: Fuel Contrail plugin
 # Plugin version
+#version: 1.0.0
 version: 1.0.0
 # Description
 description: Enable to use Contrail plugin
@@ -23,4 +24,8 @@ releases:
     repository_path: repositories/centos
 
 # Version of plugin package
-package_version: '1.0.0'
+package_version: '2.0.0'
+licenses: ['Apache 2.0']
+authors: ['Vyacheslav Struk, Mirantis', 'Oleksandr Martsyniuk, Mirantis']
+homepage: https://github.com/stackforge/fuel-plugin-contrail
+groups: ['network']
