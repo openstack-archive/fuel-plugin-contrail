@@ -82,12 +82,10 @@
     puppet_manifest: puppet/manifests/site-compute-post.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-# TODO: Use "type: reboot" when new plugin sdk will be released.
 - role: ['compute']
   stage: post_deployment
-  type: shell
+  type: reboot 
   parameters:
-    cmd: '/sbin/reboot'
     timeout: 720
 - role: ['base-os']
   stage: post_deployment

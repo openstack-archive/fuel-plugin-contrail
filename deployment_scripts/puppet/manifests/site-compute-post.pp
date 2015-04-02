@@ -12,7 +12,7 @@ case $operatingsystem {
     } ->
 
     class { 'contrail::package':
-      install => ['contrail-openstack-vrouter','iproute2','haproxy','libatm1'],
+      install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
       remove  => ['openvswitch-common','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
       }
 
