@@ -4,13 +4,6 @@ include contrail
 case $operatingsystem {
   Ubuntu: {
 
-    apt::source { 'contrail-from-fuel-master':
-      location    => "http://${contrail::master_ip}:8080/plugins/contrail-${contrail::plugin_version}/repositories/ubuntu/",
-      release     => '',
-      repos       => '/',
-      include_src => false,
-    } ->
-
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
       remove  => ['openvswitch-common','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],

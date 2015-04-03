@@ -16,6 +16,7 @@ case $operatingsystem
         ->
         exec {'add_default_gw':
             command => "/sbin/ip route add default via ${contrail::master_ip}",
+            before  => Class['Contrail::Package'],
         }
         #####################################
       }
@@ -45,6 +46,4 @@ class { 'contrail::ssh':
 class { 'contrail::package':
   install        => $pkgs,
   pip_install    => $pip_pkgs,
-  require         => Exec['add_default_gw']
-
 }
