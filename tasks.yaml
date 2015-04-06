@@ -39,7 +39,7 @@
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post1.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 1440
 - role: ['base-os']
   stage: post_deployment
   type: puppet
