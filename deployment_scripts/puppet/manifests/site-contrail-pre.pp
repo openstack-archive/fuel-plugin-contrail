@@ -35,8 +35,9 @@ class { 'contrail::network':
   ifname          => $contrail::ifname,
   netmask         => $contrail::netmask_short,
   public_addr     => $contrail::public_addr,
-  public_netmask  => $contrail::public_prefix,
-  public_if       => $contrail::public_if
+  public_netmask  => $contrail::public_netmask,
+  public_if       => $contrail::public_if,
+  public_gw       => $contrail::public_gw
 } ->
 
 class { 'contrail::ssh':
