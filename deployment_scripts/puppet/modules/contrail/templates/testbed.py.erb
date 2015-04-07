@@ -23,7 +23,7 @@ case node['role']
     role_os << 'os_ctrl_'+mgm_ip.count.to_s
   when 'base-os'
     priv_ip << scope.function_get_ip_from_range([ scope.lookupvar('contrail::private_first'),scope.lookupvar('contrail::private_last'),scope.lookupvar('contrail::netmask_short'),node['uid'],'first'])
-    public_ip_baseos << scope.function_get_ip_from_range([ scope.lookupvar('contrail::public_first'),scope.lookupvar('contrail::public_last'),scope.lookupvar('contrail::public_prefix'),node['uid'],'last'])
+    public_ip_baseos << scope.function_get_ip_from_range([ scope.lookupvar('contrail::public_first'),scope.lookupvar('contrail::public_last'),scope.lookupvar('contrail::public_netmask'),node['uid'],'last'])
     mgm_ip_baseos << node['internal_address']
     # Also find out a deployment node
     if node['user_node_name'] == scope.lookupvar('contrail::deployment_node')
