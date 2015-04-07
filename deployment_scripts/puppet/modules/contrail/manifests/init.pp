@@ -44,8 +44,11 @@ $public_prefix=$public_tmp[1] # netmask prefix here
 $public_addr=get_ip_from_range($public_first,$public_last,$public_prefix,$uid,'last')
 
 $public_if=$settings['contrail_public_if']
+$public_gw=$neutron_settings['predefined_networks']['net04_ext']['L3']['gateway']
 
 $contrail_mgmt_vip=get_last_ip(get_network_role_property('management', 'cidr'))
+
+$metadata_secret=$neutron_settings['metadata']['metadata_proxy_shared_secret']
 
 $contrail_node_basename='contrail'
 $deployment_node="${contrail_node_basename}-1"
