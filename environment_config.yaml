@@ -53,3 +53,12 @@ attributes:
     regex:
       source: '\S'
       error: "Error field cannot be empty"
+  contrail_private_if:
+    value: ''
+    label: 'Private interface'
+    description: 'Interface must match to Nodes->Configure interfaces->Private'
+    weight: 60
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
