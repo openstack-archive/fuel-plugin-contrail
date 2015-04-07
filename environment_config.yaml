@@ -53,3 +53,21 @@ attributes:
     regex:
       source: '\S'
       error: "Error field cannot be empty"
+  contrail_public_start:
+    value: ''
+    label: 'Contrail Public IP range start'
+    description: 'First IP address of contrail public network'
+    weight: 30
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"
+  contrail_public_end:
+    value: ''
+    label: 'Contrail Public IP range end'
+    description: 'Last IP address of contrail public network. NOTE: Last one will be used as VIP address for Contrail UI'
+    weight: 40
+    type: "text"
+    regex:
+      source: '\S'
+      error: "Error field cannot be empty"

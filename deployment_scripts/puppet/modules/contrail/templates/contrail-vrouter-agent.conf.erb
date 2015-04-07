@@ -12,6 +12,7 @@ max_control_nodes=2
 type=kvm
 [FLOWS]
 [METADATA]
+metadata_proxy_secret=<%= scope.lookupvar('contrail::metadata_secret') %>
 [NETWORKS]
 control_network_ip=<%= scope.lookupvar('contrail::address') %>
 [VIRTUAL-HOST-INTERFACE]
