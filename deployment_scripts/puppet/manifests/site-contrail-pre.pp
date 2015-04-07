@@ -7,20 +7,7 @@ case $operatingsystem
         $pkgs = ['python-crypto','python-netaddr','python-paramiko','ifenslave-2.6','patch',
                   'openjdk-7-jre-headless','contrail-fabric-utils','contrail-setup']
         $pip_pkgs = ['ecdsa-0.10','Fabric-1.7.0']
-
-        #####################################
-        # Workaround for fuel bug 1438127
-        exec {'remove_default_gw':
-            command => '/sbin/ip route del default',
         }
-        ->
-        exec {'add_default_gw':
-            command => "/sbin/ip route add default via ${contrail::master_ip}",
-            before  => Class['Contrail::Package'],
-        }
-        #####################################
-      }
-
     CentOS:
       {
         $pkgs = ['python-netaddr','python-paramiko','patch',
@@ -35,8 +22,9 @@ class { 'contrail::network':
   ifname          => $contrail::ifname,
   netmask         => $contrail::netmask_short,
   public_addr     => $contrail::public_addr,
-  public_netmask  => $contrail::public_prefix,
-  public_if       => $contrail::public_if
+  public_netmask  => $contrail::public_netmask,
+  public_if       => $contrail::public_if,
+  public_gw       => $contrail::public_gw
 } ->
 
 class { 'contrail::ssh':

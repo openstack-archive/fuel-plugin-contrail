@@ -5,12 +5,16 @@ class contrail::network (
   $netmask,
   $public_addr = undef,
   $public_netmask = undef,
-  $public_if = undef
+  $public_if = undef,
+  $public_gw = undef
   ) {
+
+  Exec {
+    path => '/bin:/sbin:/usr/bin:/usr/sbin',
+  }
 
   # Remove interface from the bridge
   exec {"remove_${ifname}":
-    path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
     command => "brctl delif br-aux ${ifname}",
     returns => [0,1] # Idempotent
   } ->
@@ -31,11 +35,20 @@ class contrail::network (
         l23network::l3::ifconfig {$public_if:
           interface => $public_if,
           ipaddr    => "${public_addr}/${public_netmask}",
+          before    => Exec["ifup-${public_if}"],
         }
       }
       # l23network::l3::ifconfig does not brings the interface up. Bug? Check it later
       exec {"ifup-${public_if}":
-        command => "/sbin/ip link set up dev ${public_if}",
+        command => "ip link set up dev ${public_if}",
+      } ->
+      exec {'remove_default_gw':
+          command => '/sbin/ip route del default',
+          returns => [0,2] # Idempotent
+      } ->
+      # contrail controllers must be available from outer nets
+      exec {"add-default-route-via-${public_gw}":
+        command => "ip route add default via ${public_gw}",
       }
     }
     'compute':{
