@@ -38,7 +38,7 @@ class contrail::config ( $node_role ) {
       } ->
 
       firewall {'0000 metadata service':
-        source  => '168.254.0.0/16',
+        source  => '169.254.0.0/16',
         iniface => 'vhost0',
         action  => 'accept'
       } ->
