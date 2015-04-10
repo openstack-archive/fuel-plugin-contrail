@@ -1,5 +1,7 @@
 include contrail
 
+if $contrail::node_name =~ /^contrail.\d+$/ {
+
 case $operatingsystem
   {
     Ubuntu:
@@ -34,4 +36,6 @@ class { 'contrail::ssh':
 class { 'contrail::package':
   install        => $pkgs,
   pip_install    => $pip_pkgs,
+}
+
 }
