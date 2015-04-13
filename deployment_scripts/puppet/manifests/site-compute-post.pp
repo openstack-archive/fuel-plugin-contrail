@@ -11,10 +11,10 @@ case $operatingsystem {
 
   }
   CentOS: {
-
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','iproute','haproxy'],
       }
+    service {'supervisord': enable => true}
   }
 }
 
