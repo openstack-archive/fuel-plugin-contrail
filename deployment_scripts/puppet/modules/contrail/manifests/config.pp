@@ -14,6 +14,12 @@ class contrail::config ( $node_role ) {
         'DEFAULT/security_group_api': value=> 'neutron';
         'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
       }
+
+      file {'/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg':
+        ensure  => present,
+        content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
+      }
+
     }
     'compute': {
       nova_config {
@@ -75,7 +81,7 @@ class contrail::config ( $node_role ) {
           path    => '/etc/contrail/contrail-api.conf',
           section => 'DEFAULTS',
           setting => 'rabbit_server',
-          value   => $contrail::rabbit_hosts[0]  # Using first rabbitmq in list. TODO. Make a VIP,w/o proxying. (RMQ VIP does not exists for now). Contrail does not support a server list.
+          value   => $contrail::mos_mgmt_vip
       } ->
       ini_setting { 'contrail_rabbit_port':
           ensure  => present,
@@ -135,10 +141,6 @@ class contrail::config ( $node_role ) {
           setting => 'rabbit_password',
           value   => $contrail::rabbit_password
       }
-
     }
-
-
-
   }
 }

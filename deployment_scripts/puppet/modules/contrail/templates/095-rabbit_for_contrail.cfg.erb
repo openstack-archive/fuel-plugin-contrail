@@ -1,0 +1,18 @@
+listen rabbit
+  bind <%= scope.function_hiera(['management_vip']) %>:5673
+  mode tcp
+  balance leastconn # The server with the lowest number of connections receives the connection.
+
+<%-
+nodes=scope.function_hiera(['nodes'])
+nodes.each do |node|
+  case node['role']
+    when /^(primary-)?controller$/
+-%>
+  server <%= node['name'] %> <%= node['internal_address']%>:5673   check inter 10s fastinter 2s downinter 3s rise 3 fall 3
+<%- end
+end
+-%>
+
+
+
