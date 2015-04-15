@@ -18,6 +18,15 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
         }
     }
 
+  # Copied from osnailyfacter/modular/netconfig/netconfig.pp
+  $network_scheme = hiera('network_scheme')
+  prepare_network_config($network_scheme)
+  $sdn = generate_network_config()
+  class { 'l23network' :
+    use_ovs => hiera('use_neutron', false)
+  } ->
+  notify {"SDN: ${sdn}": } ->
+
   class { 'contrail::network':
     node_role       => 'base-os',
     address         => $contrail::address,
