@@ -13,7 +13,15 @@ case $operatingsystem {
   CentOS: {
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','iproute','haproxy'],
+      remove  => ['kmod-openvswitch']
       }
+    ->
+    file { '/etc/supervisord.conf':
+      ensure => 'link',
+      target => '/etc/contrail/supervisord_vrouter.conf',
+      force  => yes
+    }
+    ->
     service {'supervisord': enable => true}
   }
 }
