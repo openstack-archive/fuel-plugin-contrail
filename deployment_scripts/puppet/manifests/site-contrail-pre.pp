@@ -1,5 +1,7 @@
 include contrail
 
+Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin'}
+
 if $contrail::node_name =~ /^contrail.\d+$/ {
 
   case $operatingsystem

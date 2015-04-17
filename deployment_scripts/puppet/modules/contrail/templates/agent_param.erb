@@ -9,3 +9,7 @@ dev=<%= scope.function_get_private_ifname([]) %>
 vgw_subnet_ip=__VGW_SUBNET_IP__
 vgw_intf=__VGW_INTF_LIST__
 LOGFILE=--log-file=/var/log/contrail/vrouter.log
+<%- if scope.lookupvar('operatingsystem') ==  'CentOS' then -%>
+VHOST_CFG=<%= '/etc/sysconfig/network-scripts/ifcfg-vhost0' %>
+kmod=/lib/modules/<%= scope.lookupvar('kernelrelease') %>/extra/net/vrouter/vrouter.ko
+<%- end -%>
