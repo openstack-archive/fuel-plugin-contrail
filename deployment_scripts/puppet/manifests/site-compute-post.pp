@@ -11,10 +11,24 @@ case $operatingsystem {
 
   }
   CentOS: {
+    class { 'contrail::vrouter_module':}
+    ->
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','iproute','haproxy'],
-      }
-    service {'supervisord': enable => true}
+      remove  => ['openvswitch','openstack-neutron-openvswitch']
+    }
+    ->
+    file { '/etc/supervisord.conf':
+      ensure => 'link',
+      target => '/etc/contrail/supervisord_vrouter.conf',
+      force  => yes
+    }
+    ->
+    file {'/etc/contrail/default_pmac':
+              ensure => present
+    }
+    ->
+    service {'supervisor-vrouter': enable => true}
   }
 }
 
