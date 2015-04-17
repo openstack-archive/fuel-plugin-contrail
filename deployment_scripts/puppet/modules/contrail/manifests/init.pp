@@ -83,5 +83,9 @@ split(
 $tmp_rabbit = join($rabbit_hosts,':5673,')
 $rabbit_hosts_ports = "${tmp_rabbit}:5673"
 
+Exec {
+  path => '/bin:/sbin:/usr/bin:/usr/sbin',
+}
+
 
 }
