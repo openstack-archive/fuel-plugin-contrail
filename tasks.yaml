@@ -4,11 +4,11 @@
 # cinder and compute nodes
 #
 #####################################
-- role: ['primary-controller','controller']
+- role: '*'
   stage: pre_deployment
   type: puppet
   parameters:
-    puppet_manifest: puppet/manifests/site-controller-pre.pp
+    puppet_manifest: puppet/manifests/site-common-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 # In case of base-os Hiera must be deployed manually

@@ -8,9 +8,9 @@ class contrail::network (
   $public_if = undef,
   $public_gw = undef
   ) {
-
-  Exec {
-    path => '/bin:/sbin:/usr/bin:/usr/sbin',
+  $br_aux_file = $operatingsystem ? {
+      'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-aux',
+      'CentOS' => ['/etc/sysconfig/network-scripts/ifcfg-br-aux',"/etc/sysconfig/network-scripts/ifcfg-${ifname}"],
   }
 
   # Remove interface from the bridge
@@ -18,9 +18,8 @@ class contrail::network (
     command => "brctl delif br-aux ${ifname}",
     returns => [0,1] # Idempotent
   } ->
-  file { '/etc/network/interfaces.d/ifcfg-br-aux':
-    ensure => absent,
-  } ->
+  file { $br_aux_file: ensure => absent }
+  ->
 
   case $node_role {
     'base-os':{

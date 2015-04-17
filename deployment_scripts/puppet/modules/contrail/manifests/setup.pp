@@ -1,12 +1,11 @@
 class contrail::setup (
   $node_name
   ) {
-
   if $node_name == $contrail::deployment_node {
 
-    $fixpath = $operatingsystem ? {
-      'Ubuntu' => '/usr/local/lib/python2.7/dist-packages/contrail_provisioning/config/quantum_in_keystone_setup.py',
-      'CentOS' => '/usr/lib/python2.6/site-packages/contrail_provisioning/config/quantum_in_keystone_setup.py'
+    $pythonpath = $operatingsystem ? {
+      'Ubuntu' => '/usr/local/lib/python2.7/dist-packages',
+      'CentOS' => '/usr/lib/python2.6/site-packages'
     }
 
     file {'/tmp/install.py.patch':
@@ -14,8 +13,7 @@ class contrail::setup (
       source => 'puppet:///modules/contrail/install.py.patch'
     } ->
     exec {'install.py.patch':
-    command => '/usr/bin/patch /opt/contrail/utils/fabfile/tasks/install.py /tmp/install.py.patch',
-    returns => [0,1] # Idempotent behaviour
+    command => 'patch /opt/contrail/utils/fabfile/tasks/install.py /tmp/install.py.patch',
     } ->
 
     file {'/tmp/ha.py.patch':
@@ -23,8 +21,7 @@ class contrail::setup (
       source => 'puppet:///modules/contrail/ha.py.patch'
     } ->
     exec {'ha.py.patch':
-    command => '/usr/bin/patch /opt/contrail/utils/fabfile/tasks/ha.py /tmp/ha.py.patch',
-    returns => [0,1] # Idempotent behaviour
+    command => 'patch /opt/contrail/utils/fabfile/tasks/ha.py /tmp/ha.py.patch',
     } ->
 
     file {'/tmp/keepalived_conf_template.py.patch':
@@ -32,8 +29,7 @@ class contrail::setup (
       source => 'puppet:///modules/contrail/keepalived_conf_template.py.patch'
     } ->
     exec {'keepalived_conf_template.py.patch':
-    command => '/usr/bin/patch /usr/local/lib/python2.7/dist-packages/contrail_provisioning/common/templates/keepalived_conf_template.py /tmp/keepalived_conf_template.py.patch',
-    returns => [0,1] # Idempotent behaviour
+      command => "patch ${pythonpath}/contrail_provisioning/common/templates/keepalived_conf_template.py /tmp/keepalived_conf_template.py.patch",
     } ->
 
     file {'/tmp/provision.py.patch':
@@ -41,8 +37,7 @@ class contrail::setup (
       source => 'puppet:///modules/contrail/provision.py.patch'
     } ->
     exec {'provision.py.patch':
-    command => '/usr/bin/patch /opt/contrail/utils/fabfile/tasks/provision.py /tmp/provision.py.patch',
-    returns => [0,1] # Idempotent behaviour
+    command => 'patch /opt/contrail/utils/fabfile/tasks/provision.py /tmp/provision.py.patch',
     } ->
 
     # Database installation
@@ -51,7 +46,7 @@ class contrail::setup (
       notify{"Waiting for cassandra nodes: ${contrail::contrail_node_num}":} ->
       exec {'wait_for_cassandra':
         provider  => 'shell',
-        command   => "if [ `/usr/bin/nodetool status|grep ^UN|wc -l` -lt ${contrail::contrail_node_num} ]; then exit 1; fi",
+        command   => "if [ `nodetool status|grep ^UN|wc -l` -lt ${contrail::contrail_node_num} ]; then exit 1; fi",
         tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
         try_sleep => 30,
       } ->
@@ -65,7 +60,7 @@ class contrail::setup (
     run_fabric { 'fixup_restart_haproxy_in_collector': } ->
     run_fabric { 'fix-service-tenant-name':
       hostgroup => 'control',
-      command   => "sed -i '49s/service/services/g' ${fixpath}",
+      command   => "sed -i '49s/service/services/g' ${pythonpath}/contrail_provisioning/config/quantum_in_keystone_setup.py",
     } ->
     # Setting up the components
     run_fabric { 'setup_cfgm': } ->
