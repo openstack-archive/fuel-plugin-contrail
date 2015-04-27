@@ -1,7 +1,14 @@
 listen rabbit
   bind <%= scope.function_hiera(['management_vip']) %>:5673
   mode tcp
-  balance leastconn # The server with the lowest number of connections receives the connection.
+  option tcplog
+  balance roundrobin
+  option redispatch
+  timeout connect 5000
+  timeout client 24h
+  timeout server 24h
+  option tcpka
+  retries 3
 
 <%-
 nodes=scope.function_hiera(['nodes'])
