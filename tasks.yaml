@@ -25,13 +25,20 @@
   parameters:
     cmd: ln -s /etc/base-os.yaml /etc/astute.yaml
     timeout: 30
-# Config default network, first of all
+# In case of base-os globals.yaml must be created 
 - role: ['base-os']
   stage: pre_deployment
   type: puppet
   parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/globals/globals.pp
     puppet_modules: /etc/puppet/modules
+    timeout: 720
+# Config default network, first of all
+- role: ['base-os']
+  stage: pre_deployment
+  type: shell
+  parameters:
+    cmd: if hiera user_node_name | egrep '^contrail-[0-9]'; then puppet apply /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp; fi
     timeout: 720
 - role: ['base-os']
   stage: pre_deployment
