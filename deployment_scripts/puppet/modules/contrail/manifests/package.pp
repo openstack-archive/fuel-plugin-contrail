@@ -4,15 +4,15 @@ class contrail::package (
   $pip_install = undef,
   ) {
 
-  if ($install) {
-
-    if $operatingsystem == 'Ubuntu' {
-      file { '/etc/apt/preferences.d/contrail-pin-100':
-        ensure => file,
-        source => 'puppet:///modules/contrail/contrail-pin-100',
-        before => Package[$install],
-      }
+  # A helper to run pip
+  define exec_pip ( $path ){
+    exec { "Install-pip-package-${name}":
+      path    => '/usr/local/bin/:/usr/bin:/bin',
+      command => "pip install --upgrade --no-deps --index-url='' ${path}/${name}.tar.gz",
     }
+  }
+
+  if ($install) {
 
     package { $install:
       ensure  => present,
