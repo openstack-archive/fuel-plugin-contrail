@@ -10,8 +10,8 @@ class contrail::service ( $node_role ) {
     }
     'controller','primary-controller': {
       $services = $operatingsystem ? {
-        'Ubuntu' => ['nova-api','nova-scheduler','nova-conductor','haproxy'],
-        'CentOS' => ['openstack-nova-api','openstack-nova-scheduler','openstack-nova-conductor','haproxy'],
+        'Ubuntu' => ['nova-api','nova-scheduler','nova-conductor'],
+        'CentOS' => ['openstack-nova-api','openstack-nova-scheduler','openstack-nova-conductor'],
         default  => undef,
       }
     }

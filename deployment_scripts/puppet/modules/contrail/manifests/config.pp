@@ -18,6 +18,12 @@ class contrail::config ( $node_role ) {
       file {'/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg':
         ensure  => present,
         content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
+      } ~>
+
+      service {'haproxy':
+        ensure     => running,
+        hasrestart => true,
+        restart    => '/sbin/ip netns exec haproxy service haproxy reload',
       }
 
     }
