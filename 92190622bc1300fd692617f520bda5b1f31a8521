@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Code-Review+2: Vyacheslav Struk <vstruk@mirantis.com>
+Workflow+1: Vyacheslav Struk <vstruk@mirantis.com>
+Submitted-by: Jenkins
+Submitted-at: Wed, 06 May 2015 12:15:53 +0000
+Reviewed-on: https://review.openstack.org/180165
+Project: stackforge/fuel-plugin-contrail
+Branch: refs/heads/master
