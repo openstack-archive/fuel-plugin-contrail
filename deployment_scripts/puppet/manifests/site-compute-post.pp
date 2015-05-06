@@ -1,5 +1,6 @@
 include contrail
 
+Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH'}
 
 case $operatingsystem {
   Ubuntu: {
@@ -12,9 +13,23 @@ case $operatingsystem {
   }
   CentOS: {
     class { 'contrail::package':
-      install => ['contrail-openstack-vrouter','iproute','haproxy'],
-      }
-    service {'supervisord': enable => true}
+      install => ['contrail-openstack-vrouter','iproute','haproxy','patch'],
+      remove  => ['openvswitch','openstack-neutron-openvswitch']
+    }
+    ->
+    class { 'contrail::vrouter_module':}
+    ->
+    file { '/etc/supervisord.conf':
+      ensure => 'link',
+      target => '/etc/contrail/supervisord_vrouter.conf',
+      force  => yes
+    }
+    ->
+    file {'/etc/contrail/default_pmac':
+              ensure => present
+    }
+    ->
+    service {'supervisor-vrouter': enable => true}
   }
 }
 
