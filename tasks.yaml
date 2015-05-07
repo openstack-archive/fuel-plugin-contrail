@@ -91,9 +91,8 @@
     timeout: 720
 - role: ['compute']
   stage: post_deployment
-  type: shell
+  type: reboot
   parameters:
-    cmd: /sbin/reboot
     timeout: 720
 - role: ['base-os']
   stage: post_deployment
