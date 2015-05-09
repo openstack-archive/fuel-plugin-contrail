@@ -13,7 +13,7 @@
 #    under the License.
 
 include contrail
-
+$node_role = 'base-os'
 Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin'}
 
 if $contrail::node_name =~ /^contrail.\d+$/ {
@@ -35,14 +35,14 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
     }
 
   class { 'contrail::network':
-    node_role       => 'base-os',
+    node_role       => $node_role,
     address         => $contrail::address,
     ifname          => $contrail::ifname,
     netmask         => $contrail::netmask_short,
     public_addr     => $contrail::public_addr,
     public_netmask  => $contrail::public_netmask,
     public_if       => $contrail::public_if,
-    public_gw       => $contrail::public_gw
+    public_gw       => $contrail::public_gw,
   } ->
 
   class { 'contrail::ssh':

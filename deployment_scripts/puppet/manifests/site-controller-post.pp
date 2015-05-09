@@ -13,12 +13,13 @@
 #    under the License.
 
 include contrail
+$node_role = 'controller'
 class { 'contrail::config':
-  node_role => $contrail::node_role,
+  node_role => $node_role,
 } ~>
 class { 'contrail::service':
-  node_role => $contrail::node_role,
+  node_role => $node_role,
 } ->
 class {'contrail::provision':
-  node_role => $contrail::node_role,
+  node_role => $node_role,
 }

@@ -13,8 +13,15 @@
 #    under the License.
 
 include contrail
-
+$node_role = 'compute'
 Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH'}
+
+class { 'contrail::network':
+  node_role => $node_role,
+  address   => $contrail::address,
+  ifname    => $contrail::ifname,
+  netmask   => $contrail::netmask_short,
+} ->
 
 case $operatingsystem {
   Ubuntu: {
@@ -28,7 +35,7 @@ case $operatingsystem {
   CentOS: {
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','iproute','haproxy','patch'],
-      remove  => ['openvswitch','openstack-neutron-openvswitch']
+      remove  => ['openvswitch','openstack-neutron-openvswitch'],
     }
     ->
     class { 'contrail::vrouter_module':}
@@ -36,29 +43,21 @@ case $operatingsystem {
     file { '/etc/supervisord.conf':
       ensure => 'link',
       target => '/etc/contrail/supervisord_vrouter.conf',
-      force  => yes
+      force  => 'yes',
     }
     ->
     file {'/etc/contrail/default_pmac':
-              ensure => present
+              ensure => present,
     }
     ->
     service {'supervisor-vrouter': enable => true}
   }
-}
-
-class { 'contrail::network':
-  node_role => 'compute',
-  address   => $contrail::address,
-  ifname    => $contrail::ifname,
-  netmask   => $contrail::netmask_short,
-  require   => Class['contrail::package']
 } ->
 
 class { 'contrail::config':
-  node_role => $contrail::node_role,
+  node_role => $node_role,
 } ->
 
 class { 'contrail::provision':
-  node_role => $contrail::node_role,
+  node_role => $node_role,
 }
