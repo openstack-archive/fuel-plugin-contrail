@@ -29,7 +29,7 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
       CentOS:
         {
           $pkgs = ['python-netaddr','python-paramiko','patch',
-                  'java-1.7.0-openjdk','contrail-fabric-utils','contrail-setup']
+                  'java-1.7.0-openjdk','contrail-fabric-utils','contrail-setup','kernel-devel']
           $pip_pkgs = ['Fabric-1.7.0']
         }
     }
