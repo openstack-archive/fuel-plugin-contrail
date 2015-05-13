@@ -34,7 +34,7 @@ case $operatingsystem {
   }
   CentOS: {
     class { 'contrail::package':
-      install => ['contrail-openstack-vrouter','iproute','haproxy','patch'],
+      install => ['contrail-openstack-vrouter','iproute','haproxy','patch','kernel-devel'],
       remove  => ['openvswitch','openstack-neutron-openvswitch'],
     }
     ->
