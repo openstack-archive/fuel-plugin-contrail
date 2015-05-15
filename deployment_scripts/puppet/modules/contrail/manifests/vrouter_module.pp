@@ -13,8 +13,8 @@
 #    under the License.
 
 class contrail::vrouter_module () {
-  package {['contrail-vrouter-source','dkms']:
-    ensure          => present,
+  package {['contrail-vrouter-source','dkms','kernel-devel']:
+    ensure => present,
     install_options => ['nogpgcheck'] # dkms package it not signed yet
   }
   ->
@@ -35,7 +35,7 @@ class contrail::vrouter_module () {
 
   file {'/usr/src/vrouter-2.01/dkms.conf':
     ensure => file,
-    source => 'puppet:///modules/contrail/dkms.conf'
+    source => 'puppet:///modules/contrail/dkms.conf',
   }
   ->
 
@@ -43,9 +43,13 @@ class contrail::vrouter_module () {
     command => 'patch /usr/src/vrouter-2.01/include/vr_compat.h /tmp/vrouter.patch',
   }
   ->
-
+  exec {'add_module':
+    command => 'dkms add vrouter/2.01',
+    unless  => "dkms status vrouter/2.01 | grep -E 'added|installed' 2>/dev/null",
+  }
+  ->
   exec {'build_install_module':
-    command => 'dkms add vrouter/2.01 && dkms build vrouter/2.01 && dkms install vrouter/2.01',
+    command => 'dkms build vrouter/2.01 && dkms install vrouter/2.01',
     unless  => 'dkms status vrouter/2.01 | grep installed 2>/dev/null',
   }
 }
