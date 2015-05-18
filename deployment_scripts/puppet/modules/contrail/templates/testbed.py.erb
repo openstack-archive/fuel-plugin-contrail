@@ -67,7 +67,7 @@ c_ctrl_<%= i+1 %> : '<%= ip %>',
 #External routers
 ext_routers = [
 <%-
-gateways=scope.lookupvar('contrail::settings')['contrail_gateways'].split(',')
+gateways=scope.lookupvar('contrail::settings')['contrail_gateways'].split(',').map{|x|x.lstrip}
 gateways.each_with_index do |gw, i|
 -%>
 ('gateway<%= i+1 %>','<%= gw %>'),
