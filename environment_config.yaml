@@ -1,4 +1,9 @@
 attributes:
+  # Show contrail only in supported network config
+  metadata:
+    restrictions:
+      - condition: "not (cluster:net_provider == 'neutron' and networking_parameters:segmentation_type == 'vlan')"
+        message: "Please use Neutron with VLAN segmentation network type to use with Contrail plugin"
   contrail_asnum:
     value: '64512'
     label: 'AS Number'
@@ -6,8 +11,8 @@ attributes:
     weight: 10
     type: "text"
     regex:
-      source: '\S'
-      error: "Error field cannot be empty"
+      source: '^(?:\d){1,5}$'
+      error: "Invalid AS number"
   contrail_private_cidr:
     value: '10.109.3.0/24'
     label: 'Private network CIDR'
@@ -15,8 +20,8 @@ attributes:
     weight: 20
     type: "text"
     regex:
-      source: '\S'
-      error: "Error field cannot be empty"
+      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:\/(?:[1-2]\d|[8-9]))$'
+      error: "Invalid network CIDR"
   contrail_private_start:
     value: '10.109.3.5'
     label: 'Private IP range start'
@@ -24,8 +29,8 @@ attributes:
     weight: 30
     type: "text"
     regex:
-      source: '\S'
-      error: "Error field cannot be empty"
+      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}$'
+      error: "Invalid IP address"
   contrail_private_end:
     value: '10.109.3.254'
     label: 'Private IP range end'
@@ -33,8 +38,8 @@ attributes:
     weight: 40
     type: "text"
     regex:
-      source: '\S'
-      error: "Error field cannot be empty"
+      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}$'
+      error: "Invalid IP address"
   contrail_gateways:
     value: '10.109.3.1,10.109.3.2'
     label: 'GW IP'
@@ -42,8 +47,8 @@ attributes:
     weight: 50
     type: "text"
     regex:
-      source: '\S'
-      error: "Error field cannot be empty"
+      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:,\s*(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})*$'
+      error: "Invalid IP address list"
   contrail_public_if:
     value: ''
     label: 'Public interface'
@@ -51,5 +56,5 @@ attributes:
     weight: 60
     type: "text"
     regex:
-      source: '\S'
-      error: "Error field cannot be empty"
+      source: '^eth((?:\d{1,2})|(?:\d{1,2}\.\d{1,4}))$'
+      error: "Invalid interface name"
