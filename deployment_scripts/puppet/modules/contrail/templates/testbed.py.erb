@@ -125,7 +125,7 @@ env.ha = {
    'internal_vip'   : '<%= os_management_vip %>',
    'external_vip'   : '<%= os_public_vip %>',
    'contrail_internal_vip'   : '<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>',
-   'contrail_external_vip'   : '<%= scope.lookupvar('contrail::public_last') %>',
+   'contrail_external_vip'   : '<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>',
 }
 
 env.keystone = {
