@@ -10,7 +10,6 @@ contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
 deployment_node_priv_ip=''
 mgm_ip=Array.new
 mgm_ip_baseos=Array.new
-public_ip_baseos=Array.new
 priv_ip=Array.new
 role_all=[]
 role_ctrl=[]
@@ -25,7 +24,6 @@ case node['role']
   when 'base-os'
     if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
       priv_ip << scope.function_get_ip_from_range([ scope.lookupvar('contrail::private_first'),scope.lookupvar('contrail::private_last'),scope.lookupvar('contrail::netmask_short'),node['uid'],'first'])
-      public_ip_baseos << scope.function_get_ip_from_range([ scope.lookupvar('contrail::public_first'),scope.lookupvar('contrail::public_last'),scope.lookupvar('contrail::public_netmask'),node['uid'],'last'])
       mgm_ip_baseos << node['internal_address']
       # Also find out a deployment node
       if node['user_node_name'] == scope.lookupvar('contrail::deployment_node')
@@ -54,12 +52,6 @@ c_db_<%= i+1 %> = 'root@<%= ip %>'
 
 env.hoststring_mgm_ip= {
 <%- mgm_ip_baseos.each_with_index do |ip, i| -%>
-c_ctrl_<%= i+1 %> : '<%= ip %>',
-<%- end -%>
-}
-
-env.hoststring_public_ip= {
-<%- public_ip_baseos.each_with_index do |ip, i| -%>
 c_ctrl_<%= i+1 %> : '<%= ip %>',
 <%- end -%>
 }
@@ -124,8 +116,8 @@ env.openstack = {
 env.ha = {
    'internal_vip'   : '<%= os_management_vip %>',
    'external_vip'   : '<%= os_public_vip %>',
-   'contrail_internal_vip'   : '<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>',
-   'contrail_external_vip'   : '<%= scope.lookupvar('contrail::public_last') %>',
+   'contrail_internal_vip'   : '<%= scope.lookupvar('contrail::private_first') %>',
+   'contrail_external_vip'   : '<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>',
 }
 
 env.keystone = {
