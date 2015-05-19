@@ -58,3 +58,4 @@ attributes:
     regex:
       source: '^eth((?:\d{1,2})|(?:\d{1,2}\.\d{1,4}))$'
       error: "Invalid interface name"
+

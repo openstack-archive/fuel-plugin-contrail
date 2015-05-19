@@ -30,28 +30,12 @@ class contrail::setup (
     command => 'patch /opt/contrail/utils/fabfile/tasks/install.py /tmp/install.py.patch',
     } ->
 
-    file {'/tmp/ha.py.patch':
-      ensure => file,
-      source => 'puppet:///modules/contrail/ha.py.patch'
-    } ->
-    exec {'ha.py.patch':
-    command => 'patch /opt/contrail/utils/fabfile/tasks/ha.py /tmp/ha.py.patch',
-    } ->
-
     file {'/tmp/keepalived_conf_template.py.patch':
       ensure => file,
       source => 'puppet:///modules/contrail/keepalived_conf_template.py.patch'
     } ->
     exec {'keepalived_conf_template.py.patch':
       command => "patch ${pythonpath}/contrail_provisioning/common/templates/keepalived_conf_template.py /tmp/keepalived_conf_template.py.patch",
-    } ->
-
-    file {'/tmp/provision.py.patch':
-      ensure => file,
-      source => 'puppet:///modules/contrail/provision.py.patch'
-    } ->
-    exec {'provision.py.patch':
-    command => 'patch /opt/contrail/utils/fabfile/tasks/provision.py /tmp/provision.py.patch',
     } ->
 
     # Database installation
