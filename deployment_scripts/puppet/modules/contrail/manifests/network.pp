@@ -17,10 +17,7 @@ class contrail::network (
   $address,
   $ifname = undef,
   $netmask,
-  $public_addr = undef,
-  $public_netmask = undef,
-  $public_if = undef,
-  $public_gw = undef
+  $default_gw = undef
   ) {
   $br_aux_file = $operatingsystem ? {
       'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-aux',
@@ -41,27 +38,12 @@ class contrail::network (
         interface => $ifname,
         ipaddr    => "${address}/${netmask}",
       }
-      # Contrail controller needs public ip anyway
-      $public_ip_settings=hiera('public_network_assignment')
-      $assign_public=$public_ip_settings['assign_to_all_nodes']
-      if (! $assign_public) {
-        l23network::l3::ifconfig {$public_if:
-          interface => $public_if,
-          ipaddr    => "${public_addr}/${public_netmask}",
-          before    => Exec["ifup-${public_if}"],
-        }
-      }
-      # l23network::l3::ifconfig does not brings the interface up. Bug? Check it later
-      exec {"ifup-${public_if}":
-        command => "ip link set up dev ${public_if}",
-      } ->
       exec {'remove_default_gw':
           command => '/sbin/ip route del default',
           returns => [0,2] # Idempotent
       } ->
-      # contrail controllers must be available from outer nets
-      exec {"add-default-route-via-${public_gw}":
-        command => "ip route add default via ${public_gw}",
+      exec {"add-default-route-via-${default_gw}":
+        command => "ip route add default via ${default_gw}",
       }
     }
     'compute':{
