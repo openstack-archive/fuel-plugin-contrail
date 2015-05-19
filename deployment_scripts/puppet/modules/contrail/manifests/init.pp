@@ -48,20 +48,11 @@ $netmask=cidr_to_netmask($cidr) # returns i.e. "255.255.255.0"
 $netmask_short=netmask_to_cidr($netmask) # returns i.e. "/24"
 $address=get_ip_from_range($private_first,$private_last,$netmask_short,$uid,'first')
 
-# Public address
-$neutron_settings=hiera('quantum_settings')
-$public_cidr=$neutron_settings['predefined_networks']['net04_ext']['L3']['subnet']
-$public_tmp=split($public_cidr,'/')
-$public_netmask=$public_tmp[1] # netmask prefix here
-$public_first=get_first_ip($public_cidr)
-$public_last=get_last_ip($public_cidr)
-$public_addr=get_ip_from_range($public_first,$public_last,$public_netmask,$uid,'last')
-
-$public_if=$settings['contrail_public_if']
-$public_gw=$neutron_settings['predefined_networks']['net04_ext']['L3']['gateway']
+$default_gw = hiera('management_vrouter_vip')
 
 $contrail_mgmt_vip=get_last_ip(get_network_role_property('management', 'cidr'))
 
+$neutron_settings=hiera('quantum_settings')
 $metadata_secret=$neutron_settings['metadata']['metadata_proxy_shared_secret']
 
 $contrail_node_basename='contrail'

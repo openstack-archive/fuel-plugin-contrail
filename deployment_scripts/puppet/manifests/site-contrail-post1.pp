@@ -14,9 +14,35 @@
 
 include contrail
 Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH', timeout => 1800}
+
+if $contrail::node_name =~ /^contrail.\d+$/ {
+
+  case $operatingsystem
+    {
+      Ubuntu:
+        {
+          $pkgs = ['python-crypto','python-netaddr','python-paramiko','ifenslave-2.6','patch',
+                  'openjdk-7-jre-headless','contrail-fabric-utils','contrail-setup']
+          $pip_pkgs = ['ecdsa-0.10','Fabric-1.7.0']
+          }
+      CentOS:
+        {
+          $pkgs = ['python-netaddr','python-paramiko','patch',
+                  'java-1.7.0-openjdk','contrail-fabric-utils','contrail-setup']
+          $pip_pkgs = ['Fabric-1.7.0']
+        }
+    }
+  class { 'contrail::package':
+    install        => $pkgs,
+    pip_install    => $pip_pkgs,
+  }
+}
+
 if $contrail::node_name == $contrail::deployment_node {
 
-  class { 'contrail::testbed': }
+  class { 'contrail::testbed':
+    require => Class[contrail::package],
+  }
   ->
   class { 'contrail::setup':
     node_name => $contrail::node_name,
