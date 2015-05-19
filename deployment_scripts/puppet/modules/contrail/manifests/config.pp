@@ -29,10 +29,17 @@ class contrail::config ( $node_role ) {
         'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
       }
 
+      file {'/etc/haproxy/conf.d/094-web_for_contrail.cfg':
+        ensure  => present,
+        content => template('contrail/094-web_for_contrail.cfg.erb'),
+        notify  => Service['haproxy'],
+      } ->
+
       file {'/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg':
         ensure  => present,
         content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
-      } ~>
+        notify  => Service['haproxy'],
+      }
 
       service {'haproxy':
         ensure     => running,
