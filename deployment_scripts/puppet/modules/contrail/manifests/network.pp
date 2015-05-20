@@ -24,22 +24,22 @@ class contrail::network (
   ) {
   $br_aux_file = $operatingsystem ? {
       'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-aux',
-      'CentOS' => ['/etc/sysconfig/network-scripts/ifcfg-br-aux',"/etc/sysconfig/network-scripts/ifcfg-${ifname}"],
+      'CentOS' => '/etc/sysconfig/network-scripts/ifcfg-br-aux',
   }
 
+  file { $br_aux_file: ensure => absent } ->
   # Remove interface from the bridge
   exec {"remove_${ifname}":
     command => "brctl delif br-aux ${ifname}",
     returns => [0,1] # Idempotent
-  } ->
-  file { $br_aux_file: ensure => absent }
-  ->
+  }
 
   case $node_role {
     'base-os':{
       l23network::l3::ifconfig {$ifname:
         interface => $ifname,
         ipaddr    => "${address}/${netmask}",
+        require   => File[$br_aux_file],
       }
       # Contrail controller needs public ip anyway
       $public_ip_settings=hiera('public_network_assignment')
