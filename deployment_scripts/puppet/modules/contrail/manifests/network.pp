@@ -47,6 +47,10 @@ class contrail::network (
       }
     }
     'compute':{
+      file {'/etc/hiera/override/plugins.yaml':
+        ensure => present,
+        source => 'puppet:///modules/contrail/plugins.yaml',
+      }
       case $operatingsystem
       {
           Ubuntu:
