@@ -22,6 +22,7 @@ define contrail::run_fabric (
     cwd => '/opt/contrail/utils',
     path => '/bin:/usr/bin:/usr/local/bin',
     logoutput => 'on_failure',
+    creates => "/opt/contrail/${name}-DONE"
   }
   case $hostgroup {
     control: {
