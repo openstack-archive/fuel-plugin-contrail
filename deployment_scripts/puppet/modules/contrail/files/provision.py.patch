@@ -1,52 +1,11 @@
+--- /opt/contrail/utils/fabfile/tasks/provision.py.orig
 +++ /opt/contrail/utils/fabfile/tasks/provision.py
-@@ -91,9 +91,32 @@
-     #server  10.84.14.2 10.84.14.2:9111 check
- 
- $__rabbitmq_config__
-+
-+################################################
-+#contrail-webui-marker-start
-+frontend contrail-webui-api *:443
-+    mode tcp
-+    default_backend contrail-webui-api
-+
-+backend contrail-webui-api
-+    mode tcp
-+    balance roundrobin
-+    option nolinger
-+    stick on src
-+    stick-table type ip size 200k expire 30m
-+    option tcp-check
-+    tcp-check connect port 8143
-+    default-server error-limit 1 on-error mark-down
-+$__contrail_web_servers__
-+#contrail-webui-marker-end
-+###############################################
-+
-+
- #contrail-config-marker-end
- """)
- 
-+    web_listen_port = 8143
-+    web_server_lines = ''
-     q_listen_port = 9697
-     q_server_lines = ''
-     api_listen_port = 9100
-@@ -117,6 +140,9 @@
-         '    server %s %s:%s check inter 2000 rise 2 fall 3\n' \
-                     %(host_ip, host_ip, str(q_listen_port))
-         for i in range(nworkers):
-+            web_server_lines = web_server_lines + \
-+            '    server %s %s:%s check inter 2000 rise 2 fall 3\n' \
-+                        %(host_ip, host_ip, str(web_listen_port + i))
-             api_server_lines = api_server_lines + \
-             '    server %s %s:%s check inter 2000 rise 2 fall 3\n' \
-                         %(host_ip, host_ip, str(api_listen_port + i))
-@@ -136,6 +162,7 @@
-         haproxy_config = template.safe_substitute({
-             '__contrail_quantum_servers__': q_server_lines,
-             '__contrail_api_backend_servers__': api_server_lines,
-+            '__contrail_web_servers__': web_server_lines,
-             '__contrail_disc_backend_servers__': disc_server_lines,
-             '__contrail_hap_user__': 'haproxy',
-             '__contrail_hap_passwd__': 'contrail123',
+@@ -463,7 +463,7 @@
+                     cmd += ' --manage_neutron %s' % manage_neutron
+             else:
+                 cmd += ' --manage_neutron no'
+-            internal_vip = get_contrail_internal_vip()
++            internal_vip = get_contrail_external_vip()
+             if internal_vip:
+                 # Highly available setup
+                 cmd += ' --internal_vip %s' % (internal_vip)

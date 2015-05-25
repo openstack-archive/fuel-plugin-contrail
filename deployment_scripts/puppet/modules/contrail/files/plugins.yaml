@@ -1,0 +1,21 @@
+use_neutron: false
+network_scheme:
+  transformations:
+  - action: add-br
+    name: br-fw-admin
+  - action: add-br
+    name: br-mgmt
+  - action: add-br
+    name: br-storage
+  - action: add-br
+    name: br-prv
+  roles:
+    neutron/private: br-prv
+    management: br-mgmt
+    storage: br-storage
+    fw-admin: br-fw-admin
+  interfaces:
+    eth0:
+  version: '1.1'
+  provider: lnx
+
