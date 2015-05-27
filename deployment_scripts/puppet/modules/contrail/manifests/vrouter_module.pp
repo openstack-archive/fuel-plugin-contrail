@@ -41,6 +41,7 @@ class contrail::vrouter_module () {
 
   exec {'patch_vrouter':
     command => 'patch /usr/src/vrouter-2.01/include/vr_compat.h /tmp/vrouter.patch',
+    creates => '/opt/contrail/patch_vrouter-DONE'
   }
   ->
   exec {'add_module':
