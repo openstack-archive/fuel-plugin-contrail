@@ -23,7 +23,7 @@
   stage: pre_deployment
   type: shell
   parameters:
-    cmd: ln -s /etc/base-os.yaml /etc/astute.yaml
+    cmd: ln -sf /etc/base-os.yaml /etc/astute.yaml
     timeout: 30
 # In case of base-os globals.yaml must be created 
 - role: ['base-os']
