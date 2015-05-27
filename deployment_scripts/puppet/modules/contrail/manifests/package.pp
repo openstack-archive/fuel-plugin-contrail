@@ -41,7 +41,7 @@ class contrail::package (
 
   if ($remove) {
     package { $remove:
-      ensure  => absent,
+      ensure  => purged,
     }
   }
 
