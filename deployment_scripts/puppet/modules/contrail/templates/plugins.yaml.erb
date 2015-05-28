@@ -1,0 +1,40 @@
+use_neutron: false
+network_scheme:
+  transformations:
+  - action: add-br
+    name: br-fw-admin
+  - action: add-br
+    name: br-mgmt
+  - action: add-br
+    name: br-storage
+  - action: add-br
+    name: br-prv
+<%- if scope.lookupvar('contrail::public_allnodes') == true -%>
+  - action: add-br
+    name: br-ex
+<% end %>
+  roles:
+    neutron/private: br-prv
+    management: br-mgmt
+    storage: br-storage
+    fw-admin: br-fw-admin
+<%- if scope.lookupvar('contrail::public_allnodes') == true -%>
+    brex: br-ex
+<% end %>
+  interfaces:
+    eth0:
+  version: '1.1'
+  provider: lnx
+  endpoints:
+    br-fw-admin:
+      IP:
+        - <%= scope.lookupvar('contrail::admin_address') %>/<%= scope.lookupvar('contrail::admin_netmask') %>
+    br-mgmt:
+      IP: 
+        - <%= scope.lookupvar('contrail::mgmt_address') %>/<%= scope.lookupvar('contrail::mgmt_netmask') %>
+      gateway: <%= scope.lookupvar('contrail::default_gw') %>
+<%- if scope.lookupvar('contrail::public_allnodes') == true -%>
+    br-ex:
+      IP:
+        - <%= scope.lookupvar('contrail::public_address') %>/<%= scope.lookupvar('contrail::public_netmask') %>
+<% end %>

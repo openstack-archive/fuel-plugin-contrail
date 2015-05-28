@@ -52,7 +52,7 @@ class contrail::network (
       }
       file {'/etc/hiera/override/plugins.yaml':
         ensure => present,
-        source => 'puppet:///modules/contrail/plugins.yaml',
+        content => template('contrail/plugins.yaml.erb'),
         require => File['/etc/hiera/override'],
       }
       case $operatingsystem
@@ -60,16 +60,16 @@ class contrail::network (
           Ubuntu:
           {
             file {'/etc/network/interfaces.d/ifcfg-vhost0':
-              ensure => present,
-              content => template('contrail/ubuntu-ifcfg-vhost0.erb');
+              ensure  => present,
+              content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
             }
           }
 
           CentOS:
           {
             file {'/etc/sysconfig/network-scripts/ifcfg-vhost0':
-              ensure => present,
-              content => template('contrail/centos-ifcfg-vhost0.erb');
+              ensure  => present,
+              content => template('contrail/centos-ifcfg-vhost0.erb'),
             }
           }
       }
