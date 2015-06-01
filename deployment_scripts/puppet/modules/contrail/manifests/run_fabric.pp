@@ -21,18 +21,18 @@ define contrail::run_fabric (
   Exec {
     cwd => '/opt/contrail/utils',
     path => '/bin:/usr/bin:/usr/local/bin',
-    logoutput => 'on_failure',
+    logoutput => true,
     creates => "/opt/contrail/${name}-DONE"
   }
   case $hostgroup {
     control: {
       exec { "Run-fabric-command-on-${hostgroup}":
-        command => "fab -P -R ${hostgroup} -- '${command}'",
+        command => "fab --show debug -P -R ${hostgroup} -- '${command}'",
       }
     }
     default: {
       exec { "Run-local-fabric-task-${taskname}":
-        command => "fab ${taskname}",
+        command => "fab --show debug ${taskname}",
       }
     }
   }
