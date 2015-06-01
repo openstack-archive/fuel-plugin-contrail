@@ -19,12 +19,6 @@ class contrail::vrouter_module () {
   }
   ->
 
-  file {'/tmp/vrouter.patch':
-    ensure => file,
-    source => 'puppet:///modules/contrail/vrouter.patch',
-  }
-  ->
-
   file {'/usr/src/vrouter-2.01': ensure => directory }
   ->
 
@@ -39,11 +33,6 @@ class contrail::vrouter_module () {
   }
   ->
 
-  exec {'patch_vrouter':
-    command => 'patch /usr/src/vrouter-2.01/include/vr_compat.h /tmp/vrouter.patch',
-    creates => '/opt/contrail/patch_vrouter-DONE'
-  }
-  ->
   exec {'add_module':
     command => 'dkms add vrouter/2.01',
     unless  => "dkms status vrouter/2.01 | grep -E 'added|installed' 2>/dev/null",
