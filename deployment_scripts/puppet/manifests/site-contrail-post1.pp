@@ -13,7 +13,6 @@
 #    under the License.
 
 include contrail
-Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH', timeout => 1800}
 
 if $contrail::node_name =~ /^contrail.\d+$/ {
 
@@ -38,13 +37,3 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
   }
 }
 
-if $contrail::node_name == $contrail::deployment_node {
-
-  class { 'contrail::testbed':
-    require => Class[contrail::package],
-  }
-  ->
-  class { 'contrail::setup':
-    node_name => $contrail::node_name,
-  }
-}
