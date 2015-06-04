@@ -21,6 +21,14 @@ class contrail::provision ( $node_role ) {
       run_fabric { 'prov_metadata_services': } ->
       run_fabric { 'prov_encap_type': }
     }
+    'controller','primary-controller': {
+      keystone_endpoint {'RegionOne/neutron':
+        ensure       => present,
+        public_url   => "http://${contrail::contrail_mgmt_vip}:9696/",
+        admin_url    => "http://${contrail::contrail_mgmt_vip}:9696/",
+        internal_url => "http://${contrail::contrail_mgmt_vip}:9696/",
+      }
+    }
     'compute': {
       exec { 'provision-vrouter':
         path    => '/bin:/usr/bin/',

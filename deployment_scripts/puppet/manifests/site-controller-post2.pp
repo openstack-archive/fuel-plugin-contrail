@@ -14,12 +14,9 @@
 
 include contrail
 $node_role = 'controller'
-class { 'contrail::config':
+class {'contrail::provision':
   node_role => $node_role,
 } ~>
 class { 'contrail::service':
-  node_role => $node_role,
-} ->
-class {'contrail::provision':
   node_role => $node_role,
 }

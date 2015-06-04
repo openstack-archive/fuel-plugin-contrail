@@ -27,26 +27,25 @@ class contrail::config ( $node_role ) {
         'DEFAULT/enabled_apis': value=> 'ec2,osapi_compute,metadata';
         'DEFAULT/security_group_api': value=> 'neutron';
         'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
+      } ->
+      keystone_endpoint {'RegionOne/neutron':
+        ensure => absent,
       }
-
       file {'/etc/haproxy/conf.d/094-web_for_contrail.cfg':
         ensure  => present,
         content => template('contrail/094-web_for_contrail.cfg.erb'),
         notify  => Service['haproxy'],
       } ->
-
       file {'/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg':
         ensure  => present,
         content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
         notify  => Service['haproxy'],
-      }
-
+      } ~>
       service {'haproxy':
         ensure     => running,
         hasrestart => true,
         restart    => '/sbin/ip netns exec haproxy service haproxy reload',
       }
-
     }
     'compute': {
       nova_config {
@@ -140,7 +139,6 @@ class contrail::config ( $node_role ) {
           setting => 'admin_password',
           value   => $contrail::service_token
       } ->
-
       ini_setting { 'neutron_rabbit_hosts':
           ensure  => present,
           path    => '/etc/neutron/neutron.conf',

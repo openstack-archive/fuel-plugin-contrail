@@ -30,10 +30,9 @@ $nodes= hiera('nodes')
 
 $neutron_settings=hiera('quantum_settings')
 $metadata_secret=$neutron_settings['metadata']['metadata_proxy_shared_secret']
-#$service_token = $neutron_settings['keystone']['admin_password']
+$service_token = $neutron_settings['keystone']['admin_password']
 $keystone=hiera('keystone')
 $admin_token = $keystone['admin_token']
-$service_token = $admin_token
 
 $mos_mgmt_vip=hiera('management_vip')
 
