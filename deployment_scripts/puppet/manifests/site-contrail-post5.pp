@@ -13,12 +13,9 @@
 #    under the License.
 
 include contrail
-$node_role = 'base-os'
 if $contrail::node_name =~ /^contrail.\d+$/ {
-  class { 'contrail::config':
-    node_role => $node_role,
-  } ~>
-  class { 'contrail::service':
-    node_role => $node_role,
+  class { 'contrail::ssh':
+    password_auth => 'no',
+    root_login    => 'without-password'
   }
 }

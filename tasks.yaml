@@ -60,14 +60,14 @@
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post1.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 3600
+    timeout: 720
 - role: ['base-os']
   stage: post_deployment
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post2.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 3600
 - role: ['base-os']
   stage: post_deployment
   type: puppet
@@ -80,6 +80,13 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post4.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+- role: ['base-os']
+  stage: post_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/site-contrail-post5.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 - role: ['compute']

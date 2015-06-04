@@ -13,12 +13,16 @@
 #    under the License.
 
 include contrail
-$node_role = 'base-os'
-if $contrail::node_name =~ /^contrail.\d+$/ {
-  class { 'contrail::config':
-    node_role => $node_role,
-  } ~>
-  class { 'contrail::service':
-    node_role => $node_role,
+
+Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH', timeout => 1800}
+
+if $contrail::node_name == $contrail::deployment_node {
+
+  class { 'contrail::testbed':
+    require => Class[contrail::package],
+  }
+  ->
+  class { 'contrail::setup':
+    node_name => $contrail::node_name,
   }
 }
