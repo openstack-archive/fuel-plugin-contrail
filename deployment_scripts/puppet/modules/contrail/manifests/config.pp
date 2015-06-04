@@ -20,33 +20,32 @@ class contrail::config ( $node_role ) {
         'DEFAULT/neutron_url': value => "http://${contrail::contrail_mgmt_vip}:9696";
         'DEFAULT/neutron_admin_tenant_name': value=> 'services';
         'DEFAULT/neutron_admin_username': value=> 'neutron';
-        'DEFAULT/neutron_admin_password': value=> $contrail::keystone['admin_token'];
+        'DEFAULT/neutron_admin_password': value=> $contrail::service_token;
         'DEFAULT/neutron_url_timeout': value=> '300';
         'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
         'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
         'DEFAULT/enabled_apis': value=> 'ec2,osapi_compute,metadata';
         'DEFAULT/security_group_api': value=> 'neutron';
         'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
+      } ->
+      keystone_endpoint {'RegionOne/neutron':
+        ensure => absent,
       }
-
       file {'/etc/haproxy/conf.d/094-web_for_contrail.cfg':
         ensure  => present,
         content => template('contrail/094-web_for_contrail.cfg.erb'),
         notify  => Service['haproxy'],
       } ->
-
       file {'/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg':
         ensure  => present,
         content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
         notify  => Service['haproxy'],
-      }
-
+      } ~>
       service {'haproxy':
         ensure     => running,
         hasrestart => true,
         restart    => '/sbin/ip netns exec haproxy service haproxy reload',
       }
-
     }
     'compute': {
       nova_config {
@@ -55,7 +54,7 @@ class contrail::config ( $node_role ) {
         'DEFAULT/network_api_class': value=> 'nova_contrail_vif.contrailvif.ContrailNetworkAPI';
         'DEFAULT/neutron_admin_tenant_name': value=> 'services';
         'DEFAULT/neutron_admin_username': value=> 'neutron';
-        'DEFAULT/neutron_admin_password': value=> $contrail::keystone['admin_token'];
+        'DEFAULT/neutron_admin_password': value=> $contrail::service_token;
         'DEFAULT/neutron_url_timeout': value=> '300';
         'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
         'DEFAULT/security_group_api': value=> 'neutron';
@@ -133,6 +132,13 @@ class contrail::config ( $node_role ) {
       } ->
 
       # Neutron
+      ini_setting { 'neutron_admin_password':
+          ensure  => present,
+          path    => '/etc/neutron/neutron.conf',
+          section => 'keystone_authtoken',
+          setting => 'admin_password',
+          value   => $contrail::service_token
+      } ->
       ini_setting { 'neutron_rabbit_hosts':
           ensure  => present,
           path    => '/etc/neutron/neutron.conf',

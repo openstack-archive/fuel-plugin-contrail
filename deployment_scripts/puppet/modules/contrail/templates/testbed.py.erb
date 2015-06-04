@@ -110,7 +110,7 @@ env.ostypes = {
 <%- end -%>
 }
 env.openstack = {
-    'service_token' : '<%= keystone['admin_token'] %>'
+    'service_token' : '<%= scope.lookupvar('contrail::admin_token') %>'
 }
 
 env.ha = {
@@ -122,7 +122,8 @@ env.ha = {
 
 env.keystone = {
     'service_tenant': 'services',
-    'admin_token' : '<%= keystone['admin_token'] %>'
+    'admin_token'   : '<%= scope.lookupvar('contrail::admin_token') %>',
+    'manage_neutron': 'no',
 }
 
 multi_tenancy = True
