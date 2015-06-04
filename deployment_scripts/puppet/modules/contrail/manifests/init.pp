@@ -28,12 +28,16 @@ $node_role = hiera('role')
 $node_name = hiera('user_node_name')
 $nodes= hiera('nodes')
 
+$neutron_settings=hiera('quantum_settings')
+$metadata_secret=$neutron_settings['metadata']['metadata_proxy_shared_secret']
+$service_token = $neutron_settings['keystone']['admin_password']
 $keystone=hiera('keystone')
+$admin_token = $keystone['admin_token']
+
 $mos_mgmt_vip=hiera('management_vip')
 
 # Contrail settings
 $asnum = $settings['contrail_asnum']
-$admin_token = $keystone['admin_token']
 $admin_tenant_private_cidr = $settings['admin_tenant_private_cidr']
 $admin_tenant_public_cidr = $settings['admin_tenant_public_cidr']
 
@@ -65,8 +69,6 @@ if $public_allnodes == true {
 $default_gw = hiera('management_vrouter_vip')
 $contrail_mgmt_vip=get_last_ip(get_network_role_property('management', 'cidr'))
 
-$neutron_settings=hiera('quantum_settings')
-$metadata_secret=$neutron_settings['metadata']['metadata_proxy_shared_secret']
 
 $contrail_node_basename='contrail'
 $deployment_node="${contrail_node_basename}-1"
