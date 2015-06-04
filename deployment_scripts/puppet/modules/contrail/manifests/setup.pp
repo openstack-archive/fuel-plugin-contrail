@@ -73,6 +73,9 @@ class contrail::setup (
     } ->
     # Setting up the components
     run_fabric { 'setup_cfgm': } ->
+    exec {'update_neutron_pwd':
+      command => "keystone --os-endpoint http://${contrail::mos_mgmt_vip}:35357/v2.0 --os-token ${contrail::admin_token} \
+--os-tenant-name services user-password-update --pass  ${contrail::service_token}  neutron"} ->
     run_fabric { 'setup_control': } ->
     run_fabric { 'setup_collector': } ->
     run_fabric { 'setup_webui': }
