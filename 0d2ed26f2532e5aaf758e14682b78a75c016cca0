@@ -1,0 +1,5 @@
+Verified+1: Jenkins
+Code-Review+1: Wojciech Sronek <wsronek@mirantis.com>
+Reviewed-on: https://review.openstack.org/188418
+Project: stackforge/fuel-plugin-contrail
+Branch: refs/heads/master
