@@ -12,16 +12,18 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::setup (
-  $node_name
-  ) {
+class contrail::setup ($node_name)
+{
   if $node_name == $contrail::deployment_node {
 
     $pythonpath = $operatingsystem ? {
       'Ubuntu' => '/usr/local/lib/python2.7/dist-packages',
       'CentOS' => '/usr/lib/python2.6/site-packages'
     }
-
+    exec {'cassandra_mindisk':
+      command => '/bin/sed -i -e "s/minimum_diskGB.*/minimum_diskGB\':\ \'32\'\,/" /usr/local/lib/python2.7/dist-packages/contrail_provisioning/database/setup.py',
+      creates => '/opt/contrail/cassandra_mindisk-DONE'
+    } ->
     file {'/tmp/install.py.patch':
       ensure => file,
       source => 'puppet:///modules/contrail/install.py.patch'
@@ -30,14 +32,13 @@ class contrail::setup (
     command => 'patch /opt/contrail/utils/fabfile/tasks/install.py /tmp/install.py.patch',
     creates => '/opt/contrail/install.py.patch-DONE'
     } ->
-
-    file {'/tmp/provision.py.patch':
+    file {'/tmp/commandline.py.patch':
       ensure => file,
-      source => 'puppet:///modules/contrail/provision.py.patch'
+      source => 'puppet:///modules/contrail/commandline.py.patch'
     } ->
-    exec {'provision.py.patch':
-    command => 'patch /opt/contrail/utils/fabfile/tasks/provision.py /tmp/provision.py.patch',
-    creates => '/opt/contrail/provision.py.patch-DONE'
+    exec {'commandline.py.patch':
+    command => 'patch /opt/contrail/utils/fabfile/util/commandline.py /tmp/commandline.py.patch',
+    creates => '/opt/contrail/commandline.py.patch-DONE'
     } ->
 
     file {'/tmp/keepalived_conf_template.py.patch':
