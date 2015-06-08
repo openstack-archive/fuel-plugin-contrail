@@ -1,0 +1,11 @@
+--- /opt/contrail/utils/fabfile/util/commandline.py.orig        2015-06-08 10:40:43.967097851 +0000
++++ /opt/contrail/utils/fabfile/util/commandline.py     2015-06-08 10:41:27.391097689 +0000
+@@ -152,7 +152,7 @@
+             cmd += ' --manage_neutron %s' % manage_neutron
+     else:
+         cmd += ' --manage_neutron no'
+-    internal_vip = get_contrail_internal_vip()
++    internal_vip = get_contrail_external_vip()
+     if internal_vip:
+         # Highly available setup
+         cmd += ' --internal_vip %s' % (internal_vip)
