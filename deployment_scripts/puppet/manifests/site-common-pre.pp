@@ -17,6 +17,7 @@ case $operatingsystem
     CentOS:
       {
         yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
+        yumrepo {"contrail-1.0.0": exclude => 'python-pycrypto'} # Conflicts with python-crypto@mos. Provides same files.
         package {'yum-plugin-priorities': ensure => present }
       }
 }
