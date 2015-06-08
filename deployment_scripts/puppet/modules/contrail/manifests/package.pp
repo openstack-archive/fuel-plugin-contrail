@@ -20,14 +20,6 @@ class contrail::package (
 
   if ($install) {
 
-    if $operatingsystem == 'Ubuntu' {
-      file { '/etc/apt/preferences.d/contrail-pin-100':
-        ensure => file,
-        source => 'puppet:///modules/contrail/contrail-pin-100',
-        before => Package[$install],
-      }
-    }
-
     package { $install:
       ensure  => present,
     }
