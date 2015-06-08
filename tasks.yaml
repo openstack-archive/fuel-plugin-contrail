@@ -4,13 +4,6 @@
 # cinder and compute nodes
 #
 #####################################
-- role: '*'
-  stage: pre_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/site-common-pre.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
 # In case of base-os Hiera must be deployed manually
 - role: ['base-os']
   stage: pre_deployment
@@ -32,6 +25,13 @@
   parameters:
     puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/globals/globals.pp
     puppet_modules: /etc/puppet/modules
+    timeout: 720
+- role: '*'
+  stage: pre_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/site-common-pre.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 # Config default network, first of all
 - role: ['base-os']

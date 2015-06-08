@@ -1,7 +1,0 @@
-Package: haproxy
-Pin: version  1.5.4-1ppa1~precise
-Pin-Priority: 1060
-
-Package: nodejs
-Pin: version 0.8.15-1contrail1
-Pin-Priority: 1060
