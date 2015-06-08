@@ -12,11 +12,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+include contrail
 case $operatingsystem
 {
     CentOS:
       {
         yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
+        yumrepo {"contrail-${contrail::plugin_version}.0": exclude => 'python-pycrypto'} # Conflicts with python-crypto@mos. Provides same files.
         package {'yum-plugin-priorities': ensure => present }
       }
 }
