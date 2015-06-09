@@ -22,16 +22,5 @@ case $operatingsystem
       }
     Ubuntu:
       {
-        if ($contrail::node_role =~ /^base-os$/) or ($contrail::node_role =~ /^compute$/) {
-          file { '/etc/apt/preferences.d/contrail-pin-100':
-            ensure  => file,
-            content => template('contrail/contrail-pin-100.erb'),
-          }
-        }
-        if $contrail::node_name =~ /^contrail.\d+$/ {
-          file { '/etc/apt/sources.list.d/mos.list':
-            ensure => absent,
-          }
-        }
       }
 }

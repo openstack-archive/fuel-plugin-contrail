@@ -25,12 +25,14 @@ class { 'contrail::network':
 
 case $operatingsystem {
   Ubuntu: {
-
+    file { '/etc/apt/preferences.d/contrail-pin-100':
+      ensure  => file,
+      content => template('contrail/contrail-pin-100.erb'),
+     }
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
       remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
       }
-
   }
   CentOS: {
     class { 'contrail::package':
