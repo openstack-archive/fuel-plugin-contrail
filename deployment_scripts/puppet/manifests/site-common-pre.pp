@@ -12,11 +12,26 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+include contrail
 case $operatingsystem
 {
     CentOS:
       {
         yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
         package {'yum-plugin-priorities': ensure => present }
+      }
+    Ubuntu:
+      {
+        if ($contrail::node_role =~ /^base-os$/) or ($contrail::node_role =~ /^compute$/) {
+          file { '/etc/apt/preferences.d/contrail-pin-100':
+            ensure  => file,
+            content => template('contrail/contrail-pin-100.erb'),
+          }
+        }
+        if $contrail::node_name =~ /^contrail.\d+$/ {
+          file { '/etc/apt/sources.list.d/mos.list':
+            ensure => absent,
+          }
+        }
       }
 }
