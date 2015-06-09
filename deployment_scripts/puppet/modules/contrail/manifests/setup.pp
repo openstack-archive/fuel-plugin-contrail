@@ -74,6 +74,7 @@ class contrail::setup ($node_name)
     } ->
     # Setting up the components
     run_fabric { 'setup_cfgm': } ->
+    exec {'update_neutron_pwd': command => "keystone user-password-update --pass ${contrail::admin_token} neutron"} ->
     run_fabric { 'setup_control': } ->
     run_fabric { 'setup_collector': } ->
     run_fabric { 'setup_webui': }
