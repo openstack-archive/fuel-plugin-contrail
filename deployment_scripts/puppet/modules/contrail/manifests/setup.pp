@@ -20,10 +20,6 @@ class contrail::setup ($node_name)
       'Ubuntu' => '/usr/local/lib/python2.7/dist-packages',
       'CentOS' => '/usr/lib/python2.6/site-packages'
     }
-    exec {'cassandra_mindisk':
-      command => '/bin/sed -i -e "s/minimum_diskGB.*/minimum_diskGB\':\ \'32\'\,/" /usr/local/lib/python2.7/dist-packages/contrail_provisioning/database/setup.py',
-      creates => '/opt/contrail/cassandra_mindisk-DONE'
-    } ->
     file {'/tmp/install.py.patch':
       ensure => file,
       source => 'puppet:///modules/contrail/install.py.patch'
@@ -37,7 +33,7 @@ class contrail::setup ($node_name)
       source => 'puppet:///modules/contrail/commandline.py.patch'
     } ->
     exec {'commandline.py.patch':
-    command => 'patch /opt/contrail/utils/fabfile/util/commandline.py /tmp/commandline.py.patch',
+    command => 'patch /opt/contrail/utils/fabfile/utils/commandline.py /tmp/commandline.py.patch',
     creates => '/opt/contrail/commandline.py.patch-DONE'
     } ->
 

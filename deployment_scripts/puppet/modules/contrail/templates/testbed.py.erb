@@ -110,7 +110,7 @@ env.ostypes = {
 <%- end -%>
 }
 env.openstack = {
-    'service_token' : '<%= scope.loopkupvar('contrail::service_token') %>'
+    'service_token' : '<%= scope.lookupvar('contrail::service_token') %>'
 }
 
 env.ha = {
