@@ -133,6 +133,14 @@ class contrail::config ( $node_role ) {
       } ->
 
       # Neutron
+      ini_setting { 'neutron_admin_password':
+          ensure  => present,
+          path    => '/etc/neutron/neutron.conf',
+          section => 'keystone_authtoken',
+          setting => 'admin_password',
+          value   => $contrail::service_token
+      } ->
+
       ini_setting { 'neutron_rabbit_hosts':
           ensure  => present,
           path    => '/etc/neutron/neutron.conf',
