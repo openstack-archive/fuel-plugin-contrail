@@ -23,7 +23,7 @@ newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
      cfg = L23network::Scheme.get_config(lookupvar('l3_fqdn_hostname'))
      cfg[:transformations].each do |entry|
 
-     if entry[:action] == "add-port" and entry[:bridge] == "br-aux"
+     if entry[:action] == "add-port" and (entry[:bridge] == "br-aux" or entry[:bridge] == "br-mesh")
        ifname = entry[:name]
      end
 
