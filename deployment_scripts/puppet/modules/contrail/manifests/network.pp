@@ -19,24 +19,32 @@ class contrail::network (
   $netmask,
   $default_gw = undef
   ) {
-  $br_aux_file = $operatingsystem ? {
-      'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-aux',
-      'CentOS' => '/etc/sysconfig/network-scripts/ifcfg-br-aux',
+  $br_file = $operatingsystem ? {
+      'Ubuntu' => ['/etc/network/interfaces.d/ifcfg-br-aux', '/etc/network/interfaces.d/ifcfg-br-mesh'],
+      'CentOS' => ['/etc/sysconfig/network-scripts/ifcfg-br-aux', '/etc/sysconfig/network-scripts/ifcfg-br-mesh'],
   }
 
-  file { $br_aux_file: ensure => absent } ->
+  file { $br_file: ensure => absent } ->
   # Remove interface from the bridge
-  exec {"remove_${ifname}":
+  exec {"remove_${ifname}_aux":
     command => "brctl delif br-aux ${ifname}",
     returns => [0,1] # Idempotent
+  } ->
+  exec {"remove_${ifname}_mesh":
+    command => "brctl delif br-mesh ${ifname}",
+    returns => [0,1] # Idempotent
   }
-
+  ->
+  exec {"flush_addr_br_mesh":
+    command => 'ip addr flush dev br-mesh',
+    returns => [0,1] # Idempotent
+  }
   case $node_role {
     'base-os':{
       l23network::l3::ifconfig {$ifname:
         interface => $ifname,
         ipaddr    => "${address}/${netmask}",
-        require   => File[$br_aux_file],
+        require   => File[$br_file],
       }
       exec {'remove_default_gw':
           command => '/sbin/ip route del default',
