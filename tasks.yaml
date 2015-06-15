@@ -51,7 +51,7 @@
   stage: post_deployment
   type: puppet
   parameters:
-    puppet_manifest: puppet/manifests/site-controller-post.pp
+    puppet_manifest: puppet/manifests/site-controller-post1.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 - role: ['base-os']
@@ -80,6 +80,13 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post4.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+- role: ['primary-controller','controller']
+  stage: post_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/site-controller-post2.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 - role: ['compute']
