@@ -52,12 +52,6 @@ $netmask=cidr_to_netmask($cidr) # returns i.e. "255.255.255.0"
 $netmask_short=netmask_to_cidr($netmask) # returns i.e. "/24"
 $address=get_ip_from_range($private_first,$private_last,$netmask_short,$uid,'first')
 
-$admin_address=get_network_role_property('fw-admin', 'ipaddr')
-$admin_netmask=netmask_to_cidr(get_network_role_property('fw-admin', 'netmask'))
-
-$mgmt_address=get_network_role_property('management', 'ipaddr')
-$mgmt_netmask=netmask_to_cidr(get_network_role_property('management', 'netmask'))
-
 $public_network_assignment=hiera('public_network_assignment')
 $public_allnodes=$public_network_assignment['assign_to_all_nodes']
 
@@ -68,7 +62,6 @@ if $public_allnodes == true {
 
 $default_gw = hiera('management_vrouter_vip')
 $contrail_mgmt_vip=get_last_ip(get_network_role_property('management', 'cidr'))
-
 
 $contrail_node_basename='contrail'
 $deployment_node="${contrail_node_basename}-1"
