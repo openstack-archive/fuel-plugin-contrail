@@ -22,17 +22,17 @@ define contrail::run_fabric (
     cwd => '/opt/contrail/utils',
     path => '/bin:/usr/bin:/usr/local/bin',
     logoutput => true,
-    creates => "/opt/contrail/${name}-DONE"
+    creates => "/opt/contrail/${taskname}-DONE"
   }
   case $hostgroup {
     control: {
       exec { "Run-fabric-command-on-${hostgroup}":
-        command => "fab --show debug -P -R ${hostgroup} -- '${command}'",
+        command => "fab --show debug -P -R ${hostgroup} -- '${command}' && touch /opt/contrail/${taskname}-DONE",
       }
     }
     default: {
       exec { "Run-local-fabric-task-${taskname}":
-        command => "fab --show debug ${taskname}",
+        command => "fab --show debug ${taskname} && touch /opt/contrail/${taskname}-DONE",
       }
     }
   }
