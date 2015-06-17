@@ -25,7 +25,7 @@ class contrail::setup ($node_name)
       source => 'puppet:///modules/contrail/install.py.patch'
     } ->
     exec {'install.py.patch':
-    command => 'patch /opt/contrail/utils/fabfile/tasks/install.py /tmp/install.py.patch',
+    command => 'patch /opt/contrail/utils/fabfile/tasks/install.py /tmp/install.py.patch && touch /opt/contrail/install.py.patch-DONE',
     creates => '/opt/contrail/install.py.patch-DONE'
     } ->
     file {'/tmp/commandline.py.patch':
@@ -33,7 +33,7 @@ class contrail::setup ($node_name)
       source => 'puppet:///modules/contrail/commandline.py.patch'
     } ->
     exec {'commandline.py.patch':
-    command => 'patch /opt/contrail/utils/fabfile/utils/commandline.py /tmp/commandline.py.patch',
+    command => 'patch /opt/contrail/utils/fabfile/utils/commandline.py /tmp/commandline.py.patch && touch /opt/contrail/commandline.py.patch-DONE',
     creates => '/opt/contrail/commandline.py.patch-DONE'
     } ->
 
@@ -42,7 +42,8 @@ class contrail::setup ($node_name)
       source => 'puppet:///modules/contrail/keepalived_conf_template.py.patch'
     } ->
     exec {'keepalived_conf_template.py.patch':
-      command => "patch ${pythonpath}/contrail_provisioning/common/templates/keepalived_conf_template.py /tmp/keepalived_conf_template.py.patch",
+      command => "patch ${pythonpath}/contrail_provisioning/common/templates/keepalived_conf_template.py /tmp/keepalived_conf_template.py.patch \
+&& touch /opt/contrail/keepalived_conf_template.py.patch-DONE",
       creates => '/opt/contrail/keepalived_conf_template.py.patch-DONE'
     } ->
 
