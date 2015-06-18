@@ -94,6 +94,10 @@ class contrail::config ( $node_role ) {
         ensure  => present,
         content => template('contrail/contrail-vrouter-agent.conf.erb'),
       }
+      file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
+        ensure  => present,
+        content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
+      }
 
     }
 
