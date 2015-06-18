@@ -17,8 +17,8 @@ class contrail::service ( $node_role ) {
   case $node_role {
     'base-os': {
       $services = $operatingsystem ? {
-        'Ubuntu' => ['keepalived','neutron-server','supervisor-support-service','redis-server','contrail-api'],
-        'CentOS' => ['keepalived','neutron-server','supervisor-support-service','redis','contrail-api'],
+        'Ubuntu' => ['haproxy','keepalived','neutron-server','supervisor-support-service','redis-server','contrail-api'],
+        'CentOS' => ['haproxy','keepalived','neutron-server','supervisor-support-service','redis','contrail-api'],
         default  => undef,
       }
     }
