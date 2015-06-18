@@ -17,8 +17,8 @@ class contrail::service ( $node_role ) {
   case $node_role {
     'base-os': {
       $services = $operatingsystem ? {
-        'Ubuntu' => ['haproxy','keepalived','neutron-server','supervisor-support-service','redis-server','contrail-api'],
-        'CentOS' => ['haproxy','keepalived','neutron-server','supervisor-support-service','redis','contrail-api'],
+        'Ubuntu' => ['keepalived','neutron-server','supervisor-support-service','redis-server','contrail-api'],
+        'CentOS' => ['keepalived','neutron-server','supervisor-support-service','redis','contrail-api'],
         default  => undef,
       }
     }
@@ -27,6 +27,9 @@ class contrail::service ( $node_role ) {
         'Ubuntu' => ['nova-api','nova-scheduler','nova-conductor'],
         'CentOS' => ['openstack-nova-api','openstack-nova-scheduler','openstack-nova-conductor'],
         default  => undef,
+      }
+      notify { 'restart-services':
+        notify => Service[$services],
       }
     }
   }
