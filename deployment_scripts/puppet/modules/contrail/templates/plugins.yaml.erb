@@ -41,7 +41,7 @@ network_scheme:
     storage: br-storage
     fw-admin: br-fw-admin
 <%- if scope.lookupvar('contrail::public_allnodes') == true -%>
-    brex: br-ex
+    ex: br-ex
 <%- end -%>
   interfaces:
     eth0:

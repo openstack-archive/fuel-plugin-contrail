@@ -28,6 +28,9 @@ class contrail::service ( $node_role ) {
         'CentOS' => ['openstack-nova-api','openstack-nova-scheduler','openstack-nova-conductor'],
         default  => undef,
       }
+      notify { 'restart-services':
+        notify => Service[$services],
+      }
     }
   }
 
