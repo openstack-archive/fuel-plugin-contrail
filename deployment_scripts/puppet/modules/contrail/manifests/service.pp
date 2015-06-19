@@ -32,6 +32,13 @@ class contrail::service ( $node_role ) {
         notify => Service[$services],
       }
     }
+    'compute': {
+      $services = $operatingsystem ? {
+        'Ubuntu' => ['nova-compute','supervisor-vrouter'],
+        'CentOS' => ['openstack-nova-compute','supervisor-vrouter'],
+        default  => undef,
+      }
+    }
   }
 
   if ( $services ) {
