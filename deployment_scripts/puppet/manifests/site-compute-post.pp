@@ -49,13 +49,19 @@ case $operatingsystem {
     file {'/etc/contrail/default_pmac':
               ensure => present,
     }
-    ->
-    service {'supervisor-vrouter': enable => true}
   }
 } ->
 
 class { 'contrail::config':
   node_role => $node_role,
+} ~>
+
+class { 'contrail::service':
+  node_role => $node_role,
+} ->
+
+service { 'supervisor-vrouter':
+  enable => true,
 } ->
 
 class { 'contrail::provision':
