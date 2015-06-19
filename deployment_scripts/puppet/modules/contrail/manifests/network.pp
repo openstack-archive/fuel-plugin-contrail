@@ -19,9 +19,16 @@ class contrail::network (
   $netmask,
   $default_gw = undef
   ) {
-  $br_file = $operatingsystem ? {
-      'Ubuntu' => ['/etc/network/interfaces.d/ifcfg-br-aux', '/etc/network/interfaces.d/ifcfg-br-mesh'],
-      'CentOS' => ['/etc/sysconfig/network-scripts/ifcfg-br-aux', '/etc/sysconfig/network-scripts/ifcfg-br-mesh'],
+  case $operatingsystem {
+    'Ubuntu': {
+      $br_file = ['/etc/network/interfaces.d/ifcfg-br-aux', '/etc/network/interfaces.d/ifcfg-br-mesh']
+    }
+    'CentOS': {
+      $br_file = ['/etc/sysconfig/network-scripts/ifcfg-br-aux', '/etc/sysconfig/network-scripts/ifcfg-br-mesh']
+      exec {"remove_bridge_from_${ifname}_config":
+        command => "sed -i '/BRIDGE/d' /etc/sysconfig/network-scripts/ifcfg-${ifname}",
+      }
+    }
   }
 
   file { $br_file: ensure => absent } ->
