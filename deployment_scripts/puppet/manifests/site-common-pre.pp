@@ -12,6 +12,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH'}
+
+# Network configuration fails because of deployed contrail
+exec {'no_predefined_network_hack':
+  command => 'sed -i -e "82s/.*/\tif\ false\ {/" /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-controller.pp'
+}
+
 case $operatingsystem
 {
     CentOS:

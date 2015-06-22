@@ -67,3 +67,9 @@ service { 'supervisor-vrouter':
 class { 'contrail::provision':
   node_role => $node_role,
 }
+
+# Do not reconfigure network. Re-deployment fails because of contrail
+exec {'no_network_reconfigure':
+  command => 'echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp' 
+}
+
