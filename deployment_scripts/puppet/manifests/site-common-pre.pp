@@ -12,6 +12,18 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH'}
+
+# Network configuration fails because of deployed contrail
+exec {'no_predefined_network_hack':
+  command => 'sed -i -e "82s/.*/\tif\ false\ {/" /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-controller.pp'
+}
+
+# Network configuration fails because of deployed contrail
+exec {'no_network_reconfigure':
+  command => 'touch /etc/puppet/modules/osnailyfacter/modular/openstack-network/noop.pp && sed -i -e "s/openstack-network-compute\.pp/noop\.pp/" /etc/puppet/modules/osnailyfacter/modular/openstack-network/tasks.yaml'
+}
+
 case $operatingsystem
 {
     CentOS:
