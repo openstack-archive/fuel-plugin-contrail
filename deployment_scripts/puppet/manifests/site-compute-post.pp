@@ -67,3 +67,8 @@ service { 'supervisor-vrouter':
 class { 'contrail::provision':
   node_role => $node_role,
 }
+->
+# Hack for compute re-deploy
+exec {'redeploy_hack':
+  command => 'touch /etc/puppet/modules/osnailyfacter/modular/openstack-network/noop.pp && sed -i -e "s/openstack-network-compute\.pp/noop\.pp/" /etc/puppet/modules/osnailyfacter/modular/openstack-network/tasks.yaml'
+}
