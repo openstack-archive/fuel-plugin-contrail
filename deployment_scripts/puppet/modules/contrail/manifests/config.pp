@@ -183,28 +183,28 @@ class contrail::config ( $node_role ) {
       ini_setting { 'contrail-svc_rabbit_server':
           ensure  => present,
           path    => '/etc/contrail/contrail-svc-monitor.conf',
-          section => 'DEFAULT',
+          section => 'DEFAULTS',
           setting => 'rabbit_server',
           value   => $contrail::mos_mgmt_vip
       }
       ini_setting { 'contrail-svc_rabbit_port':
           ensure  => present,
           path    => '/etc/contrail/contrail-svc-monitor.conf',
-          section => 'DEFAULT',
+          section => 'DEFAULTS',
           setting => 'rabbit_port',
           value   => '5673'
       }
       ini_setting { 'contrail-svc_rabbit_password':
           ensure  => present,
           path    => '/etc/contrail/contrail-svc-monitor.conf',
-          section => 'DEFAULT',
+          section => 'DEFAULTS',
           setting => 'rabbit_password',
           value   => $contrail::rabbit_password
       }
       ini_setting { 'contrail-svc_rabbit_user':
           ensure  => present,
           path    => '/etc/contrail/contrail-svc-monitor.conf',
-          section => 'DEFAULT',
+          section => 'DEFAULTS',
           setting => 'rabbit_user',
           value   => 'nova'
       }
