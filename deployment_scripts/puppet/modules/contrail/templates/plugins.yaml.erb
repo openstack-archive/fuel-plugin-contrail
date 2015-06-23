@@ -12,9 +12,14 @@ storage_netmask=scope.function_netmask_to_cidr([scope.function_get_network_role_
 storage_physdev=scope.function_get_network_role_property(['storage', 'phys_dev']).join
 -%>
 use_neutron: false
+use_vcenter: undef
 floating_network_range: <%= scope.lookupvar('contrail::neutron_floating') %>
+fixed_network_range: 10.0.0.0/16
+public_interface: false
+private_int: false
+network_manager: nova.network.manager.FlatManager
 novanetwork_parameters:
-  network_manager: FlatDHCPManager
+  network_manager: FlatManager
   network_size: 65536
   num_networks: 1
 network_scheme:
