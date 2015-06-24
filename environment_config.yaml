@@ -3,7 +3,7 @@ attributes:
   metadata:
     restrictions:
       - condition: "not (cluster:net_provider == 'neutron' and (networking_parameters:segmentation_type == 'vlan' or networking_parameters:segmentation_type == 'gre'))"
-      - message: "Please use Neutron, the only network type supported with Contrail plugin."
+        message: "Please use Neutron, the only network type supported with Contrail plugin."
   contrail_asnum:
     value: '64512'
     label: 'AS Number'
