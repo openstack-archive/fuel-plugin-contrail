@@ -40,10 +40,19 @@ attributes:
     regex:
       source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}$'
       error: "Invalid IP address"
+  contrail_private_gw:
+    value: '10.109.3.1'
+    label: 'Gateway for Private network'
+    description: 'The IP address of gateway for contrail private network to reach BGP routers'
+    weight: 40
+    type: "text"
+    regex:
+      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}$'
+      error: "Invalid IP address"
   contrail_gateways:
     value: '10.109.3.1,10.109.3.2'
     label: 'GW IP'
-    description: 'Comma separated IP addresses of gateways'
+    description: 'Comma separated IP addresses of BGP peers'
     weight: 50
     type: "text"
     regex:
