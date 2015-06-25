@@ -19,7 +19,7 @@ control_network_ip=<%= scope.lookupvar('contrail::address') %>
 name=vhost0
 ip=<%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
 physical_interface=<%= scope.function_get_private_ifname([]) %>
-gateway=
+gateway=<%= scope.lookupvar('contrail::private_gw') %>
 [GATEWAY-0]
 [GATEWAY-1]
 [SERVICE-INSTANCE]
