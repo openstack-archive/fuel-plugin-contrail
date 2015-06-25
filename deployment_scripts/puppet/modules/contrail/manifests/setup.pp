@@ -39,7 +39,14 @@ class contrail::setup (
     command => 'patch /opt/contrail/utils/fabfile/tasks/provision.py /tmp/provision.py.patch && touch /opt/contrail/provision.py.patch-DONE',
     creates => '/opt/contrail/provision.py.patch-DONE'
     } ->
-
+    file {'/tmp/ha.py.patch':
+      ensure => file,
+      source => 'puppet:///modules/contrail/ha.py.patch'
+    } ->
+    exec {'commandline.py.patch':
+    command => 'patch /opt/contrail/utils/fabfile/utils/ha.py /tmp/ha.py.patch && touch /opt/contrail/ha.py.patch-DONE',
+    creates => '/opt/contrail/ha.py.patch-DONE'
+    } ->
     file {'/tmp/keepalived_conf_template.py.patch':
       ensure => file,
       source => 'puppet:///modules/contrail/keepalived_conf_template.py.patch'
