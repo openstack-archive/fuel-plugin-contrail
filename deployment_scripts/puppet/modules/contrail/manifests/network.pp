@@ -23,6 +23,7 @@ class contrail::network (
       'Ubuntu' => ['/etc/network/interfaces.d/ifcfg-br-aux', '/etc/network/interfaces.d/ifcfg-br-mesh'],
       'CentOS' => ['/etc/sysconfig/network-scripts/ifcfg-br-aux', '/etc/sysconfig/network-scripts/ifcfg-br-mesh'],
   }
+#  $gateways = inline_template("<%= scope.lookupvar('contrail::settings')['contrail_gateways'].split(',').map{|x|x.lstrip} %>")
 
   file { $br_file: ensure => absent } ->
   # Remove interface from the bridge
@@ -53,6 +54,11 @@ class contrail::network (
       exec {"add-default-route-via-${default_gw}":
         command => "ip route add default via ${default_gw}",
       }
+# ->
+#      l23network::l3::route {$gateways:
+#        destination => $gateways,
+#        gateway     => $contrail::private_gw,
+#      }
     }
     'compute':{
       file {'/etc/hiera/override':
