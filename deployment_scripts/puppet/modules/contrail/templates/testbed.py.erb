@@ -94,7 +94,7 @@ env.roledefs = {
 }
 
 #Openstack admin password
-env.openstack_admin_password = 'admin'
+env.openstack_admin_password = '<%= scope.lookupvar('contrail::admin_password') %>'
 env.password = 'r00tme'
 #Passwords of each host
 env.passwords = {
