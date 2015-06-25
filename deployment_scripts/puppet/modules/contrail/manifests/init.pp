@@ -34,6 +34,10 @@ $service_token = $neutron_settings['keystone']['admin_password']
 $keystone=hiera('keystone')
 $admin_token = $keystone['admin_token']
 
+$admin_settings = hiera('access')
+$admin_username = $admin_settings['user']
+$admin_password = $admin_settings['password']
+
 $mos_mgmt_vip=hiera('management_vip')
 
 # Contrail settings
