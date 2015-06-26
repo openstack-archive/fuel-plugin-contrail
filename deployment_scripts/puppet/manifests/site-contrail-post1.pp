@@ -43,11 +43,7 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
   class { 'contrail::package':
     install        => $pkgs,
     pip_install    => $pip_pkgs,
-  } ->
+  }
 
-  exec {'cassandra_mindisk':
-      command => '/bin/sed -i -e "30s/minimum_diskGB.*/minimum_diskGB\':\ \'32\'\,/" /usr/local/lib/python2.7/dist-packages/contrail_provisioning/database/setup.py',
-      creates => '/opt/contrail/cassandra_mindisk-DONE'
-    }
 }
 
