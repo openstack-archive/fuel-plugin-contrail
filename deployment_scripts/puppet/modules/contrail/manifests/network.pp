@@ -24,6 +24,18 @@ class contrail::network (
       'CentOS' => ['/etc/sysconfig/network-scripts/ifcfg-br-aux', '/etc/sysconfig/network-scripts/ifcfg-br-mesh'],
   }
 
+  define contrail::add_route ( $destination, $gateway ) {
+    exec {"check_route_to_${name}":
+      command => "ip route del ${name}",
+      onlyif  => "ip route | grep ${name}",
+      before  => L23network::L3::Route[$name],
+    }
+    l23network::l3::route {$name:
+      destination => $name,
+      gateway     => $gateway,
+    }
+  }
+
   file { $br_file: ensure => absent } ->
   # Remove interface from the bridge
   exec {"remove_${ifname}_aux":
@@ -41,6 +53,8 @@ class contrail::network (
   }
   case $node_role {
     'base-os':{
+      $gateways = split($contrail::settings['contrail_gateways'], ',')
+      class { 'l23network': use_ovs => false }
       l23network::l3::ifconfig {$ifname:
         interface => $ifname,
         ipaddr    => "${address}/${netmask}",
@@ -52,6 +66,10 @@ class contrail::network (
       } ->
       exec {"add-default-route-via-${default_gw}":
         command => "ip route add default via ${default_gw}",
+      } ->
+      contrail::add_route { $gateways:
+        destination => $gateways,
+        gateway     => $contrail::private_gw,
       }
     }
     'compute':{

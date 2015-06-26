@@ -65,6 +65,7 @@ if $public_allnodes == true {
 }
 
 $default_gw = hiera('management_vrouter_vip')
+$private_gw = $settings['contrail_private_gw']
 $contrail_mgmt_vip=get_last_ip(get_network_role_property('management', 'cidr'))
 
 $contrail_node_basename='contrail'
