@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-require 'ipaddr'
+require 'yaml'
 
 module Puppet::Parser::Functions
 newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
@@ -20,15 +20,15 @@ newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
     EOS
   ) do |args|
      ifname = String.new
-     cfg = L23network::Scheme.get_config(lookupvar('l3_fqdn_hostname'))
-     cfg[:transformations].each do |entry|
+     yml = YAML.load(File.open("/etc/astute.yaml"))
 
-     if entry[:action] == "add-port" and (entry[:bridge] == "br-aux" or entry[:bridge] == "br-mesh")
-       ifname = entry[:name]
-     end
+     yml['network_scheme']['transformations'].each do |entry|
+       if entry['bridge'] == "br-aux" or entry['bridge'] == "br-mesh"
+         ifname = entry['name']
+       end
+    end
 
-   end
-        return ifname.to_s
+    return ifname.to_s
     end
 end
 
