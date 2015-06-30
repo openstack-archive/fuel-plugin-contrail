@@ -23,7 +23,7 @@ newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
      yml = YAML.load(File.open("/etc/astute.yaml"))
 
      yml['network_scheme']['transformations'].each do |entry|
-       if entry['action'] == "add-port" and (entry['bridge'] == "br-aux" or entry['bridge'] == "br-mesh")
+       if entry['bridge'] == "br-aux" or entry['bridge'] == "br-mesh"
          ifname = entry['name']
        end
     end
