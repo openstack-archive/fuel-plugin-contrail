@@ -24,8 +24,9 @@ class contrail::service ( $node_role ) {
     }
     'controller','primary-controller': {
       $services = $operatingsystem ? {
-        'Ubuntu' => ['nova-api','nova-scheduler','nova-conductor'],
-        'CentOS' => ['openstack-nova-api','openstack-nova-scheduler','openstack-nova-conductor'],
+        'Ubuntu' => ['nova-api','nova-scheduler','nova-conductor','heat-api','heat-api-cfn','heat-engine'],
+        'CentOS' => ['openstack-nova-api','openstack-nova-scheduler','openstack-nova-conductor',
+                    'openstack-heat-api','openstack-heat-api-cfn','openstack-heat-engine'],
         default  => undef,
       }
       notify { 'restart-services':
