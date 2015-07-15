@@ -17,4 +17,4 @@ How to build plugin:
 
     fpb --build .
 
-- Check if file contrail-1.0-1.0.0-1.noarch.rpm was created.
+- Check if file contrail-1.0-1.0.1-1.noarch.rpm was created.
