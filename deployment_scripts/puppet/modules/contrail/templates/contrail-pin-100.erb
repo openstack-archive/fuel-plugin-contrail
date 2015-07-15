@@ -5,3 +5,15 @@ Pin-Priority: 1060
 Package: nodejs
 Pin: origin <%= scope.lookupvar('contrail::master_ip') %>
 Pin-Priority: 1060
+
+Package: python*
+Pin: origin <%= scope.lookupvar('contrail::master_ip') %>
+Pin-Priority: 1060
+
+Package: neutron*
+Pin: origin <%= scope.lookupvar('contrail::master_ip') %>
+Pin-Priority: 1060
+
+Package: rabbitmq-server
+Pin: origin <%= scope.lookupvar('contrail::master_ip') %>
+Pin-Priority: 1060
