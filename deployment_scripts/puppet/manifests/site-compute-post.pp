@@ -27,7 +27,8 @@ case $operatingsystem {
   Ubuntu: {
     file { '/etc/apt/preferences.d/contrail-pin-100':
       ensure  => file,
-      content => template('contrail/contrail-pin-100.erb'),
+      source  => 'puppet:///modules/contrail/contrail-pin-100',
+      before  => Class['contrail::package'],
     }
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
