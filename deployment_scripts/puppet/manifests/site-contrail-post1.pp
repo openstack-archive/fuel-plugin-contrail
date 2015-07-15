@@ -22,12 +22,8 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
         {
           file { '/etc/apt/preferences.d/contrail-pin-100':
             ensure  => file,
-            content => template('contrail/contrail-pin-100.erb'),
+            source  => 'plugins:///modules/contrail/contrail-pin-100',
             before  => Class['contrail::package'],
-          }
-          file { '/etc/apt/sources.list.d/mos.list':
-            ensure => absent,
-            before => Class['contrail::package'],
           }
           $pkgs = ['python-crypto','python-netaddr','python-paramiko','ifenslave-2.6','patch',
                   'openjdk-7-jre-headless','contrail-fabric-utils','contrail-setup']
