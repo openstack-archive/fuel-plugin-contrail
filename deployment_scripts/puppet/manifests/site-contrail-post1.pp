@@ -22,7 +22,7 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
         {
           file { '/etc/apt/preferences.d/contrail-pin-100':
             ensure  => file,
-            source  => 'plugins:///modules/contrail/contrail-pin-100',
+            source  => 'puppet:///modules/contrail/contrail-pin-100',
             before  => Class['contrail::package'],
           }
           $pkgs = ['python-crypto','python-netaddr','python-paramiko','ifenslave-2.6','patch',
