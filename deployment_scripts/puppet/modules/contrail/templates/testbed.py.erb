@@ -23,7 +23,7 @@ case node['role']
     role_os << 'os_ctrl_'+mgm_ip.count.to_s
   when 'base-os'
     if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
-      priv_ip << scope.function_get_ip_from_range([ scope.lookupvar('contrail::private_first'),scope.lookupvar('contrail::private_last'),scope.lookupvar('contrail::netmask_short'),node['uid'],'first'])
+      priv_ip << node['private_address']
       mgm_ip_baseos << node['internal_address']
       # Also find out a deployment node
       if node['user_node_name'] == scope.lookupvar('contrail::deployment_node')
@@ -116,7 +116,7 @@ env.openstack = {
 env.ha = {
    'internal_vip'   : '<%= os_management_vip %>',
    'external_vip'   : '<%= os_public_vip %>',
-   'contrail_internal_vip'   : '<%= scope.lookupvar('contrail::private_first') %>',
+   'contrail_internal_vip'   : '<%= scope.lookupvar('contrail::contrail_private_vip') %>',
    'contrail_external_vip'   : '<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>',
 }
 

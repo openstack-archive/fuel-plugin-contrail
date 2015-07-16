@@ -20,11 +20,11 @@ class contrail::network (
   $default_gw = undef
   ) {
   $br_file = $operatingsystem ? {
-      'Ubuntu' => ['/etc/network/interfaces.d/ifcfg-br-aux', '/etc/network/interfaces.d/ifcfg-br-mesh'],
-      'CentOS' => ['/etc/sysconfig/network-scripts/ifcfg-br-aux', '/etc/sysconfig/network-scripts/ifcfg-br-mesh'],
+      'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
+      'CentOS' => '/etc/sysconfig/network-scripts/ifcfg-br-mesh',
   }
 
-  define contrail::add_route ( $destination, $gateway ) {
+  define contrail::network::add_route ( $destination, $gateway ) {
     exec {"check_route_to_${name}":
       command => "ip route del ${name}",
       onlyif  => "ip route | grep ${name}",
@@ -36,17 +36,17 @@ class contrail::network (
     }
   }
 
+  if $operatingsystem == 'CentOS' {
+    exec {"remove_bridge_from_${ifname}_config":
+      command => "sed -i '/BRIDGE/d' /etc/sysconfig/network-scripts/ifcfg-${ifname}",
+    }
+  } ->
   file { $br_file: ensure => absent } ->
   # Remove interface from the bridge
-  exec {"remove_${ifname}_aux":
-    command => "brctl delif br-aux ${ifname}",
-    returns => [0,1] # Idempotent
-  } ->
   exec {"remove_${ifname}_mesh":
     command => "brctl delif br-mesh ${ifname}",
     returns => [0,1] # Idempotent
-  }
-  ->
+  } ->
   exec {'flush_addr_br_mesh':
     command => 'ip addr flush dev br-mesh',
     returns => [0,1] # Idempotent
@@ -67,29 +67,30 @@ class contrail::network (
       exec {"add-default-route-via-${default_gw}":
         command => "ip route add default via ${default_gw}",
       } ->
-      contrail::add_route { $gateways:
-        destination => $gateways,
-        gateway     => $contrail::private_gw,
+      case $contrail::private_gw {
+        '': { notify { 'No gateway for private network':} }
+        default: {
+          contrail::network::add_route { $gateways:
+            destination => $gateways,
+            gateway     => $contrail::private_gw,
+          }
+        }
       }
     }
     'compute':{
-      case $operatingsystem
-      {
-          Ubuntu:
-          {
-            file {'/etc/network/interfaces.d/ifcfg-vhost0':
-              ensure  => present,
-              content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
-            }
+      case $operatingsystem {
+        'Ubuntu': {
+          file {'/etc/network/interfaces.d/ifcfg-vhost0':
+            ensure  => present,
+            content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
           }
-
-          CentOS:
-          {
-            file {'/etc/sysconfig/network-scripts/ifcfg-vhost0':
-              ensure  => present,
-              content => template('contrail/centos-ifcfg-vhost0.erb'),
-            }
+        }
+        'CentOS': {
+          file {'/etc/sysconfig/network-scripts/ifcfg-vhost0':
+            ensure  => present,
+            content => template('contrail/centos-ifcfg-vhost0.erb'),
           }
+        }
       }
     }
     default: { notify { "Node role ${node_role} not supported": } }
