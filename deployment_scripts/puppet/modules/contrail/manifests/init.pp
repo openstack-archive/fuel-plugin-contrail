@@ -46,17 +46,16 @@ $asnum = $settings['contrail_asnum']
 # Network configuration
 prepare_network_config($network_scheme)
 $ifname = get_private_ifname()
-$private_first = $settings['contrail_private_start']
-$private_last = $settings['contrail_private_end']
-# "cidr" is actually a network address with subnet, i.e. 192.168.150.0/24
-$cidr = $settings['contrail_private_cidr']
-$netmask=cidr_to_netmask($cidr) # returns i.e. "255.255.255.0"
-$netmask_short=netmask_to_cidr($netmask) # returns i.e. "/24"
-$address=get_ip_from_range($private_first,$private_last,$netmask_short,$uid,'first')
+$address=get_network_role_property('neutron/mesh', 'ipaddr')
+$cidr=get_network_role_property('neutron/mesh', 'cidr')
+$netmask=get_network_role_property('neutron/mesh', 'netmask')
+$netmask_short=netmask_to_cidr($netmask)
 
 $default_gw = hiera('management_vrouter_vip')
 $private_gw = $settings['contrail_private_gw']
+
 $contrail_mgmt_vip=get_last_ip(get_network_role_property('management', 'cidr'))
+$contrail_private_vip=get_last_ip(get_network_role_property('neutron/mesh', 'cidr'))
 
 $contrail_node_basename='contrail'
 $deployment_node="${contrail_node_basename}-1"
@@ -64,7 +63,7 @@ $deployment_node="${contrail_node_basename}-1"
 $contrail_node_num = inline_template("<%-
 rv=0
   @nodes.each do |node|
-    if node['user_node_name'] =~ /^#{@contrail_node_basename}-.*/
+    if (node['user_node_name'] =~ /^#{@contrail_node_basename}-.*/ and node['role'] == 'base-os')
     rv+=1
   end
 end
