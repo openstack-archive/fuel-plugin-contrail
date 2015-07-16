@@ -2,8 +2,8 @@ attributes:
   # Show contrail only in supported network config
   metadata:
     restrictions:
-      - condition: "not (cluster:net_provider == 'neutron' and (networking_parameters:segmentation_type == 'vlan' or networking_parameters:segmentation_type == 'gre'))"
-        message: "Please use Neutron, the only network type supported with Contrail plugin."
+      - condition: "not (cluster:net_provider == 'neutron' and networking_parameters:segmentation_type == 'gre')"
+        message: "Please use Neutron with GRE segmentation, the only network type supported with Contrail plugin."
   contrail_asnum:
     value: '64512'
     label: 'AS Number'
@@ -13,46 +13,19 @@ attributes:
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid AS number"
-  contrail_private_cidr:
-    value: '10.109.3.0/24'
-    label: 'Private network CIDR'
-    description: 'CIDR for private network used in Contrail inter-node communication'
-    weight: 20
-    type: "text"
-    regex:
-      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:\/(?:[1-2]\d|[8-9]))$'
-      error: "Invalid network CIDR"
-  contrail_private_start:
-    value: '10.109.3.5'
-    label: 'Private IP range start'
-    description: 'First IP address of contrail private network. NOTE: First one will be used as VIP address for controller HA'
-    weight: 30
-    type: "text"
-    regex:
-      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}$'
-      error: "Invalid IP address"
-  contrail_private_end:
-    value: '10.109.3.254'
-    label: 'Private IP range end'
-    description: 'Last IP address of contrail private network'
-    weight: 40
-    type: "text"
-    regex:
-      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}$'
-      error: "Invalid IP address"
   contrail_private_gw:
-    value: '10.109.3.1'
+    value: ''
     label: 'Gateway for Private network'
-    description: 'The IP address of gateway for contrail private network to reach BGP routers'
+    description: 'The IP address of gateway for contrail private network to reach BGP routers. Empty if not needed.'
     weight: 40
     type: "text"
     regex:
-      source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}$'
+      source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})|(?:^)$'
       error: "Invalid IP address"
   contrail_gateways:
-    value: '10.109.3.2,10.110.1.1'
+    value: '10.109.3.254,10.110.1.1'
     label: 'GW IP'
-    description: 'Comma separated IP addresses of BGP peers'
+    description: 'Comma separated IP addresses of BGP peers.'
     weight: 50
     type: "text"
     regex:
