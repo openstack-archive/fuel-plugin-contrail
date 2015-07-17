@@ -21,6 +21,11 @@ exec {'no_predefined_network_hack':
 }
 
 exec {'no_network_reconfigure':
+  command => 'echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
+  onlyif => 'test -f /opt/contrail/provision-vrouter-DONE'
+}
+
+exec {'no_openstack_network_reconfigure':
   command => 'echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
   onlyif => 'test -f /opt/contrail/provision-vrouter-DONE'
 }

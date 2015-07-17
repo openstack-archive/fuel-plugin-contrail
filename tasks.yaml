@@ -98,8 +98,9 @@
     timeout: 720
 - role: ['compute']
   stage: post_deployment
-  type: reboot
+  type: shell
   parameters:
+    cmd: if [ ! -f /opt/contrail/reboot-vrouter-DONE ]; then touch /opt/contrail/reboot-vrouter-DONE && /sbin/reboot; fi
     timeout: 720
 - role: ['base-os']
   stage: post_deployment

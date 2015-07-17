@@ -73,14 +73,6 @@ class contrail::network (
       }
     }
     'compute':{
-      file {'/etc/hiera/override':
-        ensure => directory,
-      }
-      file {'/etc/hiera/override/plugins.yaml':
-        ensure => present,
-        content => template('contrail/plugins.yaml.erb'),
-        require => File['/etc/hiera/override'],
-      }
       case $operatingsystem
       {
           Ubuntu:
