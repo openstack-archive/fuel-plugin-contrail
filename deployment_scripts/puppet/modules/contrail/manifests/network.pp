@@ -19,15 +19,20 @@ class contrail::network (
   $netmask,
   $default_gw = undef
   ) {
-  case $operatingsystem {
-    'Ubuntu': {
-      $br_file = ['/etc/network/interfaces.d/ifcfg-br-aux', '/etc/network/interfaces.d/ifcfg-br-mesh']
+  $br_file = $operatingsystem ? {
+      'Ubuntu' => ['/etc/network/interfaces.d/ifcfg-br-aux', '/etc/network/interfaces.d/ifcfg-br-mesh'],
+      'CentOS' => ['/etc/sysconfig/network-scripts/ifcfg-br-aux', '/etc/sysconfig/network-scripts/ifcfg-br-mesh'],
+  }
+
+  define contrail::add_route ( $destination, $gateway ) {
+    exec {"check_route_to_${name}":
+      command => "ip route del ${name}",
+      onlyif  => "ip route | grep ${name}",
+      before  => L23network::L3::Route[$name],
     }
-    'CentOS': {
-      $br_file = ['/etc/sysconfig/network-scripts/ifcfg-br-aux', '/etc/sysconfig/network-scripts/ifcfg-br-mesh']
-      exec {"remove_bridge_from_${ifname}_config":
-        command => "sed -i '/BRIDGE/d' /etc/sysconfig/network-scripts/ifcfg-${ifname}",
-      }
+    l23network::l3::route {$name:
+      destination => $name,
+      gateway     => $gateway,
     }
   }
 
@@ -48,6 +53,8 @@ class contrail::network (
   }
   case $node_role {
     'base-os':{
+      $gateways = split($contrail::settings['contrail_gateways'], ',')
+      class { 'l23network': use_ovs => false }
       l23network::l3::ifconfig {$ifname:
         interface => $ifname,
         ipaddr    => "${address}/${netmask}",
@@ -59,17 +66,13 @@ class contrail::network (
       } ->
       exec {"add-default-route-via-${default_gw}":
         command => "ip route add default via ${default_gw}",
+      } ->
+      contrail::add_route { $gateways:
+        destination => $gateways,
+        gateway     => $contrail::private_gw,
       }
     }
     'compute':{
-      file {'/etc/hiera/override':
-        ensure => directory,
-      }
-      file {'/etc/hiera/override/plugins.yaml':
-        ensure => present,
-        content => template('contrail/plugins.yaml.erb'),
-        require => File['/etc/hiera/override'],
-      }
       case $operatingsystem
       {
           Ubuntu:

@@ -1,13 +1,15 @@
-+++ /opt/contrail/utils/fabfile/tasks/install.py
-@@ -171,10 +171,7 @@
-                 run(cmd)
-
+--- /opt/contrail/utils/fabfile/tasks/install.py        2015-06-09 20:15:26.809587058 +0000
++++ /opt/contrail/utils/fabfile/tasks/install.py_new    2015-06-09 20:08:40.031819798 +0000
+@@ -208,10 +208,7 @@
+                 sudo(cmd)
+ 
  def yum_install(rpms, disablerepo = True):
 -    if disablerepo:
--        cmd = "yum -y --nogpgcheck --disablerepo=* --enablerepo=contrail_install_repo install "
+-        cmd = "yum -y --nogpgcheck --disablerepo=* --enablerepo=contrail* install "
 -    else:
 -        cmd = "yum -y --nogpgcheck install "
 +    cmd = "yum -y --nogpgcheck install "
      os_type = detect_ostype()
      # redhat platform installs from multiple repos
      if os_type in ['redhat']:
+

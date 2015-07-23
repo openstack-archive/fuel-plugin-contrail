@@ -30,7 +30,6 @@ $nodes= hiera('nodes')
 
 $neutron_settings=hiera('quantum_settings')
 $metadata_secret=$neutron_settings['metadata']['metadata_proxy_shared_secret']
-$neutron_floating=$neutron_settings['predefined_networks']['net04_ext']['L3']['floating']
 $service_token = $neutron_settings['keystone']['admin_password']
 $keystone=hiera('keystone')
 $admin_token = $keystone['admin_token']
@@ -43,8 +42,6 @@ $mos_mgmt_vip=hiera('management_vip')
 
 # Contrail settings
 $asnum = $settings['contrail_asnum']
-$admin_tenant_private_cidr = $settings['admin_tenant_private_cidr']
-$admin_tenant_public_cidr = $settings['admin_tenant_public_cidr']
 
 # Network configuration
 prepare_network_config($network_scheme)
@@ -57,15 +54,8 @@ $netmask=cidr_to_netmask($cidr) # returns i.e. "255.255.255.0"
 $netmask_short=netmask_to_cidr($netmask) # returns i.e. "/24"
 $address=get_ip_from_range($private_first,$private_last,$netmask_short,$uid,'first')
 
-$public_network_assignment=hiera('public_network_assignment')
-$public_allnodes=$public_network_assignment['assign_to_all_nodes']
-
-if $public_allnodes == true {
-  $public_address=get_network_role_property('ex', 'ipaddr')
-  $public_netmask=netmask_to_cidr(get_network_role_property('ex', 'netmask'))
-}
-
 $default_gw = hiera('management_vrouter_vip')
+$private_gw = $settings['contrail_private_gw']
 $contrail_mgmt_vip=get_last_ip(get_network_role_property('management', 'cidr'))
 
 $contrail_node_basename='contrail'
