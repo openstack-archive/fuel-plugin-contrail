@@ -1,0 +1,19 @@
+tickTime=2000
+initLimit=10
+syncLimit=5
+dataDir=/var/lib/zookeeper
+clientPort=2181
+maxSessionTimeout=120000
+<%-
+nodes=scope.function_hiera(['nodes'])
+contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
+nodes.each do |node|
+  case node['role']
+    when 'base-os'
+      if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
+-%>
+  server.<%= node['uid'] %>=<%= node['private_address']%>:2888:3888
+<%-   end
+  end
+end
+-%>
