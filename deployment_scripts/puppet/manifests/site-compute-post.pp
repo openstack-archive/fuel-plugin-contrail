@@ -39,22 +39,19 @@ case $operatingsystem {
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','iproute','haproxy','patch'],
       remove  => ['openvswitch','kmod-openvswitch','kmod-openvswitch-lt','openstack-neutron-openvswitch'],
-    }
-    ->
-    class { 'contrail::vrouter_module':}
-    ->
+    } ->
+    class { 'contrail::vrouter_module':} ->
     file { '/etc/supervisord.conf':
       ensure => 'link',
       target => '/etc/contrail/supervisord_vrouter.conf',
       force  => 'yes',
-    }
-    ->
+    } ->
     file {'/etc/contrail/default_pmac':
               ensure => present,
-    }
-    ->
+    } ->
     service {'supervisor-vrouter': enable => true}
   }
+  default: {}
 } ->
 
 class { 'contrail::config':

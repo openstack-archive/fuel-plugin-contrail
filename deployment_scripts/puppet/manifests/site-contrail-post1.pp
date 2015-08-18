@@ -25,8 +25,10 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
             source  => 'puppet:///modules/contrail/contrail-pin-100',
             before  => Class['contrail::package'],
           }
-          $pkgs = ['python-crypto','python-netaddr','python-paramiko','ifenslave-2.6','patch',
-                  'openjdk-7-jre-headless','contrail-fabric-utils','contrail-setup']
+          $pkgs = ['python-crypto','python-netaddr','python-paramiko',
+                  'ifenslave-2.6','patch','openjdk-7-jre-headless',
+                  'python-contrail','contrail-setup','contrail-utils','contrail-nodemgr','supervisor',
+                  'contrail-fabric-utils']
           $pip_pkgs = ['Fabric-1.7.5']
           }
       CentOS:
@@ -35,6 +37,7 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
                   'java-1.7.0-openjdk','contrail-fabric-utils','contrail-setup']
           $pip_pkgs = ['Fabric-1.7.5']
         }
+      default: {}
     }
   class { 'contrail::package':
     install        => $pkgs,
