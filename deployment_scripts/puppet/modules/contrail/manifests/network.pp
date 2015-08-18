@@ -77,6 +77,7 @@ class contrail::network (
             content => template('contrail/centos-ifcfg-vhost0.erb'),
           }
         }
+        default: {}
       }
     }
     default: { notify { "Node role ${node_role} not supported": } }
