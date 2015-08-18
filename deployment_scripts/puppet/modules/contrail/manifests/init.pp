@@ -46,10 +46,16 @@ $asnum = $settings['contrail_asnum']
 # Network configuration
 prepare_network_config($network_scheme)
 $ifname = get_private_ifname()
+$private_if=get_network_role_property('neutron/mesh', 'interface')
 $address=get_network_role_property('neutron/mesh', 'ipaddr')
 $cidr=get_network_role_property('neutron/mesh', 'cidr')
 $netmask=get_network_role_property('neutron/mesh', 'netmask')
 $netmask_short=netmask_to_cidr($netmask)
+
+$mgmt_if=get_network_role_property('management', 'interface')
+$mgmt_cidr=get_network_role_property('management', 'cidr')
+$mgmt_netmask=get_network_role_property('management', 'netmask')
+$mgmt_netmask_short=netmask_to_cidr($mgmt_netmask)
 
 $default_gw = hiera('management_vrouter_vip')
 $private_gw = $settings['contrail_private_gw']
