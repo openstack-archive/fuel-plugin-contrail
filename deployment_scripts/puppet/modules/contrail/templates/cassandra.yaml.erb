@@ -1,0 +1,114 @@
+<%-
+nodes=scope.function_hiera(['nodes'])
+contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
+priv_ip=Array.new
+nodes.each do |node|
+case node['role']
+  when 'base-os'
+    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
+      priv_ip << node['private_address']
+    end
+  end
+end
+
+-%>
+cluster_name: 'Contrail'
+num_tokens: 256
+hinted_handoff_enabled: true
+max_hint_window_in_ms: 10800000 # 3 hours
+hinted_handoff_throttle_in_kb: 1024
+max_hints_delivery_threads: 2
+authenticator: AllowAllAuthenticator
+authorizer: AllowAllAuthorizer
+permissions_validity_in_ms: 2000
+partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+data_file_directories:
+    - /var/lib/cassandra/data
+commitlog_directory: /var/lib/cassandra/commitlog
+disk_failure_policy: stop
+key_cache_size_in_mb:
+key_cache_save_period: 14400
+row_cache_size_in_mb: 0
+row_cache_save_period: 0
+row_cache_provider: SerializingCacheProvider
+saved_caches_directory: /var/lib/cassandra/saved_caches
+commitlog_sync: periodic
+commitlog_sync_period_in_ms: 10000
+commitlog_segment_size_in_mb: 32
+seed_provider:
+    # Addresses of hosts that are deemed contact points. 
+    # Cassandra nodes use this list of hosts to find each other and learn
+    # the topology of the ring.  You must change this if you are running
+    # multiple nodes!
+    - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+      parameters:
+          # seeds is actually a comma-delimited list of addresses.
+          # Ex: "<ip1>,<ip2>,<ip3>"
+          - seeds: "<%= priv_ip.join(',') %>"
+flush_largest_memtables_at: 0.75
+reduce_cache_sizes_at: 0.85
+reduce_cache_capacity_to: 0.6
+concurrent_reads: 192
+concurrent_writes: 256
+memtable_flush_queue_size: 4
+trickle_fsync: false
+trickle_fsync_interval_in_kb: 10240
+storage_port: 7000
+ssl_storage_port: 7001
+listen_address: <%= @local_ip %>
+start_native_transport: true
+native_transport_port: 9042
+start_rpc: true
+rpc_address: <%= @local_ip %>
+rpc_port: 9160
+rpc_keepalive: true
+rpc_server_type: sync
+thrift_framed_transport_size_in_mb: 15
+incremental_backups: false
+snapshot_before_compaction: false
+auto_snapshot: true
+tombstone_debug_threshold: 10000
+column_index_size_in_kb: 64
+in_memory_compaction_limit_in_mb: 512
+multithreaded_compaction: false
+compaction_throughput_mb_per_sec: 512
+compaction_preheat_key_cache: true
+read_request_timeout_in_ms: 10000
+range_request_timeout_in_ms: 10000
+write_request_timeout_in_ms: 10000
+truncate_request_timeout_in_ms: 60000
+request_timeout_in_ms: 10000
+cross_node_timeout: false
+endpoint_snitch: SimpleSnitch
+dynamic_snitch_update_interval_in_ms: 100 
+dynamic_snitch_reset_interval_in_ms: 600000
+dynamic_snitch_badness_threshold: 0.1
+request_scheduler: org.apache.cassandra.scheduler.NoScheduler
+index_interval: 128
+server_encryption_options:
+    internode_encryption: none
+    keystore: conf/.keystore
+    keystore_password: cassandra
+    truststore: conf/.truststore
+    truststore_password: cassandra
+    # More advanced defaults below:
+    # protocol: TLS
+    # algorithm: SunX509
+    # store_type: JKS
+    # cipher_suites: [TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA]
+    # require_client_auth: false
+client_encryption_options:
+    enabled: false
+    keystore: conf/.keystore
+    keystore_password: cassandra
+    # require_client_auth: false
+    # Set trustore and truststore_password if require_client_auth is true
+    # truststore: conf/.truststore
+    # truststore_password: cassandra
+    # More advanced defaults below:
+    # protocol: TLS
+    # algorithm: SunX509
+    # store_type: JKS
+    # cipher_suites: [TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA]
+internode_compression: all
+inter_dc_tcp_nodelay: true
