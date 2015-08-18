@@ -36,23 +36,6 @@ class contrail::setup ($node_name)
     command => 'patch /opt/contrail/utils/fabfile/utils/commandline.py /tmp/commandline.py.patch && touch /opt/contrail/commandline.py.patch-DONE',
     creates => '/opt/contrail/commandline.py.patch-DONE'
     } ->
-    file {'/tmp/ha.py.patch':
-      ensure => file,
-      source => 'puppet:///modules/contrail/ha.py.patch'
-    } ->
-    exec {'ha.py.patch':
-    command => 'patch /opt/contrail/utils/fabfile/tasks/ha.py /tmp/ha.py.patch && touch /opt/contrail/ha.py.patch-DONE',
-    creates => '/opt/contrail/ha.py.patch-DONE'
-    } ->
-    file {'/tmp/keepalived_conf_template.py.patch':
-      ensure => file,
-      source => 'puppet:///modules/contrail/keepalived_conf_template.py.patch'
-    } ->
-    exec {'keepalived_conf_template.py.patch':
-      command => "patch ${pythonpath}/contrail_provisioning/common/templates/keepalived_conf_template.py /tmp/keepalived_conf_template.py.patch \
-&& touch /opt/contrail/keepalived_conf_template.py.patch-DONE",
-      creates => '/opt/contrail/keepalived_conf_template.py.patch-DONE'
-    } ->
 
     # Database installation
     #run_fabric { 'install_database': } ->
@@ -70,8 +53,8 @@ class contrail::setup ($node_name)
     run_fabric { 'install_collector': } ->
     run_fabric { 'install_webui': } ->
     # Some fixups
-    run_fabric { 'setup_contrail_keepalived': } ->
-    run_fabric { 'fixup_restart_haproxy_in_collector': } ->
+    #run_fabric { 'setup_contrail_keepalived': } ->
+    #run_fabric { 'fixup_restart_haproxy_in_collector': } ->
     run_fabric { 'fix-service-tenant-name':
       hostgroup => 'control',
       command   => "sed -i '49s/service/services/g' ${pythonpath}/contrail_provisioning/config/quantum_in_keystone_setup.py",
