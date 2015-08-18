@@ -76,6 +76,7 @@ class contrail::network (
             ensure  => present,
             content => template('contrail/centos-ifcfg-vhost0.erb'),
           }
+        default: {}
         }
       }
     }

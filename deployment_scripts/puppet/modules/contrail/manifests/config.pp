@@ -14,6 +14,7 @@
 
 class contrail::config ( $node_role ) {
   case $node_role {
+    default: {}
     'controller','primary-controller': {
       nova_config {
         'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';

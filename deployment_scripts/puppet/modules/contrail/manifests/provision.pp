@@ -38,6 +38,7 @@ class contrail::provision ( $node_role ) {
         creates => '/opt/contrail/provision-vrouter-DONE',
       }
     }
+    default: {}
   }
 
 }
