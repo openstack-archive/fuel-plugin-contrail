@@ -21,7 +21,8 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
   class { 'contrail::vip': } ->
   class { 'contrail::cfgm': } ->
   class { 'contrail::analytics': } ->
-  class { 'contrail::control': }
+  class { 'contrail::control': } ->
+  class { 'contrail::webui': }
 }
 
 if $contrail::node_name == $contrail::deployment_node {
@@ -29,6 +30,6 @@ if $contrail::node_name == $contrail::deployment_node {
   ->
   class { 'contrail::setup':
     node_name => $contrail::node_name,
-    require   => Class['contrail::control'],
+    require   => Class['contrail::webui'],
   }
 }
