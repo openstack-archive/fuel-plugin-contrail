@@ -19,6 +19,7 @@ Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH
 if $contrail::node_name =~ /^contrail.\d+$/ {
   class { 'contrail::database': }
   class { 'contrail::vip': }
+  class { 'contrail::cfgm': }
 }
 
 if $contrail::node_name == $contrail::deployment_node {
