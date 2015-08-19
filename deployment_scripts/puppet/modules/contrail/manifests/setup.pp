@@ -51,7 +51,7 @@ class contrail::setup ($node_name)
     #run_fabric { 'install_cfgm': } ->
     #run_fabric { 'install_control': } ->
     #run_fabric { 'install_collector': } ->
-    run_fabric { 'install_webui': } ->
+    #run_fabric { 'install_webui': } ->
     # Some fixups
     #run_fabric { 'setup_contrail_keepalived': } ->
     #run_fabric { 'fixup_restart_haproxy_in_collector': } ->
@@ -63,10 +63,10 @@ class contrail::setup ($node_name)
     #run_fabric { 'setup_cfgm': } ->
     exec {'update_neutron_pwd':
       command => "keystone --os-endpoint http://${contrail::mos_mgmt_vip}:35357/v2.0 --os-token ${contrail::admin_token} \
---os-tenant-name services user-password-update --pass  ${contrail::service_token}  neutron"} ->
+--os-tenant-name services user-password-update --pass  ${contrail::service_token}  neutron"}
     #run_fabric { 'setup_control': } ->
     #run_fabric { 'setup_collector': } ->
-    run_fabric { 'setup_webui': }
+    #run_fabric { 'setup_webui': }
 
   }
 
