@@ -17,8 +17,9 @@ include contrail
 Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH', timeout => 1800}
 
 if $contrail::node_name =~ /^contrail.\d+$/ {
-  class { 'contrail::database': }
-  class { 'contrail::vip': }
+  class { 'contrail::database': } ->
+  class { 'contrail::vip': } ->
+  class { 'contrail::cfgm': }
 }
 
 if $contrail::node_name == $contrail::deployment_node {
@@ -26,6 +27,6 @@ if $contrail::node_name == $contrail::deployment_node {
   ->
   class { 'contrail::setup':
     node_name => $contrail::node_name,
-    require   => [Class['contrail::database'],Class['contrail::vip']],
+    require   => Class['contrail::cfgm'],
   }
 }
