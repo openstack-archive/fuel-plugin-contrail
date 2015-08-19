@@ -1,0 +1,42 @@
+<%-
+nodes=scope.function_hiera(['nodes'])
+contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
+priv_ip=Array.new
+nodes.each do |node|
+case node['role']
+  when 'base-os'
+    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
+      priv_ip << node['private_address']
+    end
+  end
+end
+-%>
+[DEFAULTS]
+ifmap_server_ip=<%= scope.lookupvar('contrail::address') %>
+ifmap_server_port=8443
+ifmap_username=svc-monitor
+ifmap_password=svc-monitor
+api_server_ip=<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>
+api_server_port=8082
+zk_server_ip=<%= priv_ip.map{ |ip| "#{ip}:2181" }.join(',') %>
+log_file=/var/log/contrail/contrail-svc-monitor.log
+cassandra_server_list=<%= priv_ip.map{ |ip| "#{ip}:9160" }.join(' ') %>
+disc_server_ip=<%= scope.lookupvar('contrail::contrail_private_vip') %>
+disc_server_port=5998
+region_name=RegionOne
+log_local=1
+log_level=SYS_NOTICE
+rabbit_server=<%= scope.lookupvar('contrail::mos_mgmt_vip') %>
+rabbit_port=5673
+rabbit_password = <%= scope.lookupvar('contrail::rabbit_password') %>
+rabbit_user = nova
+
+[SECURITY]
+use_certs=False
+keyfile=/etc/contrail/ssl/private_keys/svc_monitor_key.pem
+certfile=/etc/contrail/ssl/certs/svc_monitor.pem
+ca_certs=/etc/contrail/ssl/certs/ca.pem
+
+[SCHEDULER]
+analytics_server_ip=<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>
+analytics_server_port=8081
