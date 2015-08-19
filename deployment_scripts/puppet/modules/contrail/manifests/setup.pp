@@ -48,7 +48,7 @@ class contrail::setup ($node_name)
       try_sleep => 30,
     } ->
     # Installing components
-    run_fabric { 'install_cfgm': } ->
+    #run_fabric { 'install_cfgm': } ->
     run_fabric { 'install_control': } ->
     run_fabric { 'install_collector': } ->
     run_fabric { 'install_webui': } ->
@@ -60,7 +60,7 @@ class contrail::setup ($node_name)
       command   => "sed -i '49s/service/services/g' ${pythonpath}/contrail_provisioning/config/quantum_in_keystone_setup.py",
     } ->
     # Setting up the components
-    run_fabric { 'setup_cfgm': } ->
+    #run_fabric { 'setup_cfgm': } ->
     exec {'update_neutron_pwd':
       command => "keystone --os-endpoint http://${contrail::mos_mgmt_vip}:35357/v2.0 --os-token ${contrail::admin_token} \
 --os-tenant-name services user-password-update --pass  ${contrail::service_token}  neutron"} ->
