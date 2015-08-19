@@ -1,0 +1,43 @@
+<%-
+nodes=scope.function_hiera(['nodes'])
+contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
+priv_ip=Array.new
+nodes.each do |node|
+case node['role']
+  when 'base-os'
+    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
+      priv_ip << node['private_address']
+    end
+  end
+end
+-%>
+[DEFAULTS]
+host_ip = <%= scope.lookupvar('contrail::address') %>
+cassandra_server_list=<%= priv_ip.map{ |ip| "#{ip}:9160" }.join(' ') %>
+collectors = <%= scope.lookupvar('contrail::address') %>:8086
+http_server_port = 8090
+rest_api_port = 9081
+rest_api_ip = 0.0.0.0 
+log_local = 1
+log_level = SYS_NOTICE
+log_category = 
+log_file = /var/log/contrail/contrail-analytics-api.log
+
+# Time-to-live in hours of the various data stored by collector into
+# cassandra
+# analytics_config_audit_ttl, if not set (or set to -1), defaults to analytics_data_ttl
+# analytics_statistics_ttl, if not set (or set to -1), defaults to analytics_data_ttl
+# analytics_flow_ttl, if not set (or set to -1), defaults to analytics_statsdata_ttl
+analytics_data_ttl=48
+analytics_config_audit_ttl=-1
+analytics_statistics_ttl=-1
+analytics_flow_ttl=-1
+
+[DISCOVERY]
+disc_server_ip = <%= scope.lookupvar('contrail::contrail_private_vip') %>
+disc_server_port = 5998
+
+[REDIS]
+redis_server_port = 6379
+redis_query_port = 6379
+

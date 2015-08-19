@@ -1,3 +1,16 @@
+<%-
+nodes=scope.function_hiera(['nodes'])
+contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
+priv_ip=Array.new
+nodes.each do |node|
+case node['role']
+  when 'base-os'
+    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
+      priv_ip << node['private_address']
+    end
+  end
+end
+-%>
 [DEFAULTS]
 api_server_ip=<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>
 api_server_port=8082
