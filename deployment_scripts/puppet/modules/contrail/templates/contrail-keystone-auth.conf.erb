@@ -1,0 +1,10 @@
+[KEYSTONE]
+auth_host=<%= scope.lookupvar('contrail::mos_mgmt_vip') %>
+auth_protocol=http
+auth_port=35357
+admin_user=<%= scope.lookupvar('contrail::admin_username') %>
+admin_password=<%= scope.lookupvar('contrail::admin_password') %>
+admin_token=<%= scope.lookupvar('contrail::admin_token') %>
+admin_tenant_name=admin
+insecure=False
+memcache_servers=127.0.0.1:11211
