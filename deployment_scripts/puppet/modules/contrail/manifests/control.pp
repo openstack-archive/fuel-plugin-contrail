@@ -20,8 +20,8 @@ class contrail::control {
   File {
     ensure  => present,
     mode    => '0644',
-    owner   => root,
-    group   => root,
+    owner   => 'contrail',
+    group   => 'contrail',
     require => Package['contrail-openstack-control'],
   }
 
@@ -41,7 +41,7 @@ class contrail::control {
   }
 
   file { '/etc/contrail/dns/contrail-named.conf':
-    source  => 'puppet:///modules/contrail/contrail-named.conf',
+    content => template('contrail/contrail-named.conf.erb'),
     require => Package['contrail-dns'],
   }
 
@@ -54,16 +54,20 @@ class contrail::control {
     content => template('contrail/contrail-control-nodemgr.conf.erb'),
   }
 
-
 # Control service
+  service { 'contrail-named':
+    ensure    => running,
+    require   => Package['contrail-dns'],
+    subscribe => [File['/etc/contrail/dns/contrail-named.conf'],
+                  File['/etc/contrail/dns/contrail-rndc.conf'],
+                  ]
+  }
   service { 'supervisor-control':
     ensure      => running,
     enable      => true,
     require     => Package['contrail-openstack-control'],
     subscribe   => [File['/etc/contrail/contrail-control.conf'],
                     File['/etc/contrail/contrail-dns.conf'],
-                    File['/etc/contrail/dns/contrail-named.conf'],
-                    File['/etc/contrail/dns/contrail-rndc.conf'],
                     ],
   }
 

@@ -74,14 +74,14 @@
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post3.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 1440
 - role: ['base-os']
   stage: post_deployment
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post4.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 1440
 - role: ['primary-controller','controller']
   stage: post_deployment
   type: puppet
@@ -102,11 +102,3 @@
   parameters:
     cmd: if [ ! -f /opt/contrail/reboot-vrouter-DONE ]; then touch /opt/contrail/reboot-vrouter-DONE && /sbin/reboot; fi
     timeout: 720
-- role: ['base-os']
-  stage: post_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/site-contrail-post5.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
-
