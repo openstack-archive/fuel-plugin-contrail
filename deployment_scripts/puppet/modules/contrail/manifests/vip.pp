@@ -31,8 +31,8 @@ class contrail::vip {
   file { '/etc/keepalived/keepalived.conf':
     content => template('contrail/keepalived.conf.erb'),
   }
-  file { '/etc/haproxy/haproxy.conf':
-    content => template('contrail/haproxy.conf.erb'),
+  file { '/etc/haproxy/haproxy.cfg':
+    content => template('contrail/haproxy.cfg.erb'),
   }
 
 # Services
