@@ -47,6 +47,49 @@ class contrail::config ( $node_role ) {
         hasrestart => true,
         restart    => '/sbin/ip netns exec haproxy service haproxy reload',
       }
+# Contrail-specific heat templates settings
+      ini_setting { 'contrail-user':
+          ensure  => present,
+          path    => '/etc/heat/heat.conf',
+          section => 'clients_contrail',
+          setting => 'user',
+          value   => 'neutron',
+      }
+      ini_setting { 'contrail-password':
+          ensure  => present,
+          path    => '/etc/heat/heat.conf',
+          section => 'clients_contrail',
+          setting => 'password',
+          value   => $contrail::service_token,
+      }
+      ini_setting { 'contrail-tenant':
+          ensure  => present,
+          path    => '/etc/heat/heat.conf',
+          section => 'clients_contrail',
+          setting => 'tenant',
+          value   => 'services',
+      }
+      ini_setting { 'contrail-api_server':
+          ensure  => present,
+          path    => '/etc/heat/heat.conf',
+          section => 'clients_contrail',
+          setting => 'api_server',
+          value   => $contrail::contrail_mgmt_vip,
+      }
+      ini_setting { 'contrail-auth_host_ip':
+          ensure  => present,
+          path    => '/etc/heat/heat.conf',
+          section => 'clients_contrail',
+          setting => 'auth_host_ip',
+          value   => $contrail::mos_mgmt_vip,
+      }
+      ini_setting { 'contrail-api_base_url':
+          ensure  => present,
+          path    => '/etc/heat/heat.conf',
+          section => 'clients_contrail',
+          setting => 'api_base_url',
+          value   => '/',
+      }
     }
     'compute': {
       nova_config {

@@ -39,7 +39,7 @@ class contrail::provision ( $node_role ) {
       exec { 'prov_control_bgp':
         command  => "python /opt/contrail/utils/provision_control.py --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --oper add --host_name ${::fqdn}  --host_ip ${contrail::address} --router_asn ${contrail::asnum} --admin_user ${contrail::admin_username} --admin_tenant_name services --admin_password  ${contrail::admin_password} && touch /opt/contrail/prov_control_bgp-DONE",
         require  => Exec['wait_for_api'],
-        creates  => '/etc/contrail//opt/contrail/prov_control_bgp-DONE',
+        creates  => '/opt/contrail/prov_control_bgp-DONE',
       }
       if $contrail::node_name == $contrail::deployment_node {
         contrail::provision::prov_ext_bgp { $gateways:
