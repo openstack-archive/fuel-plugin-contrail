@@ -24,11 +24,6 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
     ifname     => $contrail::ifname,
     netmask    => $contrail::netmask_short,
     default_gw => $contrail::default_gw,
-  } ->
-
-  class { 'contrail::ssh':
-    password_auth => 'yes',
-    root_login    => 'yes'
   }
 
 }

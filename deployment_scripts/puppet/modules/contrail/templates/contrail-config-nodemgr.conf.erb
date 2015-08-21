@@ -1,7 +1,3 @@
-[DEFAULT]
-hostip=<%= scope.lookupvar('contrail::address') %>
-minimum_diskGB=256
-
 [DISCOVERY]
 server=<%= scope.lookupvar('contrail::contrail_private_vip') %>
 port=5998
