@@ -19,8 +19,8 @@ class contrail::vip {
   File {
     ensure  => present,
     mode    => '0644',
-    owner   => root,
-    group   => root,
+    owner   => 'root',
+    group   => 'root',
   }
 
 # Packages
@@ -30,23 +30,23 @@ class contrail::vip {
 # Configs
   file { '/etc/keepalived/keepalived.conf':
     content => template('contrail/keepalived.conf.erb'),
+    require   => Package['keepalived'],
   }
-  file { '/etc/haproxy/haproxy.conf':
-    content => template('contrail/haproxy.conf.erb'),
+  file { '/etc/haproxy/haproxy.cfg':
+    content => template('contrail/haproxy.cfg.erb'),
+    require   => Package['haproxy'],
   }
 
 # Services
   service { 'keepalived':
     ensure    => running,
     enable    => true,
-    require   => Package['keepalived'],
     subscribe => File['/etc/keepalived/keepalived.conf'],
   }
   service { 'haproxy':
     ensure    => running,
     enable    => true,
-    require   => Package['haproxy'],
-    subscribe => File['/etc/haproxy/haproxy.conf'],
+    subscribe => File['/etc/haproxy/haproxy.cfg'],
   }
 
 }

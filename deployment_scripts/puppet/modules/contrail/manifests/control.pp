@@ -20,8 +20,8 @@ class contrail::control {
   File {
     ensure  => present,
     mode    => '0644',
-    owner   => root,
-    group   => root,
+    owner   => 'contrail',
+    group   => 'contrail',
     require => Package['contrail-openstack-control'],
   }
 
