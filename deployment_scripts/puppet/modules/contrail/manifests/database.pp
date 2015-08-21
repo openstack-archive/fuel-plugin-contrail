@@ -32,14 +32,14 @@ class contrail::database {
 # Zookeeper
   file { '/etc/zookeeper/conf/myid':
     content => $contrail::uid,
-  }
+    require => Package['zookeeper'],
+  } ->
   file { '/etc/zookeeper/conf/zoo.cfg':
     content => template('contrail/zoo.cfg.erb');
   }
   service { 'zookeeper':
     ensure      => running,
     enable      => true,
-    require     => Package['zookeeper'],
     subscribe   => [
       File['/etc/zookeeper/conf/zoo.cfg'],
       File['/etc/zookeeper/conf/myid'],
@@ -47,18 +47,20 @@ class contrail::database {
   }
 
 # Cassandra
+  file { '/var/lib/cassandra':
+    ensure  => directory,
+    mode    => '0755',
+    require => Package['cassandra'],
+  } ->
+  file { '/var/crashes':
+    ensure => directory,
+    mode   => '0777',
+  } ->
   file { '/etc/cassandra/cassandra.yaml':
     content => template('contrail/cassandra.yaml.erb'),
   } ->
   file { '/etc/cassandra/cassandra-env.sh':
     source  => 'puppet:///modules/contrail/cassandra-env.sh',
-  } ->
-  file { '/var/lib/cassandra':
-    ensure  => directory,
-    mode    => '0755',
-    owner   => root,
-    group   => root,
-    require => Package['cassandra'],
   }
 
 # Supervisor-database
