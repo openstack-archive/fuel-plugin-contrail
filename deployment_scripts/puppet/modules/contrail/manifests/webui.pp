@@ -20,12 +20,10 @@ class contrail::webui {
   File {
     ensure  => present,
     mode    => '0644',
-    owner   => root,
-    group   => root,
+    owner   => 'contrail',
+    group   => 'contrail',
     require => Package['contrail-openstack-webui'],
   }
-
-  Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
 # Packages
   package { 'nodejs': } ->

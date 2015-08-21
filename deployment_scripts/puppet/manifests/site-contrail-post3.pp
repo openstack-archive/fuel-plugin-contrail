@@ -14,9 +14,13 @@
 
 include contrail
 $node_role = 'base-os'
-if $contrail::node_name =~ /^contrail.\d+$/ {
+# Deploy first node
+if $contrail::node_name == $contrail::deployment_node {
   class { 'contrail::cfgm': } ->
   class { 'contrail::control': } ->
   class { 'contrail::analytics': } ->
   class { 'contrail::webui': }
+  class {'contrail::provision':
+    node_role => $node_role,
+  }
 }
