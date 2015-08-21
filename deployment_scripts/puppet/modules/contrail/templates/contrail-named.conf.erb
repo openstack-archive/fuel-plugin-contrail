@@ -1,3 +1,4 @@
+<%- external_dns=scope.function_hiera(['external_dns']) %>
 options {
     directory "/etc/contrail/dns/";
     managed-keys-directory "/etc/contrail/dns/";
@@ -35,4 +36,5 @@ view "_default_view_" {
     match-clients {any;};
     match-destinations {any;};
     match-recursive-only no;
+    forwarders { <%= external_dns['dns_list'].split(',').map{ |ip| "#{ip};" }.join(' ') %> };
 };

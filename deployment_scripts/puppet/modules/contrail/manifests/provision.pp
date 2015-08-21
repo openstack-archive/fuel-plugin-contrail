@@ -16,15 +16,19 @@ class contrail::provision ( $node_role ) {
 
   Exec {
     provider => 'shell',
-    path     => '/usr/bin:/bin',
+    path     => '/usr/bin:/bin:/sbin',
   }
 
   $gateways = split($contrail::settings['contrail_gateways'], ',')
 
   define contrail::provision::prov_ext_bgp {
     exec { "prov_external_bgp_${name}":
-      command  => "python /opt/contrail/utils/provision_mx.py --router_name mx1 --router_ip ${name} --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --oper add && touch /opt/contrail/prov_external_bgp_${name}-DONE",
-      creates  => "/opt/contrail/prov_external_bgp_prov_external_bgp_${name}-DONE",
+      command  => "python /opt/contrail/utils/provision_mx.py  \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--oper add --router_name ${name} --router_ip ${name} \
+--admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+&& touch /opt/contrail/prov_external_bgp_${name}-DONE",
+      creates  => "/opt/contrail/prov_external_bgp_${name}-DONE",
     }
   }
 
@@ -32,26 +36,41 @@ class contrail::provision ( $node_role ) {
     'base-os': {
       notify {'Waiting for contrail API':} ->
       exec {'wait_for_api':
-        command   => "while [ 200 != $(curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082) ]; do sleep 2; done",
-        tries     => 10, # wait for api is up: 10 tries every 30 seconds = 5 min
-        try_sleep => 30,
+        command    => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
+then exit 1; fi",
+        tries     => 10,
+        try_sleep => 10,
       } ->
       exec { 'prov_control_bgp':
-        command  => "python /opt/contrail/utils/provision_control.py --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --oper add --host_name ${::fqdn}  --host_ip ${contrail::address} --router_asn ${contrail::asnum} --admin_user ${contrail::admin_username} --admin_tenant_name services --admin_password  ${contrail::admin_password} && touch /opt/contrail/prov_control_bgp-DONE",
+        command  => "python /opt/contrail/utils/provision_control.py \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--oper add --host_name ${::fqdn} --host_ip ${contrail::address} --router_asn ${contrail::asnum} \
+--admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+&& touch /opt/contrail/prov_control_bgp-DONE",
         require  => Exec['wait_for_api'],
         creates  => '/opt/contrail/prov_control_bgp-DONE',
       }
       if $contrail::node_name == $contrail::deployment_node {
         contrail::provision::prov_ext_bgp { $gateways:
-          require  => Exec['wait_for_api'],
-        }
+          require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
+        } ->
         exec { 'prov_metadata_services':
-          command  => "python  /opt/contrail/utils/provision_linklocal.py --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --linklocal_service_name metadata --linklocal_service_ip 169.254.169.254 --linklocal_service_port 80 --ipfabric_service_ip ${contrail::mos_mgmt_vip} --ipfabric_service_port 8775 --oper add --admin_user ${contrail::admin_username} --admin_tenant_name services --admin_password  ${contrail::admin_password} && touch /opt/contrail/prov_metadata_service-DONE",
+          command  => "python /opt/contrail/utils/provision_linklocal.py \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--oper add \
+--linklocal_service_name metadata --linklocal_service_ip 169.254.169.254 --linklocal_service_port 80 \
+--ipfabric_service_ip ${contrail::mos_mgmt_vip} --ipfabric_service_port 8775  \
+--admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+&& touch /opt/contrail/prov_metadata_service-DONE",
           require  => Exec['wait_for_api'],
           creates  => '/opt/contrail/prov_metadata_service-DONE',
-        }
+        } ->
         exec { 'prov_encap_type':
-          command  => "python  /opt/contrail/utils/provision_encap.py --api_server_ip ${contrail::contrail_mgmt_vip}  --api_server_port 8082 --encap_priority MPLSoUDP,MPLSoGRE,VXLAN --oper add --admin_user ${contrail::admin_username} --admin_password ${contrail::admin_password} && touch /opt/contrail/prov_encap_type-DONE",
+          command  => "python /opt/contrail/utils/provision_encap.py \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--oper add --encap_priority MPLSoUDP,MPLSoGRE,VXLAN \
+--admin_user ${contrail::admin_username} --admin_password ${contrail::admin_password} \
+&& touch /opt/contrail/prov_encap_type-DONE",
           require  => Exec['wait_for_api'],
           creates  => '/opt/contrail/prov_encap_type-DONE',
         }
@@ -60,9 +79,11 @@ class contrail::provision ( $node_role ) {
     'compute': {
       exec { 'provision-vrouter':
         path    => '/bin:/usr/bin/',
-        command => "python /opt/contrail/utils/provision_vrouter.py --host_name ${::fqdn} \
---host_ip ${contrail::address} --api_server_ip ${contrail::contrail_mgmt_vip} --openstack_ip ${contrail::mos_mgmt_vip} \
---admin_user neutron --admin_password ${contrail::service_token} --admin_tenant_name services --oper add && touch /opt/contrail/provision-vrouter-DONE",
+        command => "python /opt/contrail/utils/provision_vrouter.py \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::mos_mgmt_vip} \
+--oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
+--admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+&& touch /opt/contrail/provision-vrouter-DONE",
         creates => '/opt/contrail/provision-vrouter-DONE',
       }
     }
