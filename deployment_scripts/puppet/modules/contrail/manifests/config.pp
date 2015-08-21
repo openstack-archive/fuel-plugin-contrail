@@ -15,85 +15,9 @@
 class contrail::config ( $node_role ) {
   case $node_role {
     default: {}
-    'controller','primary-controller': {
-      nova_config {
-        'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
-        'DEFAULT/neutron_url': value => "http://${contrail::contrail_mgmt_vip}:9696";
-        'DEFAULT/neutron_admin_tenant_name': value=> 'services';
-        'DEFAULT/neutron_admin_username': value=> 'neutron';
-        'DEFAULT/neutron_admin_password': value=> $contrail::service_token;
-        'DEFAULT/neutron_url_timeout': value=> '300';
-        'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
-        'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
-        'DEFAULT/enabled_apis': value=> 'ec2,osapi_compute,metadata';
-        'DEFAULT/security_group_api': value=> 'neutron';
-        'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
-      } ->
-      keystone_endpoint {'RegionOne/neutron':
-        ensure => absent,
-      }
-      file {'/etc/haproxy/conf.d/094-web_for_contrail.cfg':
-        ensure  => present,
-        content => template('contrail/094-web_for_contrail.cfg.erb'),
-        notify  => Service['haproxy'],
-      } ->
-      file {'/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg':
-        ensure  => present,
-        content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
-        notify  => Service['haproxy'],
-      } ~>
-      service {'haproxy':
-        ensure     => running,
-        hasrestart => true,
-        restart    => '/sbin/ip netns exec haproxy service haproxy reload',
-      }
-# Contrail-specific heat templates settings
-      ini_setting { 'contrail-user':
-          ensure  => present,
-          path    => '/etc/heat/heat.conf',
-          section => 'clients_contrail',
-          setting => 'user',
-          value   => 'neutron',
-      }
-      ini_setting { 'contrail-password':
-          ensure  => present,
-          path    => '/etc/heat/heat.conf',
-          section => 'clients_contrail',
-          setting => 'password',
-          value   => $contrail::service_token,
-      }
-      ini_setting { 'contrail-tenant':
-          ensure  => present,
-          path    => '/etc/heat/heat.conf',
-          section => 'clients_contrail',
-          setting => 'tenant',
-          value   => 'services',
-      }
-      ini_setting { 'contrail-api_server':
-          ensure  => present,
-          path    => '/etc/heat/heat.conf',
-          section => 'clients_contrail',
-          setting => 'api_server',
-          value   => $contrail::contrail_mgmt_vip,
-      }
-      ini_setting { 'contrail-auth_host_ip':
-          ensure  => present,
-          path    => '/etc/heat/heat.conf',
-          section => 'clients_contrail',
-          setting => 'auth_host_ip',
-          value   => $contrail::mos_mgmt_vip,
-      }
-      ini_setting { 'contrail-api_base_url':
-          ensure  => present,
-          path    => '/etc/heat/heat.conf',
-          section => 'clients_contrail',
-          setting => 'api_base_url',
-          value   => '/',
-      }
-    }
     'compute': {
       nova_config {
-        'DEFAULT/neutron_url': value => "http://${contrail::contrail_mgmt_vip}:9696";
+        'DEFAULT/neutron_url': value => "http://${contrail::mos_mgmt_vip}:9696";
         'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
         'DEFAULT/network_api_class': value=> 'nova_contrail_vif.contrailvif.ContrailNetworkAPI';
         'DEFAULT/neutron_admin_tenant_name': value=> 'services';

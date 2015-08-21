@@ -14,9 +14,4 @@
 
 include contrail
 $node_role = 'controller'
-class { 'contrail::package':
-  install => 'contrail-heat',
-} ->
-class { 'contrail::config':
-  node_role => $node_role,
-}
+class { 'contrail::controller': }
