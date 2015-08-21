@@ -19,15 +19,18 @@ class contrail::cfgm {
 # Resources defaults
   Package { ensure => present }
 
+  Exec {
+    provider => 'shell',
+    path     => '/usr/bin:/usr/sbin',
+  }
+
   File {
     ensure  => present,
     mode    => '0644',
-    owner   => root,
-    group   => root,
+    owner   => 'contrail',
+    group   => 'contrail',
     require => Package['contrail-openstack-config'],
   }
-
-  Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
 # Packages
   package { 'openjdk-7-jre-headless': }->
@@ -36,11 +39,15 @@ class contrail::cfgm {
 
 # Java support files
   file {'/etc/java-7-openjdk/security/java.security':
+    owner   => 'root',
+    group   => 'root',
     source  => 'puppet:///modules/contrail/java.security',
     require => Package['openjdk-7-jre-headless'],
   }
 
   file { '/etc/ifmap-server/log4j.properties':
+    owner   => 'root',
+    group   => 'root',
     source  => 'puppet:///modules/contrail/log4j.properties',
     require => Package['openjdk-7-jre-headless'],
   }
@@ -53,8 +60,20 @@ class contrail::cfgm {
 
 # Contrail config files
   file { '/etc/ifmap-server/publisher.properties':
+    owner   => 'root',
+    group   => 'root',
     source  => 'puppet:///modules/contrail/publisher.properties',
     require => Package['ifmap-server'],
+  } ->
+
+  file { '/etc/ifmap-server/basicauthusers.properties':
+    owner   => 'root',
+    group   => 'root',
+    content => template('contrail/basicauthusers.properties.erb'),
+  }
+
+  file { '/etc/contrail/vnc_api_lib.ini':
+    content => template('contrail/vnc_api_lib.ini.erb')
   }
 
   file { '/etc/contrail/contrail-api.conf':
@@ -77,12 +96,12 @@ class contrail::cfgm {
     content => template('contrail/contrail-svc-monitor.conf.erb'),
   }
 
-  file { '/etc/ifmap-server/basicauthusers.properties':
-    content => template('contrail/basicauthusers.properties.erb'),
-  }
-
   file { '/etc/contrail/contrail-device-manager.conf':
     content => template('contrail/contrail-device-manager.conf.erb')
+  }
+
+  file { '/etc/contrail/contrail-config-nodemgr.conf':
+    content => template('contrail/contrail-config-nodemgr.conf.erb')
   }
 
 # Contrail services
@@ -103,6 +122,7 @@ class contrail::cfgm {
                   File['/etc/contrail/contrail-schema.conf'],
                   File['/etc/contrail/contrail-svc-monitor.conf'],
                   File['/etc/contrail/contrail-device-manager.conf'],
+                  File['/etc/contrail/contrail-config-nodemgr.conf'],
                   File['/etc/ifmap-server/basicauthusers.properties']],
   }
 
