@@ -27,7 +27,7 @@
 
 set -ex
 
-PLUGIN_PATH="/var/www/nailgun/plugins/contrail-1.0"
+PLUGIN_PATH="/var/www/nailgun/plugins/contrail-2.0"
 UBUNTU_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.deb'`
 CENTOS_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm'`
 
@@ -35,16 +35,20 @@ yum -y install dpkg-devel createrepo
 
 if [ ! -f "$UBUNTU_PKG" ] && [ ! -f "$CENTOS_PKG" ];
   then
-    echo "ERROR: No packages found at  $PLUGIN_PATH" 
-    exit 1
+    echo "No Juniper Contrail packages found at $PLUGIN_PATH. Updating existing plugin repos."
+    cd $PLUGIN_PATH/repositories/ubuntu/
+    dpkg-scanpackages ./ | gzip -c - > Packages.gz
+    cd $PLUGIN_PATH/repositories/centos/
+    createrepo .
   fi
 
 if [ -f "$UBUNTU_PKG" ];
   then
     DEB=`mktemp -d`
     dpkg -x $UBUNTU_PKG $DEB
-    tar -xzvf $DEB/opt/contrail/contrail_packages/contrail_debs.tgz -C $PLUGIN_PATH/repositories/ubuntu/
     cd $PLUGIN_PATH/repositories/ubuntu/
+    find . -type f -name "*.deb" -delete
+    tar -xzvf $DEB/opt/contrail/contrail_packages/contrail_debs.tgz -C $PLUGIN_PATH/repositories/ubuntu/
     dpkg-scanpackages ./ | gzip -c - > Packages.gz
   fi
 
@@ -54,8 +58,9 @@ if [ -f "$CENTOS_PKG" ];
     cd $RPM
     rpm2cpio $CENTOS_PKG | cpio -id
     mkdir -p $PLUGIN_PATH/repositories/centos/Packages
-    tar -xzvf $RPM/opt/contrail/contrail_packages/contrail_rpms.tgz -C $PLUGIN_PATH/repositories/centos/Packages/
     cd $PLUGIN_PATH/repositories/centos/
+    find Packages -type f -name "*.rpm" -delete
+    tar -xzvf $RPM/opt/contrail/contrail_packages/contrail_rpms.tgz -C $PLUGIN_PATH/repositories/centos/Packages/
     createrepo .
   fi
 

@@ -38,9 +38,9 @@ class contrail::database {
     content => template('contrail/zoo.cfg.erb');
   }
   service { 'zookeeper':
-    ensure      => running,
-    enable      => true,
-    require   => Package['zookeeper'],
+    ensure    => running,
+    enable    => true,
+    require   => [Package['zookeeper'],Package['contrail-openstack-database']],
     subscribe => [File['/etc/zookeeper/conf/zoo.cfg'],
                   File['/etc/zookeeper/conf/myid'],
                   ],
