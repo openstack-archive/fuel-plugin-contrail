@@ -27,9 +27,7 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
           }
           $pkgs = ['python-crypto','python-netaddr','python-paramiko',
                   'ifenslave-2.6','patch','openjdk-7-jre-headless',
-                  'python-contrail','contrail-setup','contrail-utils','contrail-nodemgr','supervisor',
-                  'contrail-fabric-utils']
-          $pip_pkgs = ['Fabric-1.7.5']
+                  'python-contrail','contrail-setup','contrail-utils','contrail-nodemgr','supervisor']
           }
       CentOS:
         {

@@ -19,7 +19,8 @@ $settings = hiera('contrail')
 
 # TODO
 #$plugin_version = $settings['metadata']['plugin_version']
-$plugin_version = '1.0'
+$plugin_version = '2.0'
+$distribution=$settings['contrail_distribution']
 
 $network_scheme = hiera('network_scheme')
 $uid = hiera('uid')

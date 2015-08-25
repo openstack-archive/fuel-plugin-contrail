@@ -38,5 +38,10 @@ case $operatingsystem
         yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
         package {'yum-plugin-priorities': ensure => present }
       }
+    Ubuntu: {
+      file { '/etc/apt/preferences.d/contrail-2.0.0.pref':
+        ensure => absent,
+      }
+    }
     default: {}
 }

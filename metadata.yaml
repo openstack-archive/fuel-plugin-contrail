@@ -3,7 +3,7 @@ name: contrail
 # Human-readable name for your plugin
 title: Fuel Contrail plugin
 # Plugin version
-version: 1.0.1
+version: 2.0.0
 # Description
 description: Contrail plugin for Fuel provides the functionality to add Juniper Contrail SDN for Mirantis OpenStack as network backend using Fuel Web UI in a user-friendly manner
 # Required fuel version
@@ -25,6 +25,6 @@ releases:
 # Version of plugin package
 package_version: '2.0.0'
 licenses: ['Apache 2.0']
-authors: ['Vyacheslav Struk, Mirantis', 'Oleksandr Martsyniuk, Mirantis']
+authors: ['Mirantis Inc.']
 homepage: https://github.com/stackforge/fuel-plugin-contrail
 groups: ['network']
