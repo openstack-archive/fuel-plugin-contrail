@@ -4,11 +4,22 @@ attributes:
     restrictions:
       - condition: "not (cluster:net_provider == 'neutron' and networking_parameters:segmentation_type == 'gre')"
         message: "Please use Neutron with GRE segmentation, the only network type supported with Contrail plugin."
+  contrail_distribution:
+    type: "select"
+    weight: 10
+    value: "open"
+    label: "Contrail distribution"
+    description: "Select Contrail distribution"
+    values:
+      - data: "open"
+        label: "OpenContrail"
+      - data: "juniper"
+        label: "Juniper Contrail"
   contrail_asnum:
     value: '64512'
     label: 'AS Number'
     description: 'AS number for BGP communication'
-    weight: 10
+    weight: 20
     type: "text"
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
@@ -16,17 +27,17 @@ attributes:
   contrail_private_gw:
     value: ''
     label: 'Gateway for Private network'
-    description: 'The IP address of gateway for contrail private network to reach BGP routers. Empty if not needed.'
-    weight: 40
+    description: 'The IP address of gateway for contrail private network to reach BGP peers. Empty if not needed.'
+    weight: 30
     type: "text"
     regex:
       source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})|(?:^)$'
       error: "Invalid IP address"
   contrail_gateways:
-    value: '10.109.3.254,10.110.1.1'
+    value: '10.109.3.250'
     label: 'GW IP'
     description: 'Comma separated IP addresses of BGP peers.'
-    weight: 50
+    weight: 40
     type: "text"
     regex:
       source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:,\s*(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})*$'

@@ -228,11 +228,19 @@ config.redis_server_ip = '127.0.0.1';
 config.redis_dump_file = '/var/lib/redis/dump-webui.rdb';
 config.redis_password = '';
 
+<% if scope.lookupvar('contrail::distribution') == 'open' %>
+/* Logo File: Use complete path of logo file location */
+config.logo_file = '/usr/src/contrail/contrail-web-core/webroot/img/opencontrail-logo.png';
+
+/* Favicon File: Use complete path of favicon file location */
+config.favicon_file = '/usr/src/contrail/contrail-web-core/webroot/img/opencontrail-favicon.ico';
+<% else %>
 /* Logo File: Use complete path of logo file location */
 config.logo_file = '/usr/src/contrail/contrail-web-core/webroot/img/juniper-networks-logo.png';
 
 /* Favicon File: Use complete path of favicon file location */
 config.favicon_file = '/usr/src/contrail/contrail-web-core/webroot/img/juniper-networks-favicon.ico';
+<% end %>
 
 config.featurePkg = {};
 /* Add new feature Package Config details below */
