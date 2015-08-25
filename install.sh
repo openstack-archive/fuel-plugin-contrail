@@ -27,7 +27,7 @@
 
 set -ex
 
-PLUGIN_PATH="/var/www/nailgun/plugins/contrail-1.0"
+PLUGIN_PATH="/var/www/nailgun/plugins/contrail-2.0"
 UBUNTU_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.deb'`
 CENTOS_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm'`
 
@@ -35,8 +35,11 @@ yum -y install dpkg-devel createrepo
 
 if [ ! -f "$UBUNTU_PKG" ] && [ ! -f "$CENTOS_PKG" ];
   then
-    echo "ERROR: No packages found at  $PLUGIN_PATH" 
-    exit 1
+    echo "No Contrail packages found at $PLUGIN_PATH. Updating plugin repos." 
+    cd $PLUGIN_PATH/repositories/ubuntu/
+    dpkg-scanpackages ./ | gzip -c - > Packages.gz
+    cd $PLUGIN_PATH/repositories/centos/
+    createrepo .
   fi
 
 if [ -f "$UBUNTU_PKG" ];
