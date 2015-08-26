@@ -28,7 +28,15 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
           $pkgs = ['python-crypto','python-netaddr','python-paramiko',
                   'ifenslave-2.6','patch','openjdk-7-jre-headless',
                   'python-contrail','contrail-setup','contrail-utils','contrail-nodemgr','supervisor']
+          if $contrail::distribution == 'juniper' {
+            package { 'tzdata':
+              ensure => '2015c-0ubuntu0.14.04',
+            }
+            package { 'tzdata-java':
+              ensure => '2015c-0ubuntu0.14.04',
+            }
           }
+        }
       CentOS:
         {
           $pkgs = ['python-netaddr','python-paramiko','patch',
