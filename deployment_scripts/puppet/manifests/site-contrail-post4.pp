@@ -19,7 +19,7 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
   class { 'contrail::cfgm': } ->
   class { 'contrail::control': } ->
   class { 'contrail::analytics': } ->
-  class { 'contrail::webui': }
+  class { 'contrail::webui': } ->
   class {'contrail::provision':
     node_role => $node_role,
   }

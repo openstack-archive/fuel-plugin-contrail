@@ -18,7 +18,7 @@ ifmap_username=api-server
 ifmap_password=api-server
 cassandra_server_list=<%= priv_ip.map{ |ip| "#{ip}:9160" }.join(' ') %>
 listen_ip_addr=0.0.0.0
-listen_port=8082
+listen_port=9100
 multi_tenancy=True
 log_file=/var/log/contrail/contrail-api.log
 log_local=1
