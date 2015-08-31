@@ -39,6 +39,10 @@ class contrail::network (
 
   case $node_role {
     'base-os':{
+      sysctl::value { 'net.ipv4.conf.all.rp_filter':  value => '0' }
+      sysctl::value { 'net.ipv4.conf.default.rp_filter':  value => '0' }
+      sysctl::value { 'net.ipv4.conf.br-mesh.rp_filter':  value => '0' }
+      sysctl::value { 'net.ipv4.conf.br-mgmt.rp_filter':  value => '0' }
       class { 'l23network': use_ovs => false }
       case $contrail::private_gw {
         '': { notify { 'No gateway for private network':} }
