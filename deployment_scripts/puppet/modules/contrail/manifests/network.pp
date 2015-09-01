@@ -28,7 +28,7 @@ class contrail::network (
   define contrail::network::add_route ( $destination, $gateway ) {
     exec {"check_route_to_${name}":
       command => "ip route del ${name}",
-      onlyif  => "ip route | grep ${name}",
+      onlyif  => "ip route | grep -E ^${name}' via'.*",
       before  => L23network::L3::Route[$name],
     }
     l23network::l3::route {$name:
