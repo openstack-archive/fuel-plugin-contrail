@@ -6,7 +6,7 @@ priv_ip=Array.new
 nodes.each do |node|
 case node['role']
   when 'base-os'
-    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
+    if node['user_node_name'] == contrail_deployment_node
       priv_ip << node['private_address']
     end
   end
