@@ -1,6 +1,6 @@
 <%-
 nodes=scope.function_hiera(['nodes'])
-contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
+contrail_deployment_node=scope.lookupvar('contrail::deployment_node')
 uid=scope.lookupvar('contrail::uid')
 priv_ip=Array.new
 nodes.each do |node|
