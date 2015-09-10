@@ -31,6 +31,18 @@ exec {'no_openstack_network_reconfigure':
 }
 ############################################################################
 
+# Another hack. Network configuration shell task may fail in some cases [FIXME]
+$node_name=hiera('user_node_name')
+case $node_name {
+  /^contrail.\d+$/: {
+    exec { 'run-netconfig':
+      command   => 'puppet apply /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
+      logoutput => true,
+    }
+  }
+  default : {}
+}
+
 case $operatingsystem
 {
     CentOS:

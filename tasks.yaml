@@ -32,14 +32,7 @@
   parameters:
     puppet_manifest: puppet/manifests/site-common-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
-# Config default network, first of all
-- role: ['base-os']
-  stage: pre_deployment
-  type: shell
-  parameters:
-    cmd: if hiera user_node_name | egrep '^contrail-[0-9]'; then puppet apply /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp; fi
-    timeout: 720
+    timeout: 1440
 - role: ['base-os']
   stage: pre_deployment
   type: puppet
