@@ -30,6 +30,18 @@ case $operatingsystem {
       source  => 'puppet:///modules/contrail/contrail-pin-100',
       before  => Class['contrail::package'],
     }
+    package { ['linux-image-3.13.0-53-generic','linux-headers-3.13.0-53-generic']:
+      ensure => 'present',
+    } ->
+    exec { 'grub-set-default-kernel':
+      command => 'grub-set-default "Advanced options for Ubuntu>Ubuntu, with Linux 3.13.0-53-generic"',
+    } ->
+    exec { 'grub-set-default-entry':
+      command => 'sed -i -e "s/^GRUB_DEFAULT.*/GRUB_DEFAULT=saved/g" /etc/default/grub',
+    } ->
+    exec { 'update-grub':
+      command => 'update-grub',
+    } ->
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
       remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
