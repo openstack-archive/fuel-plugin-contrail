@@ -67,6 +67,17 @@ class contrail::config ( $node_role ) {
         content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
       }
 
+      file {'/etc/init.d/fixup-vrouter':
+        ensure  => present,
+        mode    => '0755',
+        owner   => 'root',
+        group   => 'root',
+        content => 'puppet:///modules/contrail/fixup-vouter.init',
+      } ->
+      service {'fixup-vrouter':
+        enable => true,
+      }
+
     }
   }
 }
