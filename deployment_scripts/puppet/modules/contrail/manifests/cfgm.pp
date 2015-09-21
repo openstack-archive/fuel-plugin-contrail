@@ -104,6 +104,10 @@ class contrail::cfgm {
   file { '/etc/contrail/contrail-config-nodemgr.conf':
     content => template('contrail/contrail-config-nodemgr.conf.erb')
   }
+# Supervisor-config
+  file { '/etc/contrail/supervisord_config.conf':
+    source  => 'puppet:///modules/contrail/supervisord_config.conf',
+  }
 
 # Contrail services
 # Rabbitmq service disabled
@@ -130,6 +134,7 @@ class contrail::cfgm {
                   File['/etc/contrail/contrail-svc-monitor.conf'],
                   File['/etc/contrail/contrail-device-manager.conf'],
                   File['/etc/contrail/contrail-config-nodemgr.conf'],
+                  File['/etc/contrail/supervisord_config.conf'],
                   File['/etc/ifmap-server/basicauthusers.properties']],
   }
 
