@@ -1,0 +1,21 @@
+volumes:
+  - id: "cassandra"
+    type: "vg"
+    min_size:
+      generator: "calc_gb_to_mb"
+      generator_args: [320]
+    label: "cassandra database"
+    volumes:
+      - mount: "/var/lib/cassandra"
+        type: "lv"
+        name: "cassandra"
+        file_system: "ext4"
+        size:
+          generator: "calc_total_vg"
+          generator_args: ["cassandra"]
+
+volumes_roles_mapping:
+  contrail-db:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "logs"}
+    - {allocate_size: "full-disk", id: "cassandra"}
