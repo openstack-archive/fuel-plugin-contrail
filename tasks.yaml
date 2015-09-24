@@ -4,28 +4,6 @@
 # cinder and compute nodes
 #
 #####################################
-# In case of base-os Hiera must be deployed manually
-- role: ['base-os']
-  stage: pre_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/hiera/hiera.pp
-    puppet_modules: /etc/puppet/modules
-    timeout: 720
-- role: ['base-os']
-  stage: pre_deployment
-  type: shell
-  parameters:
-    cmd: ln -sf /etc/base-os.yaml /etc/astute.yaml
-    timeout: 30
-# In case of base-os globals.yaml must be created 
-- role: ['base-os']
-  stage: pre_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/globals/globals.pp
-    puppet_modules: /etc/puppet/modules
-    timeout: 720
 - role: '*'
   stage: pre_deployment
   type: puppet
@@ -33,15 +11,7 @@
     puppet_manifest: puppet/manifests/site-common-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-# Config default network, first of all
-- role: ['base-os']
-  stage: pre_deployment
-  type: puppet
-  parameters:
-    puppet_modules: /etc/puppet/modules
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp
-    timeout: 3600
-- role: ['base-os']
+- role: ['contrail-config','contrail-control','contrail-db']
   stage: pre_deployment
   type: puppet
   parameters:
@@ -55,28 +25,28 @@
     puppet_manifest: puppet/manifests/site-controller-post1.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-- role: ['base-os']
+- role: ['contrail-config','contrail-control','contrail-db']
   stage: post_deployment
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post1.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-- role: ['base-os']
+- role: ['contrail-db']
   stage: post_deployment
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post2.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
-- role: ['base-os']
+- role: ['contrail-config','contrail-control','contrail-db']
   stage: post_deployment
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/site-contrail-post3.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
-- role: ['base-os']
+- role: ['contrail-config','contrail-control','contrail-db']
   stage: post_deployment
   type: puppet
   parameters:
