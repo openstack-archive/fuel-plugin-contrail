@@ -33,6 +33,13 @@
     puppet_manifest: puppet/manifests/site-common-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+- role: '*'
+  stage: post_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: pupprt/manifests/site-common-post.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
 # Config default network, first of all
 - role: ['base-os']
   stage: pre_deployment
@@ -83,6 +90,13 @@
     puppet_manifest: puppet/manifests/site-contrail-post4.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+- role: ['base-os']
+  stage: post_deployment
+  type: puppet
+  parameters:
+    # puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/logging/logging.pp
+    puppet_manifest: puppet/manifests/site-contrail-post5.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
 - role: ['primary-controller','controller']
   stage: post_deployment
   type: puppet
