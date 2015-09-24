@@ -1,0 +1,38 @@
+- id: contrail-db
+  type: group
+  role: [contrail-db]
+  tasks:
+    - hiera
+    - globals
+    - netconfig
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: parallel
+
+- id: contail-config
+  type: group
+  role: [contrail-config]
+  tasks:
+    - hiera
+    - globals
+    - netconfig
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: parallel
+
+- id: contail-control
+  type: group
+  role: [contrail-control]
+  tasks:
+    - hiera
+    - globals
+    - netconfig
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: parallel
