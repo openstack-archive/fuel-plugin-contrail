@@ -83,4 +83,21 @@ class contrail::analytics {
                     ],
   }
 
+  file { 'contrailsyslog.sh':
+    ensure  => 'present',
+    path    => '/usr/local/sbin/contrailrsyslog.sh',
+    mode    => '0700',
+    owner   => 'root',
+    group   => 'root',
+    content => template('contrail/contrailrsyslog.sh.erb'),
+  }
+
+  cron { 'contrail-syslog':
+    ensure  => 'present',
+    command => '/usr/local/sbin/contrailrsyslog.sh',
+    user    => 'root',
+    minute  => '*/15',
+    require => [ Service['supervisor-analytics'], File['contrailsyslog.sh'] ],
+  }
+
 }
