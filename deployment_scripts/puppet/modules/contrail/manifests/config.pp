@@ -26,6 +26,7 @@ class contrail::config ( $node_role ) {
         'DEFAULT/neutron_url_timeout': value=> '300';
         'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
         'DEFAULT/security_group_api': value=> 'neutron';
+        'DEFAULT/heal_instance_info_cache_interval': value=> '0';
       }
 
       $ipv4_file = $operatingsystem ? {

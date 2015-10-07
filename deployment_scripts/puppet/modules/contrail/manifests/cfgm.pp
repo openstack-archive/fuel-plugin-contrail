@@ -81,6 +81,10 @@ class contrail::cfgm {
     content => template('contrail/contrail-api.conf.erb'),
   }
 
+  file { '/etc/contrail/supervisord_config_files/contrail-api.ini':
+    content => template('contrail/contrail-api.ini.erb'),
+  }
+
   file { '/etc/contrail/contrail-discovery.conf':
     content => template('contrail/contrail-discovery.conf.erb'),
   }
@@ -128,6 +132,7 @@ class contrail::cfgm {
     enable    => true,
     require   => Package['contrail-openstack-config'],
     subscribe => [File['/etc/contrail/contrail-api.conf'],
+                  File['/etc/contrail/supervisord_config_files/contrail-api.ini'],
                   File['/etc/contrail/contrail-discovery.conf'],
                   File['/etc/contrail/contrail-keystone-auth.conf'],
                   File['/etc/contrail/contrail-schema.conf'],
