@@ -27,9 +27,10 @@
 
 set -ex
 
-PLUGIN_PATH="/var/www/nailgun/plugins/contrail-2.0"
-UBUNTU_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.deb'`
-CENTOS_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm'`
+PLUGIN_PATH="/var/www/nailgun/plugins/contrail-2.1"
+#Now uses the latest package file
+UBUNTU_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.deb' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d'/' -f 2`
+CENTOS_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d'/' -f 2`
 
 yum -y install dpkg-devel createrepo
 
