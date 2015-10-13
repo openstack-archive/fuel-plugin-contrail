@@ -1,0 +1,4 @@
+[submodule "fuelweb_test/fuel-qa"]
+	path = fuelweb_test/fuel-qa
+	url = https://github.com/stackforge/fuel-qa
+	branch = stable/6.1
