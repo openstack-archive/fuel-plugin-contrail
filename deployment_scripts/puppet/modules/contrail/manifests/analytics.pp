@@ -58,12 +58,12 @@ class contrail::analytics {
     content => template('contrail/contrail-snmp-collector.conf.erb'),
   }
 
-  file { '/etc/contrail/contrail-topology.conf':
-    content => template('contrail/contrail-topology.conf.erb'),
+  file { '/etc/contrail/contrail-alarm-gen.conf':
+    content => template('contrail/contrail-alarm-gen.conf.erb'),
   }
 
-  file { '/etc/contrail/supervisord_analytics_files/contrail-alarm-gen.ini':
-    ensure => absent,
+  file { '/etc/contrail/contrail-topology.conf':
+    content => template('contrail/contrail-topology.conf.erb'),
   }
 
 # Services
@@ -77,7 +77,7 @@ class contrail::analytics {
   service { 'contrail-alarm-gen':
     ensure    => stopped,
     enable    => false,
-    require   => [Package['contrail-openstack-analytics'],File['/etc/contrail/supervisord_analytics_files/contrail-alarm-gen.ini']],
+    require   => Package['contrail-openstack-analytics'],
   }
 
   service { 'supervisor-analytics':
@@ -91,6 +91,7 @@ class contrail::analytics {
                     File['/etc/contrail/contrail-query-engine.conf'],
                     File['/etc/contrail/contrail-analytics-nodemgr.conf'],
                     File['/etc/contrail/contrail-snmp-collector.conf'],
+                    File['/etc/contrail/contrail-alarm-gen.conf'],
                     File['/etc/contrail/contrail-topology.conf'],
                     ],
   }
