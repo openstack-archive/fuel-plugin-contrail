@@ -42,3 +42,34 @@ attributes:
     regex:
       source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:,\s*(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})*$'
       error: "Invalid IP address list"
+  contrail_use_custom_user:
+    value: false
+    label: 'Use custom service user'
+    description: 'Use specified credentials for service user'
+    weight: 150
+    type: "checkbox"
+  contrail_neutron_user:
+    value: 'neutron'
+    label: 'Service User for Neutron'
+    description: ''
+    weight: 160
+    type: "text"
+    regex:
+      source: '^[a-zA-Z0-9]{1,255}$'
+      error: "Please specify username"
+    restrictions:
+      - condition: settings:contrail.contrail_use_custom_user.value != true
+      - condition: true == true
+        action: hide
+  contrail_neutron_pw:
+    value: 'ChangeMeOrR00tme'
+    label: 'Service User Password'
+    description: 'User password for service user'
+    weight: 170
+    type: "password"
+    regex:
+      source: '^[a-zA-Z0-9]{8,255}$'
+      error: "Password is mandatory. Should be at least 8 chars long"
+    restrictions:
+      - condition: settings:contrail.contrail_use_custom_user.value != true
+        action: hide
