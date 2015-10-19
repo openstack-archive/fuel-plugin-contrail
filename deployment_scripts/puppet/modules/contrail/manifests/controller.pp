@@ -29,6 +29,7 @@ class contrail::controller {
 
 # Packages
   package { 'neutron-server': } ->
+  package { 'python-neutron-lbaas': } ->
   package { 'python-contrail': } ->
   package { 'neutron-plugin-contrail': } ->
   package { 'contrail-heat': }
@@ -64,6 +65,9 @@ class contrail::controller {
     'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin';
     'DEFAULT/allow_overlapping_ips': value => 'True';
     'service_providers/service_provider': value => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
+    'keystone_authtoken/auth_host': value => $contrail::mos_mgmt_vip;
+    'keystone_authtoken/auth_port': value => '35357';
+    'keystone_authtoken/auth_protocol': value => 'http';
     'QUOTAS/quota_network': value => '-1';
     'QUOTAS/quota_subnet': value => '-1';
     'QUOTAS/quota_port': value => '-1';
@@ -78,11 +82,11 @@ class contrail::controller {
 
 # Contrail-specific heat templates settings
   ini_setting { 'contrail-user':
-  ensure  => present,
-  path    => '/etc/heat/heat.conf',
-  section => 'clients_contrail',
-  setting => 'user',
-  value   => 'neutron',
+    ensure  => present,
+    path    => '/etc/heat/heat.conf',
+    section => 'clients_contrail',
+    setting => 'user',
+    value   => 'neutron',
   } ->
   ini_setting { 'contrail-password':
       ensure  => present,
