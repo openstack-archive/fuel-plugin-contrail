@@ -1,24 +1,11 @@
-<%-
-nodes=scope.function_hiera(['nodes'])
-contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
-priv_ip=Array.new
-nodes.each do |node|
-case node['role']
-  when 'base-os'
-    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
-      priv_ip << node['private_address']
-    end
-  end
-end
--%>
 [DEFAULTS]
-zk_server_ip=<%= priv_ip.join(',') %>
+zk_server_ip=<%= scope.lookupvar('contrail::baseos_ips').join(',') %>
 zk_server_port=2181
 listen_ip_addr=0.0.0.0
 listen_port=9110
 log_local=True
 log_file=/var/log/contrail/discovery.log
-cassandra_server_list=<%= priv_ip.map{ |ip| "#{ip}:9160" }.join(' ') %>
+cassandra_server_list=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
 log_level=SYS_NOTICE
 
 # minimim time to allow client to cache service information (seconds)

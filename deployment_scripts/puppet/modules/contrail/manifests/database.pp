@@ -50,6 +50,8 @@ class contrail::database {
   file { '/var/lib/cassandra':
     ensure  => directory,
     mode    => '0755',
+    owner   => 'cassandra',
+    group   => 'cassandra',
     require => Package['cassandra'],
   } ->
   file { '/var/crashes':
@@ -67,9 +69,7 @@ class contrail::database {
   file { '/etc/contrail/contrail-database-nodemgr.conf':
     content => template('contrail/contrail-database-nodemgr.conf.erb'),
   }
-  file { '/etc/contrail/supervisord_database.conf':
-    source  => 'puppet:///modules/contrail/supervisord_database.conf',
-  }
+
   service { 'supervisor-database':
     ensure      => running,
     enable      => true,
@@ -78,7 +78,6 @@ class contrail::database {
       File['/etc/cassandra/cassandra.yaml'],
       File['/etc/cassandra/cassandra-env.sh'],
       File['/etc/contrail/contrail-database-nodemgr.conf'],
-      File['/etc/contrail/supervisord_database.conf'],
     ],
   }
 
