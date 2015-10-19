@@ -39,7 +39,7 @@ case $operatingsystem
         package {'yum-plugin-priorities': ensure => present }
       }
     Ubuntu: {
-      file { '/etc/apt/preferences.d/contrail-2.1.0.pref':
+      file { '/etc/apt/preferences.d/contrail-3.0.0.pref':
         ensure => absent,
       }
     }
