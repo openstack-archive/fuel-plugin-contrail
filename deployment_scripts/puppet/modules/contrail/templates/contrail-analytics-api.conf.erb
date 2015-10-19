@@ -1,19 +1,6 @@
-<%-
-nodes=scope.function_hiera(['nodes'])
-contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
-priv_ip=Array.new
-nodes.each do |node|
-case node['role']
-  when 'base-os'
-    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
-      priv_ip << node['private_address']
-    end
-  end
-end
--%>
 [DEFAULTS]
 host_ip = <%= scope.lookupvar('contrail::address') %>
-cassandra_server_list=<%= priv_ip.map{ |ip| "#{ip}:9160" }.join(' ') %>
+cassandra_server_list=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
 collectors = <%= scope.lookupvar('contrail::address') %>:8086
 http_server_port = 8090
 rest_api_port = 9081

@@ -13,8 +13,18 @@
 #    under the License.
 
 include contrail
+$node_role = 'base-os'
+Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin'}
 
 if $contrail::node_name =~ /^contrail.\d+$/ {
+
+  class { 'contrail::network':
+    node_role  => $node_role,
+    address    => $contrail::address,
+    ifname     => $contrail::ifname,
+    netmask    => $contrail::netmask_short,
+    default_gw => $contrail::default_gw,
+  }
 
   case $operatingsystem
     {
@@ -23,6 +33,9 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
           file { '/etc/apt/preferences.d/contrail-pin-100':
             ensure  => file,
             source  => 'puppet:///modules/contrail/contrail-pin-100',
+          } ->
+          package { 'tzdata':
+            ensure  => '2015d-0ubuntu0.14.04',
             before  => Class['contrail::package'],
           }
           $pkgs = ['python-crypto','python-netaddr','python-paramiko',
