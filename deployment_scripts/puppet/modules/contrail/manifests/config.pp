@@ -19,7 +19,7 @@ class contrail::config ( $node_role ) {
       nova_config {
         'DEFAULT/neutron_url': value => "http://${contrail::mos_mgmt_vip}:9696";
         'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
-        'DEFAULT/network_api_class': value=> 'nova_contrail_vif.contrailvif.ContrailNetworkAPI';
+        'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
         'DEFAULT/neutron_admin_tenant_name': value=> 'services';
         'DEFAULT/neutron_admin_username': value=> 'neutron';
         'DEFAULT/neutron_admin_password': value=> $contrail::service_token;

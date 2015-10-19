@@ -62,10 +62,6 @@ class contrail::analytics {
     content => template('contrail/contrail-topology.conf.erb'),
   }
 
-  file { '/etc/contrail/supervisord_analytics_files/contrail-alarm-gen.ini':
-    ensure => absent,
-  }
-
 # Services
   service { 'redis-server':
     ensure    => running,
@@ -77,7 +73,7 @@ class contrail::analytics {
   service { 'contrail-alarm-gen':
     ensure    => stopped,
     enable    => false,
-    require   => [Package['contrail-openstack-analytics'],File['/etc/contrail/supervisord_analytics_files/contrail-alarm-gen.ini']],
+    require   => Package['contrail-openstack-analytics'],
   }
 
   service { 'supervisor-analytics':

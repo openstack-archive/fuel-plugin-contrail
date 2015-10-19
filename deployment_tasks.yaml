@@ -1,0 +1,7 @@
+- id: contail-baseos-symlink
+  role: [base-os]
+  required_for: [post_deployment_start]
+  type: shell
+  parameters:
+    cmd: ln -sf /etc/base-os.yaml /etc/astute.yaml
+    timeout: 30
