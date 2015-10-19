@@ -11,7 +11,7 @@ How to build plugin:
 - Install fuel plugin builder (fpb)
 - Clone plugin repo and run fpb there:
 
-    git clone https://github.com/stackforge/fuel-plugin-contrail
+    git clone https://github.com/openstack/fuel-plugin-contrail
 
     cd fuel-plugin-contrail/
 

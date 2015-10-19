@@ -66,8 +66,3 @@ if [ -f "$CENTOS_PKG" ];
   fi
 
 echo "DONE"
-
-
-
-
-
