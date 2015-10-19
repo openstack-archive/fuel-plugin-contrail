@@ -29,6 +29,7 @@ class contrail::controller {
 
 # Packages
   package { 'neutron-server': } ->
+  package { 'python-neutron-lbaas': } ->
   package { 'python-contrail': } ->
   package { 'neutron-plugin-contrail': } ->
   package { 'contrail-heat': }
