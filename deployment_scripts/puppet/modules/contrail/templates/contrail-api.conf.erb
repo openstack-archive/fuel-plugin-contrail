@@ -1,22 +1,9 @@
-<%-
-nodes=scope.function_hiera(['nodes'])
-contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
-priv_ip=Array.new
-nodes.each do |node|
-case node['role']
-  when 'base-os'
-    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
-      priv_ip << node['private_address']
-    end
-  end
-end
--%>
 [DEFAULTS]
 ifmap_server_ip=<%= scope.lookupvar('contrail::address') %>
 ifmap_server_port=8443
 ifmap_username=api-server
 ifmap_password=api-server
-cassandra_server_list=<%= priv_ip.map{ |ip| "#{ip}:9160" }.join(' ') %>
+cassandra_server_list=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
 listen_ip_addr=0.0.0.0
 listen_port=9100
 multi_tenancy=True
@@ -25,7 +12,7 @@ log_local=1
 log_level=SYS_NOTICE
 disc_server_ip=<%= scope.lookupvar('contrail::contrail_private_vip') %>
 disc_server_port=5998
-zk_server_ip=<%= priv_ip.map{ |ip| "#{ip}:2181" }.join(',') %>
+zk_server_ip=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
 redis_server_ip=$__contrail_redis_ip__
 rabbit_server=<%= scope.lookupvar('contrail::mos_mgmt_vip') %>
 rabbit_port=5673
