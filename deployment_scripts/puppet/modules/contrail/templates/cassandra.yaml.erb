@@ -1,18 +1,3 @@
-<%-
-nodes=scope.function_hiera(['nodes'])
-contrail_deployment_node=scope.lookupvar('contrail::deployment_node')
-uid=scope.lookupvar('contrail::uid')
-priv_ip=Array.new
-nodes.each do |node|
-case node['role']
-  when 'base-os'
-    if node['user_node_name'] == contrail_deployment_node
-      priv_ip << node['private_address']
-    end
-  end
-end
-
--%>
 cluster_name: 'Contrail'
 num_tokens: 256
 hinted_handoff_enabled: true
@@ -45,7 +30,7 @@ seed_provider:
       parameters:
           # seeds is actually a comma-delimited list of addresses.
           # Ex: "<ip1>,<ip2>,<ip3>"
-          - seeds: "<%= priv_ip.join(',') %>"
+          - seeds: "<%= scope.lookupvar('contrail::baseos_ips').join(',') %>"
 flush_largest_memtables_at: 0.75
 reduce_cache_sizes_at: 0.85
 reduce_cache_capacity_to: 0.6
