@@ -1,0 +1,12 @@
+- id: contail-baseos-tasks
+  type: group
+  role: [base-os]
+  tasks:
+    - hiera
+    - globals
+    - netconfig
+  required_for: [post_deployment_start]
+  requires: [deploy_end]
+  parameters:
+    strategy:
+      type: parallel
