@@ -2,7 +2,7 @@ attributes:
   # Show contrail only in supported network config
   metadata:
     restrictions:
-      - condition: "not (cluster:net_provider == 'neutron' and networking_parameters:segmentation_type == 'gre')"
+      - condition: "not (cluster:net_provider == 'neutron' and networking_parameters:segmentation_type != 'vlan')"
         message: "Please use Neutron with GRE segmentation, the only network type supported with Contrail plugin."
   contrail_distribution:
     type: "radio"

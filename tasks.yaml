@@ -4,28 +4,6 @@
 # cinder and compute nodes
 #
 #####################################
-# In case of base-os Hiera must be deployed manually
-- role: ['base-os']
-  stage: pre_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/hiera/hiera.pp
-    puppet_modules: /etc/puppet/modules
-    timeout: 720
-- role: ['base-os']
-  stage: pre_deployment
-  type: shell
-  parameters:
-    cmd: ln -sf /etc/base-os.yaml /etc/astute.yaml
-    timeout: 30
-# In case of base-os globals.yaml must be created 
-- role: ['base-os']
-  stage: pre_deployment
-  type: puppet
-  parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/globals/globals.pp
-    puppet_modules: /etc/puppet/modules
-    timeout: 720
 - role: '*'
   stage: pre_deployment
   type: puppet
