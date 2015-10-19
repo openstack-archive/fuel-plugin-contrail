@@ -19,10 +19,11 @@ $settings = hiera('contrail')
 
 # TODO
 #$plugin_version = $settings['metadata']['plugin_version']
-$plugin_version = '2.0'
+$plugin_version = '3.0'
 $distribution=$settings['contrail_distribution']
 
 $network_scheme = hiera('network_scheme')
+$network_metadata = hiera_hash('network_metadata', {})
 $uid = hiera('uid')
 $master_ip = hiera('master_ip')
 $node_role = hiera('role')
@@ -80,21 +81,11 @@ end
 # Settings for RabbitMQ on contrail controllers
 $rabbit=hiera('rabbit')
 $rabbit_password=$rabbit['password']
+$rabbit_hosts_ports = hiera('amqp_hosts')
 
-# Returns array of ip addresses
-$rabbit_hosts =
-split(
-  inline_template("<%-
-    rv=Array.new
-    @nodes.each do |node|
-      if node['role'] =~ /^(primary-)?controller$/
-        rv << node['internal_address']
-      end
-    end
-  -%>
-  <%= rv.join(',') %>")
-, ',')
-$tmp_rabbit = join($rabbit_hosts,':5673,')
-$rabbit_hosts_ports = "${tmp_rabbit}:5673"
+# Base-os nodes Private IP list
+$baseos_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['base-os'])
+$baseos_ips_hash = get_node_to_ipaddr_map_by_network_role($baseos_nodes_hash, 'neutron/mesh')
+$baseos_ips = values($baseos_ips_hash)
 
 }
