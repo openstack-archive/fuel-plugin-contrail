@@ -1,0 +1,12 @@
+Verified+2: Jenkins
+Code-Review+2: Oleksandr Martsyniuk <omartsyniuk@mirantis.com>
+Workflow+1: Oleksandr Martsyniuk <omartsyniuk@mirantis.com>
+Code-Review+1: Olesia Tsvigun <otsvigun@mirantis.com>
+Code-Review+1: Ilya Bumarskov <ibumarskov@mirantis.com>
+Code-Review+1: Ruslan Khozinov <rkhozinov@mirantis.com>
+Code-Review+1: Andrey Setyaev <asetyaev@asdco.ru>
+Submitted-by: Jenkins
+Submitted-at: Tue, 20 Oct 2015 08:09:04 +0000
+Reviewed-on: https://review.openstack.org/234281
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/stable/2.0
