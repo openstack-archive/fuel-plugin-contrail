@@ -1,0 +1,268 @@
+2015-10-21 11:51:46,722 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:51:46,931 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:51:46,931 - DEBUG helpers.py:330 -- Executing command: 'date'
+2015-10-21 11:51:46,974 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:51:47,128 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:51:47,128 - DEBUG helpers.py:330 -- Executing command: 'dockerctl list'
+2015-10-21 11:51:47,175 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check nginx'
+2015-10-21 11:51:47,989 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check rabbitmq'
+2015-10-21 11:51:48,476 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check astute'
+2015-10-21 11:51:49,180 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check rsync'
+2015-10-21 11:51:49,951 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check keystone'
+2015-10-21 11:51:51,303 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check postgres'
+2015-10-21 11:51:52,038 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check rsyslog'
+2015-10-21 11:51:52,856 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check nailgun'
+2015-10-21 11:51:53,761 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check cobbler'
+2015-10-21 11:51:56,361 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check ostf'
+2015-10-21 11:51:56,836 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check mcollective'
+2015-10-21 11:51:57,601 - WARNING client.py:145 -- /home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/keystoneclient/v2_0/client.py:145: DeprecationWarning: Constructing an instance of the keystoneclient.v2_0.client.Client class without a session is deprecated as of the 1.7.0 release and may be removed in the 2.0.0 release.
+  'the 2.0.0 release.', DeprecationWarning)
+
+2015-10-21 11:51:57,601 - WARNING _utils.py:57 -- /home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/keystoneclient/v2_0/client.py:147: DeprecationWarning: Using the 'tenant_name' argument is deprecated in version '1.7.0' and will be removed in version '2.0.0', please use the 'project_name' argument instead
+  super(Client, self).__init__(**kwargs)
+
+2015-10-21 11:51:57,602 - WARNING httpclient.py:376 -- /home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/keystoneclient/httpclient.py:376: DeprecationWarning: Constructing an HTTPClient instance without using a session is deprecated as of the 1.7.0 release and may be removed in the 2.0.0 release.
+  'the 2.0.0 release.', DeprecationWarning)
+
+2015-10-21 11:51:57,602 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:57,862 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:58,019 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:58,183 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:58,346 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:58,603 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:58,713 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:58,814 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:59,015 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:59,132 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:59,238 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:59,442 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:59,558 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:59,666 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:51:59,925 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:52:00,039 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:52:00,142 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:52:00,347 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:00,542 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:00,542 - DEBUG helpers.py:330 -- Executing command: 'ps -C pacemakerd && crm_resource --resource p_ntp --locate'
+2015-10-21 11:52:00,644 - DEBUG helpers.py:330 -- Executing command: 'awk '/^server/ && $2 !~ /127.*/ {print $2}' /etc/ntp.conf'
+2015-10-21 11:52:00,734 - DEBUG helpers.py:330 -- Executing command: 'find /etc/init.d/ -regex '/etc/init.d/ntp.?''
+2015-10-21 11:52:00,825 - DEBUG helpers.py:330 -- Executing command: 'ntpdate -p 4 -t 0.2 -bu 10.109.15.1'
+2015-10-21 11:52:01,018 - DEBUG helpers.py:330 -- Executing command: 'hwclock -w'
+2015-10-21 11:52:02,503 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd stop'
+2015-10-21 11:52:02,718 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd start'
+2015-10-21 11:52:02,836 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:52:10,950 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:52:19,017 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:52:19,063 - DEBUG helpers.py:330 -- Executing command: 'date'
+2015-10-21 11:52:19,158 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:19,367 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:19,367 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r')
+2015-10-21 11:52:19,368 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r') -> 00000000
+2015-10-21 11:52:19,372 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:19,383 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:19,581 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:19,582 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r')
+2015-10-21 11:52:19,583 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r') -> 00000000
+2015-10-21 11:52:19,588 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:19,590 - DEBUG helpers.py:259 -- Connect to '10.109.15.3:22' as 'root:r00tme'
+2015-10-21 11:52:19,769 - ERROR helpers.py:266 -- Authentication failed
+2015-10-21 11:52:19,770 - ERROR helpers.py:267 -- ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+Traceback (most recent call last):
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/devops/helpers/helpers.py", line 264, in connect
+    password=self.password, pkey=private_key)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 307, in connect
+    look_for_keys, gss_auth, gss_kex, gss_deleg_creds, gss_host)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 519, in _auth
+    raise saved_exception
+BadAuthenticationType: ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+2015-10-21 11:52:20,036 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:20,049 - DEBUG helpers.py:330 -- Executing command: 'ps -C pacemakerd && crm_resource --resource p_ntp --locate'
+2015-10-21 11:52:20,065 - DEBUG helpers.py:330 -- Executing command: 'awk '/^server/ && $2 !~ /127.*/ {print $2}' /etc/ntp.conf'
+2015-10-21 11:52:20,142 - DEBUG helpers.py:330 -- Executing command: 'find /etc/init.d/ -regex '/etc/init.d/ntp.?''
+2015-10-21 11:52:20,220 - DEBUG helpers.py:330 -- Executing command: 'sed -i 's/^server 10.109.15.2 .*/server 10.109.15.2 minpoll 3 maxpoll 5 ibrust/' /etc/ntp.conf'
+2015-10-21 11:52:20,307 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:20,499 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:20,499 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r')
+2015-10-21 11:52:20,500 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r') -> 00000000
+2015-10-21 11:52:20,503 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:20,513 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:20,705 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:20,705 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r')
+2015-10-21 11:52:20,706 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r') -> 00000000
+2015-10-21 11:52:20,710 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:20,711 - DEBUG helpers.py:259 -- Connect to '10.109.15.4:22' as 'root:r00tme'
+2015-10-21 11:52:20,869 - ERROR helpers.py:266 -- Authentication failed
+2015-10-21 11:52:20,870 - ERROR helpers.py:267 -- ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+Traceback (most recent call last):
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/devops/helpers/helpers.py", line 264, in connect
+    password=self.password, pkey=private_key)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 307, in connect
+    look_for_keys, gss_auth, gss_kex, gss_deleg_creds, gss_host)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 519, in _auth
+    raise saved_exception
+BadAuthenticationType: ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+2015-10-21 11:52:21,106 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:21,115 - DEBUG helpers.py:330 -- Executing command: 'ps -C pacemakerd && crm_resource --resource p_ntp --locate'
+2015-10-21 11:52:21,130 - DEBUG helpers.py:330 -- Executing command: 'awk '/^server/ && $2 !~ /127.*/ {print $2}' /etc/ntp.conf'
+2015-10-21 11:52:21,206 - DEBUG helpers.py:330 -- Executing command: 'find /etc/init.d/ -regex '/etc/init.d/ntp.?''
+2015-10-21 11:52:21,279 - DEBUG helpers.py:330 -- Executing command: 'sed -i 's/^server 10.109.15.2 .*/server 10.109.15.2 minpoll 3 maxpoll 5 ibrust/' /etc/ntp.conf'
+2015-10-21 11:52:21,369 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:21,564 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:21,564 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r')
+2015-10-21 11:52:21,566 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r') -> 00000000
+2015-10-21 11:52:21,569 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:21,581 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:21,781 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:21,781 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r')
+2015-10-21 11:52:21,783 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r') -> 00000000
+2015-10-21 11:52:21,787 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:21,789 - DEBUG helpers.py:259 -- Connect to '10.109.15.5:22' as 'root:r00tme'
+2015-10-21 11:52:21,966 - ERROR helpers.py:266 -- Authentication failed
+2015-10-21 11:52:21,966 - ERROR helpers.py:267 -- ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+Traceback (most recent call last):
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/devops/helpers/helpers.py", line 264, in connect
+    password=self.password, pkey=private_key)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 307, in connect
+    look_for_keys, gss_auth, gss_kex, gss_deleg_creds, gss_host)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 519, in _auth
+    raise saved_exception
+BadAuthenticationType: ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+2015-10-21 11:52:22,212 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:22,227 - DEBUG helpers.py:330 -- Executing command: 'ps -C pacemakerd && crm_resource --resource p_ntp --locate'
+2015-10-21 11:52:22,251 - DEBUG helpers.py:330 -- Executing command: 'awk '/^server/ && $2 !~ /127.*/ {print $2}' /etc/ntp.conf'
+2015-10-21 11:52:22,328 - DEBUG helpers.py:330 -- Executing command: 'find /etc/init.d/ -regex '/etc/init.d/ntp.?''
+2015-10-21 11:52:22,408 - DEBUG helpers.py:330 -- Executing command: 'sed -i 's/^server 10.109.15.2 .*/server 10.109.15.2 minpoll 3 maxpoll 5 ibrust/' /etc/ntp.conf'
+2015-10-21 11:52:22,500 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:22,692 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:22,692 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r')
+2015-10-21 11:52:22,693 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r') -> 00000000
+2015-10-21 11:52:22,696 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:22,704 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:22,896 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:22,897 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r')
+2015-10-21 11:52:22,899 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r') -> 00000000
+2015-10-21 11:52:22,903 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:22,905 - DEBUG helpers.py:259 -- Connect to '10.109.15.6:22' as 'root:r00tme'
+2015-10-21 11:52:23,087 - ERROR helpers.py:266 -- Authentication failed
+2015-10-21 11:52:23,088 - ERROR helpers.py:267 -- ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+Traceback (most recent call last):
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/devops/helpers/helpers.py", line 264, in connect
+    password=self.password, pkey=private_key)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 307, in connect
+    look_for_keys, gss_auth, gss_kex, gss_deleg_creds, gss_host)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 519, in _auth
+    raise saved_exception
+BadAuthenticationType: ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+2015-10-21 11:52:23,341 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:23,356 - DEBUG helpers.py:330 -- Executing command: 'ps -C pacemakerd && crm_resource --resource p_ntp --locate'
+2015-10-21 11:52:23,382 - DEBUG helpers.py:330 -- Executing command: 'awk '/^server/ && $2 !~ /127.*/ {print $2}' /etc/ntp.conf'
+2015-10-21 11:52:23,468 - DEBUG helpers.py:330 -- Executing command: 'find /etc/init.d/ -regex '/etc/init.d/ntp.?''
+2015-10-21 11:52:23,548 - DEBUG helpers.py:330 -- Executing command: 'sed -i 's/^server 10.109.15.2 .*/server 10.109.15.2 minpoll 3 maxpoll 5 ibrust/' /etc/ntp.conf'
+2015-10-21 11:52:23,637 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:23,832 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:23,833 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r')
+2015-10-21 11:52:23,834 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/id_rsa', 'r') -> 00000000
+2015-10-21 11:52:23,838 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:23,852 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:52:24,012 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:24,012 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r')
+2015-10-21 11:52:24,017 - DEBUG sftp.py:129 -- [chan 0] open('/root/.ssh/bootstrap.rsa', 'r') -> 00000000
+2015-10-21 11:52:24,022 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:52:24,024 - DEBUG helpers.py:259 -- Connect to '10.109.15.7:22' as 'root:r00tme'
+2015-10-21 11:52:24,214 - ERROR helpers.py:266 -- Authentication failed
+2015-10-21 11:52:24,214 - ERROR helpers.py:267 -- ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+Traceback (most recent call last):
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/devops/helpers/helpers.py", line 264, in connect
+    password=self.password, pkey=private_key)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 307, in connect
+    look_for_keys, gss_auth, gss_kex, gss_deleg_creds, gss_host)
+  File "/home/jenkins/venv-nailgun-tests-2.9/local/lib/python2.7/site-packages/paramiko/client.py", line 519, in _auth
+    raise saved_exception
+BadAuthenticationType: ('Bad authentication type', [u'publickey']) (allowed_types=[u'publickey'])
+2015-10-21 11:52:24,464 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:52:24,475 - DEBUG helpers.py:330 -- Executing command: 'ps -C pacemakerd && crm_resource --resource p_ntp --locate'
+2015-10-21 11:52:24,513 - DEBUG helpers.py:330 -- Executing command: 'awk '/^server/ && $2 !~ /127.*/ {print $2}' /etc/ntp.conf'
+2015-10-21 11:52:24,592 - DEBUG helpers.py:330 -- Executing command: 'find /etc/init.d/ -regex '/etc/init.d/ntp.?''
+2015-10-21 11:52:24,668 - DEBUG helpers.py:330 -- Executing command: 'sed -i 's/^server 10.109.15.2 .*/server 10.109.15.2 minpoll 3 maxpoll 5 ibrust/' /etc/ntp.conf'
+2015-10-21 11:52:24,744 - DEBUG helpers.py:330 -- Executing command: 'ntpdate -p 4 -t 0.2 -bu 10.109.15.2'
+2015-10-21 11:52:24,872 - DEBUG helpers.py:330 -- Executing command: 'hwclock -w'
+2015-10-21 11:52:25,510 - DEBUG helpers.py:330 -- Executing command: 'ntpdate -p 4 -t 0.2 -bu 10.109.15.2'
+2015-10-21 11:52:25,636 - DEBUG helpers.py:330 -- Executing command: 'hwclock -w'
+2015-10-21 11:52:26,504 - DEBUG helpers.py:330 -- Executing command: 'ntpdate -p 4 -t 0.2 -bu 10.109.15.2'
+2015-10-21 11:52:26,642 - DEBUG helpers.py:330 -- Executing command: 'hwclock -w'
+2015-10-21 11:52:28,505 - DEBUG helpers.py:330 -- Executing command: 'ntpdate -p 4 -t 0.2 -bu 10.109.15.2'
+2015-10-21 11:52:28,637 - DEBUG helpers.py:330 -- Executing command: 'hwclock -w'
+2015-10-21 11:52:29,505 - DEBUG helpers.py:330 -- Executing command: 'ntpdate -p 4 -t 0.2 -bu 10.109.15.2'
+2015-10-21 11:52:29,631 - DEBUG helpers.py:330 -- Executing command: 'hwclock -w'
+2015-10-21 11:52:31,505 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd stop'
+2015-10-21 11:52:31,653 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd stop'
+2015-10-21 11:52:31,790 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd stop'
+2015-10-21 11:52:31,928 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd stop'
+2015-10-21 11:52:32,068 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd stop'
+2015-10-21 11:52:32,208 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd start'
+2015-10-21 11:52:32,260 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd start'
+2015-10-21 11:52:32,297 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd start'
+2015-10-21 11:52:32,337 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd start'
+2015-10-21 11:52:32,374 - DEBUG helpers.py:330 -- Executing command: '/etc/init.d/ntpd start'
+2015-10-21 11:52:32,418 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:52:40,456 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:52:48,512 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:52:56,569 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:53:04,616 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:53:04,657 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:53:04,692 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:53:04,730 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:53:04,774 - DEBUG helpers.py:330 -- Executing command: 'ntpq -pn'
+2015-10-21 11:53:04,817 - DEBUG helpers.py:330 -- Executing command: 'date'
+2015-10-21 11:53:04,834 - DEBUG helpers.py:330 -- Executing command: 'date'
+2015-10-21 11:53:04,851 - DEBUG helpers.py:330 -- Executing command: 'date'
+2015-10-21 11:53:04,870 - DEBUG helpers.py:330 -- Executing command: 'date'
+2015-10-21 11:53:04,881 - DEBUG helpers.py:330 -- Executing command: 'date'
+2015-10-21 11:53:04,897 - DEBUG v2.py:86 -- Making authentication request to http://10.109.15.2:5000/v2.0/tokens
+2015-10-21 11:53:36,183 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:53:36,344 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:53:36,344 - DEBUG sftp.py:129 -- [chan 0] lstat('/var')
+2015-10-21 11:53:36,346 - DEBUG sftp.py:129 -- [chan 0] open('/var/contrail-2.0-2.0.0-1.noarch.rpm', 'wb')
+2015-10-21 11:53:36,348 - DEBUG sftp.py:129 -- [chan 0] open('/var/contrail-2.0-2.0.0-1.noarch.rpm', 'wb') -> 00000000
+2015-10-21 11:53:43,424 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:53:43,428 - DEBUG sftp.py:129 -- [chan 0] stat('/var/contrail-2.0-2.0.0-1.noarch.rpm')
+2015-10-21 11:53:43,441 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:53:43,636 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:53:43,636 - DEBUG helpers.py:330 -- Executing command: 'cd /var && fuel plugins --install contrail-2.0-2.0.0-1.noarch.rpm'
+2015-10-21 11:53:52,071 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:53:52,331 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:53:52,332 - DEBUG sftp.py:129 -- [chan 0] lstat('/var/www/nailgun/plugins/contrail-1.0')
+2015-10-21 11:53:52,335 - DEBUG sftp.py:129 -- [chan 0] open('/var/www/nailgun/plugins/contrail-1.0', 'wb')
+2015-10-21 11:53:52,337 - DEBUG sftp.py:129 -- [chan 0] open('/var/www/nailgun/plugins/contrail-1.0', 'wb') -> 00000000
+2015-10-21 11:54:06,948 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:54:06,951 - DEBUG sftp.py:129 -- [chan 0] stat('/var/www/nailgun/plugins/contrail-1.0')
+2015-10-21 11:54:06,961 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:54:07,220 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:54:07,220 - DEBUG sftp.py:129 -- [chan 0] lstat('/var/www/nailgun/plugins/contrail-1.0')
+2015-10-21 11:54:07,223 - DEBUG sftp.py:129 -- [chan 0] open('/var/www/nailgun/plugins/contrail-1.0', 'wb')
+2015-10-21 11:54:07,416 - DEBUG sftp.py:129 -- [chan 0] open('/var/www/nailgun/plugins/contrail-1.0', 'wb') -> 00000000
+2015-10-21 11:54:22,219 - DEBUG sftp.py:129 -- [chan 0] close(00000000)
+2015-10-21 11:54:22,624 - DEBUG sftp.py:129 -- [chan 0] stat('/var/www/nailgun/plugins/contrail-1.0')
+2015-10-21 11:54:22,638 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:54:22,872 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:54:22,872 - DEBUG helpers.py:330 -- Executing command: 'cd /var/www/nailgun/plugins/contrail-1.0 && ./install.sh'
+2015-10-21 11:55:13,454 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:55:13,624 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:55:13,625 - DEBUG helpers.py:330 -- Executing command: 'ntpdate -d -p 4 -t 0.2 -u 10.109.16.1'
+2015-10-21 11:55:49,219 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:55:49,417 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:55:49,418 - DEBUG helpers.py:330 -- Executing command: 'date'
+2015-10-21 11:55:49,459 - DEBUG helpers.py:259 -- Connect to '10.109.15.2:22' as 'root:r00tme'
+2015-10-21 11:55:49,651 - INFO sftp.py:129 -- [chan 0] Opened sftp connection (server version 3)
+2015-10-21 11:55:49,652 - DEBUG helpers.py:330 -- Executing command: 'dockerctl list'
+2015-10-21 11:55:49,708 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check nginx'
+2015-10-21 11:55:50,531 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check rabbitmq'
+2015-10-21 11:55:51,057 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check astute'
+2015-10-21 11:55:51,821 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check rsync'
+2015-10-21 11:55:52,626 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check keystone'
+2015-10-21 11:55:53,979 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check postgres'
+2015-10-21 11:55:54,719 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check rsyslog'
+2015-10-21 11:55:55,431 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check nailgun'
+2015-10-21 11:55:56,505 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check cobbler'
+2015-10-21 11:55:59,140 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check ostf'
+2015-10-21 11:55:59,607 - DEBUG helpers.py:330 -- Executing command: 'timeout 5 dockerctl check mcollective'

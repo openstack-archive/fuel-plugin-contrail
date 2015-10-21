@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?><testsuite name="nosetests" tests="4" errors="0" failures="0" skip="3"><testcase classname="setup_master" name="setup_master" time="0.117"><skipped type="unittest.case.SkipTest" message=""><![CDATA[SkipTest
+]]></skipped></testcase><testcase classname="prepare_release" name="prepare_release" time="0.034"><skipped type="unittest.case.SkipTest" message=""><![CDATA[SkipTest
+]]></skipped></testcase><testcase classname="prepare_slaves_5" name="prepare_slaves_5" time="0.034"><skipped type="unittest.case.SkipTest" message=""><![CDATA[SkipTest
+]]></skipped></testcase><testcase classname="install_contrail" name="install_contrail" time="304.067" /></testsuite>
