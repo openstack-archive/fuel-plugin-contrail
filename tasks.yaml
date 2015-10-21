@@ -33,6 +33,7 @@
     puppet_manifest: puppet/manifests/site-common-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+#
 # Config default network, first of all
 - role: ['base-os']
   stage: pre_deployment
@@ -41,6 +42,9 @@
     puppet_modules: /etc/puppet/modules
     puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp
     timeout: 3600
+#
+# Additional network configurations for Contrail controllers, i.e.:
+# add default route, disable rp_filter 
 - role: ['base-os']
   stage: pre_deployment
   type: puppet
@@ -48,6 +52,8 @@
     puppet_manifest: puppet/manifests/site-contrail-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+#
+# Configuration for Neutron, Heat and HAProxy configs for Contrail Web UI
 - role: ['primary-controller','controller']
   stage: post_deployment
   type: puppet
@@ -55,6 +61,8 @@
     puppet_manifest: puppet/manifests/site-controller-post1.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+#
+# Install Contrail packages and dependencies
 - role: ['base-os']
   stage: post_deployment
   type: puppet
@@ -62,6 +70,8 @@
     puppet_manifest: puppet/manifests/site-contrail-post1.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+#
+# Install Keepalived, HAProxy, Cassandra and wait for Cassandra cluster to bootstrap
 - role: ['base-os']
   stage: post_deployment
   type: puppet
@@ -69,6 +79,10 @@
     puppet_manifest: puppet/manifests/site-contrail-post2.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
+#
+# Install and configure Contrail Control, Contrail Analytics, Contrail WebUI 
+# and perform initial Contrail provisioning
+# this task is performed on one node initially to allow discovery service to start up
 - role: ['base-os']
   stage: post_deployment
   type: puppet
@@ -76,6 +90,8 @@
     puppet_manifest: puppet/manifests/site-contrail-post3.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+#
+# Perform same actions on other contrail nodes
 - role: ['base-os']
   stage: post_deployment
   type: puppet
@@ -83,6 +99,8 @@
     puppet_manifest: puppet/manifests/site-contrail-post4.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+#
+# Restart all Nova and Heat services
 - role: ['primary-controller','controller']
   stage: post_deployment
   type: puppet
@@ -90,6 +108,8 @@
     puppet_manifest: puppet/manifests/site-controller-post2.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+#
+# Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
 - role: ['compute']
   stage: post_deployment
   type: puppet
@@ -97,6 +117,8 @@
     puppet_manifest: puppet/manifests/site-compute-post.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+#
+# Reboot compute nodes, so they pick new network configuration
 - role: ['compute']
   stage: post_deployment
   type: shell
