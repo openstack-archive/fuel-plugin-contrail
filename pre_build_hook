@@ -2,14 +2,3 @@
 # Add here any the actions which are required before plugin build
 # like packages building, packages downloading from mirrors and so on.
 # The script should return 0 if there were no errors.
-
-set -eux
-
-ROOT="$(dirname `readlink -f $0`)"
-MODULES="${ROOT}"/deployment_scripts/puppet/modules
-mkdir -p "${MODULES}"
-FUEL_REPO_PATH='https://github.com/stackforge/fuel-library/tarball/f43d885914d74fbd062096763222f350f47480e1'
-
-wget -qO- "${FUEL_REPO_PATH}" | \
-      tar -C "${MODULES}" --strip-components=3 -zxvf - \
-      stackforge-fuel-library-f43d885/deployment/puppet/{inifile,stdlib}
