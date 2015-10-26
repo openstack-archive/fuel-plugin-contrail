@@ -7,4 +7,6 @@ deployment_scripts/puppet/modules/inifile
 deployment_scripts/puppet/modules/stdlib
 build.sh
 *.rpm
+fuel-qa
+logs
 
