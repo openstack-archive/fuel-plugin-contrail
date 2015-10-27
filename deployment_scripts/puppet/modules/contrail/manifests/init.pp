@@ -15,14 +15,14 @@
 class contrail {
 
 # General configuration
-$settings = hiera('contrail')
+$settings = hiera('contrail', {})
 
 # TODO
 #$plugin_version = $settings['metadata']['plugin_version']
 $plugin_version = '3.0'
 $distribution=$settings['contrail_distribution']
 
-$network_scheme = hiera('network_scheme')
+$network_scheme = hiera_hash('network_scheme', {})
 $network_metadata = hiera_hash('network_metadata', {})
 $uid = hiera('uid')
 $master_ip = hiera('master_ip')
@@ -30,20 +30,25 @@ $node_role = hiera('role')
 $node_name = hiera('user_node_name')
 $nodes= hiera('nodes')
 
-$neutron_settings=hiera('quantum_settings')
+$neutron_settings=hiera_hash('quantum_settings', {})
 $metadata_secret=$neutron_settings['metadata']['metadata_proxy_shared_secret']
 $service_token = $neutron_settings['keystone']['admin_password']
-$keystone=hiera('keystone')
+$nets = $neutron_settings['predefined_networks']
+
+$keystone=hiera_hash('keystone', {})
 $admin_token = $keystone['admin_token']
 
-$admin_settings = hiera('access')
+$admin_settings = hiera_hash('access', {})
 $admin_username = $admin_settings['user']
 $admin_password = $admin_settings['password']
+$admin_tenant = $admin_settings['tenant']
 
 $mos_mgmt_vip=hiera('management_vip')
 
 # Contrail settings
 $asnum = $settings['contrail_asnum']
+$external = $settings['contrail_external']
+$route_target = $settings['contrail_route_target']
 
 # Network configuration
 prepare_network_config($network_scheme)
