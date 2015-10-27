@@ -76,6 +76,38 @@ then exit 1; fi",
         }
       }
     }
+    'controller': {
+      file {'/etc/hiera/override': ensure => directory } ->
+      file {'/etc/hiera/override/plugins.yaml':
+        ensure  => present,
+        content => template('contrail/plugins.yaml.erb'),
+      }
+      if hiera('primary_controller') and $contrail::nets and !empty($contrail::nets) {
+        contrail::create_network{'net04':
+          netdata           => $contrail::nets['net04'],
+          require           => File['/etc/hiera/override/plugins.yaml'],
+        } ->
+        contrail::create_network{'net04_ext':
+          netdata           => $contrail::nets['net04_ext'],
+          notify            => Exec['prov_route_target'],
+        } ->
+        openstack::network::create_router{'router04':
+          internal_network  => 'net04',
+          external_network  => 'net04_ext',
+          tenant_name       => $contrail::admin_tenant
+        }
+      }
+      exec { 'prov_route_target':
+        command => "python /opt/contrail/utils/add_route_target.py \
+--routing_instance_name default-domain:${contrail::admin_tenant}:net04_ext:net04_ext \
+--route_target_number ${contrail::route_target} --router_asn ${contrail::asnum} \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+&& touch /opt/contrail/prov_route_target-DONE",
+        creates => '/opt/contrail/prov_route_target-DONE',
+        require => Contrail::Create_Network['net04_ext'],
+      }
+    }
     'compute': {
       exec { 'provision-vrouter':
         path    => '/bin:/usr/bin/',
