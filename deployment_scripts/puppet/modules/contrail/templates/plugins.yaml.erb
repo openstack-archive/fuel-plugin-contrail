@@ -1,0 +1,26 @@
+<%-
+external_cidr=scope.lookupvar('contrail::external')
+external_netmask=scope.lookupvar('contrail::external').to_s.split('/')[1]
+external_gw=scope.function_get_first_ip([external_cidr])
+floating_end=scope.function_get_last_ip([external_cidr])
+floating_start=scope.function_get_ip_from_range([external_gw,floating_end,external_netmask,'1','first'])
+%>
+quantum_settings:
+  predefined_networks:
+    net04_ext:
+      shared: true
+      L2:
+        router_ext: true
+      L3:
+        nameservers: []
+        subnet: <%= external_cidr %>
+        floating: <%= floating_start %>:<%= floating_end %>
+        gateway: <%= external_gw %>
+        enable_dhcp: true
+    net04:
+      shared: false
+      L2:
+        network_type: nil
+        router_ext: false
+      L3:
+        enable_dhcp: true
