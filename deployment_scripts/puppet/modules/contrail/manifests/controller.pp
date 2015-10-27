@@ -31,6 +31,7 @@ class contrail::controller {
   package { 'neutron-server': } ->
   package { 'python-neutron-lbaas': } ->
   package { 'python-contrail': } ->
+  package { 'contrail-utils': } ->
   package { 'neutron-plugin-contrail': } ->
   package { 'contrail-heat': }
 
@@ -46,6 +47,13 @@ class contrail::controller {
     notify  => Service['haproxy'],
   }
 
+# Overrides for Hiera
+  file {'/etc/hiera/override': ensure => directory } ->
+  file {'/etc/hiera/override/plugins.yaml':
+    ensure  => present,
+    content => template('contrail/plugins.yaml.erb'),
+  }
+
 # Nova configuration
   nova_config {
     'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
@@ -56,6 +64,10 @@ class contrail::controller {
     'DEFAULT/enabled_apis': value=> 'ec2,osapi_compute,metadata';
     'DEFAULT/security_group_api': value=> 'neutron';
     'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
+  } ~>
+  service {'nova-api':
+    ensure    => running,
+    enable    => true,
   }
 
 # Neutron configuration
@@ -71,7 +83,7 @@ class contrail::controller {
     'QUOTAS/quota_network': value => '-1';
     'QUOTAS/quota_subnet': value => '-1';
     'QUOTAS/quota_port': value => '-1';
-    } ->
+  } ->
   file {'/etc/neutron/plugins/opencontrail/ContrailPlugin.ini':
     content => template('contrail/ContrailPlugin.ini.erb'),
   } ->
@@ -133,7 +145,7 @@ class contrail::controller {
                   File['/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg'],
                   ]
   }
-  service {'heat-engine':
+  service {['heat-api','heat-api-cfn','heat-api-cloudwatch','heat-engine']:
     ensure    => running,
     enable    => true,
     require   => Package['contrail-heat'],
