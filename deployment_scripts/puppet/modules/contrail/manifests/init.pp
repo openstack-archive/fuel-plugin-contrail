@@ -64,9 +64,6 @@ $mgmt_cidr=get_network_role_property('management', 'cidr')
 $mgmt_netmask=get_network_role_property('management', 'netmask')
 $mgmt_netmask_short=netmask_to_cidr($mgmt_netmask)
 
-$default_gw = hiera('management_vrouter_vip')
-$private_gw = $settings['contrail_private_gw']
-
 $contrail_mgmt_vip=get_last_ip(hiera('management_network_range'))
 $contrail_private_vip=get_last_ip(hiera('private_network_range'))
 
