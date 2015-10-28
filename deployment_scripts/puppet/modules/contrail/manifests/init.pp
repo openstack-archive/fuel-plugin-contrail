@@ -49,11 +49,13 @@ $mos_mgmt_vip=hiera('management_vip')
 $asnum = $settings['contrail_asnum']
 $external = $settings['contrail_external']
 $route_target = $settings['contrail_route_target']
+$gateways = split($settings['contrail_gateways'], ',')
 
 # Network configuration
 prepare_network_config($network_scheme)
-$ifname = get_private_ifname()
-$private_if=get_network_role_property('neutron/mesh', 'interface')
+$phys_dev=get_network_role_property('neutron/mesh', 'phys_dev')
+$interface=get_network_role_property('neutron/mesh', 'interface')
+$gateway=$network_scheme['endpoints'][$interface]['gateway']
 $address=get_network_role_property('neutron/mesh', 'ipaddr')
 $cidr=get_network_role_property('neutron/mesh', 'cidr')
 $netmask=get_network_role_property('neutron/mesh', 'netmask')
@@ -63,9 +65,6 @@ $mgmt_if=get_network_role_property('management', 'interface')
 $mgmt_cidr=get_network_role_property('management', 'cidr')
 $mgmt_netmask=get_network_role_property('management', 'netmask')
 $mgmt_netmask_short=netmask_to_cidr($mgmt_netmask)
-
-$default_gw = hiera('management_vrouter_vip')
-$private_gw = $settings['contrail_private_gw']
 
 $contrail_mgmt_vip=get_last_ip(hiera('management_network_range'))
 $contrail_private_vip=get_last_ip(hiera('private_network_range'))
