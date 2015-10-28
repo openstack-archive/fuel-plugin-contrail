@@ -1,5 +1,7 @@
 auto vhost0
 iface vhost0 inet static
 address <%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
+<% if scope.lookupvar('contrail::gateway') != :undef -%>
+gateway <%= scope.lookupvar('contrail::gateway') %>
+<% end -%>
 network_name contrail
-
