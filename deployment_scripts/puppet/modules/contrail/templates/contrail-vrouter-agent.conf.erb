@@ -18,8 +18,10 @@ control_network_ip=<%= scope.lookupvar('contrail::address') %>
 [VIRTUAL-HOST-INTERFACE]
 name=vhost0
 ip=<%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
-physical_interface=<%= scope.function_get_private_ifname([]) %>
-gateway=<%= scope.lookupvar('contrail::private_gw') %>
+physical_interface=<%= scope.lookupvar('contrail::phys_dev') %>
+<% if scope.lookupvar('contrail::gateway') != :undef -%>
+gateway=<%= scope.lookupvar('contrail::gateway') %>
+<% end -%>
 [GATEWAY-0]
 [GATEWAY-1]
 [SERVICE-INSTANCE]

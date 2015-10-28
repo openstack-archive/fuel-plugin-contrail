@@ -21,7 +21,7 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
   class { 'contrail::network':
     node_role  => $node_role,
     address    => $contrail::address,
-    ifname     => $contrail::ifname,
+    ifname     => $contrail::phys_dev,
     netmask    => $contrail::netmask_short,
     default_gw => $contrail::default_gw,
   }
