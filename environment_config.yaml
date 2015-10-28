@@ -24,15 +24,6 @@ attributes:
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid AS number"
-  contrail_private_gw:
-    value: ''
-    label: 'Gateway for Private network'
-    description: 'The IP address of gateway for contrail private network to reach BGP peers. Empty if not needed.'
-    weight: 30
-    type: "text"
-    regex:
-      source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})|(?:^)$'
-      error: "Invalid IP address"
   contrail_gateways:
     value: '10.109.3.250'
     label: 'GW IP'
