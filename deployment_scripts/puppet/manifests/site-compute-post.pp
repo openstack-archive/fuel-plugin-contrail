@@ -19,7 +19,7 @@ Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH
 class { 'contrail::network':
   node_role => $node_role,
   address   => $contrail::address,
-  ifname    => $contrail::ifname,
+  ifname    => $contrail::phys_dev,
   netmask   => $contrail::netmask_short,
 } ->
 

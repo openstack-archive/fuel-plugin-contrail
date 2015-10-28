@@ -23,19 +23,6 @@ class contrail::network (
       'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
       'CentOS' => '/etc/sysconfig/network-scripts/ifcfg-br-mesh',
   }
-  $gateways = split($contrail::settings['contrail_gateways'], ',')
-
-  define contrail::network::add_route ( $destination, $gateway ) {
-    exec {"check_route_to_${name}":
-      command => "ip route del ${name}",
-      onlyif  => "ip route | grep -E ^${name}' via'.*",
-      before  => L23network::L3::Route[$name],
-    }
-    l23network::l3::route {$name:
-      destination => $name,
-      gateway     => $gateway,
-    }
-  }
 
   case $node_role {
     'base-os':{
@@ -43,16 +30,6 @@ class contrail::network (
       sysctl::value { 'net.ipv4.conf.default.rp_filter':  value => '0' }
       sysctl::value { 'net.ipv4.conf.br-mesh.rp_filter':  value => '0' }
       sysctl::value { 'net.ipv4.conf.br-mgmt.rp_filter':  value => '0' }
-      class { 'l23network': use_ovs => false }
-      case $contrail::private_gw {
-        '': { notify { 'No gateway for private network':} }
-        default: {
-          contrail::network::add_route { $gateways:
-            destination => $gateways,
-            gateway     => $contrail::private_gw,
-          }
-        }
-      }
     }
     'compute':{
       file { $br_file: ensure => absent } ->
