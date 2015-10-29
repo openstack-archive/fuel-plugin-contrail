@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ !	 -d plugin_test ]; then echo "Please start this script inside plugin directory"; exit 1; fi
 
@@ -44,4 +44,6 @@ sh -x "fuel-qa/utils/jenkins/system_tests.sh" -w $WORKSPACE $* &
   then
     grep 'errors="0"' nosetests.xml | grep -q 'failures="0"' && echo SEGFAULT workaround && RES=0
   fi 
+
+exit $RES
 
