@@ -93,63 +93,36 @@ class contrail::controller {
   }
 
 # Contrail-specific heat templates settings
-  ini_setting { 'contrail-user':
-    ensure  => present,
-    path    => '/etc/heat/heat.conf',
-    section => 'clients_contrail',
-    setting => 'user',
-    value   => 'neutron',
-  } ->
-  ini_setting { 'contrail-password':
-      ensure  => present,
-      path    => '/etc/heat/heat.conf',
-      section => 'clients_contrail',
-      setting => 'password',
-      value   => $contrail::service_token,
-  } ->
-  ini_setting { 'contrail-tenant':
-      ensure  => present,
-      path    => '/etc/heat/heat.conf',
-      section => 'clients_contrail',
-      setting => 'tenant',
-      value   => 'services',
-  } ->
-  ini_setting { 'contrail-api_server':
-      ensure  => present,
-      path    => '/etc/heat/heat.conf',
-      section => 'clients_contrail',
-      setting => 'api_server',
-      value   => $contrail::contrail_mgmt_vip,
-  } ->
-  ini_setting { 'contrail-auth_host_ip':
-      ensure  => present,
-      path    => '/etc/heat/heat.conf',
-      section => 'clients_contrail',
-      setting => 'auth_host_ip',
-      value   => $contrail::mos_mgmt_vip,
-  } ->
-  ini_setting { 'contrail-api_base_url':
-      ensure  => present,
-      path    => '/etc/heat/heat.conf',
-      section => 'clients_contrail',
-      setting => 'api_base_url',
-      value   => '/',
+  heat_config {
+    'DEFAULT/plugin_dirs': value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat';
+    'clients_contrail/contrail-user': value=> 'neutron';
+    'clients_contrail/user': value=> 'neutron';
+    'clients_contrail/password': value=> $contrail::service_token;
+    'clients_contrail/tenant': value=> 'services';
+    'clients_contrail/api_server': value=> $contrail::contrail_mgmt_vip;
+    'clients_contrail/auth_host_ip': value=> $contrail::mos_mgmt_vip;
+    'clients_contrail/api_base_url': value=> '/';
+  } ~>
+  service {'heat-engine':
+    ensure    => running,
+    name       => 'p_heat-engine',
+    enable     => true,
+    hasstatus  => true,
+    hasrestart => true,
+    provider   => 'pacemaker',
+    require   => Package['contrail-heat'],
   }
 
 # Services
   service {'haproxy':
     ensure     => running,
+    name       => 'p_haproxy',
+    hasstatus  => true,
     hasrestart => true,
-    restart    => '/sbin/ip netns exec haproxy service haproxy reload',
+    provider   => 'pacemaker',
     subscribe  => [File['/etc/haproxy/conf.d/094-web_for_contrail.cfg'],
                   File['/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg'],
                   ]
-  }
-  service {['heat-api','heat-api-cfn','heat-api-cloudwatch','heat-engine']:
-    ensure    => running,
-    enable    => true,
-    require   => Package['contrail-heat'],
-    subscribe => Ini_setting['contrail-api_base_url'],
   }
   service { 'neutron-server':
     ensure      => running,
