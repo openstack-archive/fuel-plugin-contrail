@@ -1,1 +1,0 @@
-    from plugin_test.tests import test_fuel_plugin_contrail
