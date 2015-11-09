@@ -25,7 +25,6 @@ export ALWAYS_CREATE_DIAGNOSTIC_SNAPSHOT=${ALWAYS_CREATE_DIAGNOSTIC_SNAPSHOT:-tr
 # Export specified settings
 if [ -z $NODE_VOLUME_SIZE ]; then export NODE_VOLUME_SIZE=350; fi
 if [ -z $OPENSTACK_RELEASE ]; then export OPENSTACK_RELEASE=Ubuntu; fi
-if [ -z $BONDING ]; then export BONDING=true; fi
 if [ -z $ENV_NAME ]; then export ENV_NAME="contrail"; fi
 if [ -z $ADMIN_NODE_MEMORY ]; then export ADMIN_NODE_MEMORY=4096; fi
 if [ -z $ADMIN_NODE_CPU ]; then export ADMIN_NODE_CPU=4; fi
@@ -34,6 +33,10 @@ if [ -z $SLAVE_NODE_CPU ]; then export SLAVE_NODE_CPU=4; fi
 
 # Init and update submodule
 git submodule init && git submodule update
+
+sudo /sbin/iptables -F
+sudo /sbin/iptables -t nat -F
+sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 
 ShowHelp() {
