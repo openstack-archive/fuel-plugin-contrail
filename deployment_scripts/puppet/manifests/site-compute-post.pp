@@ -26,9 +26,9 @@ class { 'contrail::network':
 case $operatingsystem {
   Ubuntu: {
     file { '/etc/apt/preferences.d/contrail-pin-100':
-      ensure  => file,
-      source  => 'puppet:///modules/contrail/contrail-pin-100',
-      before  => Class['contrail::package'],
+      ensure => file,
+      source => 'puppet:///modules/contrail/contrail-pin-100',
+      before => Class['contrail::package'],
     }
     class { 'contrail::package':
       install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
@@ -54,10 +54,6 @@ case $operatingsystem {
   default: {}
 } ->
 
-class { 'contrail::config':
-  node_role => $node_role,
-} ->
+class { 'contrail::compute': } ->
+class { 'contrail::provision_compute': }
 
-class { 'contrail::provision':
-  node_role => $node_role,
-}
