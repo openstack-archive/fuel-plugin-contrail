@@ -1,7 +1,154 @@
-- id: contail-baseos-symlink
-  role: [base-os]
-  required_for: [post_deployment_start]
-  type: shell
+- id: group-contrail
+  type: group
+  role: [primary-contrail-db, primary-contrail-config, primary-contrail-control, 
+    contrail-db, contrail-config, contrail-control]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts]
+  required_for: [pre_deployment_end]
+  requires: [pre_deployment_start]
   parameters:
-    cmd: ln -sf /etc/base-os.yaml /etc/astute.yaml
-    timeout: 30
+    strategy:
+      type: parallel
+#
+## Create apt pin for Contrail repo 
+- id: contrail-repo-pin
+  type: puppet
+  role: '*'
+  required_for: [pre_deployment_end]
+  requires: [pre_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-repo-pin.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-hiera-override
+  type: puppet
+  role:  [primary-controller, controller]
+  requires: [globals]
+  required_for: [logging]
+  parameters:
+    puppet_manifest: puppet/manifests/hiera-override.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 120
+#
+# Install Contrail utils, java 
+- id: contrail-utils
+  type: puppet
+  role: [primary-contrail-db, primary-contrail-config, primary-contrail-control, 
+    contrail-db, contrail-config, contrail-control]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/site-contrail-post1.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Install Cassandra and wait cluster to bootstrap
+- id: contrail-db-seed
+  type: puppet
+  role: [primary-contrail-db]
+  required_for: [post_deployment_end]
+  requires: [contrail-utils]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/database.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+
+- id: contrail-db-bootstrap
+  type: puppet
+  role: [contrail-db]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start, primary-contrail-db, contrail-utils]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/database.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+
+#
+# Install and configure Contrail Conifg, Contrail Analytics, Contrail WebUI
+# this task is performed on one node initially to allow discovery service to start up
+- id: contrail-config-primary
+  type: puppet
+  role: [primary-contrail-config]
+  required_for: [post_deployment_end]
+  requires: [contrail-db, contrail-utils]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Perform same actions on other contrail-config nodes
+- id: contrail-config-all
+  type: puppet
+  role: [contrail-config]
+  required_for: [post_deployment_end]
+  requires: [primary-contrail-config, contrail-utils]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Install and configure contrail-control
+- id: contrail-control-all
+  type: puppet
+  role: [primary-contrail-control, contrail-control]
+  required_for: [post_deployment_end]
+  requires: [contrail-config, contrail-utils]
+  parameters:
+    puppet_manifest: puppet/manifests/control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Perform initial Contrail provisioning
+- id: provision-contrail-control
+  type: puppet
+  role: [primary-contrail-control]
+  required_for: [post_deployment_end]
+  requires: [contrail-control-all, contrail-utils]
+  parameters:
+    puppet_manifest: puppet/manifests/provision-control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Configuration for Neutron, Heat
+- id: openstack-controller-reconfigure
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/controller.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Create networks for ostf-tests and provision route target
+- id: route-target
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start, openstack-controller-reconfigure]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/provision-controller.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
+- id: compute-contrail-vrouter
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/site-compute-post.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Reboot compute nodes, so they pick new network configuration
+- id: compute-reboot
+  type: shell
+  role: [compute]
+  required_for: [post_deployment_end]
+  requires: [compute-contrail-vrouter]
+  parameters:
+    cmd: if [ ! -f /opt/contrail/reboot-vrouter-DONE ]; then touch /opt/contrail/reboot-vrouter-DONE && /sbin/reboot; fi
+    timeout: 720
+

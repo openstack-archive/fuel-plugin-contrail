@@ -54,10 +54,6 @@ case $operatingsystem {
   default: {}
 } ->
 
-class { 'contrail::config':
-  node_role => $node_role,
-} ->
+class { 'contrail::compute': } ->
+class { 'contrail::provision_compute': }
 
-class { 'contrail::provision':
-  node_role => $node_role,
-}
