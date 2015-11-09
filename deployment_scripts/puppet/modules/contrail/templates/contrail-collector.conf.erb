@@ -13,11 +13,11 @@ analytics_flow_ttl=-1
 
 # IP address and port to be used to connect to cassandra.
 # Multiple IP:port strings separated by space can be provided
-cassandra_server_list=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
+cassandra_server_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
 
 # IP address and port to be used to connect to kafka.
 # Multiple IP:port strings separated by space can be provided
-kafka_broker_list=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:9092" }.join(' ')  %>
+kafka_broker_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9092" }.join(' ')  %>
 
 # IP address of analytics node. Resolved IP of 'hostname'
 hostip=<%= scope.lookupvar('contrail::address') %>
