@@ -12,15 +12,21 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-include contrail
-$node_role = 'base-os'
-# Deploy other nodes
-if $contrail::node_name =~ /^contrail.\d+$/ {
-  class { 'contrail::cfgm': } ->
-  class { 'contrail::control': } ->
-  class { 'contrail::analytics': } ->
-  class { 'contrail::webui': } ->
-  class {'contrail::provision':
-    node_role => $node_role,
-  }
+case $operatingsystem
+{
+    CentOS:
+      {
+        yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
+        package {'yum-plugin-priorities': ensure => present }
+      }
+    Ubuntu: {
+      file { '/etc/apt/preferences.d/contrail-3.0.0.pref':
+        ensure => absent,
+      }
+      file { '/etc/apt/preferences.d/contrail-pin-110':
+        ensure => file,
+        source  => 'puppet:///modules/contrail/contrail-pin-110',
+      }
+    }
+    default: {}
 }
