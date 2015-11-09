@@ -173,7 +173,7 @@ config.files.download_path = '/tmp';
 
 /* Cassandra Server */
 config.cassandra = {};
-config.cassandra.server_ips = [<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "'#{ip}'" }.join(',') %>];
+config.cassandra.server_ips = [<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "'#{ip}'" }.join(',') %>];
 config.cassandra.server_port = '9160';
 config.cassandra.enable_edit = false;
 
