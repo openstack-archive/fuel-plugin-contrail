@@ -75,18 +75,18 @@ class contrail::analytics {
   }
 
   service { 'contrail-alarm-gen':
-    ensure    => stopped,
-    enable    => false,
-    require   => Package['contrail-openstack-analytics'],
+    ensure  => stopped,
+    enable  => false,
+    require => Package['contrail-openstack-analytics'],
   }
 
   service { 'supervisor-analytics':
-    ensure      => running,
-    enable      => true,
-    require     => [Package['contrail-openstack-analytics'],
+    ensure    => running,
+    enable    => true,
+    require   => [Package['contrail-openstack-analytics'],
                     Service['redis-server'],
                     Service['contrail-alarm-gen']],
-    subscribe   => [File['/etc/contrail/contrail-analytics-api.conf'],
+    subscribe => [File['/etc/contrail/contrail-analytics-api.conf'],
                     File['/etc/contrail/contrail-collector.conf'],
                     File['/etc/contrail/contrail-query-engine.conf'],
                     File['/etc/contrail/contrail-analytics-nodemgr.conf'],
@@ -107,10 +107,10 @@ class contrail::analytics {
   }
 
   cron { 'contrail-syslog':
-    command  => '/usr/local/sbin/contrailsyslog.sh',
-    user     => 'root',
-    minute   => '*/1',
-    require  => [
+    command => '/usr/local/sbin/contrailsyslog.sh',
+    user    => 'root',
+    minute  => '*/1',
+    require => [
       Service['supervisor-analytics'],
       File['contrailsyslog.sh'],
     ],
