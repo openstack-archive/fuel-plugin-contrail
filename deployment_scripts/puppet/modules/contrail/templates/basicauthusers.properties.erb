@@ -25,7 +25,7 @@ helper:mapclient
 
 # This is a read-only MAPC
 reader:reader
-<%- scope.lookupvar('contrail::baseos_ips').each do |ip| -%>
+<%- scope.lookupvar('contrail::contrail_config_ips').each do |ip| -%>
 <%= ip %>:<%= ip %>
 <%= ip %>.dns:<%= ip %>.dns
 <%- end -%>
