@@ -24,20 +24,14 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
             ensure  => file,
             source  => 'puppet:///modules/contrail/contrail-pin-100',
             before  => Class['contrail::package'],
+          } ->
+          exec { 'reinstall-tzdata':
+            command => '/usr/bin/apt-get install -y --force-yes tzdata',
+            before => Class['contrail::package'],
           }
           $pkgs = ['python-crypto','python-netaddr','python-paramiko',
                   'ifenslave-2.6','patch','openjdk-7-jre-headless',
                   'python-contrail','contrail-setup','contrail-utils','contrail-nodemgr','supervisor']
-          if $contrail::distribution == 'juniper' {
-            package { 'tzdata':
-              ensure => '2015c-0ubuntu0.14.04',
-              before => Class['contrail::package'],
-            }
-            package { 'tzdata-java':
-              ensure => '2015c-0ubuntu0.14.04',
-              before => Class['contrail::package'],
-            }
-          }
         }
       CentOS:
         {
