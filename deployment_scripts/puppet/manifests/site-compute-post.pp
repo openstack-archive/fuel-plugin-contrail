@@ -54,10 +54,11 @@ case $operatingsystem {
   default: {}
 } ->
 
-class { 'contrail::config':
-  node_role => $node_role,
-} ->
+# I don't see why we need it here.
+#class { 'contrail::config':
+#  node_role => $node_role,
+#} ->
 
-class { 'contrail::provision':
+class { 'contrail::provision-compute':
   node_role => $node_role,
 }
