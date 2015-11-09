@@ -63,10 +63,10 @@ class contrail::control {
                   ]
   }
   service { 'supervisor-control':
-    ensure      => running,
-    enable      => true,
-    require     => Package['contrail-openstack-control'],
-    subscribe   => [File['/etc/contrail/contrail-control.conf'],
+    ensure    => running,
+    enable    => true,
+    require   => Package['contrail-openstack-control'],
+    subscribe => [File['/etc/contrail/contrail-control.conf'],
                     File['/etc/contrail/contrail-dns.conf'],
                     ],
   }
