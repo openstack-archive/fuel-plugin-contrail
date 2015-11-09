@@ -25,12 +25,6 @@ class contrail::network (
   }
 
   case $node_role {
-    'base-os':{
-      sysctl::value {
-        'net.ipv4.conf.all.rp_filter':  value => '2';
-        'net.ipv4.conf.default.rp_filter':  value => '2';
-      }
-    }
     'compute':{
       file { $br_file: ensure => absent } ->
       # Remove interface from the bridge
