@@ -18,6 +18,10 @@ class contrail::package (
   $pip_install = undef,
   ) {
 
+  Package {
+    install_options => [ '--force-yes' ],
+  }
+
   define contrail::package::exec_pip ( $path ){
     exec { "Install-pip-package-${name}":
       path    => '/usr/local/bin/:/usr/bin:/bin',
