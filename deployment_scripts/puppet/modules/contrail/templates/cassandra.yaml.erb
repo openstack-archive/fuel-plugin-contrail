@@ -30,7 +30,7 @@ seed_provider:
       parameters:
           # seeds is actually a comma-delimited list of addresses.
           # Ex: "<ip1>,<ip2>,<ip3>"
-          - seeds: "<%= scope.lookupvar('contrail::baseos_ips').join(',') %>"
+          - seeds: "<%= scope.lookupvar('contrail::primary_contrail_db_ip').join(',') %>"
 flush_largest_memtables_at: 0.75
 reduce_cache_sizes_at: 0.85
 reduce_cache_capacity_to: 0.6

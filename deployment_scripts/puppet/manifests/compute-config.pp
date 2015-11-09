@@ -12,8 +12,18 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+notice('MODULAR: contrail/compute-config.pp')
+
+$node_role = 'compute'
 include contrail
-$node_role = 'controller'
-class { 'contrail::provision':
+
+class { 'contrail::network':
   node_role => $node_role,
-}
+  address   => $contrail::address,
+  ifname    => $contrail::phys_dev,
+  netmask   => $contrail::netmask_short,
+} ->
+
+class { 'contrail::vrouter': } ->
+class { 'contrail::compute': } ->
+class { 'contrail::provision_compute': }
