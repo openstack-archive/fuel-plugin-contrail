@@ -5,9 +5,9 @@ ifmap_username=svc-monitor
 ifmap_password=svc-monitor
 api_server_ip=<%= scope.lookupvar('contrail::contrail_mgmt_vip') %>
 api_server_port=8082
-zk_server_ip=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
+zk_server_ip=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
 log_file=/var/log/contrail/contrail-svc-monitor.log
-cassandra_server_list=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
+cassandra_server_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
 disc_server_ip=<%= scope.lookupvar('contrail::contrail_private_vip') %>
 disc_server_port=5998
 region_name=RegionOne

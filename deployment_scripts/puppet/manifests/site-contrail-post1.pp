@@ -31,13 +31,13 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
       Ubuntu:
         {
           file { '/etc/apt/preferences.d/contrail-pin-100':
-            ensure  => file,
-            source  => 'puppet:///modules/contrail/contrail-pin-100',
-            before  => Class['contrail::package'],
+            ensure => file,
+            source => 'puppet:///modules/contrail/contrail-pin-100',
+            before => Class['contrail::package'],
           } ->
           exec { 'reinstall-tzdata':
             command => '/usr/bin/apt-get install -y --force-yes tzdata',
-            before => Class['contrail::package'],
+            before  => Class['contrail::package'],
           }
           $pkgs = ['python-crypto','python-netaddr','python-paramiko',
                   'ifenslave-2.6','patch','openjdk-7-jre-headless',
@@ -52,8 +52,8 @@ if $contrail::node_name =~ /^contrail.\d+$/ {
       default: {}
     }
   class { 'contrail::package':
-    install        => $pkgs,
-    pip_install    => $pip_pkgs,
+    install     => $pkgs,
+    pip_install => $pip_pkgs,
   }
 
 }

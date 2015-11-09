@@ -1,0 +1,32 @@
+contail-db:
+  name: Contrail - DB
+  description: Contrail DB role. Provides Cassandra for Contrail
+  has_primary: true
+  public_ip_required: false
+  weight: 100
+  conflicts:
+    - controller
+    - compute
+
+contail-config: 
+  name: Contrail - Config
+  description: >
+    Contrail config role. Provides IF_MAP, API, Discovery, Schema-transform components of Contrail.
+    Analytics and WebUI components are also here.
+  has_primary: true
+  public_ip_required: false
+  weight: 100
+  conflicts:
+    - controller
+    - compute
+
+contail-control:
+  name: Contrail - Control
+  description: >
+    Contrail control role. Provides Control and DNS components of Contrail.
+  has_primary: true
+  public_ip_required: false
+  weight: 100
+  conflicts:
+    - controller
+    - compute 
