@@ -12,7 +12,7 @@ define contrail::create_network (
 
   notify {"${name} ::: router_ext ${netdata['L2']['router_ext']}":}
   notify {"${name} ::: tenant ${netdata['tenant']}":}
-  notify {"${name} ::: shared ${$netdata['shared']}":}
+  notify {"${name} ::: shared ${netdata['shared']}":}
 
   neutron_network { $name:
     ensure          => present,
@@ -22,13 +22,13 @@ define contrail::create_network (
   }
 
   neutron_subnet { "${name}__subnet":
-    ensure          => present,
-    cidr            => $netdata['L3']['subnet'],
-    network_name    => $name,
-    tenant_name     => $tenant_name,
-    gateway_ip      => $netdata['L3']['gateway'],
-    enable_dhcp     => $netdata['L3']['enable_dhcp'],
-    dns_nameservers => $netdata['L3']['nameservers'],
-    allocation_pools=> $allocation_pools,
+    ensure           => present,
+    cidr             => $netdata['L3']['subnet'],
+    network_name     => $name,
+    tenant_name      => $tenant_name,
+    gateway_ip       => $netdata['L3']['gateway'],
+    enable_dhcp      => $netdata['L3']['enable_dhcp'],
+    dns_nameservers  => $netdata['L3']['nameservers'],
+    allocation_pools => $allocation_pools,
   }
 }
