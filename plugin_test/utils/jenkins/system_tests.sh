@@ -35,6 +35,10 @@ if [ -z $SLAVE_NODE_CPU ]; then export SLAVE_NODE_CPU=4; fi
 # Init and update submodule
 git submodule init && git submodule update
 
+sudo /sbin/iptables -F
+sudo /sbin/iptables -t nat -F
+sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
 
 ShowHelp() {
 cat << EOF
