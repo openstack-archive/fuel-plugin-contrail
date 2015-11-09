@@ -33,10 +33,12 @@ class contrail::database {
   file { '/etc/zookeeper/conf/myid':
     content => $contrail::uid,
     require => Package['zookeeper'],
-  } ->
+  }
+
   file { '/etc/zookeeper/conf/zoo.cfg':
     content => template('contrail/zoo.cfg.erb');
   }
+
   service { 'zookeeper':
     ensure    => running,
     enable    => true,
@@ -71,23 +73,40 @@ class contrail::database {
   }
 
   service { 'contrail-database':
-    ensure => running,
-    enable => true,
-    require => [File['/var/lib/cassandra'],Package['contrail-openstack-database']],
-    subscribe   => [
+    ensure    => running,
+    enable    => true,
+    require   => [File['/var/lib/cassandra'],Package['contrail-openstack-database']],
+    subscribe => [
       File['/etc/cassandra/cassandra.yaml'],
       File['/etc/cassandra/cassandra-env.sh'],
     ],
   }
 
   service { 'supervisor-database':
-    ensure      => running,
-    enable      => true,
-    require     => [Service['contrail-database'],Package['contrail-openstack-database']],
-    subscribe   => [
+    ensure    => running,
+    enable    => true,
+    require   => [Service['contrail-database'],Package['contrail-openstack-database']],
+    subscribe => [
       File['/etc/cassandra/cassandra.yaml'],
       File['/etc/contrail/contrail-database-nodemgr.conf'],
     ],
   }
 
+  notify{ 'Waiting for cassandra seed node': } ->
+  exec { 'wait_for_cassandra_seed':
+    provider  => 'shell',
+    command   => "nodetool status|grep ^UN|grep ${contrail::primary_contrail_db_ip}",
+    tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
+    try_sleep => 30,
+    require   => Service['supervisor-database'],
+  }
+
+  notify{ 'Waiting for cassandra': } ->
+  exec { 'wait_for_cassandra':
+    provider  => 'shell',
+    command   => "nodetool status|grep ^UN|grep ${contrail::address}",
+    tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
+    try_sleep => 30,
+    require   => Service['supervisor-database'],
+  }
 }
