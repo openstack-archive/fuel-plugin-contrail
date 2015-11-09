@@ -12,15 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+notice('MODULAR: contrail/contrail-provision.pp')
+
 include contrail
-$node_role = 'base-os'
-# Deploy other nodes
-if $contrail::node_name =~ /^contrail.\d+$/ {
-  class { 'contrail::cfgm': } ->
-  class { 'contrail::control': } ->
-  class { 'contrail::analytics': } ->
-  class { 'contrail::webui': } ->
-  class {'contrail::provision':
-    node_role => $node_role,
-  }
-}
+class { 'contrail::provision_contrail': }
