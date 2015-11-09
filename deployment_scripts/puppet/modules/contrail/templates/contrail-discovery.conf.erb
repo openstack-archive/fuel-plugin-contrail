@@ -1,11 +1,11 @@
 [DEFAULTS]
-zk_server_ip=<%= scope.lookupvar('contrail::baseos_ips').join(',') %>
+zk_server_ip=<%= scope.lookupvar('contrail::contrail_db_ips').join(',') %>
 zk_server_port=2181
 listen_ip_addr=0.0.0.0
 listen_port=9110
 log_local=True
 log_file=/var/log/contrail/discovery.log
-cassandra_server_list=<%= scope.lookupvar('contrail::baseos_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
+cassandra_server_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
 log_level=SYS_NOTICE
 
 # minimim time to allow client to cache service information (seconds)
