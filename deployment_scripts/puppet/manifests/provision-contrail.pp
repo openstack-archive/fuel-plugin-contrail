@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+notice('MODULAR: contrail/provision-contrail.pp')
+
 include contrail
-$node_role = 'controller'
-class { 'contrail::controller': }
+class { 'contrail::provision_contrail': }
