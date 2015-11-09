@@ -30,11 +30,11 @@ class contrail::vip {
 # Configs
   file { '/etc/keepalived/keepalived.conf':
     content => template('contrail/keepalived.conf.erb'),
-    require   => Package['keepalived'],
+    require => Package['keepalived'],
   }
   file { '/etc/haproxy/haproxy.cfg':
     content => template('contrail/haproxy.cfg.erb'),
-    require   => Package['haproxy'],
+    require => Package['haproxy'],
   }
 
 # Services
