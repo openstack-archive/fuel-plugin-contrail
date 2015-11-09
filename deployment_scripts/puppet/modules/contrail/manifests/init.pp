@@ -92,4 +92,18 @@ $baseos_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['base-os'])
 $baseos_ips_hash = get_node_to_ipaddr_map_by_network_role($baseos_nodes_hash, 'neutron/mesh')
 $baseos_ips = values($baseos_ips_hash)
 
+# Contrail DB nodes Private IP list
+$primary_contrail_db_nodes_hash = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contail-db'])
+$primary_contrail_db_ip         = values(get_node_to_ipaddr_map_by_network_role($primary_contrail_db_nodes_hash, 'neutron/mesh')))
+
+$contrail_db_nodes_hash         = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contail-db', 'contail-db'])
+$contrail_db_ips                = values(get_node_to_ipaddr_map_by_network_role($contrail_db_nodes_hash, 'neutron/mesh')))
+
+# Contrail Control nodes Private IP list
+$contrail_control_nodes_hash    = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contail-control', 'contail-control'])
+$contrail_control_ips           = values(get_node_to_ipaddr_map_by_network_role($contrail_control_nodes_hash, 'neutron/mesh')))
+
+# Contrail Config nodes Private IP list
+$contrail_config_nodes_hash     = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contail-config', 'contail-config'])
+$contrail_config_ips            = values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
 }

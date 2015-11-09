@@ -1,7 +1,186 @@
-- id: contail-baseos-symlink
-  role: [base-os]
-  required_for: [post_deployment_start]
-  type: shell
+- id: group-primary-contrail-db
+  type: group
+  role: [primary-contrail-db]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts]
+  required_for: [deploy_end]
+  requires: [deploy_start]
   parameters:
-    cmd: ln -sf /etc/base-os.yaml /etc/astute.yaml
-    timeout: 30
+    strategy:
+      type: parallel
+
+- id: group-contrail-db
+  type: group
+  role: [contrail-db]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts]
+  required_for: [deploy_end]
+  requires: [deploy_start, group-primary-contrail-db]
+  parameters:
+    strategy:
+      type: parallel
+
+- id: group-primary-contrail-config
+  type: group
+  role: [primary-contrail-config]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts]
+  required_for: [deploy_end]
+  requires: [deploy_start, group-contrail-db]
+  parameters:
+    strategy:
+      type: parallel
+
+- id: group-contrail-config
+  type: group
+  role: [contrail-config]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts]
+  required_for: [deploy_end]
+  requires: [group-primary-contrail-config, deploy_start]
+  parameters:
+    strategy:
+      type: parallel
+
+- id: group-primary-contrail-control
+  type: group
+  role: [primary-contrail-config]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts]
+  required_for: [deploy_end]
+  requires: [deploy_start, group-primary-contrail-config,]
+  parameters:
+    strategy:
+      type: parallel
+
+- id: group-contrail-control
+  type: group
+  role: [contrail-config]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts]
+  required_for: [deploy_end]
+  requires: [group-primary-contrail-control, deploy_start]
+  parameters:
+    strategy:
+      type: parallel
+#
+## Create apt pin for Contrail repo and bunch of hacks:
+## TODO: review if hacks are still nesessary. 
+- id: site-common-pre
+  type: puppet
+  groups: [group-primary-contrail-db, group-primary-contrail-config, group-primary-contrail-control,
+    group-contrail-db, group-contrail-config, group-contrail-control]
+  required_for: [contrail-utils]
+  requires: [globals]
+  parameters:
+    puppet_manifest: puppet/manifests/site-common-pre.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Install Contrail utils, java 
+- id: contrail-utils
+  type: puppet
+  groups: [group-primary-contrail-db, group-primary-contrail-config, group-primary-contrail-control,
+    group-contrail-db, group-contrail-config, group-contrail-control]
+  required_for: [contrail-vip, contrail-db-bootstrap]
+  requires: [site-common-pre]
+  parameters:
+    puppet_manifest: puppet/manifests/site-contrail-post1.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Install Cassandra and wait cluster to bootstrap
+- id: contrail-db-bootstrap
+  type: puppet
+  groups: [group-primary-contrail-db, group-contrail-db]
+  required_for: [deploy_end]
+  requires: [contrail-utils]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/database.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+#
+# VIP and HAProxy configs for Contrail API and WebUI
+- id: contrail-vip
+  type: puppet
+  groups: [group-primary-contrail-config, group-contrail-config]
+  required_for: [deploy_end]
+  requires: [contrail-utils]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/vip.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Install and configure Contrail Conifg, Contrail Analytics, Contrail WebUI
+# this task is performed on one node initially to allow discovery service to start up
+#
+# Perform same actions on other contrail-config nodes
+- id: contrail-config
+  type: puppet
+  groups: [group-primary-contrail-config, group-contrail-config]
+  required_for: [deploy_end]
+  requires: [contrail-utils]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+#
+# Install and configure contrail-control
+- id: contrail-control
+  type: puppet
+  groups: [group-primary-contrail-control, group-contrail-control]
+  required_for: [deploy_end]
+  requires: [deploy_start, contrail-utils]
+  parameters:
+    puppet_manifest: puppet/manifests/control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Perform initial Contrail provisioning
+- id: provision-contrail-control
+  type: puppet
+  groups: [group-primary-contrail-control]
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/provision-control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Configuration for Neutron, Heat
+- id: openstack-controller-reconfigure
+  type: puppet
+  role: [primary-controller,controller]
+  required_for: [deploy_end]
+  requires: [deploy_start, heat]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/controller.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Create default networks and provision route target
+- id: route-target
+  type: puppet
+  role: [primary-controller]
+  required_for: [deploy_end]
+  requires: [group-primary-contrail-control, openstack-controller-reconfigure]
+  parameters:
+    puppet_manifest: puppet/manifests/site-controller-post2.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
+- id: compute-vrouter
+  type: puppet
+  role: [compute]
+  required_for: [compute-vrouter]
+  requires: [route-target]
+  parameters:
+    puppet_manifest: puppet/manifests/site-compute-post.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Reboot compute nodes, so they pick new network configuration
+- id: compute-reboot
+  type: shell
+  role: [compute]
+  required_for: [deploy_end]
+  requires: [compute-vrouter]
+  parameters:
+    cmd: if [ ! -f /opt/contrail/reboot-vrouter-DONE ]; then touch /opt/contrail/reboot-vrouter-DONE && /sbin/reboot; fi
+    timeout: 720
