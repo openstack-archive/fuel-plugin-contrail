@@ -13,14 +13,9 @@
 #    under the License.
 
 include contrail
-$node_role = 'base-os'
-# Deploy first node
-if $contrail::node_name == $contrail::deployment_node {
-  class { 'contrail::cfgm': } ->
-  class { 'contrail::control': } ->
-  class { 'contrail::analytics': } ->
-  class { 'contrail::webui': } ->
-  class {'contrail::provision':
-    node_role => $node_role,
-  }
-}
+$node_role = 'contrail-config'
+class { 'contrail::config': } ->
+class { 'contrail::analytics': } ->
+class { 'contrail::webui': }
+
+

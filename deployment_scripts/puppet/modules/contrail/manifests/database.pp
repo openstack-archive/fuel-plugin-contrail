@@ -33,10 +33,12 @@ class contrail::database {
   file { '/etc/zookeeper/conf/myid':
     content => $contrail::uid,
     require => Package['zookeeper'],
-  } ->
+  }
+
   file { '/etc/zookeeper/conf/zoo.cfg':
     content => template('contrail/zoo.cfg.erb');
   }
+
   service { 'zookeeper':
     ensure    => running,
     enable    => true,
@@ -53,14 +55,14 @@ class contrail::database {
     owner   => 'cassandra',
     group   => 'cassandra',
     require => Package['cassandra'],
-  } ->
+  }
   file { '/var/crashes':
     ensure => directory,
     mode   => '0777',
-  } ->
+  }
   file { '/etc/cassandra/cassandra.yaml':
     content => template('contrail/cassandra.yaml.erb'),
-  } ->
+  }
   file { '/etc/cassandra/cassandra-env.sh':
     source  => 'puppet:///modules/contrail/cassandra-env.sh',
   }
@@ -90,4 +92,21 @@ class contrail::database {
     ],
   }
 
+  notify{ 'Waiting for cassandra seed node': } ->
+  exec { 'wait_for_cassandra_seed':
+    provider  => 'shell',
+    command   => "nodetool status|grep ^UN|grep ${contrail::cassandra_seed_ip}",
+    tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
+    try_sleep => 30,
+    require   => Service['supervisor-database'],
+  }
+
+  notify{ 'Waiting for cassandra': } ->
+  exec { 'wait_for_cassandra':
+    provider  => 'shell',
+    command   => "nodetool status|grep ^UN|grep ${contrail::address}",
+    tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
+    try_sleep => 30,
+    require   => Service['supervisor-database'],
+  }
 }
