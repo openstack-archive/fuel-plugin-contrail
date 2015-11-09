@@ -47,13 +47,6 @@ class contrail::controller {
     notify  => Service['haproxy'],
   }
 
-# Overrides for Hiera
-  file {'/etc/hiera/override': ensure => directory } ->
-  file {'/etc/hiera/override/plugins.yaml':
-    ensure  => present,
-    content => template('contrail/plugins.yaml.erb'),
-  }
-
 # Nova configuration
   nova_config {
     'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
@@ -66,8 +59,8 @@ class contrail::controller {
     'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
   } ~>
   service {'nova-api':
-    ensure    => running,
-    enable    => true,
+    ensure => running,
+    enable => true,
   }
 
 # Neutron configuration
@@ -89,7 +82,7 @@ class contrail::controller {
   } ->
   file {'/etc/neutron/plugin.ini':
     ensure => link,
-    target  => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'
+    target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'
   }
 
 # Contrail-specific heat templates settings
@@ -104,13 +97,13 @@ class contrail::controller {
     'clients_contrail/api_base_url': value=> '/';
   } ~>
   service {'heat-engine':
-    ensure    => running,
+    ensure     => running,
     name       => 'p_heat-engine',
     enable     => true,
     hasstatus  => true,
     hasrestart => true,
     provider   => 'pacemaker',
-    require   => Package['contrail-heat'],
+    require    => Package['contrail-heat'],
   }
 
 # Services
@@ -125,12 +118,12 @@ class contrail::controller {
                   ]
   }
   service { 'neutron-server':
-    ensure      => running,
-    enable      => true,
-    require     => [Package['neutron-server'],
+    ensure    => running,
+    enable    => true,
+    require   => [Package['neutron-server'],
                     Package['neutron-plugin-contrail'],
                     ],
-    subscribe   => [File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
+    subscribe => [File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
                     File['/etc/neutron/plugin.ini'],
                     ],
   }
