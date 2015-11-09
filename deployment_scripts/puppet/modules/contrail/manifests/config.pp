@@ -11,74 +11,136 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+#
+#    This class installs IF-MAP server for Contrail.
 
-class contrail::config ( $node_role ) {
-  case $node_role {
-    default: {}
-    'compute': {
-      nova_config {
-        'DEFAULT/neutron_url': value => "http://${contrail::mos_mgmt_vip}:9696";
-        'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
-        'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
-        'DEFAULT/neutron_admin_tenant_name': value=> 'services';
-        'DEFAULT/neutron_admin_username': value=> 'neutron';
-        'DEFAULT/neutron_admin_password': value=> $contrail::service_token;
-        'DEFAULT/neutron_url_timeout': value=> '300';
-        'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
-        'DEFAULT/security_group_api': value=> 'neutron';
-        'DEFAULT/heal_instance_info_cache_interval': value=> '0';
-      }
+class contrail::cfgm {
 
-      $ipv4_file = $operatingsystem ? {
-          'Ubuntu' => '/etc/iptables/rules.v4',
-          'CentOS' => '/etc/sysconfig/iptables',
-      }
+# Resources defaults
+  Package { ensure => present }
 
-      exec {'flush_nat':
-        command => '/sbin/iptables -t nat -F'
-      } ->
-
-      firewall {'0000 metadata service':
-        source  => '169.254.0.0/16',
-        iniface => 'vhost0',
-        action  => 'accept'
-      } ->
-
-      firewall {'0001 juniper contrail rules':
-        proto  => 'tcp',
-        dport  => ['2049','8085','9090','8102','33617','39704','44177','55970','60663'],
-        action => 'accept'
-      } ->
-
-      exec { 'persist-firewall':
-        command     => "/sbin/iptables-save > ${ipv4_file}",
-        user        => 'root',
-      }
-
-      file {'/etc/contrail/agent_param':
-        ensure  => present,
-        content => template('contrail/agent_param.erb'),
-      }
-      file {'/etc/contrail/contrail-vrouter-agent.conf':
-        ensure  => present,
-        content => template('contrail/contrail-vrouter-agent.conf.erb'),
-      }
-      file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
-        ensure  => present,
-        content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
-      }
-
-      file {'/etc/init.d/fixup-vrouter':
-        ensure  => present,
-        mode    => '0755',
-        owner   => 'root',
-        group   => 'root',
-        source  => 'puppet:///modules/contrail/fixup-vrouter.init',
-      } ->
-      service {'fixup-vrouter':
-        enable => true,
-      }
-
-    }
+  Exec {
+    provider => 'shell',
+    path     => '/usr/bin:/usr/sbin',
   }
+
+  File {
+    ensure  => present,
+    mode    => '0644',
+    owner   => 'contrail',
+    group   => 'contrail',
+    require => Package['contrail-openstack-config'],
+  }
+
+# Packages
+  package { 'openjdk-7-jre-headless': }->
+  package { 'ifmap-server': }->
+  package { 'contrail-config': }->
+  package { 'contrail-openstack-config': }->
+
+# Java support files
+  file {'/etc/java-7-openjdk/security/java.security':
+    owner   => 'root',
+    group   => 'root',
+    source  => 'puppet:///modules/contrail/java.security',
+    require => Package['openjdk-7-jre-headless'],
+  }
+
+  file { '/etc/ifmap-server/log4j.properties':
+    owner   => 'root',
+    group   => 'root',
+    source  => 'puppet:///modules/contrail/log4j.properties',
+    require => Package['openjdk-7-jre-headless'],
+  }
+
+  exec { 'update-alternatives-java7':
+    command => 'update-java-alternatives --set java-1.7.0-openjdk-amd64',
+    unless  => 'test /etc/alternatives/java -ef /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java',
+    require => Package['openjdk-7-jre-headless'],
+  }
+
+# Contrail config files
+  file { '/etc/ifmap-server/publisher.properties':
+    owner   => 'root',
+    group   => 'root',
+    source  => 'puppet:///modules/contrail/publisher.properties',
+    require => Package['ifmap-server'],
+  } ->
+
+  file { '/etc/ifmap-server/basicauthusers.properties':
+    owner   => 'root',
+    group   => 'root',
+    content => template('contrail/basicauthusers.properties.erb'),
+  }
+
+  file { '/etc/contrail/vnc_api_lib.ini':
+    content => template('contrail/vnc_api_lib.ini.erb')
+  }
+
+  file { '/etc/contrail/contrail-api.conf':
+    content => template('contrail/contrail-api.conf.erb'),
+  }
+
+  file { '/etc/contrail/supervisord_config_files/contrail-api.ini':
+    content => template('contrail/contrail-api.ini.erb'),
+  }
+
+  file { '/etc/contrail/contrail-discovery.conf':
+    content => template('contrail/contrail-discovery.conf.erb'),
+  }
+
+  file { '/etc/contrail/contrail-keystone-auth.conf':
+    content => template('contrail/contrail-keystone-auth.conf.erb'),
+  }
+
+  file { '/etc/contrail/contrail-schema.conf':
+    content => template('contrail/contrail-schema.conf.erb'),
+  }
+
+  file { '/etc/contrail/contrail-svc-monitor.conf':
+    content => template('contrail/contrail-svc-monitor.conf.erb'),
+  }
+
+  file { '/etc/contrail/contrail-device-manager.conf':
+    content => template('contrail/contrail-device-manager.conf.erb')
+  }
+
+  file { '/etc/contrail/contrail-config-nodemgr.conf':
+    content => template('contrail/contrail-config-nodemgr.conf.erb')
+  }
+# Supervisor-config
+  file { '/etc/contrail/supervisord_config.conf':
+    source  => 'puppet:///modules/contrail/supervisord_config.conf',
+  }
+
+# Contrail services
+# Rabbitmq service disabled
+  service {'supervisor-support-service':
+    ensure  => stopped,
+    enable  => false,
+    require => Package['contrail-openstack-config'],
+  }
+# Neutron-server disabled here
+  service {'neutron-server':
+    ensure  => stopped,
+    enable  => false,
+    require => Package['contrail-openstack-config'],
+  }
+
+  service { 'supervisor-config':
+    ensure    => running,
+    enable    => true,
+    require   => Package['contrail-openstack-config'],
+    subscribe => [File['/etc/contrail/contrail-api.conf'],
+                  File['/etc/contrail/supervisord_config_files/contrail-api.ini'],
+                  File['/etc/contrail/contrail-discovery.conf'],
+                  File['/etc/contrail/contrail-keystone-auth.conf'],
+                  File['/etc/contrail/contrail-schema.conf'],
+                  File['/etc/contrail/contrail-svc-monitor.conf'],
+                  File['/etc/contrail/contrail-device-manager.conf'],
+                  File['/etc/contrail/contrail-config-nodemgr.conf'],
+                  File['/etc/contrail/supervisord_config.conf'],
+                  File['/etc/ifmap-server/basicauthusers.properties']],
+  }
+
 }

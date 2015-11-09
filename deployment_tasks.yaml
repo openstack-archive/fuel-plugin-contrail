@@ -1,7 +1,146 @@
-- id: contail-baseos-symlink
-  role: [base-os]
-  required_for: [post_deployment_start]
-  type: shell
+- id: contrail-pre
+  type: group
+  role: ['contrail-db', 'contail-config', 'contail-control']
+  tasks:
+  - hiera
+  - globals
+  - netconfig
+  required_for: [deploy_end]
+  requires: [deploy_start]
   parameters:
-    cmd: ln -sf /etc/base-os.yaml /etc/astute.yaml
-    timeout: 30
+    strategy:
+    type: parallel
+#
+## Create apt pin for Contrail repo and bunch of hacks:
+## TODO: review if hacks are still nesessary. 
+- id: site-common-pre
+  type: puppet
+  role: '*'
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/site-common-pre.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Configuration for Neutron, Heat
+- id: openstack-controller-reconfigure
+  type: puppet
+  role: ['primary-controller','controller']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/controller.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Install Contrail utils, java 
+- id: contrail-utils
+  type: puppet
+  role: ['contrail-db', 'contail-config', 'contail-control']
+  required_for: [deploy_end]
+  requires: [contrail-pre]
+  parameters:
+    puppet_manifest: puppet/manifests/site-contrail-post1.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Install Cassandra and wait cluster to bootstrap
+- id:contrail-db-bootstrap
+  type: puppet
+  role: ['contrail-db']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/database.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+#
+# VIP and HAProxy configs for Contrail API and WebUI
+- id:contrail-vip
+  type: puppet
+  role: ['primary-contail-config','contail-config']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/modules/contrail/manifests/vip.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Install and configure Contrail Conifg, Contrail Analytics, Contrail WebUI
+# this task is performed on one node initially to allow discovery service to start up
+- id: primary-contrail-config
+  type: puppet
+  role: ['primary-contail-config']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Perform same actions on other contrail-config nodes
+- id: contrail-config
+  type: puppet
+  role: ['contail-config']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Install and configure contrail-control
+- id: contrail-control
+  type: puppet
+  role: ['primary-contail-control','contail-control']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Perform initial Contrail provisioning
+- id: contrail-control
+  type: puppet
+  role: ['primary-contail-control']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/provision-control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+#
+# Create default networks and provision route target
+- id: route-target
+  type: puppet
+  role: ['primary-controller','controller']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/site-controller-post2.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
+- id: compute-vrouter
+  type: puppet
+  role: ['compute']
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/site-compute-post.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+#
+# Reboot compute nodes, so they pick new network configuration
+- id: compute-reboot
+  type: shell
+  role: ['compute']
+  stage: post_deployment
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    cmd: if [ ! -f /opt/contrail/reboot-vrouter-DONE ]; then touch /opt/contrail/reboot-vrouter-DONE && /sbin/reboot; fi
+    timeout: 720

@@ -19,11 +19,4 @@ Exec { path => '/bin:/sbin:/usr/bin:/usr/sbin', refresh => 'echo NOOP_ON_REFRESH
 if $contrail::node_name =~ /^contrail.\d+$/ {
   class { 'contrail::vip': } ->
   class { 'contrail::database': } ->
-  notify{"Waiting for cassandra nodes: ${contrail::contrail_node_num}":} ->
-    exec {'wait_for_cassandra':
-      provider  => 'shell',
-      command   => "if [ `nodetool status|grep ^UN|wc -l` -lt ${contrail::contrail_node_num} ]; then exit 1; fi",
-      tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
-      try_sleep => 30,
-  }
 }
