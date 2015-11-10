@@ -139,7 +139,7 @@ When test cases are written (manual or automated) and testing process has been s
 
 5.2 Performance testing
 -----------------------
-Performance testing will be executed on the scale lab and a custom set of rally scenarios must be run with contrail environment. Test scripts for rally and shaker you can find here https://gerrit.mirantis.com/#/admin/projects/mos-scale/mos-scenarios
+Performance testing will be executed on the scale lab and a custom set of rally scenarios must be run with contrail environment.
 
 5.3 Metrics
 -----------
