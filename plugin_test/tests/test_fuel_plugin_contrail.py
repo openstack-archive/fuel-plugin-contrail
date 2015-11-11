@@ -503,7 +503,7 @@ class ContrailPlugin(TestBasic):
             }
         )
 
-        logger.info(self._ostf_msg)
+        logger.info(self.ostf_msg)
 
         self.deploy_cluster()
 
@@ -999,7 +999,7 @@ class ContrailPlugin(TestBasic):
             }
         )
 
-        logger.info(self._ostf_msg)
+        logger.info(self.ostf_msg)
 
         self.deploy_cluster()
 
