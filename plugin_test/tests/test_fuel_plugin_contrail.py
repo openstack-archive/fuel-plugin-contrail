@@ -277,10 +277,11 @@ class ContrailPlugin(TestBasic):
         self.deploy_cluster()
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["deploy_controller_compute_contrail"])
+          groups=["contrail_bvt"])
     @log_snapshot_after_test
-    def deploy_controller_compute_contrail(self):
-        """Deploy cluster with 1 controller, 1 compute,
+    def contrail_bvt(self):
+        """BVT test for contrail plugin
+        Deploy cluster with 1 controller, 1 compute,
         3 base-os and install contrail plugin
 
         Scenario:
@@ -899,11 +900,11 @@ class ContrailPlugin(TestBasic):
         )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_bvt"])
+          groups=["contrail_mu"])
     @log_snapshot_after_test
-    def contrail_bvt(self):
+    def contrail_mu(self):
         """
-        Bvt test for the build stable general verification
+        MU test for the build stable general verification
 
         Scenario:
             1. Revert snapshot "ready_with_9_slaves"
