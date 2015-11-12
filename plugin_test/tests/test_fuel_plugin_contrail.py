@@ -961,7 +961,7 @@ class ContrailPlugin(TestBasic):
         self.deploy_cluster()
 
         # create net and subnet
-        self._create_net_subnet(self.cluster_id)
+        self.create_net_subnet(self.cluster_id)
 
         #  add 1 node with compute role, 1 node with controller,
         # 1 node with base-os and redeploy cluster
