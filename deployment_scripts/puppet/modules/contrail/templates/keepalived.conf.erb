@@ -15,7 +15,7 @@ vrrp_script chk_ctrldatanet_INTERNAL {
 }
 
 vrrp_instance INTERNAL {
-        interface <%= scope.lookupvar('contrail::private_if') %>
+        interface <%= scope.lookupvar('contrail::interface') %>
         state MASTER
         preempt_delay 7
         garp_master_delay 5
@@ -26,7 +26,7 @@ vrrp_instance INTERNAL {
         vmac_xmit_base
         priority  101
         virtual_ipaddress {
-                <%= scope.lookupvar('contrail::contrail_private_vip') %>/<%= scope.lookupvar('contrail::netmask_short') %> dev <%= scope.lookupvar('contrail::private_if') %>
+                <%= scope.lookupvar('contrail::contrail_private_vip') %>/<%= scope.lookupvar('contrail::netmask_short') %> dev <%= scope.lookupvar('contrail::interface') %>
         }
         track_script  {
                 chk_haproxy_INTERNAL
@@ -36,7 +36,7 @@ vrrp_instance INTERNAL {
             chk_ctrldatanet_INTERNAL
         }
         track_interface {
-            <%= scope.lookupvar('contrail::private_if') %>
+            <%= scope.lookupvar('contrail::interface') %>
         }
 }
 
