@@ -13,7 +13,7 @@ disc_server_port=5998
 region_name=RegionOne
 log_local=1
 log_level=SYS_NOTICE
-rabbit_server=<%= scope.lookupvar('contrail::mos_mgmt_vip') %>
+rabbit_server=<%= scope.lookupvar('contrail_private_vip') %>
 rabbit_port=5673
 rabbit_password = <%= scope.lookupvar('contrail::rabbit_password') %>
 rabbit_user = nova

@@ -1,0 +1,76 @@
+#contrail-collector-marker-start
+listen contrail-collector-stats <%= scope.lookupvar('contrail_private_vip') %>:5938
+   mode http
+   stats enable
+   stats uri /
+   stats auth haproxy:contrail123
+
+frontend  contrail-analytics-api <%= scope.lookupvar('contrail_private_vip') %>:8081
+    default_backend    contrail-analytics-api
+
+frontend  contrail-analytics-api-public <%= scope.function_hiera(['public_vip']) %>:8081
+    default_backend    contrail-analytics-api
+
+backend contrail-analytics-api
+    option nolinger
+    balance     roundrobin
+    option tcp-check
+    tcp-check connect port 6379
+    default-server error-limit 1 on-error mark-down
+<%- scope.lookupvar('contrail::contrail_config_ips').each_with_index do |ip, i| -%>
+    server <%= ip %> <%= ip %>:9081 check inter 2000 rise 2 fall 3
+<%- end -%>
+#contrail-collector-marker-end
+
+#contrail-config-marker-start
+listen contrail-config-stats <%= scope.lookupvar('contrail_private_vip') %>:5937
+   mode http
+   stats enable
+   stats uri /
+   stats auth haproxy:contrail123
+
+frontend  contrail-discovery <%= scope.lookupvar('contrail_private_vip') %>:5998
+    default_backend    contrail-discovery-backend
+
+backend contrail-discovery-backend
+    option nolinger
+    balance     roundrobin
+<%- scope.lookupvar('contrail::contrail_config_ips').each_with_index do |ip, i| -%>
+    server <%= ip %> <%= ip %>:9110 check inter 2000 rise 2 fall 3
+<%- end -%>
+
+frontend  contrail-api <%= scope.lookupvar('contrail_private_vip') %>:8082
+    default_backend    contrail-api-backend
+    timeout client 3m
+
+frontend  contrail-api-public <%= scope.function_hiera(['public_vip']) %>:8082
+    default_backend    contrail-api-backend
+    timeout client 3m
+
+backend contrail-api-backend
+    option nolinger
+    timeout server 3m
+    balance     roundrobin
+<%- scope.lookupvar('contrail::contrail_config_ips').each_with_index do |ip, i| -%>
+    server <%= ip %> <%= ip %>:9100 check inter 2000 rise 2 fall 3
+<%- end -%>
+#contrail-config-marker-end
+
+#contrail-webui-marker-start
+frontend contrail-webui-api <%= scope.function_hiera(['public_vip']) %>:8143
+    mode tcp
+    default_backend contrail-webui-api
+
+backend contrail-webui-api
+    mode tcp
+    balance roundrobin
+    option nolinger
+    stick on src
+    stick-table type ip size 200k expire 30m
+    option tcp-check
+    tcp-check connect port 8143
+    default-server error-limit 1 on-error mark-down
+<%- scope.lookupvar('contrail::contrail_config_ips').each_with_index do |ip, i| -%>
+    server <%= ip %> <%= ip %>:8143 check inter 2000 rise 2 fall 3
+<%- end -%>
+#contrail-webui-marker-start

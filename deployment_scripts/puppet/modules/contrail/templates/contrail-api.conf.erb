@@ -14,7 +14,7 @@ disc_server_ip=<%= scope.lookupvar('contrail::contrail_private_vip') %>
 disc_server_port=5998
 zk_server_ip=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
 redis_server_ip=$__contrail_redis_ip__
-rabbit_server=<%= scope.lookupvar('contrail::mos_mgmt_vip') %>
+rabbit_server=<%= scope.lookupvar('contrail_private_vip') %>
 rabbit_port=5673
 list_optimization_enabled=True
 auth = keystone
