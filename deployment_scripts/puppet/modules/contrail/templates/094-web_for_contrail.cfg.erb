@@ -1,18 +1,4 @@
-<%-
-nodes=scope.function_hiera(['nodes'])
-contrail_node_basename=scope.lookupvar('contrail::contrail_node_basename')
-mgmt_ip=Array.new
-nodes.each do |node|
-case node['role']
-  when 'base-os'
-    if node['user_node_name'] =~ /^#{contrail_node_basename}-.*/
-      mgmt_ip << node['internal_address']
-    end
-  end
-end
-
--%>
-
+# Analytics API
 frontend  contrail-analytics-api <%= scope.function_hiera(['public_vip']) %>:8081
     default_backend    contrail-analytics-api
 
@@ -20,20 +6,24 @@ backend contrail-analytics-api
     option nolinger
     balance     roundrobin
     default-server error-limit 1 on-error mark-down
-<%- mgmt_ip.each_with_index do |ip, i| -%>
+<%- scope.lookupvar('contrail::baseos_ips').each_with_index do |ip, i| -%>
     server <%= ip %> <%= ip %>:9081 check inter 2000 rise 2 fall 3
 <%- end -%>
 
+# Contrail API
 frontend  contrail-api <%= scope.function_hiera(['public_vip']) %>:8082
     default_backend    contrail-api-backend
+    timeout client 3m
 
 backend contrail-api-backend
     option nolinger
+    timeout server 3m
     balance     roundrobin
-<%- mgmt_ip.each_with_index do |ip, i| -%>
+<%- scope.lookupvar('contrail::baseos_ips').each_with_index do |ip, i| -%>
     server <%= ip %> <%= ip %>:9100 check inter 2000 rise 2 fall 3
 <%- end -%>
 
+# Contrail WebUI
 frontend contrail-webui-api <%= scope.function_hiera(['public_vip']) %>:8143
     mode tcp
     default_backend contrail-webui-api
@@ -47,6 +37,6 @@ backend contrail-webui-api
     option tcp-check
     tcp-check connect port 8143
     default-server error-limit 1 on-error mark-down
-<%- mgmt_ip.each_with_index do |ip, i| -%>
+<%- scope.lookupvar('contrail::baseos_ips').each_with_index do |ip, i| -%>
     server <%= ip %> <%= ip %>:8143 check inter 2000 rise 2 fall 3
 <%- end -%>
