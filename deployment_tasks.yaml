@@ -93,17 +93,7 @@
     puppet_manifest: puppet/modules/contrail/manifests/database.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
-#
-# VIP and HAProxy configs for Contrail API and WebUI
-- id: contrail-vip
-  type: puppet
-  groups: [group-primary-contrail-config, group-contrail-config]
-  required_for: [deploy_end]
-  requires: [contrail-utils]
-  parameters:
-    puppet_manifest: puppet/modules/contrail/manifests/vip.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+
 #
 # Install and configure Contrail Conifg, Contrail Analytics, Contrail WebUI
 # this task is performed on one node initially to allow discovery service to start up
