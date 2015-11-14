@@ -61,13 +61,8 @@ $netmask_short=netmask_to_cidr($netmask)
 
 $mos_mgmt_vip=$network_metadata['vips']['management']['ipaddr']
 
-$mgmt_if=get_network_role_property('management', 'interface')
-$mgmt_cidr=get_network_role_property('management', 'cidr')
-$mgmt_netmask=get_network_role_property('management', 'netmask')
-$mgmt_netmask_short=netmask_to_cidr($mgmt_netmask)
-
-$contrail_mgmt_vip=get_last_ip(hiera('management_network_range'))
-$contrail_private_vip=get_last_ip(hiera('private_network_range'))
+$contrail_private_vip=$network_metadata['vips']['contrail_priv']['ipaddr']
+$contrail_mgmt_vip=$contrail_private_vip
 
 $contrail_node_basename='contrail'
 $deployment_node="${contrail_node_basename}-1"
@@ -86,6 +81,10 @@ end
 $rabbit=hiera('rabbit')
 $rabbit_password=$rabbit['password']
 $rabbit_hosts_ports = hiera('amqp_hosts')
+
+# RabbitMQ nodes Mgmt IP list
+$rabbit_nodes_hash         = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-controller', 'controller'])
+$rabbit_ips                = values(get_node_to_ipaddr_map_by_network_role($rabbit_nodes_hash, 'mgmt/messaging'))
 
 # Contrail DB nodes Private IP list
 $primary_contrail_db_nodes_hash = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-db'])

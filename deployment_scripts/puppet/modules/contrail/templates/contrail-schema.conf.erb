@@ -12,7 +12,7 @@ disc_server_ip=<%= scope.lookupvar('contrail::contrail_private_vip') %>
 disc_server_port=5998
 log_local=1
 log_level=SYS_NOTICE
-rabbit_server=<%= scope.lookupvar('contrail::mos_mgmt_vip') %>
+rabbit_server=<%= scope.lookupvar('contrail_private_vip') %>
 rabbit_port=5673
 rabbit_user = nova
 rabbit_password = <%= scope.lookupvar('contrail::rabbit_password') %>

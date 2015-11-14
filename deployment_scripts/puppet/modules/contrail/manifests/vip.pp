@@ -13,41 +13,28 @@
 #    under the License.
 class contrail::vip {
 
-  Package {
-    ensure => installed,
-  }
-  File {
+# Configuration files for HAProxy
+  file {'/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg':
     ensure  => present,
-    mode    => '0644',
-    owner   => 'root',
-    group   => 'root',
+    content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
+    notify  => Service['haproxy'],
   }
-
-# Packages
-  package { 'keepalived': } ->
-  package { 'haproxy': }
-
-# Configs
-  file { '/etc/keepalived/keepalived.conf':
-    content => template('contrail/keepalived.conf.erb'),
-    require  => Package['keepalived'],
+  file {'/etc/haproxy/conf.d/096-vip_for_contrail.cfg':
+    ensure  => present,
+    content => template('contrail/096-vip_for_contrail.cfg.erb'),
+    notify  => Service['haproxy'],
   }
-  file { '/etc/haproxy/haproxy.cfg':
-    content => template('contrail/haproxy.cfg.erb'),
-    require  => Package['haproxy'],
-  }
-
+  
 # Services
-  service { 'keepalived':
-    ensure    => running,
-    enable    => true,
-    hasstatus => false,
-    subscribe => File['/etc/keepalived/keepalived.conf'],
-  }
-  service { 'haproxy':
-    ensure    => running,
-    enable    => true,
-    subscribe => File['/etc/haproxy/haproxy.cfg'],
+  service {'haproxy':
+    ensure     => running,
+    name       => 'p_haproxy',
+    hasstatus  => true,
+    hasrestart => true,
+    provider   => 'pacemaker',
+    subscribe  => [File['/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg'],
+                  File['/etc/haproxy/conf.d/096-vip_for_contrail.cfg'],
+                  ]
   }
 
 }

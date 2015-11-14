@@ -35,18 +35,6 @@ class contrail::controller {
   package { 'neutron-plugin-contrail': } ->
   package { 'contrail-heat': }
 
-# Configuration files for HAProxy
-  file {'/etc/haproxy/conf.d/094-web_for_contrail.cfg':
-    ensure  => present,
-    content => template('contrail/094-web_for_contrail.cfg.erb'),
-    notify  => Service['haproxy'],
-  }
-  file {'/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg':
-    ensure  => present,
-    content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
-    notify  => Service['haproxy'],
-  }
-
 # Nova configuration
   nova_config {
     'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
@@ -106,17 +94,6 @@ class contrail::controller {
     require    => Package['contrail-heat'],
   }
 
-# Services
-  service {'haproxy':
-    ensure     => running,
-    name       => 'p_haproxy',
-    hasstatus  => true,
-    hasrestart => true,
-    provider   => 'pacemaker',
-    subscribe  => [File['/etc/haproxy/conf.d/094-web_for_contrail.cfg'],
-                  File['/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg'],
-                  ]
-  }
   service { 'neutron-server':
     ensure    => running,
     enable    => true,
