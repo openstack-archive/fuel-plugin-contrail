@@ -46,6 +46,11 @@ class contrail::controller {
     content => template('contrail/095-rabbit_for_contrail.cfg.erb'),
     notify  => Service['haproxy'],
   }
+  file {'/etc/haproxy/conf.d/096-vip_for_contrail.cfg':
+    ensure  => present,
+    content => template('contrail/096-vip_for_contrail.cfg.erb'),
+    notify  => Service['haproxy'],
+  }
 
 # Nova configuration
   nova_config {
@@ -115,6 +120,7 @@ class contrail::controller {
     provider   => 'pacemaker',
     subscribe  => [File['/etc/haproxy/conf.d/094-web_for_contrail.cfg'],
                   File['/etc/haproxy/conf.d/095-rabbit_for_contrail.cfg'],
+                  File['/etc/haproxy/conf.d/096-vip_for_contrail.cfg'],
                   ]
   }
   service { 'neutron-server':
