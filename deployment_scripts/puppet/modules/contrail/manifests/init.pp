@@ -61,13 +61,8 @@ $netmask_short=netmask_to_cidr($netmask)
 
 $mos_mgmt_vip=$network_metadata['vips']['management']['ipaddr']
 
-$mgmt_if=get_network_role_property('management', 'interface')
-$mgmt_cidr=get_network_role_property('management', 'cidr')
-$mgmt_netmask=get_network_role_property('management', 'netmask')
-$mgmt_netmask_short=netmask_to_cidr($mgmt_netmask)
-
-$contrail_mgmt_vip=get_last_ip(hiera('management_network_range'))
-$contrail_private_vip=get_last_ip(hiera('private_network_range'))
+$contrail_private_vip=$network_metadata['vips']['contrail_priv']['ipaddr']
+$contrail_mgmt_vip=$contrail_private_vip
 
 $contrail_node_basename='contrail'
 $deployment_node="${contrail_node_basename}-1"
