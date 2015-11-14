@@ -102,6 +102,16 @@
     puppet_manifest: puppet/manifests/contrail-db.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
+# Configure haproxy on OpenStack Controllers
+- id: openstack-haproxy-contrail
+  type: puppet
+  role: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [deploy_start, openstack-haproxy, rabbitmq]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-vip.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
 # Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
 # this task is performed on one node initially to allow discovery service to start up
 - id: contrail-config-primary
