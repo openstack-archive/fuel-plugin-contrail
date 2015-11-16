@@ -58,12 +58,12 @@ INTERFACES = {
 class ContrailPlugin(TestBasic):
     """ContrailPlugin."""  # TODO documentation
 
-    pack_copy_path = '/var/www/nailgun/plugins/contrail-2.0'
+    pack_copy_path = '/var/www/nailgun/plugins/contrail-*'
     add_ub_packag = \
-        '/var/www/nailgun/plugins/contrail-2.0/' \
+        '/var/www/nailgun/plugins/contrail-*/' \
         'repositories/ubuntu/contrail-setup*'
     add_cen_packeg = \
-        '/var/www/nailgun/plugins/contrail-2.0/' \
+        '/var/www/nailgun/plugins/contrail-*/' \
         'repositories/centos/Packages/contrail-setup*'
     ostf_msg = 'OSTF tests passed successfully.'
 
