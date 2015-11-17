@@ -33,7 +33,7 @@ $nodes= hiera('nodes')
 $neutron_settings=hiera_hash('quantum_settings', {})
 $metadata_secret=$neutron_settings['metadata']['metadata_proxy_shared_secret']
 $service_token = $neutron_settings['keystone']['admin_password']
-$nets = $neutron_settings['ostf_nets']
+$nets = $neutron_settings['predefined_networks']
 
 $keystone=hiera_hash('keystone', {})
 $admin_token = $keystone['admin_token']
