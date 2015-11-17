@@ -51,7 +51,7 @@ $gateways = split($settings['contrail_gateways'], ',')
 
 # Network configuration
 prepare_network_config($network_scheme)
-$phys_dev=get_network_role_property('neutron/mesh', 'phys_dev')
+$phys_dev=get_private_ifname()
 $interface=get_network_role_property('neutron/mesh', 'interface')
 $gateway=$network_scheme['endpoints'][$interface]['gateway']
 $address=get_network_role_property('neutron/mesh', 'ipaddr')

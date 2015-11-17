@@ -24,39 +24,38 @@ class contrail::network (
       'CentOS' => '/etc/sysconfig/network-scripts/ifcfg-br-mesh',
   }
 
-  case $node_role {
-    'compute':{
-      file { $br_file: ensure => absent } ->
-      # Remove interface from the bridge
-      exec {"remove_${ifname}_mesh":
-        command => "brctl delif br-mesh ${ifname}",
-        returns => [0,1] # Idempotent
-      } ->
-      exec {'flush_addr_br_mesh':
-        command => 'ip addr flush dev br-mesh',
-        returns => [0,1] # Idempotent
-      }
-      case $::operatingsystem {
-        'Ubuntu': {
-          file {'/etc/network/interfaces.d/ifcfg-vhost0':
-            ensure  => present,
-            content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
-          }
-        }
-        'CentOS': {
-          exec {"remove_bridge_from_${ifname}_config":
-            command => "sed -i '/BRIDGE/d' /etc/sysconfig/network-scripts/ifcfg-${ifname}",
-          }
-          file {'/etc/sysconfig/network-scripts/ifcfg-vhost0':
-            ensure  => present,
-            content => template('contrail/centos-ifcfg-vhost0.erb'),
-          }
-        }
-        default: {}
-      }
-    }
-    default: { notify { "Node role ${node_role} not supported": } }
+  Exec {
+    provider => 'shell',
+    path => '/usr/bin:/bin:/sbin',
   }
 
+  file { $br_file: ensure => absent } ->
+  # Remove interface from the bridge
+  exec {"remove_${ifname}_mesh":
+    command => "brctl delif br-mesh ${ifname}",
+    returns => [0,1] # Idempotent
+  } ->
+  exec {'flush_addr_br_mesh':
+    command => 'ip addr flush dev br-mesh',
+    returns => [0,1] # Idempotent
+  }
+  case $::operatingsystem {
+    'Ubuntu': {
+      file {'/etc/network/interfaces.d/ifcfg-vhost0':
+        ensure  => present,
+        content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
+      }
+    }
+    'CentOS': {
+      exec {"remove_bridge_from_${ifname}_config":
+        command => "sed -i '/BRIDGE/d' /etc/sysconfig/network-scripts/ifcfg-${ifname}",
+      }
+      file {'/etc/sysconfig/network-scripts/ifcfg-vhost0':
+        ensure  => present,
+        content => template('contrail/centos-ifcfg-vhost0.erb'),
+      }
+    }
+    default: {}
+  }
 }
 
