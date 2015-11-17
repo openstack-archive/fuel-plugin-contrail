@@ -23,6 +23,10 @@ sysctl::value {
 
 case $operatingsystem {
   Ubuntu: {
+    file { '/etc/apt/preferences.d/contrail-pin-100':
+      ensure => file,
+      source => 'puppet:///modules/contrail/contrail-pin-100',
+    } ->
     exec { 'reinstall-tzdata':
       path    => '/bin:/sbin:/usr/bin:/usr/sbin',
       command => '/usr/bin/apt-get install -y --force-yes tzdata',
