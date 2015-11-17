@@ -53,30 +53,4 @@ class contrail::compute {
     user    => 'root',
   }
 
-  file {'/etc/contrail/agent_param':
-    ensure  => present,
-    content => template('contrail/agent_param.erb'),
-  }
-
-  file {'/etc/contrail/contrail-vrouter-agent.conf':
-    ensure  => present,
-    content => template('contrail/contrail-vrouter-agent.conf.erb'),
-  }
-
-  file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
-    ensure  => present,
-    content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
-  }
-
-  file {'/etc/init.d/fixup-vrouter':
-    ensure => present,
-    mode   => '0755',
-    owner  => 'root',
-    group  => 'root',
-    source => 'puppet:///modules/contrail/fixup-vrouter.init',
-  } ->
-
-  service {'fixup-vrouter':
-    enable => true,
-  }
 }

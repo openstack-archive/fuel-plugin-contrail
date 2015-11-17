@@ -39,4 +39,3 @@ class contrail::provision_compute {
   }
 
 }
-
