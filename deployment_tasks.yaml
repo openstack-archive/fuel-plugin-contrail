@@ -105,7 +105,7 @@
 # Configure haproxy on OpenStack Controllers
 - id: openstack-haproxy-contrail
   type: puppet
-  role: [primary-controller, controller]
+  groups: [primary-controller, controller]
   required_for: [deploy_end]
   requires: [deploy_start, openstack-haproxy, rabbitmq]
   parameters:
