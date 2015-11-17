@@ -23,9 +23,6 @@ $plugin_yaml = "${plugin_name}.yaml"
 $contrail_plugin = hiera('contrail', undef)
 
 if ($contrail_plugin) {
-  $neutron_config  = hiera_hash('quantum_settings')
-  $nets            = $neutron_config['predefined_networks']
-
 
   file {'/etc/hiera/override':
     ensure  => directory,
