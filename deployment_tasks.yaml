@@ -60,16 +60,6 @@
       type: parallel
 
 # Tasks
-# Create overrides for Hiera
-- id: controller-hiera
-  type: puppet
-  groups:  [primary-controller, controller]
-  requires: [globals]
-  required_for: [logging]
-  parameters:
-    puppet_manifest: puppet/manifests/controller-hiera.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 120
 # Install Contrail utils, java
 - id: contrail-utils
   type: puppet
@@ -105,7 +95,7 @@
 # Configure haproxy on OpenStack Controllers
 - id: openstack-haproxy-contrail
   type: puppet
-  role: [primary-controller, controller]
+  groups: [primary-controller, controller]
   required_for: [deploy_end]
   requires: [deploy_start, openstack-haproxy, rabbitmq]
   parameters:
@@ -164,12 +154,22 @@
     puppet_manifest: puppet/manifests/contrail-control.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+# Create overrides for Hiera on Controllers
+- id: controller-hiera
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-hiera.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
 # Configuration for Neutron and Heat on Primary OpenStack Controller
 - id: openstack-controller-contrail-primary
   type: puppet
   role: [primary-controller]
   required_for: [post_deployment_end]
-  requires: [post_deployment_start]
+  requires: [controller-hiera]
   parameters:
     puppet_manifest: puppet/manifests/controller-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
