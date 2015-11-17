@@ -12,28 +12,20 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-repo.pp')
+notice('MODULAR: contrail/common-repo.pp')
 
 case $operatingsystem
 {
-    CentOS:
-      {
-        yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
-        package {'yum-plugin-priorities': ensure => present }
-      }
+    CentOS: {
+      yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
+      package {'yum-plugin-priorities': ensure => present }
+    }
     Ubuntu: {
       file { '/etc/apt/preferences.d/contrail-3.0.0.pref':
         ensure => absent,
       }
-      case hiera('role') {
-        /contrail/: {
-          file { '/etc/apt/preferences.d/contrail-pin-100':
-            ensure => file,
-            source => 'puppet:///modules/contrail/contrail-pin-100',
-          }
-        }
-        default: {}
-      }
     }
     default: {}
 }
+
+
