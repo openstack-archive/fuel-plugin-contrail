@@ -71,4 +71,14 @@ class contrail::control {
                     ],
   }
 
+  exec { 'prov_control_bgp':
+    command => "python /opt/contrail/utils/provision_control.py \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--oper add --host_name ${::fqdn} --host_ip ${contrail::address} --router_asn ${contrail::asnum} \
+--admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+&& touch /opt/contrail/prov_control_bgp-DONE",
+    require => Service['supervisor-control'],
+    creates => '/opt/contrail/prov_control_bgp-DONE',
+  }
+
 }
