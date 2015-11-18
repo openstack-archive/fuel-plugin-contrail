@@ -14,8 +14,6 @@
 
 notice('MODULAR: contrail/compute-repo.pp')
 
-include contrail
-
 file { '/etc/apt/preferences.d/contrail-pin-110':
   ensure => file,
   source => 'puppet:///modules/contrail/contrail-pin-110',
