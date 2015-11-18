@@ -7,7 +7,7 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 # Set proper apt pin for Contrail repo
-- role: 'compute'
+- role: ['compute']
   type: puppet
   stage: pre_deployment
   parameters:
