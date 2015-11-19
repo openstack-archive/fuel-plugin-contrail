@@ -17,13 +17,12 @@ notice('MODULAR: contrail/compute-config.pp')
 $node_role = 'compute'
 include contrail
 
+class { 'contrail::provision_compute': } ->
 class { 'contrail::network':
   node_role => $node_role,
   address   => $contrail::address,
   ifname    => $contrail::phys_dev,
   netmask   => $contrail::netmask_short,
 } ->
-
-class { 'contrail::vrouter': } ->
 class { 'contrail::compute': } ->
-class { 'contrail::provision_compute': }
+class { 'contrail::vrouter': }
