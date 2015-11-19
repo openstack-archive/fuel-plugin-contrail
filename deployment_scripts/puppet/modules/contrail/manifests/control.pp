@@ -25,6 +25,11 @@ class contrail::control {
     require => Package['contrail-openstack-control'],
   }
 
+  Exec {
+    provider => 'shell',
+    path     => '/usr/bin:/bin:/sbin',
+  }
+
 # Packages
   package { 'contrail-dns': }
   package { 'contrail-control': } ->
