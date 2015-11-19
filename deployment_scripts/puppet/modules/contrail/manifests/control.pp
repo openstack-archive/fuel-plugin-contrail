@@ -25,12 +25,21 @@ class contrail::control {
     require => Package['contrail-openstack-control'],
   }
 
+  Exec {
+    provider => 'shell',
+    path     => '/usr/bin:/bin:/sbin',
+  }
+
 # Packages
   package { 'contrail-dns': }
   package { 'contrail-control': } ->
   package { 'contrail-openstack-control': }
 
 # Contrail control config files
+  file { '/etc/contrail/vnc_api_lib.ini':
+    content => template('contrail/vnc_api_lib.ini.erb')
+  }
+
   file { '/etc/contrail/contrail-control.conf':
     content => template('contrail/contrail-control.conf.erb'),
   }
@@ -77,7 +86,7 @@ class contrail::control {
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} --router_asn ${contrail::asnum} \
 --admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
 && touch /opt/contrail/prov_control_bgp-DONE",
-    require => Service['supervisor-control'],
+    require => [Service['supervisor-control'],File['/etc/contrail/vnc_api_lib.ini']],
     creates => '/opt/contrail/prov_control_bgp-DONE',
   }
 

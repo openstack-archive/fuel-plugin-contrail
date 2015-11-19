@@ -29,3 +29,7 @@ reader:reader
 <%= ip %>:<%= ip %>
 <%= ip %>.dns:<%= ip %>.dns
 <%- end -%>
+<%- scope.lookupvar('contrail::contrail_control_ips').each do |ip| -%>
+<%= ip %>:<%= ip %>
+<%= ip %>.dns:<%= ip %>.dns
+<%- end -%>
