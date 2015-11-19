@@ -19,10 +19,13 @@ class contrail::provision_compute {
     path     => '/usr/bin:/bin:/sbin',
   }
 
+  package { 'contrail-utils':
+    ensure => present,
+  } ->
   exec { 'provision-vrouter':
     path    => '/bin:/usr/bin/',
     command => "python /opt/contrail/utils/provision_vrouter.py \
---api_server_ip ${contrail::mos_public_vip} --api_server_port 8082 --openstack_ip ${contrail::mos_mgmt_vip} \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::mos_mgmt_vip} \
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
 --admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
 && touch /opt/contrail/provision-vrouter-DONE",
