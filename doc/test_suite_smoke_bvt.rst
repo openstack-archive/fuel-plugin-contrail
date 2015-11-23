@@ -70,7 +70,7 @@ Steps
     1. Create environment with "Neutron with tunneling segmentation" as a network configuration.
     2. Add a node with contrail-config role.
     3. Add a node with contrail-control role.
-    4. Add a node with contrail-db role.
+    4. Add 3 nodes with contrail-db role.
     5. Add a node with controller role.
     6. Add a node with "compute" and "cinder" roles.
     7. Activate and configure the Contrail plugin.
