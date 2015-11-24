@@ -19,8 +19,6 @@ class contrail::provision ( $node_role ) {
     path     => '/usr/bin:/bin:/sbin',
   }
 
-  $gateways = split($contrail::settings['contrail_gateways'], ',')
-
   define contrail::provision::prov_ext_bgp {
     exec { "prov_external_bgp_${name}":
       command  => "python /opt/contrail/utils/provision_mx.py  \
@@ -51,7 +49,7 @@ then exit 1; fi",
         creates  => '/opt/contrail/prov_control_bgp-DONE',
       }
       if $contrail::node_name == $contrail::deployment_node {
-        contrail::provision::prov_ext_bgp { $gateways:
+        contrail::provision::prov_ext_bgp { $contrail::gateways:
           require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
         } ->
         exec { 'prov_metadata_services':
