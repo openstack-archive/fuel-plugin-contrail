@@ -59,39 +59,35 @@ class ContrailPlugin(TestBasic):
     """ContrailPlugin."""  # TODO documentation
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-2.1'
-    add_ub_packag = \
+    add_package = \
         '/var/www/nailgun/plugins/contrail-2.1/' \
         'repositories/ubuntu/contrail-setup*'
-    add_cen_packeg = \
-        '/var/www/nailgun/plugins/contrail-2.1/' \
-        'repositories/centos/Packages/contrail-setup*'
     ostf_msg = 'OSTF tests passed successfully.'
 
     cluster_id = ''
 
-    pack_path = [CONTRAIL_PLUGIN_PACK_UB_PATH, CONTRAIL_PLUGIN_PACK_CEN_PATH]
+    pack_path = CONTRAIL_PLUGIN_PACK_UB_PATH
 
     NEUTRON_BOND_CONFIG = deepcopy(BOND_CONFIG)
     NEUTRON_INTERFACES = deepcopy(INTERFACES)
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
-    def upload_contrail_packages(self):
-        for pack in self.pack_path:
-            node_ssh = self.env.d_env.get_admin_remote()
-            if os.path.splitext(pack)[1] in [".deb", ".rpm"]:
-                pkg_name = os.path.basename(pack)
+    def upload_contrail_packages(self, pack_path):
+        node_ssh = self.env.d_env.get_admin_remote()
+        if os.path.splitext(pack_path)[1] == ".deb":
+                pkg_name = os.path.basename(pack_path)
                 logger.debug("Uploading package {0} "
                              "to master node".format(pkg_name))
-                node_ssh.upload(pack, self.pack_copy_path)
-            else:
-                logger.error('Failed to upload file')
+                node_ssh.upload(pack_path, self.pack_copy_path)
+        else:
+            raise Exception('Failed to upload file to the master node')
 
     def install_packages(self, remote):
         command = "cd " + self.pack_copy_path + " && ./install.sh"
         logger.info('The command is %s', command)
         remote.execute_async(command)
         time.sleep(50)
-        os.path.isfile(self.add_ub_packag or self.add_cen_packeg)
+        os.path.isfile(self.add_package)
 
     def assign_net_provider(self, pub_all_nodes=False, ceph_value=False):
         """Assign neutron with gre segmentation"""
@@ -939,10 +935,10 @@ class ContrailPlugin(TestBasic):
 
         self.prepare_contrail_plugin(slaves=9)
 
-        # first verify ha with Contrail Plugin
+        logger.info("first verify ha with Contrail Plugin")
 
-        # create cluster: 2 nodes with Operating system role
-        # and 1 node with controller role
+        logger.info("The 1st deployment: create cluster with 2 nodes "
+                    "with Operating system role and 1 node with controller role")
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -964,8 +960,8 @@ class ContrailPlugin(TestBasic):
         # create net and subnet
         self.create_net_subnet(self.cluster_id)
 
-        #  add 1 node with compute role, 1 node with controller,
-        # 1 node with base-os and redeploy cluster
+        logger.info("The 2nd deployment: add 1 node with compute role, "
+                    "1 node with controller, 1 node with base-os and redeploy cluster")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-04': ['compute', 'cinder'],
                               'slave-05': ['controller'],
@@ -990,8 +986,8 @@ class ContrailPlugin(TestBasic):
                               ('Launch instance with file injection')]
         )
 
-        # add to cluster 2 nodes with compute role and one
-        # with controller role and deploy cluster
+        logger.info("The 3rd deployment: add to cluster 2 nodes with compute role"
+                    " and one with controller role and deploy cluster")
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -1021,9 +1017,9 @@ class ContrailPlugin(TestBasic):
                               ('Launch instance with file injection')]
         )
 
-        # verify that Controller's nodes can be deleted and added after deploy
+        logger.info("verify that Controller's nodes can be deleted and added after deploy")
 
-        #  remove 2 nodes with controller role
+        logger.info("The 4th deployment: remove 2 nodes with controller role")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-03': ['controller'],
                               'slave-05': ['controller']
@@ -1031,7 +1027,7 @@ class ContrailPlugin(TestBasic):
 
         self.deploy_cluster()
 
-        # add them back and redeploy cluster
+        logger.info("The 5th deployment: add them back and redeploy cluster")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-03': ['controller'],
                               'slave-05': ['controller']
@@ -1057,9 +1053,9 @@ class ContrailPlugin(TestBasic):
                               ('Check that required services are running')]
         )
 
-        # verify that Compute node can be deleted and added after deploying
+        logger.info("verify that Compute node can be deleted and added after deploying")
 
-        #  remove two nodes with compute role and deploy this changes
+        logger.info("The 6th deployment: remove two nodes with compute role and deploy this changes")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-04': ['compute', 'cinder'],
                               'slave-08': ['compute']
@@ -1067,7 +1063,7 @@ class ContrailPlugin(TestBasic):
 
         self.deploy_cluster()
 
-        # add 2 nodes with compute role and redeploy cluster
+        logger.info("The 7th deployment: add 2 nodes with compute role and redeploy cluster")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-04': ['compute', 'cinder'],
                               'slave-08': ['compute']
