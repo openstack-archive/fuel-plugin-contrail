@@ -122,7 +122,7 @@ class ContrailPlugin(TestBasic):
 
         if self.CONTRAIL_DISTRIBUTION == 'juniper':
             # copy additional packages to the master node
-            self.upload_contrail_packages()
+            self.upload_contrail_packages(pack_path)
 
             # install packages
             self.install_packages(self.env.d_env.get_admin_remote())
