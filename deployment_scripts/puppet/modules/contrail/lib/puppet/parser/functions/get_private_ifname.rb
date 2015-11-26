@@ -17,13 +17,16 @@ require 'yaml'
 module Puppet::Parser::Functions
 newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
     Returns interface selected as "Private network" in web UI
+    example:
+      get_private_ifname('br-mesh')
     EOS
   ) do |args|
+     brname = args[0]
      ifname = String.new
      yml = YAML.load(File.open("/etc/astute.yaml"))
 
      yml['network_scheme']['transformations'].each do |entry|
-       if entry['bridge'] == "br-aux" or entry['bridge'] == "br-mesh"
+       if entry['bridge'] == brname
          ifname = entry['name']
        end
     end
