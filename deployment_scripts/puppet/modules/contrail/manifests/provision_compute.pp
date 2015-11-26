@@ -29,6 +29,7 @@ class contrail::provision_compute {
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
 --admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
 && touch /opt/contrail/provision-vrouter-DONE",
+    creates => '/opt/contrail/provision-vrouter-DONE',
   }
 
   exec {'no_network_reconfigure':
