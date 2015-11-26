@@ -72,13 +72,13 @@ class ContrailPlugin(TestBasic):
     NEUTRON_INTERFACES = deepcopy(INTERFACES)
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
-    def upload_contrail_packages(self, pack_path):
+    def upload_contrail_packages(self):
         node_ssh = self.env.d_env.get_admin_remote()
-        if os.path.splitext(pack_path)[1] == ".deb":
-                pkg_name = os.path.basename(pack_path)
+        if os.path.splitext(self.pack_path)[1] == ".deb":
+                pkg_name = os.path.basename(self.pack_path)
                 logger.debug("Uploading package {0} "
                              "to master node".format(pkg_name))
-                node_ssh.upload(pack_path, self.pack_copy_path)
+                node_ssh.upload(self.pack_path, self.pack_copy_path)
         else:
             raise Exception('Failed to upload file to the master node')
 
