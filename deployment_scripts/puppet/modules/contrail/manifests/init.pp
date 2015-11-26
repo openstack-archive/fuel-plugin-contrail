@@ -51,13 +51,13 @@ $gateways = split($settings['contrail_gateways'], ',')
 
 # Network configuration
 prepare_network_config($network_scheme)
-$phys_dev=get_private_ifname()
 $interface=get_network_role_property('neutron/mesh', 'interface')
 $gateway=$network_scheme['endpoints'][$interface]['gateway']
 $address=get_network_role_property('neutron/mesh', 'ipaddr')
 $cidr=get_network_role_property('neutron/mesh', 'cidr')
 $netmask=get_network_role_property('neutron/mesh', 'netmask')
 $netmask_short=netmask_to_cidr($netmask)
+$phys_dev=get_private_ifname($interface)
 
 $mos_mgmt_vip=$network_metadata['vips']['management']['ipaddr']
 $mos_public_vip=$network_metadata['vips']['public']['ipaddr']
