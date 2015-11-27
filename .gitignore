@@ -8,4 +8,4 @@ deployment_scripts/puppet/modules/stdlib
 build.sh
 *.rpm
 logs
-
+.idea
