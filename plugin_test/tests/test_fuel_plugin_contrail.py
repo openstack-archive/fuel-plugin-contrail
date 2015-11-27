@@ -934,8 +934,10 @@ class ContrailPlugin(TestBasic):
 
         logger.info("first verify ha with Contrail Plugin")
 
-        logger.info("The 1st deployment: create cluster with 2 nodes "
-                    "with Operating system role and 1 node with controller role")
+        logger.info("##############################################################"
+                    "### The 1st deployment: create cluster with 2 nodes "
+                    "### with Operating system role and 1 node with controller role"
+                    "##############################################################")
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -957,13 +959,22 @@ class ContrailPlugin(TestBasic):
         # create net and subnet
         self.create_net_subnet(self.cluster_id)
 
-        logger.info("The 2nd deployment: add 1 node with compute role, "
-                    "1 node with controller, 1 node with base-os and redeploy cluster")
+        logger.info("####################################################################"
+                    "### The 2nd deployment: add 1 node with compute role, "
+                    "### 1 node with controller, 1 node with base-os and redeploy cluster"
+                    "####################################################################")
         self.fuel_web.update_nodes(
-            self.cluster_id, {'slave-04': ['compute', 'cinder'],
-                              'slave-05': ['controller'],
-                              'slave-06': ['base-os']}
-            )
+            self.cluster_id,
+            {
+                'slave-04': ['compute', 'cinder'],
+                'slave-05': ['controller'],
+                'slave-06': ['base-os'],
+            },
+            contrail=True
+        )
+
+        # configure disks on base-os nodes
+        self.change_disk_size()
 
         self.deploy_cluster()
 
@@ -983,8 +994,10 @@ class ContrailPlugin(TestBasic):
                               ('Launch instance with file injection')]
         )
 
-        logger.info("The 3rd deployment: add to cluster 2 nodes with compute role"
-                    " and one with controller role and deploy cluster")
+        logger.info("################################################################"
+                    "### The 3rd deployment: add to cluster 2 nodes with compute role"
+                    "### and one with controller role and deploy cluster"
+                    "################################################################")
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -1016,7 +1029,9 @@ class ContrailPlugin(TestBasic):
 
         logger.info("verify that Controller's nodes can be deleted and added after deploy")
 
-        logger.info("The 4th deployment: remove 2 nodes with controller role")
+        logger.info("###########################################################"
+                    "### The 4th deployment: remove 2 nodes with controller role"
+                    "###########################################################")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-03': ['controller'],
                               'slave-05': ['controller']
@@ -1024,7 +1039,9 @@ class ContrailPlugin(TestBasic):
 
         self.deploy_cluster()
 
-        logger.info("The 5th deployment: add them back and redeploy cluster")
+        logger.info("##########################################################"
+                    "### The 5th deployment: add them back and redeploy cluster"
+                    "##########################################################")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-03': ['controller'],
                               'slave-05': ['controller']
@@ -1052,7 +1069,9 @@ class ContrailPlugin(TestBasic):
 
         logger.info("verify that Compute node can be deleted and added after deploying")
 
-        logger.info("The 6th deployment: remove two nodes with compute role and deploy this changes")
+        logger.info("##################################################################################"
+                    "### The 6th deployment: remove two nodes with compute role and deploy this changes"
+                    "##################################################################################")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-04': ['compute', 'cinder'],
                               'slave-08': ['compute']
@@ -1060,7 +1079,9 @@ class ContrailPlugin(TestBasic):
 
         self.deploy_cluster()
 
-        logger.info("The 7th deployment: add 2 nodes with compute role and redeploy cluster")
+        logger.info("##########################################################################"
+                    "### The 7th deployment: add 2 nodes with compute role and redeploy cluster"
+                    "##########################################################################")
         self.fuel_web.update_nodes(
             self.cluster_id, {'slave-04': ['compute', 'cinder'],
                               'slave-08': ['compute']
