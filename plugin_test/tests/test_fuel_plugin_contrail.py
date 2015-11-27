@@ -800,9 +800,6 @@ class ContrailPlugin(TestBasic):
 
         self.deploy_cluster()
 
-        # create net and subnet
-        self.create_net_subnet(self.cluster_id)
-
         # TODO
         # Tests using north-south connectivity are expected to fail because
         # they require additional gateway nodes, and specific contrail
@@ -1155,18 +1152,18 @@ class ContrailPlugin(TestBasic):
                               ('Launch instance with file injection')]
         )
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["deploy_contrail_with_base_os_ceph"])
     @log_snapshot_after_test
     def deploy_contrail_with_base_os_ceph(self):
         """Verify deploy Contrail cluster with Ceph on Compute nodes
 
         Scenario:
-            1. Revert snapshot "ready_with_5_slaves"
+            1. Revert snapshot "ready_with_9_slaves"
             2. Select 'Use Ceph' in Storage Backends
             3. Create cluster
             4. Add 3 nodes with Operating system role,
-               1 node with controller role and 1 node with
+               1 node with controller role and 2 nodes with
                compute + 'Storage-Ceph OSD' role
             5. Enable Contrail plugin
             6. Deploy cluster with plugin
@@ -1180,7 +1177,7 @@ class ContrailPlugin(TestBasic):
         self.prepare_contrail_plugin(slaves=9, ceph_value=True)
 
         # create cluster: 3 nodes with Operating system role and 1 node with
-        # controller role and 1 node with compute + ceph OSD role
+        # controller role and 2 nodes with compute + ceph OSD role
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -1189,6 +1186,7 @@ class ContrailPlugin(TestBasic):
                 'slave-03': ['base-os'],
                 'slave-04': ['controller'],
                 'slave-05': ['compute', 'ceph-osd'],
+                'slave-06': ['compute', 'ceph-osd'],
             },
             contrail=True
         )
