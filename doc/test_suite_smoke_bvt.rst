@@ -36,6 +36,12 @@ Steps
     6. Deploy cluster with plugin.
 
 
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
 BVT test
 --------
 
@@ -70,4 +76,11 @@ Steps
     7. Activate and configure the Contrail plugin.
     8. Deploy cluster with plugin.
     9. Run OSTF tests.
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
 
