@@ -49,6 +49,9 @@ $external = $settings['contrail_external']
 $route_target = $settings['contrail_route_target']
 $gateways = split($settings['contrail_gateways'], ',')
 
+# Custom mount point for contrail-db
+$cassandra_path='/var/lib/contrail-db'
+
 # Network configuration
 prepare_network_config($network_scheme)
 $interface=get_network_role_property('neutron/mesh', 'interface')
