@@ -49,7 +49,7 @@ class contrail::database {
   }
 
 # Cassandra
-  file { '/var/lib/cassandra':
+  file { $contrail::cassandra_path:
     ensure  => directory,
     mode    => '0755',
     owner   => 'cassandra',
@@ -75,7 +75,7 @@ class contrail::database {
   service { 'contrail-database':
     ensure    => running,
     enable    => true,
-    require   => [File['/var/lib/cassandra'],Package['contrail-openstack-database']],
+    require   => [File["${contrail::cassandra_path}"],Package['contrail-openstack-database']],
     subscribe => [
       File['/etc/cassandra/cassandra.yaml'],
       File['/etc/cassandra/cassandra-env.sh'],
