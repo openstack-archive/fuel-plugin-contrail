@@ -193,19 +193,15 @@ if bvt is success all other automated tests will be used for maintenance after e
 
 6.3.6. Deploy Contrail cluster with jumbo frames enabled for Private network (a)
 
-6.3.7. Deploy Contrail cluster with three contrail roles on one node (a)
+6.3.7. Verify that ‘contrail_config’ role can be deleted and added back to the cluster (a)
 
-6.3.8. Deploy Contrail cluster with three contrail roles on three different nodes (a)
+6.3.8. Verify that ‘contrail_control’ role can be deleted and added back to the cluster (a)
 
-6.3.9. Verify that ‘contrail_config’ role can be deleted and added back to the cluster (a)
+6.3.9. Deploy ‘contrail_db’ on one node and ‘contrail_config’, ‘contrail_control’ on other node (a)
 
-6.3.10. Verify that ‘contrail_control’ role can be deleted and added back to the cluster (a)
+6.3.10. Deploy ‘contrail_db’, ‘contrail_config’ on one node and ‘contrail_control’ on other node (a)
 
-6.3.11. Deploy ‘contrail_db’ on one node and ‘contrail_config’, ‘contrail_control’ on other node (a)
-
-6.3.12. Deploy ‘contrail_db’, ‘contrail_config’ on one node and ‘contrail_control’ on other node (a)
-
-6.3.13. Deploy ‘contrail_config’ on one node and  ‘contrail_db’, ‘contrail_control’ on other node (a)
+6.3.11. Deploy ‘contrail_config’ on one node and  ‘contrail_db’, ‘contrail_control’ on other node (a)
 
 6.4. System testing
 -------------------
