@@ -198,6 +198,9 @@ class ContrailPlugin(TestBasic):
         """
         self.prepare_contrail_plugin(slaves=3)
 
+        # enable plugin in contrail settings
+        self.activate_plugin()
+
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -207,9 +210,6 @@ class ContrailPlugin(TestBasic):
                 'slave-02': ['controller'],
                 'slave-03': ['compute'],
             })
-
-        # enable plugin in contrail settings
-        self.activate_plugin()
 
         # deploy cluster
         self.deploy_cluster()
@@ -239,6 +239,9 @@ class ContrailPlugin(TestBasic):
         """
         self.prepare_contrail_plugin(slaves=9)
 
+        # enable plugin in contrail settings
+        self.activate_plugin()
+
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -250,9 +253,6 @@ class ContrailPlugin(TestBasic):
                 'slave-06': ['controller'],
                 'slave-07': ['compute', 'cinder'],
             })
-
-        # enable plugin in contrail settings
-        self.activate_plugin()
 
         # deploy cluster
         self.deploy_cluster()
