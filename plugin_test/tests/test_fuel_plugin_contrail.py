@@ -159,7 +159,7 @@ class ContrailPlugin(TestBasic):
                     self.env.d_env.get_ssh_to_remote(n['ip']))
                 logger.info('ip is {0}'.format(n['ip'], n['name']))
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["install_contrail"])
     @log_snapshot_after_test
     def install_contrail(self):
@@ -175,16 +175,16 @@ class ContrailPlugin(TestBasic):
         Duration 20 min
 
         """
-        self.prepare_contrail_plugin(slaves=5)
+        self.prepare_contrail_plugin(slaves=3)
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["contrail_smoke"])
     @log_snapshot_after_test
     def contrail_smoke(self):
         """Deploy a cluster with Contrail Plugin
 
         Scenario:
-            1. Revert snapshot "ready_with_5_slaves"
+            1. Revert snapshot "ready_with_3_slaves"
             2. Create cluster
             3. Add 1 node with contrail-config, contrail-control and
                contrail-db roles
@@ -196,7 +196,7 @@ class ContrailPlugin(TestBasic):
         Duration 90 min
 
         """
-        self.prepare_contrail_plugin(slaves=5)
+        self.prepare_contrail_plugin(slaves=3)
 
         self.fuel_web.update_nodes(
             self.cluster_id,
