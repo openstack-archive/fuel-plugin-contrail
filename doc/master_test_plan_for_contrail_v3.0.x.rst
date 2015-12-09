@@ -263,19 +263,3 @@ if bvt is success all other automated tests will be used for maintenance after e
 
 6.5.8. Check can not deploy Contrail cluster with  ‘contrail_control’ only (a)
 
-6.5.9. Check can not deploy Contrail cluster with  ‘contrail_db’, ‘contrail_config’ only (a)
-
-6.5.10. Check can not deploy Contrail cluster with  ‘contrail_db’, ‘contrail_control’ only (a)
-
-6.5.11. Check can not deploy Contrail cluster with  ‘contrail_config’, ‘contrail_control’ only (a)
-
-6.5.12. Check Contrail HA with deleting  ‘contrail_config’ (a)
-
-6.5.13. Check Contrail HA with deleting  ‘contrail_control’ (a)
-
-6.5.14. Check Contrail HA with deleting ‘contrail_db’, ‘contrail_config’ (a)
-
-6.5.15. Check Contrail HA with deleting ‘contrail_db’, ‘contrail_control’ (a)
-
-6.5.16. Check Contrail HA with deleting  ‘contrail_config’, ‘contrail_control’(a)
-
