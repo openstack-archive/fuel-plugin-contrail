@@ -40,10 +40,8 @@ frontend contrail-webui-api <%= scope.function_hiera(['public_vip']) %>:8143
 
 backend contrail-webui-api
     mode tcp
-    balance roundrobin
+    balance source
     option nolinger
-    stick on src
-    stick-table type ip size 200k expire 30m
     option tcp-check
     tcp-check connect port 8143
     default-server error-limit 1 on-error mark-down
