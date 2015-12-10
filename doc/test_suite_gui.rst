@@ -22,7 +22,7 @@ Install Contrail Plugin and create cluster
 Complexity
 ##########
 
-advanced
+Smoke
 
 
 Steps

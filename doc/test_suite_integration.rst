@@ -39,7 +39,7 @@ Steps
     9. Run OSTF tests
 
 
-Expected Results
+Expected results
 ################
 
 All steps must be completed successfully, without any errors.
@@ -80,7 +80,7 @@ Steps
     8. Run OSTF tests
 
 
-Expected Results
+Expected results
 ################
 
 All steps must be completed successfully, without any errors.
@@ -121,7 +121,7 @@ Steps
     8. Run OSTF tests
 
 
-Expected Results
+Expected results
 ################
 
 All steps must be completed successfully, without any errors.
@@ -146,7 +146,7 @@ Check deploy contrail on an environment with jumbo-frames support
 Complexity
 ##########
 
-Advanced
+Core
 
 
 Steps
@@ -163,7 +163,7 @@ Steps
     9. Run OSTF tests
 
 
-Expected Results
+Expected results
 ################
 
 All steps must be completed successfully, without any errors.
@@ -188,7 +188,7 @@ Check deploy contrail on an environment with vlan-tagging
 Complexity
 ##########
 
-Advanced
+Core
 
 
 Steps
@@ -206,7 +206,7 @@ Steps
     10. Run OSTF tests
 
 
-Expected Results
+Expected results
 ################
 
 All steps must be completed successfully, without any errors.

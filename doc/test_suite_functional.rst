@@ -6,6 +6,7 @@ Functional testing
 Check that Controller node can be deleted and added again
 ---------------------------------------------------------
 
+
 ID
 ##
 
@@ -39,7 +40,7 @@ Steps
     10. Run OSTF tests
 
 
-Expected Results
+Expected results
 ################
 
 All steps must be completed successfully, without any errors.
@@ -82,7 +83,7 @@ Steps
     10. Run OSTF tests
 
 
-Expected Results
+Expected results
 ################
 
 All steps must be completed successfully, without any errors.
