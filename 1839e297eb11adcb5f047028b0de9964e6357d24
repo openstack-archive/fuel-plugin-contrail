@@ -1,0 +1,10 @@
+Verified+2: Jenkins
+Code-Review+2: Oleksandr Martsyniuk <omartsyniuk@mirantis.com>
+Workflow+1: Oleksandr Martsyniuk <omartsyniuk@mirantis.com>
+Code-Review+1: Iryna Vovk <ivovk@mirantis.com>
+Verified+1: Plugins CI <plugins.ci@mirantis.com>
+Submitted-by: Jenkins
+Submitted-at: Fri, 11 Dec 2015 10:34:02 +0000
+Reviewed-on: https://review.openstack.org/255958
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/master
