@@ -41,7 +41,8 @@ class CloseSSHConnectionsPlugin(Plugin):
 
 
 def import_tests():
-    from tests import test_fuel_plugin_contrail
+    from tests import test_smoke_bvt
+    from tests import integration_tests
 
 
 def run_tests():
