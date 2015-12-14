@@ -94,6 +94,13 @@ class contrail::controller {
     require    => Package['contrail-heat'],
   }
 
+# Disable neutron agents
+  service { ['p_neutron-plugin-openvswitch-agent','p_neutron-dhcp-agent','p_neutron-metadata-agent','p_neutron-l3-agent']:
+    ensure   => stopped,
+    enable   => false,
+    provider => 'pacemaker',
+  }
+
   service { 'neutron-server':
     ensure    => running,
     enable    => true,
