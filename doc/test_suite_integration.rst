@@ -211,3 +211,43 @@ Expected results
 
 All steps must be completed successfully, without any errors.
 
+
+Deploy Environment with Contrail and bonding
+--------------------------------------------
+
+
+ID
+##
+
+contrail_bonding
+
+
+Description
+###########
+
+Check deploy contrail with aggregation of network interfaces
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+    2. Enable and configure Contrail plugin
+    3. Add 3 nodes with controller role
+    4. Add 2 nodes with "compute" roles
+    5. Add 3 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
+    8. Bond network interfaces with Active Backup mode
+    9. Deploy cluster with plugin
+    10. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
