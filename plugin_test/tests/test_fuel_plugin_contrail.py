@@ -76,15 +76,14 @@ class ContrailPlugin(TestBasic):
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
     def upload_contrail_packages(self):
-        for pack in self.pack_path:
-            node_ssh = self.env.d_env.get_admin_remote()
-            if os.path.splitext(pack)[1] in [".deb", ".rpm"]:
-                pkg_name = os.path.basename(pack)
+        node_ssh = self.env.d_env.get_admin_remote()
+        if os.path.splitext(self.pack_path)[1] == ".deb":
+                pkg_name = os.path.basename(self.pack_path)
                 logger.debug("Uploading package {0} "
                              "to master node".format(pkg_name))
-                node_ssh.upload(pack, self.pack_copy_path)
-            else:
-                logger.error('Failed to upload file')
+                node_ssh.upload(self.pack_path, self.pack_copy_path)
+        else:
+            raise Exception('Failed to upload file to the master node')
 
     def install_packages(self, remote):
         command = "cd " + self.pack_copy_path + " && ./install.sh"
