@@ -7,7 +7,7 @@
 log_local=1
 log_level=SYS_NOTICE
 log_file=/var/log/contrail/contrail-topology.log
-zookeeper = <%= scope.lookupvar('contrail::address') %>:2181
+zookeeper = <%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
 
 #scan_frequency=60
 
