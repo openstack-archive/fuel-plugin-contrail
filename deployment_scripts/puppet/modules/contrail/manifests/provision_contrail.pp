@@ -24,7 +24,7 @@ class contrail::provision_contrail {
       command => "python /opt/contrail/utils/provision_mx.py  \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
 --oper add --router_name ${name} --router_ip ${name} \
---admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+--admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_external_bgp_${name}-DONE",
       creates => "/opt/contrail/prov_external_bgp_${name}-DONE",
     }
@@ -49,7 +49,7 @@ then exit 1; fi",
 --oper add \
 --linklocal_service_name metadata --linklocal_service_ip 169.254.169.254 --linklocal_service_port 80 \
 --ipfabric_service_ip ${contrail::mos_mgmt_vip} --ipfabric_service_port 8775  \
---admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+--admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_metadata_service-DONE",
     require => Exec['wait_for_api'],
     creates => '/opt/contrail/prov_metadata_service-DONE',
@@ -59,7 +59,7 @@ then exit 1; fi",
       command => "python /opt/contrail/utils/provision_encap.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
 --oper add --encap_priority MPLSoUDP,MPLSoGRE,VXLAN \
---admin_user ${contrail::admin_username} --admin_password ${contrail::admin_password} \
+--admin_user ${contrail::admin_username} --admin_password '${contrail::admin_password}' \
 && touch /opt/contrail/prov_encap_type-DONE",
     require => Exec['wait_for_api'],
     creates => '/opt/contrail/prov_encap_type-DONE',
