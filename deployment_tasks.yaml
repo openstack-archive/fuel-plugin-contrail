@@ -197,7 +197,7 @@
 - id: controller-hiera-pre
   type: puppet
   groups: [primary-controller]
-  required_for: [openstack-network]
+  required_for: [openstack-network-start]
   requires: [deploy_start]
   parameters:
     puppet_manifest: puppet/manifests/controller-hiera.pp
