@@ -16,7 +16,6 @@ import os
 import os.path
 from proboscis import test
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
-from fuelweb_test import logger
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
@@ -93,6 +92,68 @@ class IntegrationTests(TestBasic):
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],
+            should_fail=2,
+            failed_test_name=[('Check network connectivity '
+                               'from instance via floating IP'),
+                              ('Launch instance with file injection')]
+        )
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_ha_baseos"])
+    @log_snapshot_after_test
+    def contrail_ha_baseos(self):
+        """Check deploy HA-contrail on an environment with a base-os node
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling segmentation"
+               as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add a node with controller role
+            4. Add 2 nodes with "compute" and "Storage-cinder" roles
+            5. Add a node with Base-OS role
+            6. Add 3 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
+            7. Deploy cluster with plugin
+            8. Run OSTF tests
+
+        Duration 120 min
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=9)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller'],
+                'slave-02': ['compute', 'cinder'],
+                'slave-03': ['compute', 'cinder'],
+                'slave-04': ['base-os'],
+                'slave-05': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+                'slave-06': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+                'slave-07': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+            })
+
+        # deploy cluster
+        openstack.deploy_cluster(self)
+
+        # TODO
+        # Tests using north-south connectivity are expected to fail because
+        # they require additional gateway nodes, and specific contrail
+        # settings. This mark is a workaround until it's verified
+        # and tested manually.
+        # When it will be done 'should_fail=2' and
+        # 'failed_test_name' parameter should be removed.
+
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id,
             should_fail=2,
             failed_test_name=[('Check network connectivity '
                                'from instance via floating IP'),
