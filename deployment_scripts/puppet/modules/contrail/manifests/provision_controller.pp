@@ -14,21 +14,6 @@
 
 class contrail::provision_controller {
 
-contrail::create_network{'net04':
-  netdata          => $contrail::nets['net04'],
-} ->
-
-contrail::create_network{'net04_ext':
-  netdata => $contrail::nets['net04_ext'],
-  notify  => Exec['prov_route_target'],
-} ->
-
-openstack::network::create_router{'router04':
-  internal_network => 'net04',
-  external_network => 'net04_ext',
-  tenant_name      => $contrail::admin_tenant
-}
-
 exec { 'prov_route_target':
   provider => 'shell',
   path     => '/usr/bin:/bin:/sbin',
