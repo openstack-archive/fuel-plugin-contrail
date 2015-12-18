@@ -219,12 +219,26 @@
 - id: controller-hiera-pre
   type: puppet
   groups: [primary-controller]
-  required_for: [openstack-network]
+  required_for: [openstack-network-start]
   requires: [deploy_start, globals]
   parameters:
     puppet_manifest: puppet/manifests/controller-hiera-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
+
+# Skip L2, L3 and DHCP Neutron agents
+- id: primary-openstack-network-plugins-l2
+  type: skipped
+- id: openstack-network-plugins-l2
+  type: skipped
+- id: primary-openstack-network-agents-l3
+  type: skipped
+- id: openstack-network-agents-l3
+  type: skipped  
+- id: primary-openstack-network-agents-dhcp
+  type: skipped  
+- id: openstack-network-agents-dhcp
+  type: skipped
 
 # Create overrides for Hiera on Controllers: contrail-specific predefined_nets
 - id: controller-hiera-post
@@ -248,12 +262,33 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-# Create networks for ostf-tests and provision route target
+# Create networks for ostf-tests
+- id: openstack-network-networks
+  type: puppet
+  groups: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [openstack-controller-contrail-primary]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/openstack-network/networks.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 1800
+
+- id: openstack-network-routers
+  type: puppet
+  groups: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [openstack-network-networks]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/openstack-network/routers.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 1800
+
+# Provision route target
 - id: openstack-controller-provision
   type: puppet
   role: [primary-controller]
   required_for: [post_deployment_end]
-  requires: [openstack-controller-contrail-primary]
+  requires: [openstack-network-networks]
   parameters:
     puppet_manifest: puppet/manifests/controller-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules

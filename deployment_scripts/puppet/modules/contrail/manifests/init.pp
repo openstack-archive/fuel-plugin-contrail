@@ -33,16 +33,19 @@ class contrail {
   $public_ssl_hash  = hiera('public_ssl')
   $public_ssl       = $public_ssl_hash['services']
 
-  $neutron_settings = hiera_hash('quantum_settings', {})
-  $metadata_secret  = $neutron_settings['metadata']['metadata_proxy_shared_secret']
-  $service_token    = $neutron_settings['keystone']['admin_password']
-  $nets             = $neutron_settings['predefined_networks']
+  $neutron_config   = hiera_hash('neutron_config', {})
+  $floating_net     = try_get_value($neutron_config, 'default_floating_net', 'net04_ext')
+  $private_net      = try_get_value($neutron_config, 'default_private_net', 'net04')
+  $default_router   = try_get_value($neutron_config, 'default_router', 'router04')
+  $nets             = $neutron_config['predefined_networks']
 
   $default_ceilometer_hash = { 'enabled' => false }
   $ceilometer_hash         = hiera_hash('ceilometer', $default_ceilometer_hash)
 
-  $keystone    = hiera_hash('keystone', {})
-  $admin_token = $keystone['admin_token']
+  $keystone        = hiera_hash('keystone', {})
+  $admin_token     = $keystone['admin_token']
+  $service_token   = $neutron_config['keystone']['admin_password']
+  $metadata_secret = $neutron_config['metadata']['metadata_proxy_shared_secret']
 
   $admin_settings = hiera_hash('access', {})
   $admin_username = $admin_settings['user']
@@ -73,6 +76,9 @@ class contrail {
 
   $contrail_private_vip = $network_metadata['vips']['contrail_priv']['ipaddr']
   $contrail_mgmt_vip    = $contrail_private_vip
+
+  
+
 
   $disabled_services = ['neutron-plugin-openvswitch-agent','neutron-dhcp-agent',
                         'neutron-metadata-agent','neutron-l3-agent']
