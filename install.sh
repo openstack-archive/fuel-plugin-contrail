@@ -32,7 +32,7 @@ PLUGIN_PATH="/var/www/nailgun/plugins/contrail-3.0"
 UBUNTU_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.deb' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4`
 CENTOS_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4`
 
-yum -y install dpkg-devel createrepo
+yum -y install dpkg dpkg-devel createrepo
 
 if [ ! -f "$UBUNTU_PKG" ] && [ ! -f "$CENTOS_PKG" ];
   then
