@@ -90,7 +90,7 @@ All steps must be completed successfully, without any errors.
 
 
 Verify HA with deleting Contrail roles
----------------------------------------
+--------------------------------------
 
 
 ID
