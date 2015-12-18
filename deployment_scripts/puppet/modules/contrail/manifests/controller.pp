@@ -25,8 +25,6 @@ class contrail::controller {
     require => Package['neutron-plugin-contrail'],
   }
 
-  Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
-
 # Packages
   package { 'neutron-server': } ->
   package { 'python-neutron-lbaas': } ->
@@ -95,11 +93,7 @@ class contrail::controller {
   }
 
 # Disable neutron agents
-  service { ['p_neutron-plugin-openvswitch-agent','p_neutron-dhcp-agent','p_neutron-metadata-agent','p_neutron-l3-agent']:
-    ensure   => stopped,
-    enable   => false,
-    provider => 'pacemaker',
-  }
+  contrail::pcs_delete_resource { $contrail::disabled_services: }
 
   service { 'neutron-server':
     ensure    => running,
