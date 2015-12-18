@@ -16,21 +16,11 @@ notice('MODULAR: contrail/controller-hiera-post.pp')
 
 include contrail
 
-$hiera_dir = '/etc/hiera/override'
-$plugin_name = 'contrail'
-$plugin_yaml = "${plugin_name}.yaml"
-
-$contrail_plugin = hiera('contrail', undef)
-
-file {'/etc/hiera/override':
-  ensure  => directory,
-}
 # Post-install
 # Create predefined_networks for OSTF-nets in controller-provision.pp
 if empty($contrail::nets) {
-  file { "${hiera_dir}/${plugin_yaml}":
+  file { '/etc/hiera/plugins/contrail.yaml':
     ensure  => file,
     content => template('contrail/plugins.yaml.erb'),
-    require => File['/etc/hiera/override']
   }
 }
