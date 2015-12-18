@@ -5,9 +5,12 @@ external_gw=scope.function_get_first_ip([external_cidr])
 floating_end=scope.function_get_last_ip([external_cidr])
 floating_start=scope.function_get_ip_from_range([external_gw,floating_end,external_netmask,'1','first'])
 %>
-quantum_settings:
+neutron_config:
+  default_floating_net: <%= scope.lookupvar('contrail::floating_net') %>
+  default_private_net: <%= scope.lookupvar('contrail::private_net') %>
+  default_router: <%= scope.lookupvar('contrail::default_router') %>
   predefined_networks:
-    net04_ext:
+    <%= scope.lookupvar('contrail::floating_net') %>:
       shared: true
       L2:
         router_ext: true
@@ -17,7 +20,7 @@ quantum_settings:
         floating: <%= floating_start %>:<%= floating_end %>
         gateway: <%= external_gw %>
         enable_dhcp: true
-    net04:
+    <%= scope.lookupvar('contrail::private_net') %>:
       shared: false
       L2:
         router_ext: false
