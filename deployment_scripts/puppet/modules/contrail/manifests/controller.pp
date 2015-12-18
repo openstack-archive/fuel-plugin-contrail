@@ -27,6 +27,14 @@ class contrail::controller {
 
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
+# Define to delete PCS resources
+  define contrail::contoller::pcs_delete_resource {
+    exec { "Delete-pcs-resource-${name}":
+      command => "/usr/sbin/pcs resource delete clone_p_${name}",
+      returns => [0,1],
+    }
+  }
+
 # Packages
   package { 'neutron-server': } ->
   package { 'python-neutron-lbaas': } ->
@@ -95,11 +103,7 @@ class contrail::controller {
   }
 
 # Disable neutron agents
-  service { ['p_neutron-plugin-openvswitch-agent','p_neutron-dhcp-agent','p_neutron-metadata-agent','p_neutron-l3-agent']:
-    ensure   => stopped,
-    enable   => false,
-    provider => 'pacemaker',
-  }
+  contrail::contoller::pcs_delete_resource { contrail::disabled_services: }
 
   service { 'neutron-server':
     ensure    => running,
