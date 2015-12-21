@@ -155,7 +155,7 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Add a node with controller role
-    4. Add 2 nodes with "compute" and "Storage-cinder" roles
+    4. Add 2 nodes with "compute" and "Ceph-OSD" roles
     5. Add a node with "contrail-config", "contrail-control" and "contrail-db" roles
     6. Add 2 nodes with "contrail-config", "contrail-control" roles
     7. Configure MTU on network interfaces (Jumbo-frames)
