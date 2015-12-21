@@ -15,10 +15,13 @@
 import os
 import os.path
 from proboscis import test
+from proboscis import asserts
+from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+from fuelweb_test.tests.test_jumbo_frames import TestJumboFrames
 from helpers import plugin
 from helpers import openstack
 
@@ -86,16 +89,15 @@ class IntegrationTests(TestBasic):
         # they require additional gateway nodes, and specific contrail
         # settings. This mark is a workaround until it's verified
         # and tested manually.
-        # When it will be done 'should_fail=2' and
+        # When it will be done 'should_fail=1' and
         # 'failed_test_name' parameter should be removed.
 
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],
-            should_fail=2,
+            should_fail=1,
             failed_test_name=[('Check network connectivity '
-                               'from instance via floating IP'),
-                              ('Launch instance with file injection')]
+                               'from instance via floating IP')]
         )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -206,14 +208,125 @@ class IntegrationTests(TestBasic):
         # they require additional gateway nodes, and specific contrail
         # settings. This mark is a workaround until it's verified
         # and tested manually.
-        # When it will be done 'should_fail=2' and
+        # When it will be done 'should_fail=1' and
         # 'failed_test_name' parameter should be removed.
 
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],
-            should_fail=2,
+            should_fail=1,
             failed_test_name=[('Check network connectivity '
-                               'from instance via floating IP'),
-                              ('Launch instance with file injection')]
+                               'from instance via floating IP')]
         )
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_jumbo"])
+    @log_snapshot_after_test
+    def contrail_jumbo(self):
+        """Check deploy contrail on an environment with jumbo-frames support
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling segmentation"
+               as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add a node with controller role
+            4. Add 2 nodes with "compute" and "Storage-Ceph OSD" roles
+            5. Add a node with "contrail-config", "contrail-control" and "contrail-db" roles
+            6. Add 2 nodes with "contrail-config", "contrail-control" roles
+            7. Configure MTU on network interfaces (Jumbo-frames)
+            8. Deploy cluster with plugin
+            9. Run OSTF tests
+
+        Duration 120 min
+
+        """
+
+        plugin.prepare_contrail_plugin(self, slaves=9, ceph_value=True)
+
+        jumbo = TestJumboFrames()
+
+        devops_env = self.env.d_env
+        private_bridge = devops_env.get_network(name='private').bridge_name()
+        logger.info("Search for {0} interfaces for update".
+                    format(private_bridge))
+
+        # find private bridge interface
+        bridge_interfaces = jumbo.get_host_bridge_ifaces(private_bridge)
+        logger.info("Found {0} interfaces for update: {1}"
+                    .format(len(bridge_interfaces), bridge_interfaces))
+
+        # set MTU 9000 to private bridge interface
+        for iface in bridge_interfaces:
+            jumbo.set_host_iface_mtu(iface, 9000)
+            logger.info("MTU of {0} was changed to 9000".format(iface))
+            logger.debug("New {0} interface properties:\n{1}"
+                         .format(iface, jumbo.get_host_iface(iface)))
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        interfaces = {
+            'eth0': ['fuelweb_admin'],
+            'eth1': ['public'],
+            'eth2': ['management'],
+            'eth3': ['private'],
+            'eth4': ['storage'],
+            }
+
+        interfaces_update = [{
+            'name': 'eth3',
+            'interface_properties': {
+                'mtu': 9000,
+                'disable_offloading': False
+            },
+            }]
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller'],
+                'slave-02': ['compute', 'ceph-osd'],
+                'slave-03': ['compute', 'ceph-osd'],
+                'slave-04': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+                'slave-05': ['contrail-config',
+                             'contrail-control'],
+                'slave-06': ['contrail-config',
+                             'contrail-control'],
+                })
+
+        slave_nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
+        for node in slave_nodes:
+            self.fuel_web.update_node_networks(
+                node['id'], interfaces,
+                override_ifaces_params=interfaces_update)
+
+        # deploy cluster
+        openstack.deploy_cluster(self)
+
+        # TODO
+        # Tests using north-south connectivity are expected to fail because
+        # they require additional gateway nodes, and specific contrail
+        # settings. This mark is a workaround until it's verified
+        # and tested manually.
+        # When it will be done 'should_fail=1' and
+        # 'failed_test_name' parameter should be removed.
+
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id,
+            test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],
+            should_fail=1,
+            failed_test_name=[('Check network connectivity '
+                               'from instance via floating IP')]
+        )
+
+        for node_name in ['slave-01', 'slave-02',
+                          'slave-03', 'slave-04', 'slave-05', 'slave-06']:
+            node = self.fuel_web.get_nailgun_node_by_name(node_name)
+            with self.env.d_env.get_ssh_to_remote(node['ip']) as remote:
+                asserts.assert_true(
+                    jumbo.check_node_iface_mtu(remote, "eth3", 9000),
+                    "MTU on {0} is not 9000. Actual value: {1}"
+                    .format(remote.host,
+                            jumbo.get_node_iface(remote, "eth3")))
