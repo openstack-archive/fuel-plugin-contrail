@@ -31,7 +31,8 @@ class contrail::controller {
   package { 'python-contrail': } ->
   package { 'contrail-utils': } ->
   package { 'neutron-plugin-contrail': } ->
-  package { 'contrail-heat': }
+  package { 'contrail-heat': } ->
+  package { 'ceilometer-plugin-contrail': }
 
 # Nova configuration
   nova_config {
@@ -94,6 +95,24 @@ class contrail::controller {
 
 # Disable neutron agents
   contrail::pcs_delete_resource { $contrail::disabled_services: }
+
+# Contrail-specific ceilometer settings
+  $ceilometer_enabled = $contrail::ceilometer_hash['enabled']
+
+  if ($ceilometer_enabled) {
+    file {'/etc/ceilometer/pipeline.yaml':
+      ensure  => file,
+      content => template('contrail/pipeline.yaml.erb'),
+    } ~>
+    service {'ceilometer-agent-central':
+      ensure     => runnning,
+      name       => 'p_ceilometer-agent-central',
+      enable     => true,
+      hasstatus  => true,
+      hasrestart => true,
+      provider   => 'pacemaker',
+    }
+  }
 
   service { 'neutron-server':
     ensure    => running,
