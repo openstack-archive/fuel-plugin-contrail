@@ -38,6 +38,9 @@ $nets = $neutron_settings['predefined_networks']
 $keystone=hiera_hash('keystone', {})
 $admin_token = $keystone['admin_token']
 
+$default_ceilometer_hash = { 'enabled' => false }
+$ceilometer_hash = hiera_hash('ceilometer', $default_ceilometer_hash)
+
 $admin_settings = hiera_hash('access', {})
 $admin_username = $admin_settings['user']
 $admin_password = $admin_settings['password']
