@@ -42,6 +42,8 @@ class contrail::vip {
     ensure    => running,
     enable    => true,
     hasstatus => false,
+    status    => '/bin/false',
+    start     => 'service keepalived restart',
     subscribe => File['/etc/keepalived/keepalived.conf'],
   }
   service { 'haproxy':
