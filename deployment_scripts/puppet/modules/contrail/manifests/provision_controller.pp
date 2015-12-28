@@ -38,7 +38,7 @@ if hiera('primary_controller') {
 --routing_instance_name default-domain:${contrail::admin_tenant}:net04_ext:net04_ext \
 --route_target_number ${contrail::route_target} --router_asn ${contrail::asnum} \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
---admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+--admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' \
 && touch /etc/contrail/prov_route_target-DONE",
     creates  => '/etc/contrail/prov_route_target-DONE',
     require  => Contrail::Create_Network['net04_ext'],
