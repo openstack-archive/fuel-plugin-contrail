@@ -15,6 +15,7 @@
 #    under the License.
 
 /usr/bin/contrail-logs \
+    --analytics-api-ip <%= scope.lookupvar('contrail::contrail_private_vip') %> \
     --last 1m \
     --level SYS_INFO \
     --send-syslog \
