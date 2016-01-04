@@ -3,18 +3,7 @@ attributes:
   metadata:
     restrictions:
       - condition: "not (cluster:net_provider == 'neutron' and networking_parameters:segmentation_type != 'vlan')"
-        message: "Please use Neutron with GRE segmentation, the only network type supported with Contrail plugin."
-  contrail_distribution:
-    type: "radio"
-    weight: 10
-    value: "open"
-    label: "Contrail distribution"
-    description: "Select Contrail distribution"
-    values:
-      - data: "open"
-        label: "OpenContrail"
-      - data: "juniper"
-        label: "Juniper Contrail"
+        message: "Please use Neutron with tunneling segmentation."
   contrail_asnum:
     value: '64512'
     label: 'AS Number'

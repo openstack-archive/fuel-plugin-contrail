@@ -20,7 +20,7 @@ $settings = hiera('contrail', {})
 # TODO
 #$plugin_version = $settings['metadata']['plugin_version']
 $plugin_version = '3.0'
-$distribution=$settings['contrail_distribution']
+$distribution= 'juniper'
 
 $network_scheme = hiera_hash('network_scheme', {})
 $network_metadata = hiera_hash('network_metadata', {})
