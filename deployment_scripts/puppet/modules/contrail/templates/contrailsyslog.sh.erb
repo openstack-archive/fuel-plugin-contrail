@@ -16,7 +16,7 @@
 
 /usr/bin/contrail-logs \
     --last 1m \
-    --level SYS_INFO \
+    --level SYS_ERR \
     --send-syslog \
     --syslog-server <%= scope.lookupvar('contrail::master_ip') %> \
     --syslog-port 514
