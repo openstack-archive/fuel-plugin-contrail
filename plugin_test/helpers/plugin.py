@@ -80,4 +80,7 @@ def activate_plugin(obj):
                   'contrail_distribution/value': 'juniper', }
     else:
         option = {'metadata/enabled': True, }
+    ## FIXME: remove next line when opencontrail v3.0 is available
+    option = {'metadata/enabled': True,}
+
     obj.fuel_web.update_plugin_data(obj.cluster_id, plugin_name, option)
