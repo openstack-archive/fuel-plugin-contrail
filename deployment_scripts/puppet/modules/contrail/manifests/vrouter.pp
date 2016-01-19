@@ -14,10 +14,13 @@
 
 class contrail::vrouter {
 
-    class { 'contrail::package':
-      install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
-      remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
-    }
+  class { 'contrail::package':
+    install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
+    remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
+  } ->
+  exec { 'remove-ovs-modules':
+    command => '/sbin/modprobe -r openvswitch'
+  }
 
   file {'/etc/contrail/agent_param':
     ensure  => present,
@@ -43,6 +46,14 @@ class contrail::vrouter {
 
   service {'fixup-vrouter':
     enable => true,
+    ensure => running,
+  } ->
+  service {'supervisor-vrouter':
+    enable    => true,
+    ensure    => running,
+    subscribe => [Package['contrail-openstack-vrouter','contrail-vrouter-dkms'],
+                  File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
+                  '/etc/contrail/contrail-vrouter-nodemgr.conf']
+                  ],
   }
-
 }
