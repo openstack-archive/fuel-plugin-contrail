@@ -25,6 +25,10 @@ class contrail::compute {
     'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
     'DEFAULT/security_group_api': value=> 'neutron';
     'DEFAULT/heal_instance_info_cache_interval': value=> '0';
+  } ~>
+  service { 'nova-compute':
+    ensure => running,
+    enable => true,
   }
 
   $ipv4_file = $::operatingsystem ? {
