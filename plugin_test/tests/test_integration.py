@@ -172,9 +172,10 @@ class IntegrationTests(TestBasic):
             1. Create an environment with "Neutron with tunneling segmentation"
                as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
-            3. Add 3 nodes with controller role
-            4. Add 2 nodes with "compute" and "Ceph-OSD" roles
-            5. Add a node with MongoDB role
+            3. Add 2 nodes with "controller" role and 1 node with "controller" + "MongoDB" multirole
+            4. Add 1 node with "compute" and "ceph-OSD" and
+               1 node with "compute" + "ceph-OSD" + " MongoDB" multiroles
+            5. Add a node with "MongoDB" role
             6. Add a node with "contrail-config", "contrail-control" and "contrail-db" roles
             7. Deploy cluster with plugin
             8. Run OSTF tests
@@ -192,8 +193,8 @@ class IntegrationTests(TestBasic):
             {
                 'slave-01': ['controller'],
                 'slave-02': ['controller'],
-                'slave-03': ['controller'],
-                'slave-04': ['compute', 'ceph-osd'],
+                'slave-03': ['controller', 'mongo'],
+                'slave-04': ['compute', 'ceph-osd', 'mongo'],
                 'slave-05': ['compute', 'ceph-osd'],
                 'slave-06': ['mongo'],
                 'slave-07': ['contrail-config',
