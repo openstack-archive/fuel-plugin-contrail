@@ -21,6 +21,27 @@ from proboscis.asserts import assert_true
 import openstack
 
 
+BOND_CONFIG = [{
+    'mac': None,
+    'mode': 'active-backup',
+    'name': 'lnx-bond0',
+    'slaves': [
+        {'name': 'eth4'},
+        {'name': 'eth2'},
+    ],
+    'state': None,
+    'type': 'bond',
+    'assigned_networks': []}]
+INTERFACES = {
+    'eth0': ['fuelweb_admin'],
+    'eth1': ['public'],
+    'eth3': ['private'],
+    'lnx-bond0': ['management',
+                  'storage'
+                  ]
+    }
+
+
 def upload_contrail_packages(obj):
     node_ssh = obj.env.d_env.get_admin_remote()
     if os.path.splitext(obj.pack_path)[1] == ".deb":
