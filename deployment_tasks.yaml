@@ -230,12 +230,4 @@
     puppet_manifest: puppet/manifests/compute-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-# Reboot compute nodes, so they pick new network configuration
-- id: compute-reboot
-  type: shell
-  role: [compute]
-  required_for: [post_deployment_end]
-  requires: [configure_default_route]
-  parameters:
-    cmd: if [ ! -f /opt/contrail/reboot-vrouter-DONE ]; then touch /opt/contrail/reboot-vrouter-DONE && /sbin/reboot; fi
-    timeout: 720
+
