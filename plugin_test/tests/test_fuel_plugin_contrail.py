@@ -32,6 +32,8 @@ from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
 from fuelweb_test.helpers.checkers import check_repo_managment
 
+from .helpers import node_rename
+
 BOND_CONFIG = [{
     'mac': None,
     'mode': 'active-backup',
@@ -271,6 +273,86 @@ class ContrailPlugin(TestBasic):
 
         # deploy cluster
         self.deploy_cluster()
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["deploy_contrail_plugin_with_the_same_names"])
+    @log_snapshot_after_test
+    def deploy_contrail_plugin_with_the_same_names(self):
+        """Verify deploy correctness with the same Contrail Controllers names
+
+        Open the Settings tab of the Fuel web UI
+        Select the Contrail plugin checkbox and configure plugin settings
+        Configure network
+        Add 3 nodes with "Operating system" role
+        Rename one node in the template "contrail-1" and other two "contrail-2"
+        Add 1 node with "Controller" role and 1 node with "Compute" role and start deploy.
+        Check Controller, Compute and Contrail nodes status and start deploy.
+        After the end of deploy run OSTF tests
+
+        Expected Result
+        All steps must be completed successfully, without any errors.
+        """
+
+        self.prepare_contrail_plugin(slaves=5)
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['base-os'],
+                'slave-02': ['base-os'],
+                'slave-03': ['base-os'],
+                'slave-04': ['controller'],
+                'slave-05': ['compute'],
+            },
+            contrail=True
+        )
+
+        node_rename(self.fuel_web, 'contrail-[2,3]', new_name='contrail-twins', update_all=False)
+
+        #######################################################################
+        # Debug code here
+        configured_nodes = self.fuel_web.client.list_nodes()
+        def get_node_short_info(nodes_info):
+            nodes_short_info = []
+            for node in nodes_info:
+                keys = ['id', 'name', 'cluster', 'mac', 'pending_roles']
+                nodes_short_info.append({k: node[k] for k in keys})
+            return nodes_short_info
+
+        logger.info('#'*80)
+        logger.info('Configured nodes:')
+        from pprint import pformat
+        logger.info(pformat(get_node_short_info(self.fuel_web.client.list_nodes())))
+        logger.info('#'*80)
+        #######################################################################
+
+
+        # configure disks on base-os nodes
+        self.change_disk_size()
+
+        # enable plugin in contrail settings
+        self.activate_plugin()
+
+        # deploy cluster
+        self.deploy_cluster()
+
+        # run OSTF
+
+        # TODO
+        # Tests using north-south connectivity are expected to fail because
+        # they require additional gateway nodes, and specific contrail
+        # settings. This mark is a workaround until it's verified
+        # and tested manually.
+        # When it will be done 'should_fail=2' and
+        # 'failed_test_name' parameter should be removed.
+
+        self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                               should_fail=2,
+                               failed_test_name=[
+                                   'Check network connectivity '
+                                   'from instance via floating IP',
+                                   'Launch instance with file injection'])
+
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_bvt"])
