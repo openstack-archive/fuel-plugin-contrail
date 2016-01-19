@@ -41,6 +41,7 @@ class contrail::vip {
   service { 'keepalived':
     ensure    => running,
     enable    => true,
+    provider  => init,
     hasstatus => false,
     status    => '/bin/false',
     start     => 'service keepalived restart',
