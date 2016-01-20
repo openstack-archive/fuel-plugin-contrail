@@ -19,7 +19,7 @@ from fuelweb_test.settings import DEPLOYMENT_MODE
 from fuelweb_test.helpers.checkers import check_repo_managment
 
 
-def assign_net_provider(obj, pub_all_nodes=False, ceph_value=False):
+def assign_net_provider(obj, pub_all_nodes, ceph_value, net_template):
     """Assign neutron with tunneling segmentation"""
     segment_type = 'tun'
     obj.cluster_id = obj.fuel_web.create_cluster(
@@ -29,7 +29,10 @@ def assign_net_provider(obj, pub_all_nodes=False, ceph_value=False):
             "net_provider": 'neutron',
             "net_segment_type": segment_type,
             "assign_to_all_nodes": pub_all_nodes,
-            "images_ceph": ceph_value
+            "images_ceph": ceph_value,
+            "tenant": net_template,
+            "user": net_template,
+            "password": net_template,
             }
     )
     return obj.cluster_id
