@@ -13,6 +13,7 @@
 #    under the License.
 
 import os
+import re
 import os.path
 import time
 from copy import deepcopy
@@ -215,6 +216,33 @@ class ContrailPlugin(TestBasic):
                     self.env.d_env.get_ssh_to_remote(n['ip']))
                 logger.info('ip is {0}'.format(n['ip'], n['name']))
 
+    def node_rename(self, node_name_regexp, new_name, update_all=False):
+        """Update nodes with new name
+        """
+        re_obj = re.compile(node_name_regexp)
+        configured_nodes = self.fuel_web.client.list_nodes()
+
+        nodes4update = []
+        for node in configured_nodes:
+            node_data = {
+                'cluster_id': node['cluster'],
+                'id': node['id'],
+                'pending_addition': node['pending_addition'],
+                'pending_deletion': node['pending_deletion'],
+                'pending_roles': node['pending_roles'],
+            }
+            if re_obj.match(node['name']):
+                logger.info("Rename node '%s' to '%s'" % (node['name'], new_name))
+                node_data['name'] = new_name
+                nodes4update.append(node_data)
+            else:
+                if update_all:
+                    node_data['name'] = node['name']
+                    nodes4update.append(node_data)
+
+        return self.fuel_web.client.update_nodes(nodes4update)
+
+
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["install_contrail"])
     @log_snapshot_after_test
@@ -271,6 +299,71 @@ class ContrailPlugin(TestBasic):
 
         # deploy cluster
         self.deploy_cluster()
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["deploy_contrail_plugin_with_the_same_names"])
+    @log_snapshot_after_test
+    def deploy_contrail_plugin_with_the_same_names(self):
+        """Verify deploy correctness with the same Contrail Controllers names
+
+        Open the Settings tab of the Fuel web UI
+        Select the Contrail plugin checkbox and configure plugin settings
+        Configure network
+        Add 3 nodes with "Operating system" role
+        Rename one node in the template "contrail-1" and other two "contrail-2"
+        Add 1 node with "Controller" role and 1 node with "Compute" role and start deploy.
+        Check Controller, Compute and Contrail nodes status and start deploy.
+        After the end of deploy run OSTF tests
+
+        Expected Result
+        All steps must be completed successfully, without any errors.
+        """
+
+        self.prepare_contrail_plugin(slaves=5)
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['base-os'],
+                'slave-02': ['base-os'],
+                'slave-03': ['base-os'],
+                'slave-04': ['controller'],
+                'slave-05': ['compute'],
+            },
+            contrail=True
+        )
+
+        self.node_rename('contrail-[2,3]', new_name='contrail-2', update_all=False)
+
+        # configure disks on base-os nodes
+        self.change_disk_size()
+
+        # enable plugin in contrail settings
+        self.activate_plugin()
+
+        # deploy cluster
+        self.deploy_cluster()
+
+        # create net and subnet
+        self.create_net_subnet(self.cluster_id)
+
+        # run OSTF
+
+        # TODO
+        # Tests using north-south connectivity are expected to fail because
+        # they require additional gateway nodes, and specific contrail
+        # settings. This mark is a workaround until it's verified
+        # and tested manually.
+        # When it will be done 'should_fail=2' and
+        # 'failed_test_name' parameter should be removed.
+
+        self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                               should_fail=2,
+                               failed_test_name=[
+                                   'Check network connectivity '
+                                   'from instance via floating IP',
+                                   'Launch instance with file injection'])
+
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_bvt"])
