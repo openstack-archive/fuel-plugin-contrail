@@ -146,13 +146,14 @@ class ContrailPlugin(TestBasic):
             option = {'metadata/enabled': True, }
         self.fuel_web.update_plugin_data(self.cluster_id, plugin_name, option)
 
-    def create_net_subnet(self, cluster):
+    def create_net_subnet(self, cluster, os_user=None,
+                          os_password=None, os_tenant=None):
         """Create net and subnet"""
         contrail_ip = self.fuel_web.get_public_vip(cluster)
         logger.info('The ip is %s', contrail_ip)
         net = Common(
-            controller_ip=contrail_ip, user='admin',
-            password='admin', tenant='admin'
+            controller_ip=contrail_ip, user=os_user or 'admin',
+            password=os_password or 'admin',tenant=os_tenant or 'admin'
         )
 
         net.neutron.create_network(body={
@@ -306,14 +307,16 @@ class ContrailPlugin(TestBasic):
     def deploy_contrail_plugin_with_the_same_names(self):
         """Verify deploy correctness with the same Contrail Controllers names
 
-        Open the Settings tab of the Fuel web UI
-        Select the Contrail plugin checkbox and configure plugin settings
-        Configure network
-        Add 3 nodes with "Operating system" role
-        Rename one node in the template "contrail-1" and other two "contrail-2"
-        Add 1 node with "Controller" role and 1 node with "Compute" role and start deploy.
-        Check Controller, Compute and Contrail nodes status and start deploy.
-        After the end of deploy run OSTF tests
+        Scenario:
+            1. Revert snapshot "ready_with_5_slaves"
+            2. Create cluster
+            3. Add 3 nodes with "Operating system" role
+                Rename one node in the template "contrail-1" and other two "contrail-2"
+            4. Add 1 node with "Controller" role and 1 node with "Compute" role.
+            4. Enable Contrail plugin
+            5. Deploy cluster with plugin
+            6. Create net and subnet
+            7. Run OSTF tests
 
         Expected Result
         All steps must be completed successfully, without any errors.
@@ -364,7 +367,6 @@ class ContrailPlugin(TestBasic):
                                    'from instance via floating IP',
                                    'Launch instance with file injection'])
 
-
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_bvt"])
     @log_snapshot_after_test
@@ -411,6 +413,74 @@ class ContrailPlugin(TestBasic):
 
         # create net and subnet
         self.create_net_subnet(self.cluster_id)
+
+        # TODO
+        # Tests using north-south connectivity are expected to fail because
+        # they require additional gateway nodes, and specific contrail
+        # settings. This mark is a workaround until it's verified
+        # and tested manually.
+        # When it will be done 'should_fail=2' and
+        # 'failed_test_name' parameter should be removed.
+
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id,
+            should_fail=2,
+            failed_test_name=[('Check network connectivity '
+                               'from instance via floating IP'),
+                              ('Launch instance with file injection')]
+        )
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+          groups=["contrail_spec_pass"])
+    @log_snapshot_after_test
+    def contrail_spec_pass(self):
+        """Deploy cluster with 1 controller, 1 compute,
+        3 base-os and install contrail plugin
+
+        Scenario:
+            1. Revert snapshot "ready_with_3_slaves"
+            2. Create cluster
+            3. Add a node with Operating system role, a node with controller
+               role and a node with compute + cinder role
+            4. Enable Contrail plugin
+            5. Change password for administrator in settings tab using special characters
+            6. Deploy cluster with plugin
+            7. Create net and subnet
+            8. Run OSTF tests
+
+        Duration 110 min
+        """
+        self.prepare_contrail_plugin(slaves=3)
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['base-os'],
+                'slave-02': ['controller'],
+                'slave-03': ['compute', 'cinder'],
+            },
+            contrail=True
+        )
+
+        # configure disks on base-os nodes
+        self.change_disk_size()
+
+        # enable plugin in contrail settings
+        self.activate_plugin()
+
+        # Change password for Admin
+        new_openstack_password = 'pass\/\/@$"\'&'
+        attributes = self.fuel_web.client.get_cluster_attributes(self.cluster_id)
+        attributes['editable']['access']['password']['value'] = \
+            new_openstack_password
+        self.fuel_web.client.update_cluster_attributes(self.cluster_id,
+                                                       attributes)
+
+        # deploy cluster
+        self.deploy_cluster()
+
+        # create net and subnet
+        self.create_net_subnet(self.cluster_id, os_password=new_openstack_password)
 
         # TODO
         # Tests using north-south connectivity are expected to fail because
