@@ -14,8 +14,6 @@
 
 class contrail::provision_controller {
 
-if hiera('primary_controller') {
-
   contrail::create_network{'net04':
     netdata          => $contrail::nets['net04'],
   } ->
@@ -40,8 +38,8 @@ if hiera('primary_controller') {
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
 --admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' \
 && touch /etc/contrail/prov_route_target-DONE",
-    creates  => '/etc/contrail/prov_route_target-DONE',
-    require  => Contrail::Create_Network['net04_ext'],
+   creates  => '/etc/contrail/prov_route_target-DONE',
+   require  => Contrail::Create_Network['net04_ext'],
   }
-}
+
 }
