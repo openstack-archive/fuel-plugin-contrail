@@ -428,6 +428,104 @@ class ContrailPlugin(TestBasic):
                               ('Launch instance with file injection')]
         )
 
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+          groups=["contrail_spec_pass"])
+    @log_snapshot_after_test
+    def contrail_spec_pass(self):
+        """Deploy cluster with 1 controller, 1 compute,
+        3 base-os and install contrail plugin
+
+        Scenario:
+            1. Revert snapshot "ready_with_3_slaves"
+            2. Create cluster
+            3. Add a node with Operating system role, a node with controller
+               role and a node with compute + cinder role
+            4. Enable Contrail plugin
+            5. Change password for administrator in settings tab using special characters
+            6. Deploy cluster with plugin
+            7. Create net and subnet
+            8. Run OSTF tests
+
+        Duration 110 min
+        """
+        self.prepare_contrail_plugin(slaves=3)
+
+        def cluster_update_settings(cluster_id, settings={}):
+            logger.info("Update cluster settings to %s", settings)
+            attributes = self.fuel_web.client.get_cluster_attributes(cluster_id)
+
+            for option in settings:
+                section = False
+                if option in ('sahara', 'murano', 'ceilometer', 'mongo'):
+                    section = 'additional_components'
+                if option in ('mongo_db_name', 'mongo_replset', 'mongo_user',
+                              'hosts_ip', 'mongo_password'):
+                    section = 'external_mongo'
+                if option in ('volumes_ceph', 'images_ceph', 'ephemeral_ceph',
+                              'objects_ceph', 'osd_pool_size', 'volumes_lvm',
+                              'volumes_vmdk', 'images_vcenter'):
+                    section = 'storage'
+                if option in ('tenant', 'password', 'user'):
+                    section = 'access'
+                if option == 'assign_to_all_nodes':
+                    section = 'public_network_assignment'
+                if option in ('dns_list'):
+                    section = 'external_dns'
+                if option in ('ntp_list'):
+                    section = 'external_ntp'
+                if section:
+                    attributes['editable'][section][option]['value'] =\
+                        settings[option]
+
+            logger.debug("Try to update cluster "
+             "with next attributes {0}".format(attributes))
+            res = self.fuel_web.client.update_cluster_attributes(cluster_id, attributes)
+            return res
+
+        cluster_settings = {
+            'user': 'admin',
+            'password': 'pass\/\/@$"\'&'
+        }
+        res = cluster_update_settings(self.cluster_id, cluster_settings)
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['base-os'],
+                'slave-02': ['controller'],
+                'slave-03': ['compute', 'cinder'],
+            },
+            contrail=True
+        )
+
+        # configure disks on base-os nodes
+        self.change_disk_size()
+
+        # enable plugin in contrail settings
+        self.activate_plugin()
+
+        # deploy cluster
+        self.deploy_cluster()
+
+        # create net and subnet
+        self.create_net_subnet(self.cluster_id)
+
+        # TODO
+        # Tests using north-south connectivity are expected to fail because
+        # they require additional gateway nodes, and specific contrail
+        # settings. This mark is a workaround until it's verified
+        # and tested manually.
+        # When it will be done 'should_fail=2' and
+        # 'failed_test_name' parameter should be removed.
+
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id,
+            should_fail=2,
+            failed_test_name=[('Check network connectivity '
+                               'from instance via floating IP'),
+                              ('Launch instance with file injection')]
+        )
+
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_plugin_add_delete_compute_node"])
     @log_snapshot_after_test
