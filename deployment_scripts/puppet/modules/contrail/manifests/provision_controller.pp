@@ -14,8 +14,6 @@
 
 class contrail::provision_controller {
 
-if hiera('primary_controller') {
-
   contrail::create_network{'net04':
     netdata          => $contrail::nets['net04'],
   } ->
@@ -43,5 +41,4 @@ if hiera('primary_controller') {
     creates  => '/etc/contrail/prov_route_target-DONE',
     require  => Contrail::Create_Network['net04_ext'],
   }
-}
 }
