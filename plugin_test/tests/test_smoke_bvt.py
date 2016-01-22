@@ -16,7 +16,6 @@ import os
 import os.path
 from proboscis import test
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
-from fuelweb_test import logger
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
@@ -106,15 +105,17 @@ class ContrailPlugin(TestBasic):
         and install contrail plugin
 
         Scenario:
-            1. Revert snapshot "ready_with_5_slaves"
+            1. Revert snapshot "ready_with_9_slaves"
             2. Create cluster
-            3. Add 3 nodes with contrail-config, contrail-control, contrail-db
-               roles, 1 node with controller role
-               and 1 node with compute + cinder role
-            4. Enable Contrail plugin
-            5. Deploy cluster with plugin
-            6. Create net and subnet
-            7. Run OSTF tests
+            3. Add 3 nodes with contrail-db role
+            4. Add a node with contrail-config role
+            5. Add a node with contrail-control role
+            6. Add a node with with controller role
+            7. Add a node with compute + cinder role
+            8. Enable Contrail plugin
+            9. Deploy cluster with plugin
+            10. Create net and subnet
+            11. Run OSTF tests
 
         Duration 110 min
 
@@ -123,6 +124,8 @@ class ContrailPlugin(TestBasic):
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
+        # activate vSRX image
+        plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -139,18 +142,4 @@ class ContrailPlugin(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        # TODO
-        # Tests using north-south connectivity are expected to fail because
-        # they require additional gateway nodes, and specific contrail
-        # settings. This mark is a workaround until it's verified
-        # and tested manually.
-        # When it will be done 'should_fail=2' and
-        # 'failed_test_name' parameter should be removed.
-
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            should_fail=2,
-            failed_test_name=[('Check network connectivity '
-                               'from instance via floating IP'),
-                              ('Launch instance with file injection')]
-        )
+        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
