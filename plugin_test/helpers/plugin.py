@@ -14,10 +14,13 @@
 
 import os
 import time
+import subprocess
+
 from fuelweb_test import logger
 from fuelweb_test.helpers import checkers
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PATH
 from proboscis.asserts import assert_true
+from settings import VSRX_TEMPLATE_PATH
 import openstack
 
 
@@ -101,7 +104,31 @@ def activate_plugin(obj):
                   'contrail_distribution/value': 'juniper', }
     else:
         option = {'metadata/enabled': True, }
-    ## FIXME: remove next line when opencontrail v3.0 is available
-    option = {'metadata/enabled': True,}
+    # FIXME: remove next line when opencontrail v3.0 is available
+    option = {'metadata/enabled': True, }
 
     obj.fuel_web.update_plugin_data(obj.cluster_id, plugin_name, option)
+
+
+def activate_vsrx():
+    """Activate vSRX1 image"""
+    logger.info('Delete previous installation of vSRX...')
+    subprocess.call('virsh destroy vSRX1', shell=True)
+    subprocess.call('virsh undefine vSRX1', shell=True)
+    command = 'sed -r "s/ENV_NAME/$ENV_NAME/g" {0} > logs/vSRX1.xml'.\
+        format(VSRX_TEMPLATE_PATH)
+    subprocess.call(command, shell=True)
+    command = 'virsh create logs/vSRX1.xml'
+    logger.info('Create vSRX...')
+    if subprocess.call(command, shell=True):
+        raise Exception('vSRX could not be created')
+
+    logger.info('Configure iptables and route...')
+    command = 'sudo /sbin/iptables -F'
+    subprocess.call(command, shell=True)
+    command = 'sudo /sbin/iptables -t nat -F'
+    subprocess.call(command, shell=True)
+    command = 'sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE'
+    subprocess.call(command, shell=True)
+    command = 'sudo ip route add 10.100.1.0/24 via 10.109.1.250'
+    subprocess.call(command, shell=True)
