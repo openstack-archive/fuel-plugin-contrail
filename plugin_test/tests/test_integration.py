@@ -441,3 +441,46 @@ class IntegrationTests(TestBasic):
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha', 'tests_platform'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_ceph_multirole"])
+    @log_snapshot_after_test
+    def contrail_ceph_multirole(self):
+        """Check deploy contrail with Controller + Ceph multirole
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling segmentation"
+               as a network configuration and CEPH storage
+            2. Enable and configure Contrail plugin
+            3. Add 3 nodes with "controller" + "Ceph-OSD" multirole
+            4. Add 2 nodes with "compute" role
+            5. Add 1 node with "contrail-config", "contrail-control" and "contrail-db" roles
+            6. Deploy cluster with plugin
+            8. Run OSTF tests
+
+        """
+
+        plugin.prepare_contrail_plugin(self, slaves=9, ceph_value=True)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        plugin.activate_vsrx()
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller', 'ceph-osd'],
+                'slave-02': ['controller', 'ceph-osd'],
+                'slave-03': ['controller', 'ceph-osd'],
+                'slave-04': ['compute'],
+                'slave-05': ['compute'],
+                'slave-06': ['contrail-config', 'contrail-control', 'contrail-db'],
+            })
+
+        # deploy cluster
+        openstack.deploy_cluster(self)
+
+        # run OSTF tests
+        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
