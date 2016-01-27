@@ -484,3 +484,45 @@ class IntegrationTests(TestBasic):
 
         # run OSTF tests
         self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_cinder_multirole"])
+    @log_snapshot_after_test
+    def contrail_cinder_multirole(self):
+        """Check deploy contrail with Controller + Cinder multirole
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add 3 nodes with "controller" + "storage-cinder" multirole
+            4. Add 1 node with "compute" role
+            5. Add 2 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
+            6. Deploy cluster with plugin
+            8. Run OSTF tests
+
+        """
+
+        plugin.prepare_contrail_plugin(self, slaves=9)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        plugin.activate_vsrx()
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller', 'cinder'],
+                'slave-02': ['controller', 'cinder'],
+                'slave-03': ['controller', 'cinder'],
+                'slave-04': ['compute'],
+                'slave-05': ['contrail-config', 'contrail-control', 'contrail-db'],
+                'slave-06': ['contrail-config', 'contrail-control', 'contrail-db'],
+            })
+
+        # deploy cluster
+        openstack.deploy_cluster(self)
+
+        # run OSTF tests
+        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
