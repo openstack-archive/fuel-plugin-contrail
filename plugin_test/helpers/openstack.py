@@ -19,19 +19,25 @@ from fuelweb_test.settings import DEPLOYMENT_MODE
 from fuelweb_test.helpers.checkers import check_repo_managment
 
 
-def assign_net_provider(obj, pub_all_nodes=False, ceph_value=False):
+def assign_net_provider(obj, **options):
     """Assign neutron with tunneling segmentation"""
-    segment_type = 'tun'
+    available_params = ['pub_all_nodes', 'ceph_value', 'volumes_ceph', 'ephemeral_ceph', 'objects_ceph', 'volumes_lvm']
+    assert all(p in available_params for p in options), 'Invalid params for func %s' % options
+    settings = {
+        "net_provider": 'neutron',
+        "net_segment_type": 'tun',
+        "assign_to_all_nodes": False,
+        "images_ceph": False,
+        "volumes_ceph": False,
+        "ephemeral_ceph": False,
+        "objects_ceph": False,
+        "volumes_lvm": False
+    }
+    settings.update(options)
     obj.cluster_id = obj.fuel_web.create_cluster(
         name=obj.__class__.__name__,
         mode=DEPLOYMENT_MODE,
-        settings={
-            "net_provider": 'neutron',
-            "net_segment_type": segment_type,
-            "assign_to_all_nodes": pub_all_nodes,
-            "images_ceph": ceph_value
-            }
-    )
+        settings=settings)
     return obj.cluster_id
 
 
