@@ -65,7 +65,8 @@ def install_packages(obj, remote):
 
 
 def prepare_contrail_plugin(
-        obj, slaves=None, pub_all_nodes=False, ceph_value=False):
+        obj, slaves=None, pub_all_nodes=False, ceph_value=False, volumes_ceph=False,
+        ephemeral_ceph=False, objects_ceph=False):
     """Copy necessary packages to the master node and install them"""
 
     obj.env.revert_snapshot("ready_with_%d_slaves" % slaves)
@@ -88,7 +89,7 @@ def prepare_contrail_plugin(
         install_packages(obj, obj.env.d_env.get_admin_remote())
 
     # prepare fuel
-    openstack.assign_net_provider(obj, pub_all_nodes, ceph_value)
+    openstack.assign_net_provider(obj, pub_all_nodes, ceph_value, volumes_ceph, ephemeral_ceph, objects_ceph)
 
 
 def activate_plugin(obj):

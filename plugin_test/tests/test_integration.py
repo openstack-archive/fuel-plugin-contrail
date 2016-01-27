@@ -15,6 +15,7 @@
 import os
 import os.path
 from proboscis import test
+import time
 from copy import deepcopy
 from proboscis import asserts
 from fuelweb_test import logger
@@ -460,7 +461,8 @@ class IntegrationTests(TestBasic):
 
         """
 
-        plugin.prepare_contrail_plugin(self, slaves=9, ceph_value=True)
+        plugin.prepare_contrail_plugin(self, slaves=9, ceph_value=True, volumes_ceph=True,
+                                       ephemeral_ceph=True, objects_ceph=True)
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -523,6 +525,59 @@ class IntegrationTests(TestBasic):
 
         # deploy cluster
         openstack.deploy_cluster(self)
+
+        # FIXME: remove next line when bug #1516969 will be fixed
+        time.sleep(60*25)
+
+        # run OSTF tests
+        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_cinder_ceph_multirole"])
+    @log_snapshot_after_test
+    def contrail_cinder_ceph_multirole(self):
+        """Check deploy contrail with Controller + Cinder + Ceph multirole
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling segmentation"
+               as a network configuration and CEPH storage
+            2. Enable and configure Contrail plugin
+            3. Add 1 node with "controller" + "storage-cinder" + "Ceph-OSD" multirole
+            4. Add 1 node with "controller" + "storage-cinder" and 1 node
+               with "controller" + "Ceph-OSD" multiroles
+            5. Add 2 nodes with "compute" role
+            6. Add 3 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
+            7. Deploy cluster with plugin
+            8. Run OSTF tests
+
+        """
+
+        plugin.prepare_contrail_plugin(self, slaves=9, ceph_value=True)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        plugin.activate_vsrx()
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller', 'cinder', 'ceph-osd'],
+                'slave-02': ['controller', 'cinder'],
+                'slave-03': ['controller', 'ceph-osd'],
+                'slave-04': ['compute'],
+                'slave-05': ['compute'],
+                'slave-06': ['contrail-config', 'contrail-control', 'contrail-db'],
+                'slave-07': ['contrail-config', 'contrail-control', 'contrail-db'],
+                'slave-08': ['contrail-config', 'contrail-control', 'contrail-db']
+            })
+
+        # deploy cluster
+        openstack.deploy_cluster(self)
+
+        # FIXME: remove next line when bug #1516969 will be fixed
+        time.sleep(60*25)
 
         # run OSTF tests
         self.fuel_web.run_ostf(cluster_id=self.cluster_id)
