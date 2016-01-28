@@ -29,8 +29,8 @@ BOND_CONFIG = [{
     'mode': 'active-backup',
     'name': 'lnx-bond0',
     'slaves': [
-        {'name': 'eth4'},
-        {'name': 'eth2'},
+        {'name': 'eth3'},
+        {'name': 'eth5'},
     ],
     'state': None,
     'type': 'bond',
@@ -38,10 +38,9 @@ BOND_CONFIG = [{
 INTERFACES = {
     'eth0': ['fuelweb_admin'],
     'eth1': ['public'],
-    'eth3': ['private'],
-    'lnx-bond0': ['management',
-                  'storage'
-                  ]
+    'eth2': ['management'],
+    'eth4': ['storage'],
+    'lnx-bond0': ['private'],
     }
 
 
