@@ -78,8 +78,9 @@ def prepare_contrail_plugin(obj, slaves=None, options={}):
     checkers.install_plugin_check_code(
         obj.env.d_env.get_admin_remote(),
         plugin=os.path.basename(CONTRAIL_PLUGIN_PATH))
-
-    if obj.CONTRAIL_DISTRIBUTION == 'juniper':
+    # FIXME: when opencontrail v3.0 is available
+    # FIXME: remove the following line from 'or True'
+    if obj.CONTRAIL_DISTRIBUTION == 'juniper' or True:
         # copy additional packages to the master node
         upload_contrail_packages(obj)
 
@@ -98,11 +99,16 @@ def activate_plugin(obj):
         obj.fuel_web.check_plugin_exists(obj.cluster_id, plugin_name),
         msg)
     logger.debug('we have contrail element')
+
+    # FIXME: uncomment next block when opencontrail v3.0 is available
+    """
     if obj.CONTRAIL_DISTRIBUTION == 'juniper':
         option = {'metadata/enabled': True,
                   'contrail_distribution/value': 'juniper', }
     else:
         option = {'metadata/enabled': True, }
+    """
+
     # FIXME: remove next line when opencontrail v3.0 is available
     option = {'metadata/enabled': True, }
 
