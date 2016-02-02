@@ -72,7 +72,7 @@ class IntegrationTests(TestBasic):
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -90,7 +90,8 @@ class IntegrationTests(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha_baseos"])
@@ -118,7 +119,7 @@ class IntegrationTests(TestBasic):
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -149,7 +150,8 @@ class IntegrationTests(TestBasic):
         # When it will be done 'should_fail=2' and
         # 'failed_test_name' parameter should be removed.
 
-        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ceilometer"])
@@ -181,7 +183,7 @@ class IntegrationTests(TestBasic):
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -199,7 +201,8 @@ class IntegrationTests(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_jumbo"])
@@ -267,7 +270,7 @@ class IntegrationTests(TestBasic):
             }]
 
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -293,7 +296,8 @@ class IntegrationTests(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
         for node_name in ['slave-01', 'slave-02',
                           'slave-03', 'slave-04', 'slave-05', 'slave-06']:
@@ -419,7 +423,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.client.update_network(self.cluster_id)
 
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -445,9 +449,10 @@ class IntegrationTests(TestBasic):
         # When it will be done 'should_fail=2' and
         # 'failed_test_name' parameter should be removed.
 
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            test_sets=['smoke', 'sanity', 'ha', 'tests_platform'])
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha', 'tests_platform'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ceph_multirole"])
@@ -475,7 +480,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -495,7 +500,8 @@ class IntegrationTests(TestBasic):
         time.sleep(60*25)
 
         # run OSTF tests
-        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_cinder_multirole"])
@@ -520,7 +526,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -540,7 +546,8 @@ class IntegrationTests(TestBasic):
         time.sleep(60*25)
 
         # run OSTF tests
-        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_cinder_ceph_multirole"])
@@ -570,7 +577,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -592,4 +599,5 @@ class IntegrationTests(TestBasic):
         time.sleep(60*25)
 
         # run OSTF tests
-        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)

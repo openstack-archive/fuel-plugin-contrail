@@ -15,4 +15,4 @@
 
 import os
 
-VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH')
+VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH', False)

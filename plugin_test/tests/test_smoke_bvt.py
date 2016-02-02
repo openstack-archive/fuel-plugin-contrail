@@ -125,7 +125,7 @@ class ContrailPlugin(TestBasic):
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx_setup_result = plugin.activate_vsrx()
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -142,4 +142,5 @@ class ContrailPlugin(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
