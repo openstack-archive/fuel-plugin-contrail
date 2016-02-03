@@ -12,7 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
 import time
 from fuelweb_test import logger
 from fuelweb_test.settings import DEPLOYMENT_MODE
@@ -60,3 +59,16 @@ def deploy_cluster(obj):
             check_repo_managment(
                 obj.env.d_env.get_ssh_to_remote(n['ip']))
             logger.info('ip is {0}'.format(n['ip'], n['name']))
+
+
+def assign_vlan(obj, **interface_tags):
+    """ Configure vlan on interfaces
+    :param obj: Test case object
+    :param interface_tags: keyword params of interface role and it's vlan tags
+    :return: None
+    """
+    nets = obj.fuel_web.client.get_networks(obj.cluster_id)['networks']
+    for net in nets:
+        if net['name'] in interface_tags.keys():
+            net['vlan_start'] = interface_tags[net['name']]
+    obj.fuel_web.client.update_network(obj.cluster_id, networks=nets)
