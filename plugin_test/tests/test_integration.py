@@ -65,7 +65,7 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-        options = {'ceph_value': True}
+        options = {'images_ceph': True}
 
         plugin.prepare_contrail_plugin(self, slaves=9, options=options)
 
@@ -176,7 +176,7 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-        options = {'ceph_value': True}
+        options = {'images_ceph': True}
 
         plugin.prepare_contrail_plugin(self, slaves=9, options=options)
 
@@ -227,7 +227,7 @@ class IntegrationTests(TestBasic):
 
         """
 
-        options = {'ceph_value': True}
+        options = {'images_ceph': True}
 
         plugin.prepare_contrail_plugin(self, slaves=9, options=options)
 
@@ -472,7 +472,7 @@ class IntegrationTests(TestBasic):
 
         """
 
-        options = {'ceph_value': True, 'volumes_ceph': True, 'ephemeral_ceph': True, 'objects_ceph': True}
+        options = {'images_ceph': True, 'volumes_ceph': True, 'ephemeral_ceph': True, 'objects_ceph': True}
 
         plugin.prepare_contrail_plugin(self, slaves=9, options=options)
 
@@ -569,7 +569,7 @@ class IntegrationTests(TestBasic):
 
         """
 
-        options = {'ceph_value': True}
+        options = {'images_ceph': True}
 
         plugin.prepare_contrail_plugin(self, slaves=9, options=options)
 

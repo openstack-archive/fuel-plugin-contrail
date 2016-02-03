@@ -21,7 +21,9 @@ from fuelweb_test.helpers.checkers import check_repo_managment
 
 def assign_net_provider(obj, **options):
     """Assign neutron with tunneling segmentation"""
-    available_params = ['pub_all_nodes', 'ceph_value', 'volumes_ceph', 'ephemeral_ceph', 'objects_ceph', 'volumes_lvm']
+    available_params = [
+        'assign_to_all_nodes', 'images_ceph', 'volumes_ceph', 'ephemeral_ceph', 'objects_ceph', 'volumes_lvm'
+    ]
     assert all(p in available_params for p in options), 'Invalid params for func %s' % options
     settings = {
         "net_provider": 'neutron',
