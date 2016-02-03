@@ -27,6 +27,7 @@ class contrail::vip {
     ipaddresses            => $contrail::contrail_config_ips,
     public                 => true,
     internal               => true,
+    public_ssl             => $contrail::public_ssl,
     haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check'],
                                 'balance'        => 'roundrobin',
                                 'tcp-check'      => 'connect port 6379',
@@ -42,6 +43,7 @@ class contrail::vip {
     ipaddresses            => $contrail::contrail_config_ips,
     public                 => true,
     internal               => true,
+    public_ssl             => $contrail::public_ssl,
     haproxy_config_options => { 'option'  => 'nolinger',
                                 'balance' => 'roundrobin',
                                 'timeout' => ['server 3m', 'client 3m'] },
@@ -112,4 +114,3 @@ class contrail::vip {
   }
 
 }
-
