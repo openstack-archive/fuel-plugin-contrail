@@ -412,15 +412,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self)
 
         # configure vlan on storage and management interfaces
-        networking_parameters = self.fuel_web.client.get_networks(
-            self.cluster_id)
-        tags = {'storage': 101, 'management': 102}
-        for name in networking_parameters["networks"]:
-            for k in tags.keys():
-                if k == str(name['name']):
-                    name['vlan_start'] = tags[k]
-
-        self.fuel_web.client.update_network(self.cluster_id)
+        openstack.assign_vlan(self, storage=101, management=102)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
