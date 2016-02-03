@@ -88,7 +88,7 @@ def prepare_contrail_plugin(obj, slaves=None, options={}):
         install_packages(obj, obj.env.d_env.get_admin_remote())
 
     # prepare fuel
-    openstack.assign_net_provider(obj, options)
+    openstack.assign_net_provider(obj, **options)
 
 
 def activate_plugin(obj):
