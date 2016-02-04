@@ -184,13 +184,15 @@ config.kue.ui_port = '3002'
 /* IP List to listen on */
 config.webui_addresses = ['0.0.0.0'];
 
-/* Is insecure access to WebUI? 
+/* Is insecure access to WebUI?
  * If set as false, then all http request will be redirected
  * to https, if set true, then no https request will be processed, but only http
  * request
- */
+ */<% if scope.lookupvar('contrail::public_ssl') == true %>
+config.insecure_access = true;
+<% else %>
 config.insecure_access = false;
-
+<% end %>
 // HTTP port for NodeJS Server.
 config.http_port = '8080';
 
@@ -280,4 +282,3 @@ config.getDomainsFromApiServer = false;
 
 // Export this as a module.
 module.exports = config;
-
