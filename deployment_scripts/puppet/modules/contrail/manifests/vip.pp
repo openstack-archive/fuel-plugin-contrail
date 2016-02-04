@@ -14,6 +14,12 @@
 
 class contrail::vip {
 
+  if $contrail::public_ssl {
+    $ui_backend_port = 8080
+  } else {
+    $ui_backend_port = 8143
+  }
+
   Openstack::Ha::Haproxy_service {
     internal_virtual_ip => $contrail::contrail_private_vip,
     public_virtual_ip   => $contrail::mos_public_vip,
@@ -66,14 +72,15 @@ class contrail::vip {
   openstack::ha::haproxy_service { 'contrail-webui':
     order                  => '204',
     listen_port            => 8143,
-    balancermember_port    => 8143,
+    balancermember_port    => $ui_backend_port,
     server_names           => $contrail::contrail_config_ips,
     ipaddresses            => $contrail::contrail_config_ips,
     public                 => true,
     internal               => false,
+    public_ssl             => $contrail::public_ssl,
     haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check'],
                                 'balance'        => 'source',
-                                'tcp-check'      => 'connect port 8143',
+                                'tcp-check'      => "connect port ${ui_backend_port}",
                                 'default-server' => 'error-limit 1 on-error mark-down',
                                 'mode'           => 'tcp' },
     balancermember_options => 'check inter 2000 rise 2 fall 3',
