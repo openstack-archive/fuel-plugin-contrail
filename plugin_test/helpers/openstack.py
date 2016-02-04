@@ -33,7 +33,7 @@ def assign_net_provider(obj, **options):
         "volumes_ceph": False,
         "ephemeral_ceph": False,
         "objects_ceph": False,
-        "volumes_lvm": False
+        "volumes_lvm": True
     }
     settings.update(options)
     obj.cluster_id = obj.fuel_web.create_cluster(
