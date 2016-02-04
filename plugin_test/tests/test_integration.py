@@ -65,9 +65,8 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-        options = {'images_ceph': True}
 
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(self, slaves=9, options={'images_ceph': True})
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -176,9 +175,8 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-        options = {'images_ceph': True}
 
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(self, slaves=9, options={'images_ceph': True})
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -227,9 +225,7 @@ class IntegrationTests(TestBasic):
 
         """
 
-        options = {'images_ceph': True}
-
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(self, slaves=9, options={'images_ceph': True})
 
         jumbo = TestJumboFrames()
 
@@ -472,9 +468,12 @@ class IntegrationTests(TestBasic):
 
         """
 
-        options = {'images_ceph': True, 'volumes_ceph': True, 'ephemeral_ceph': True, 'objects_ceph': True}
-
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(
+            self, slaves=9,
+            options={
+                'images_ceph': True, 'volumes_ceph': True, 'ephemeral_ceph': True,
+                'objects_ceph': True, "volumes_lvm": False
+            })
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -569,9 +568,7 @@ class IntegrationTests(TestBasic):
 
         """
 
-        options = {'images_ceph': True}
-
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(self, slaves=9, options={'images_ceph': True})
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)

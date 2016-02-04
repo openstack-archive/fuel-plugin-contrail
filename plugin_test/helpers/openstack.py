@@ -25,7 +25,7 @@ def assign_net_provider(obj, **options):
         'assign_to_all_nodes', 'images_ceph', 'volumes_ceph', 'ephemeral_ceph', 'objects_ceph', 'volumes_lvm'
     ]
     assert all(p in available_params for p in options), 'Invalid params for func %s' % options
-    settings = {
+    default_settings = {
         "net_provider": 'neutron',
         "net_segment_type": 'tun',
         "assign_to_all_nodes": False,
@@ -33,13 +33,13 @@ def assign_net_provider(obj, **options):
         "volumes_ceph": False,
         "ephemeral_ceph": False,
         "objects_ceph": False,
-        "volumes_lvm": False
+        "volumes_lvm": True
     }
-    settings.update(options)
+    default_settings.update(options)
     obj.cluster_id = obj.fuel_web.create_cluster(
         name=obj.__class__.__name__,
         mode=DEPLOYMENT_MODE,
-        settings=settings)
+        settings=default_settings)
     return obj.cluster_id
 
 
