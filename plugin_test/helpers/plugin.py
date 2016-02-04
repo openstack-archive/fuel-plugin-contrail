@@ -126,9 +126,9 @@ def activate_vsrx():
     command = 'sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE'
     subprocess.call(command, shell=True)
 
-    if VSRX_TEMPLATE_PATH:
+    if not VSRX_TEMPLATE_PATH:
         logger.info("#" * 10 + 'VSRX_TEMPLATE_PATH is not defined, '
-                    'OSTF will not be running' + "#" * 10 )
+                    'OSTF will not be running' + "#" * 10)
         return False
 
     logger.info("#" * 10 + 'Delete previous installation of vSRX...')
@@ -141,7 +141,7 @@ def activate_vsrx():
     logger.info("#" * 10 + 'Create vSRX...')
     if subprocess.call(command, shell=True):
         logger.info("#" * 10 + 'VSRX could not be established, '
-                    'OSTF will not be running' + "#" * 10 )
+                    'OSTF will not be running' + "#" * 10)
         return False
 
     command = 'sudo ip route add 10.100.1.0/24 via 10.109.1.250'

@@ -51,8 +51,8 @@ class IntegrationTests(TestBasic):
         """Check Contrail deploy on HA environment
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation"
-               as a network configuration and CEPH storage
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with controller role
             4. Add 2 nodes with "compute" and "Ceph-OSD" roles
@@ -65,9 +65,10 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-        options = {'images_ceph': True}
 
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(
+            self, slaves=9, options={'images_ceph': True}
+        )
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -100,8 +101,8 @@ class IntegrationTests(TestBasic):
         """Check deploy HA-contrail on an environment with a base-os node
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation"
-               as a network configuration
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Add a node with controller role
             4. Add 2 nodes with "compute" and "Storage-cinder" roles
@@ -160,8 +161,8 @@ class IntegrationTests(TestBasic):
         """Check deploy environment with Contrail and Ceilometer
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation"
-               as a network configuration and CEPH storage
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
             3. Add 2 nodes with "controller" role and 1 node with
                "controller" + "MongoDB" multirole
@@ -176,9 +177,10 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-        options = {'images_ceph': True}
 
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(
+            self, slaves=9, options={'images_ceph': True}
+        )
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -211,8 +213,8 @@ class IntegrationTests(TestBasic):
         """Check deploy contrail on an environment with jumbo-frames support
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation"
-               as a network configuration
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Add a node with controller role
             4. Add 2 nodes with "compute" and "Storage-Ceph OSD" roles
@@ -227,9 +229,9 @@ class IntegrationTests(TestBasic):
 
         """
 
-        options = {'images_ceph': True}
-
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(
+            self, slaves=9, options={'images_ceph': True}
+        )
 
         jumbo = TestJumboFrames()
 
@@ -316,8 +318,8 @@ class IntegrationTests(TestBasic):
         """Check deploy contrail with aggregation of network interfaces
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation"
-               as a network configuration
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with controller role
             4. Add 2 nodes with "compute" roles
@@ -391,8 +393,8 @@ class IntegrationTests(TestBasic):
         """Check deploy contrail on an environment with vlan-tagging
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation"
-               as a network configuration
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with controller role
             4. Add 2 nodes with "compute" and "Storage-cinder" roles
@@ -461,20 +463,27 @@ class IntegrationTests(TestBasic):
         """Check deploy contrail with Controller + Ceph multirole
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation"
-               as a network configuration and CEPH storage
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with "controller" + "Ceph-OSD" multirole
             4. Add 2 nodes with "compute" role
-            5. Add 1 node with "contrail-config", "contrail-control" and "contrail-db" roles
+            5. Add 1 node with "contrail-config", "contrail-control" and
+               "contrail-db" roles
             6. Deploy cluster with plugin
-            8. Run OSTF tests
+            7. Run OSTF tests
 
         """
 
-        options = {'images_ceph': True, 'volumes_ceph': True, 'ephemeral_ceph': True, 'objects_ceph': True}
-
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(
+            self, slaves=9,
+            options={
+                'images_ceph': True,
+                'volumes_ceph': True,
+                'ephemeral_ceph': True,
+                'objects_ceph': True,
+                "volumes_lvm": False
+            })
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -490,7 +499,9 @@ class IntegrationTests(TestBasic):
                 'slave-03': ['controller', 'ceph-osd'],
                 'slave-04': ['compute'],
                 'slave-05': ['compute'],
-                'slave-06': ['contrail-config', 'contrail-control', 'contrail-db'],
+                'slave-06': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
             })
 
         # deploy cluster
@@ -510,11 +521,13 @@ class IntegrationTests(TestBasic):
         """Check deploy contrail with Controller + Cinder multirole
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with "controller" + "storage-cinder" multirole
             4. Add 1 node with "compute" role
-            5. Add 2 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
+            5. Add 2 nodes with "contrail-config", "contrail-control" and
+               "contrail-db" roles
             6. Deploy cluster with plugin
             8. Run OSTF tests
 
@@ -535,8 +548,12 @@ class IntegrationTests(TestBasic):
                 'slave-02': ['controller', 'cinder'],
                 'slave-03': ['controller', 'cinder'],
                 'slave-04': ['compute'],
-                'slave-05': ['contrail-config', 'contrail-control', 'contrail-db'],
-                'slave-06': ['contrail-config', 'contrail-control', 'contrail-db'],
+                'slave-05': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+                'slave-06': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
             })
 
         # deploy cluster
@@ -556,22 +573,24 @@ class IntegrationTests(TestBasic):
         """Check deploy contrail with Controller + Cinder + Ceph multirole
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation"
-               as a network configuration and CEPH storage
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
-            3. Add 1 node with "controller" + "storage-cinder" + "Ceph-OSD" multirole
+            3. Add 1 node with "controller" + "storage-cinder" +
+               "Ceph-OSD" multirole
             4. Add 1 node with "controller" + "storage-cinder" and 1 node
                with "controller" + "Ceph-OSD" multiroles
             5. Add 2 nodes with "compute" role
-            6. Add 3 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
+            6. Add 3 nodes with "contrail-config", "contrail-control" and
+               "contrail-db" roles
             7. Deploy cluster with plugin
             8. Run OSTF tests
 
         """
 
-        options = {'images_ceph': True}
-
-        plugin.prepare_contrail_plugin(self, slaves=9, options=options)
+        plugin.prepare_contrail_plugin(
+            self, slaves=9, options={'images_ceph': True}
+        )
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -587,9 +606,15 @@ class IntegrationTests(TestBasic):
                 'slave-03': ['controller', 'ceph-osd'],
                 'slave-04': ['compute'],
                 'slave-05': ['compute'],
-                'slave-06': ['contrail-config', 'contrail-control', 'contrail-db'],
-                'slave-07': ['contrail-config', 'contrail-control', 'contrail-db'],
-                'slave-08': ['contrail-config', 'contrail-control', 'contrail-db']
+                'slave-06': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+                'slave-07': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+                'slave-08': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db']
             })
 
         # deploy cluster
