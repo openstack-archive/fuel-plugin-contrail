@@ -24,25 +24,27 @@ from settings import VSRX_TEMPLATE_PATH
 import openstack
 
 
-BOND_CONFIG = [{
-    'mac': None,
-    'mode': 'active-backup',
-    'name': 'lnx-bond0',
-    'slaves': [
-        {'name': 'eth4'},
-        {'name': 'eth2'},
-    ],
-    'state': None,
-    'type': 'bond',
-    'assigned_networks': []}]
-INTERFACES = {
-    'eth0': ['fuelweb_admin'],
-    'eth1': ['public'],
-    'eth3': ['private'],
-    'lnx-bond0': ['management',
-                  'storage'
-                  ]
+BOND_CONFIG = [
+    {
+        'mac': None,
+        'mode': 'active-backup',
+        'name': 'lnx-bond0',
+        'slaves': [
+            {'name': 'eth3'},
+            {'name': 'eth4'},
+        ],
+        'state': None,
+        'type': 'bond',
+        'assigned_networks': []
     }
+]
+
+INTERFACES = {
+    'eth0': ['fuelweb_admin', 'storage'],
+    'eth1': ['public'],
+    'eth2': ['management'],
+    'lnx-bond0': ['private']
+}
 
 
 def upload_contrail_packages(obj):
