@@ -338,6 +338,9 @@ class IntegrationTests(TestBasic):
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
 
+        # configure vlan on storage and management interfaces
+        openstack.assign_vlan(self, private=101, storage=102)
+
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -358,14 +361,13 @@ class IntegrationTests(TestBasic):
             },
             )
 
-        cluster_nodes = \
-            self.fuel_web.client.list_cluster_nodes(self.cluster_id)
+        cluster_nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
 
         for node in cluster_nodes:
             self.fuel_web.update_node_networks(
-                node['id'], interfaces_dict=deepcopy(plugin.INTERFACES),
-                raw_data=deepcopy(plugin.BOND_CONFIG)
-                )
+                node['id'],
+                interfaces_dict=deepcopy(plugin.INTERFACES),
+                raw_data=deepcopy(plugin.BOND_CONFIG))
 
         openstack.deploy_cluster(self)
 
