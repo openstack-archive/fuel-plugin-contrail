@@ -143,14 +143,6 @@ class IntegrationTests(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        # TODO
-        # Tests using north-south connectivity are expected to fail because
-        # they require additional gateway nodes, and specific contrail
-        # settings. This mark is a workaround until it's verified
-        # and tested manually.
-        # When it will be done 'should_fail=2' and
-        # 'failed_test_name' parameter should be removed.
-
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
@@ -289,7 +281,8 @@ class IntegrationTests(TestBasic):
                              'contrail-control'],
                 })
 
-        slave_nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
+        slave_nodes = \
+            self.fuel_web.client.list_cluster_nodes(self.cluster_id)
         for node in slave_nodes:
             self.fuel_web.update_node_networks(
                 node['id'], interfaces,
@@ -325,9 +318,9 @@ class IntegrationTests(TestBasic):
             4. Add 2 nodes with "compute" roles
             5. Add 3 nodes with "contrail-config", "contrail-control" and
                "contrail-db" roles
-            8. Bond network interfaces with Active Backup mode
-            9. Deploy cluster with plugin
-            10. Run OSTF tests
+            6. Bond network interfaces with balance-rr mode
+            7. Deploy cluster with plugin
+            8. Run OSTF tests
 
         Duration 120 min
 
@@ -361,8 +354,7 @@ class IntegrationTests(TestBasic):
             },
             )
 
-        cluster_nodes = \
-            self.fuel_web.client.list_cluster_nodes(self.cluster_id)
+        cluster_nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
 
         for node in cluster_nodes:
             self.fuel_web.update_node_networks(
@@ -371,6 +363,9 @@ class IntegrationTests(TestBasic):
                 raw_data=deepcopy(plugin.BOND_CONFIG))
 
         openstack.deploy_cluster(self)
+
+        # FIXME: remove next line when bug #1516969 will be fixed
+        time.sleep(60*25)
 
         # TODO
         # Tests using north-south connectivity are expected to fail because
@@ -382,7 +377,7 @@ class IntegrationTests(TestBasic):
 
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
-            test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],
+            test_sets=['smoke', 'sanity', 'ha'],
             should_fail=2,
             failed_test_name=[('Check network connectivity '
                                'from instance via floating IP'),
@@ -438,18 +433,10 @@ class IntegrationTests(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        # TODO
-        # Tests using north-south connectivity are expected to fail because
-        # they require additional gateway nodes, and specific contrail
-        # settings. This mark is a workaround until it's verified
-        # and tested manually.
-        # When it will be done 'should_fail=2' and
-        # 'failed_test_name' parameter should be removed.
-
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
-                test_sets=['smoke', 'sanity', 'ha', 'tests_platform'])
+                test_sets=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ceph_multirole"])

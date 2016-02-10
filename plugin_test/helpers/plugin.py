@@ -27,7 +27,7 @@ import openstack
 BOND_CONFIG = [
     {
         'mac': None,
-        'mode': 'active-backup',
+        'mode': 'balance-rr',
         'name': 'lnx-bond0',
         'slaves': [
             {'name': 'eth3'},
