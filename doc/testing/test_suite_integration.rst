@@ -242,9 +242,9 @@ Steps
     3. Add 3 nodes with "controller" role
     4. Add 2 nodes with "compute" roles
     5. Add 3 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
-    8. Bond network interfaces with Active Backup mode
-    9. Deploy cluster with plugin
-    10. Run OSTF tests
+    6. Bond network interfaces with balance-rr mode
+    7. Deploy cluster with plugin
+    8. Run OSTF tests
 
 
 Expected results
