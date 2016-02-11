@@ -18,3 +18,13 @@ file { '/etc/apt/preferences.d/contrail-pin-110':
   ensure => file,
   source => 'puppet:///modules/contrail/contrail-pin-110',
 }
+
+# Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
+exec {'no_network_reconfigure':
+  command => 'echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
+  onlyif => 'test -f /opt/contrail/provision-vrouter-DONE'
+}
+exec {'no_openstack_network_reconfigure':
+  command => 'echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
+  onlyif => 'test -f /opt/contrail/provision-vrouter-DONE'
+}
