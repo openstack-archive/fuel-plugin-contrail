@@ -193,8 +193,18 @@
     puppet_modules: /etc/puppet/modules
     timeout: 3600
     cwd: /
-# Create overrides for Hiera on Controllers
-- id: controller-hiera
+# Create overrides for Hiera on Controllers: empty predefined_nets
+- id: controller-hiera-pre
+  type: puppet
+  groups: [primary-controller]
+  required_for: [openstack-network]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-hiera.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+# Create overrides for Hiera on Controllers: contrail-specific predefined_nets
+- id: controller-hiera-post
   type: puppet
   role: [primary-controller]
   required_for: [post_deployment_end]
@@ -208,7 +218,7 @@
   type: puppet
   role: [primary-controller]
   required_for: [post_deployment_end]
-  requires: [controller-hiera]
+  requires: [controller-hiera-post]
   parameters:
     puppet_manifest: puppet/manifests/controller-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
