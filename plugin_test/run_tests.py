@@ -44,6 +44,8 @@ def import_tests():
     from tests import test_smoke_bvt
     from tests import test_integration
     from tests import test_functional
+    from tests import test_network_templates
+
 
 
 def run_tests():
