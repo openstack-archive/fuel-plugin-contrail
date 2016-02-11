@@ -20,12 +20,7 @@ from fuelweb_test.helpers.checkers import check_repo_managment
 
 def assign_net_provider(obj, **options):
     """Assign neutron with tunneling segmentation"""
-    available_params = [
-        'assign_to_all_nodes', 'images_ceph', 'volumes_ceph',
-        'ephemeral_ceph', 'objects_ceph', 'volumes_lvm'
-    ]
-    assert all(p in available_params for p in options), \
-        'Invalid params for func %s' % options
+
     default_settings = {
         "net_provider": 'neutron',
         "net_segment_type": 'tun',
@@ -34,8 +29,14 @@ def assign_net_provider(obj, **options):
         "volumes_ceph": False,
         "ephemeral_ceph": False,
         "objects_ceph": False,
-        "volumes_lvm": True
+        "volumes_lvm": True,
+        "tenant": None,
+        "user": None,
+        "password": None
     }
+
+    assert all(p in default_settings.keys() for p in options), \
+        'Invalid params for func %s' % options
     default_settings.update(options)
     obj.cluster_id = obj.fuel_web.create_cluster(
         name=obj.__class__.__name__,
