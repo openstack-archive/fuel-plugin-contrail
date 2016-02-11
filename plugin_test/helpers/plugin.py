@@ -149,3 +149,29 @@ def activate_vsrx():
     command = 'sudo ip route add 10.100.1.0/24 via 10.109.1.250'
     subprocess.call(command, shell=True)
     return True
+
+
+def net_group_preparation(obj):
+    """Prepare network group for network template """
+
+    node_ssh = obj.env.d_env.get_admin_remote()
+
+    # preparing commands for gateway setting and  private interface updating
+    command_remove = 'fuel network-group --delete --network 5'
+    command_create = 'fuel network-group --create --name fuel network-group' \
+                     '--create --name private --cidr 10.109.3.0/24 ' \
+                     '--gateway 10.109.3.1 --nodegroup 1'
+    command_set_render_addr_mask = \
+        'fuel network-group --set --network 6 --meta "' \
+        '{"name": "private", "notation": "cidr", "render_type": null,' \
+        '"map_priority": 2, "configurable": true, "use_gateway": true,' \
+        ' "render_addr_mask": "internal", "vlan_start": null, ' \
+        '"cidr": "10.109.3.0/24"}"'
+
+    command_list = (
+        command_remove, command_create, command_set_render_addr_mask
+    )
+
+    for i in command_list:
+        node_ssh.execute_async(i)
+        time.sleep(40)
