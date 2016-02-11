@@ -22,26 +22,27 @@ $plugin_yaml = "${plugin_name}.yaml"
 
 $contrail_plugin = hiera('contrail', undef)
 
-if ($contrail_plugin) {
+file_line {"${plugin_name}_hiera_override":
+  path  => '/etc/hiera.yaml',
+  line  => "  - override/${plugin_name}",
+  after => '  - override/module/%{calling_module}',
+} ->
+file {'/etc/hiera/override':
+  ensure  => directory,
+}
 
-  file {'/etc/hiera/override':
-    ensure  => directory,
-  }
-
+if empty($contrail::nets) {
+# Post-install
   file { "${hiera_dir}/${plugin_yaml}":
     ensure  => file,
     content => template('contrail/plugins.yaml.erb'),
     require => File['/etc/hiera/override']
   }
-
-  package {'ruby-deep-merge':
-    ensure  => 'installed',
+} else {
+# Pre-install
+  file { "${hiera_dir}/${plugin_yaml}":
+    ensure  => file,
+    content => 'quantum_settings:\n  predefined_networks: []',
+    require => File['/etc/hiera/override']
   }
-
-  file_line {"${plugin_name}_hiera_override":
-    path  => '/etc/hiera.yaml',
-    line  => "  - override/${plugin_name}",
-    after => '  - override/module/%{calling_module}',
-  }
-
 }
