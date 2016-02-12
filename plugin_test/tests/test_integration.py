@@ -156,23 +156,25 @@ class IntegrationTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
-            3. Add 2 nodes with "controller" role and 1 node with
-               "controller" + "MongoDB" multirole
-            4. Add 1 node with "compute" and "ceph-OSD" and
-               1 node with "compute" + "ceph-OSD" + " MongoDB" multiroles
-            5. Add a node with "MongoDB" role
-            6. Add a node with "contrail-config", "contrail-control" and
+            3. Add 2 nodes with "controller" role
+            4. Add a node with "controller" + "MongoDB" multirole
+            5. Add a node with "compute"+"ceph-OSD"+"cinder" multiroles
+            6. Add node with "compute" + "ceph-OSD" + " MongoDB" multiroles
+            7. Add a node with "MongoDB" role
+            8. Add a node with "contrail-config", "contrail-control" and
                "contrail-db" roles
-            7. Deploy cluster with plugin
-            8. Run OSTF tests
+            9. Deploy cluster with plugin
+            10. Run OSTF tests
 
         Duration 120 min
 
         """
 
         plugin.prepare_contrail_plugin(
-            self, slaves=9, options={'images_ceph': True}
-        )
+            self,
+            slaves=9,
+            options={'images_ceph': True,
+                     'ceilometer': True})
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -186,7 +188,7 @@ class IntegrationTests(TestBasic):
                 'slave-02': ['controller'],
                 'slave-03': ['controller', 'mongo'],
                 'slave-04': ['compute', 'ceph-osd', 'mongo'],
-                'slave-05': ['compute', 'ceph-osd'],
+                'slave-05': ['compute', 'ceph-osd', 'cinder'],
                 'slave-06': ['mongo'],
                 'slave-07': ['contrail-config',
                              'contrail-control',
@@ -196,7 +198,9 @@ class IntegrationTests(TestBasic):
         openstack.deploy_cluster(self)
 
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_jumbo"])
