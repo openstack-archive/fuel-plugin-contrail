@@ -32,13 +32,14 @@ def assign_net_provider(obj, **options):
         "objects_ceph": False,
         "volumes_lvm": True,
         "ceilometer": False,
-        "tenant": None,
-        "user": None,
-        "password": None
     }
 
-    assert all(p in default_settings.keys() for p in options), \
-        'Invalid params for func %s' % options
+    if not "assert_deny" in options:
+        assert all(p in default_settings.keys() for p in options), \
+            'Invalid params for func %s' % options
+    else:
+        del options["assert_deny"]
+
     default_settings.update(options)
     obj.cluster_id = obj.fuel_web.create_cluster(
         name=obj.__class__.__name__,
