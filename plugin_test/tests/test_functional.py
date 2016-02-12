@@ -67,25 +67,10 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        def define_and_check(nodes, delete=False):
-            # Cluster configuration
-            self.fuel_web.update_nodes(self.cluster_id,
-                                       nodes_dict=nodes,
-                                       pending_addition=not delete,
-                                       pending_deletion=delete)
-            # deploy cluster
-            openstack.deploy_cluster(self)
-
-            # FIXME: remove next line when bug #1516969 will be fixed
-            time.sleep(60*25)
-
-            # Run OSTF tests
-            if vsrx_setup_result:
-                self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-
         conf_no_controller = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
+            # Here slave-03
             'slave-04': ['compute'],
             'slave-05': ['cinder'],
             'slave-06': ['contrail-db',
@@ -98,8 +83,69 @@ class IntegrationTests(TestBasic):
                          'contrail-config',
                          'contrail-control'],
         }
-        conf_controller = {'slave-03': ['controller']}
+        conf_ctrl = {'slave-03': ['controller']}
 
-        define_and_check(dict(conf_no_controller, **conf_controller))
-        define_and_check(conf_controller, delete=True)
-        define_and_check(conf_controller)
+        openstack.update_deploy_check(self,
+                                      dict(conf_no_controller, **conf_ctrl),
+                                      is_vsrx=vsrx_setup_result)
+        openstack.update_deploy_check(self,
+                                      conf_ctrl, delete=True,
+                                      is_vsrx=vsrx_setup_result)
+        openstack.update_deploy_check(self,
+                                      conf_ctrl,
+                                      is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_plugin_add_delete_compute_node"])
+    @log_snapshot_after_test
+    def contrail_plugin_add_delete_compute_node(self):
+        """Verify that Compute node can be deleted and added after deploying
+
+        Scenario:
+            1. Create an environment with
+               "Neutron with tunneling segmentation"
+               as a network configuration and CEPH storage
+            2. Enable and configure Contrail plugin
+            3. Add some controller, compute + storage (at least 4) nodes
+            4. Add a node with "contrail-db", "contarail-config" and
+               "contrail-control" roles
+            5. Deploy cluster
+            6. Run OSTF tests
+            7. Delete a compute node and deploy changes
+            8. Run OSTF tests
+            9. Add a node with "compute" role and deploy changes
+            10. Run OSTF tests
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=9)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        conf_no_controller = {
+            'slave-01': ['controller'],
+            'slave-02': ['controller'],
+            'slave-03': ['controller'],
+            'slave-04': ['controller'],
+            'slave-05': ['compute', 'cinder'],
+            'slave-06': ['compute', 'cinder'],
+            'slave-07': ['compute', 'cinder'],
+            # Here slave-8
+            'slave-09': ['contrail-db',
+                         'contrail-config',
+                         'contrail-control'],
+
+        }
+        conf_compute = {'slave-08': ['compute', 'cinder']}
+
+        openstack.update_deploy_check(self,
+                                      dict(conf_no_controller, **conf_compute),
+                                      is_vsrx=vsrx_setup_result)
+        openstack.update_deploy_check(self,
+                                      conf_compute, delete=True,
+                                      is_vsrx=vsrx_setup_result)
+        openstack.update_deploy_check(self, conf_compute,
+                                      is_vsrx=vsrx_setup_result)
