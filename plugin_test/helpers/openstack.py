@@ -31,6 +31,7 @@ def assign_net_provider(obj, **options):
         "ephemeral_ceph": False,
         "objects_ceph": False,
         "volumes_lvm": True,
+        "ceilometer": False,
         "tenant": None,
         "user": None,
         "password": None
