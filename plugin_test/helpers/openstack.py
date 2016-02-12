@@ -32,9 +32,6 @@ def assign_net_provider(obj, **options):
         "objects_ceph": False,
         "volumes_lvm": True,
         "ceilometer": False,
-        "tenant": None,
-        "user": None,
-        "password": None
     }
 
     assert all(p in default_settings.keys() for p in options), \
