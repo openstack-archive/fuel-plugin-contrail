@@ -26,8 +26,10 @@ class contrail::database {
 
 # Packages
   package { 'zookeeper': } ->
+  package { 'kafka': } ->
   package { 'cassandra': } ->
   package { 'contrail-openstack-database': }
+
 
 # Zookeeper
   file { '/etc/zookeeper/conf/myid':
@@ -45,6 +47,33 @@ class contrail::database {
     require   => [Package['zookeeper'],Package['contrail-openstack-database']],
     subscribe => [File['/etc/zookeeper/conf/zoo.cfg'],
                   File['/etc/zookeeper/conf/myid'],
+                  ],
+  }
+
+# Kafka
+  file { '/tmp/kafka-logs':
+    ensure => 'directory',
+    mode   => '0755',
+  } ->
+  file { '/usr/share/kafka/config/log4j.properties':
+    source  => 'puppet:///modules/contrail/kafka-log4j.properties',
+    require => Package['kafka'],
+  } ->
+  file { '/usr/share/kafka/config/server.properties':
+    content => template('contrail/kafka-server.properties.erb'),
+    require => Package['kafka'],
+  } ->
+  file { '/tmp/kafka-logs/meta.properties':
+    content => inline_template("version=0\nbroker.id=<%= scope.lookupvar('contrail::uid') %>\n");
+  }
+
+  service { 'kafka':
+    ensure    => running,
+    enable    => true,
+    require   => Package['kafka'],
+    subscribe => [File['/usr/share/kafka/config/log4j.properties'],
+                  File['/usr/share/kafka/config/server.properties'],
+                  File['/tmp/kafka-logs/meta.properties'],
                   ],
   }
 
