@@ -99,13 +99,13 @@ class contrail::controller {
   $ceilometer_enabled = $contrail::ceilometer_hash['enabled']
 
   if ($ceilometer_enabled) {
-    package { 'ceilometer-plugin-contrail': } ->
+    # package { 'ceilometer-plugin-contrail': } ->
     file {'/etc/ceilometer/pipeline.yaml':
       ensure  => file,
       content => template('contrail/pipeline.yaml.erb'),
     } ~>
     service {'ceilometer-agent-central':
-      ensure     => runnning,
+      ensure     => running,
       name       => 'p_ceilometer-agent-central',
       enable     => true,
       hasstatus  => true,
