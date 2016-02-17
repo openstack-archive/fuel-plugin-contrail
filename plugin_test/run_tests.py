@@ -45,7 +45,7 @@ def import_tests():
     from tests import test_integration
     from tests import test_functional
     from tests import test_network_templates
-
+    from tests import test_failover
 
 
 def run_tests():
