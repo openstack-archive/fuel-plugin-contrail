@@ -13,8 +13,8 @@
 #    under the License.
 
 import os
-import time
 from proboscis import test
+from proboscis.asserts import assert_equal
 from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
@@ -95,6 +95,7 @@ class IntegrationTests(TestBasic):
                                       conf_ctrl,
                                       is_vsrx=vsrx_setup_result)
 
+
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_plugin_add_delete_compute_node"])
     @log_snapshot_after_test
@@ -149,3 +150,91 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self, conf_compute,
                                       is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_ha_with_shutdown_contrail_node"])
+    @log_snapshot_after_test
+    def contrail_ha_with_shutdown_contrail_node(self):
+        """Verify HA with deleting Contrail roles
+
+        Scenario:
+            1. Create an environment with
+               "Neutron with tunneling segmentation"
+               as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add some controller, compute and storage nodes
+            4. Add 4 nodes with "contrail-db", "contarail-config" and
+               "contrail-control" roles
+            5. Deploy cluster
+            6. Run OSTF tests
+            7. Check Controller and Contrail nodes status
+            8. Shutdown node with 'contrail-db', "contarail-config" and
+               "contrail-control" roles
+            9. Deploy changes
+            10. Run OSTF tests
+            11. Check Controller and Contrail nodes status
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=9)
+        plugin.activate_plugin(self)  # enable plugin in contrail settings
+        vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
+
+        conf_no_contrail = {
+            'slave-01': ['controller'],
+            'slave-02': ['controller'],
+            'slave-03': ['controller'],
+            'slave-04': ['compute'],
+            'slave-05': ['cinder'],
+            # Here slave-06 with contrail
+            'slave-07': ['contrail-db',
+                         'contrail-config',
+                         'contrail-control'],
+            'slave-08': ['contrail-db',
+                         'contrail-config',
+                         'contrail-control'],
+            'slave-09': ['contrail-db',
+                         'contrail-config',
+                         'contrail-control'],
+
+        }
+        conf_contrail = {
+            'slave-06': ['contrail-db',
+                         'contrail-config',
+                         'contrail-control']
+        }
+
+        def check_node_state(cluster_id, node_name, node_state):
+            """Checks node state by it's name"""
+            for node in self.fuel_web.client.list_cluster_nodes(cluster_id):
+                if node_name in node['name']:
+                    assert_equal(node['status'], node_state,
+                                 'Nailgun node status is not %s but %s' % (
+                                     node_state, node['status']))
+
+        # Deploy cluster and run OSTF
+        openstack.update_deploy_check(self,
+                                      dict(conf_no_contrail,
+                                           **conf_contrail),
+                                      is_vsrx=vsrx_setup_result)
+
+        # Check all nodes are 'ready'
+        for node_name in dict(conf_no_contrail, **conf_contrail):
+            check_node_state(self.cluster_id, node_name, 'ready')
+
+        # Shutdown contrail node
+        for node in self.fuel_web.client.list_cluster_nodes(self.cluster_id):
+            if 'slave-06' in node['name']:
+                logger.info('Shutdown node "%s"' % node['name'])
+                self.fuel_web.warm_shutdown_nodes(
+                    self.fuel_web.get_devops_nodes_by_nailgun_nodes([node]))
+                break
+
+        # Run OSTF tests again
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+
+        # Check controller and contrail nodes states
+        node_roles = {'controller', 'contrail-config'}
+        for node_name, roles in conf_no_contrail.items():
+            if node_roles & set(roles):
+                check_node_state(self.cluster_id, node_name, 'ready')
