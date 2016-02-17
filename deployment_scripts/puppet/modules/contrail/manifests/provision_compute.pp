@@ -31,14 +31,4 @@ class contrail::provision_compute {
     creates => '/opt/contrail/provision-vrouter-DONE',
   }
 
-  exec {'no_network_reconfigure':
-    command => 'echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
-    require => Exec['provision-vrouter'],
-  }
-
-  exec {'no_openstack_network_reconfigure':
-    command => 'echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
-    require => Exec['provision-vrouter'],
-  }
-
 }
