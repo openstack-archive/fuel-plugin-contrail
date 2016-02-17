@@ -96,7 +96,7 @@ Verify HA with deleting Contrail roles
 ID
 ##
 
-contrail_ha_with_delete_contrail_node
+contrail_ha_with_shutdown_contrail_node
 
 
 Description
@@ -121,7 +121,7 @@ Steps
     5. Deploy cluster
     6. Run OSTF tests
     7. Check Controller and Contrail nodes status
-    8. Remove one node with 'contrail-db', "contarail-config" and "contrail-control" roles
+    8. Shutdown node with 'contrail-db', "contarail-config" and "contrail-control" roles
     9. Deploy changes
     10. Run OSTF tests
     11. Check Controller and Contrail nodes status
