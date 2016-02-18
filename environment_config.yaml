@@ -40,3 +40,15 @@ attributes:
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid target"
+  hp1g_amount:
+    value: '10'
+    label: 'Hugepages amount (pcs)'
+    description: 'The amount of 1GB hugepages per compute node. NOTE: 1G*N=(ammount of allocated memory)'
+    weight: 130
+    type: 'text'
+  hp2m_amount:
+    value: '1000'
+    label: 'Hugepages amount (pcs)'
+    description: 'The amount of 2M hugepages per compute node. NOTE: 2M*N=(ammount of allocated memory)'
+    weight: 130
+    type: 'text'
