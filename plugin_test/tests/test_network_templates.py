@@ -86,15 +86,7 @@ class TestNetworkTemplates(TestNetworkTemplatesBase, TestBasic):
 
         """
 
-        plugin.prepare_contrail_plugin(
-            self, slaves=9,
-            options={
-                "assert_deny": 0,
-                "tenant": 'netTemplate',
-                "user": 'netTemplate',
-                "password": 'netTemplate'
-            }
-        )
+        plugin.prepare_contrail_plugin(self, slaves=9)
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
