@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,13 +12,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::network (
-  $node_role,
-  $address,
-  $ifname = undef,
-  $netmask,
+class contrail::compute::network {
+ 
+  $node_role = 'compute'
+  $address = $contrail::address
+  $ifname = $contrail::phys_dev
+  $netmask = $contrail::netmask_short
   $default_gw = undef
-  ) {
+
   $br_file = $::operatingsystem ? {
       'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
       'CentOS' => '/etc/sysconfig/network-scripts/ifcfg-br-mesh',
