@@ -14,6 +14,41 @@
 
 class contrail::compute {
 
+  if dpdk_enabled {
+    #To use hugepages we have to upgrade qemu packages
+
+    #The kernel configuration for hugepages
+    kernel_parameter { "hugepagesz":
+      ensure  => present,
+      value   => ["2M"],
+    } ->
+    kernel_parameter { "hugepages":
+      ensure  => present,
+      value   => ["$hp2m_amount"],
+    } ->
+    kernel_parameter { "hugepagesz":
+      ensure  => present,
+      value   => ["1G"],
+    } ->
+    kernel_parameter { "hugepages":
+      ensure  => present,
+      value   => ["$hp1g_amount"],
+    }
+
+    file { '/etc/default/qemu-kvm':
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => 'KVM_HUGEPAGES=1',
+      notify  => Service['libvirtd'],
+    } ->
+    exec { "update_grub":
+      command => "update-grub",
+      refreshonly => true,
+    }
+  }
+
+
   nova_config {
     'DEFAULT/neutron_url': value => "http://${contrail::mos_mgmt_vip}:9696";
     'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
