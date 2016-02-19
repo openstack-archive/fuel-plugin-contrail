@@ -1,7 +1,9 @@
 LOG=/var/log/contrail.log
-CONFIG=/etc/contrail/agent.conf
+CONFIG=/etc/contrail/contrail-vrouter-agent.conf
 prog=/usr/bin/contrail-vrouter-agent
+<%- unless scope.lookupvar('contrail::dpdk_enabled') == true then -%>
 kmod=vrouter
+<%- end -%>
 pname=contrail-vrouter-agent
 LIBDIR=/usr/lib64
 DEVICE=vhost0
