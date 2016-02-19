@@ -58,7 +58,17 @@
   parameters:
     strategy:
       type: parallel
-
+#
+# Compute dpdk feature
+- id: dpdk
+  type: group
+  role: [dpdk]
+  tasks: []
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: parallel
 # Tasks
 # Install Contrail utils, java
 - id: contrail-utils
@@ -253,4 +263,3 @@
     puppet_manifest: puppet/manifests/compute-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-

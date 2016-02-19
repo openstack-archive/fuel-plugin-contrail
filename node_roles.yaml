@@ -8,7 +8,7 @@ contrail-db:
     - controller
     - compute
 
-contrail-config: 
+contrail-config:
   name: Contrail - Config
   description: >
     Contrail config role. Provides IF_MAP, API, Discovery, Schema-transformer components of Contrail.
@@ -29,4 +29,17 @@ contrail-control:
   weight: 100
   conflicts:
     - controller
-    - compute 
+    - compute
+
+dpdk:
+  name: DPDK compute
+  description: >
+    Enable Contrail DPDK feature on compute node. NOTE: Use this role only together with Compute role to enable DPDK feature in other cases it will not have any effect.
+  has_primary: false
+  public_ip_required: false
+  weight: 100
+  conflicts:
+    - controller
+    - contrail-db
+    - contrail-config
+    - contrail-control
