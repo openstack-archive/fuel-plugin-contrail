@@ -35,6 +35,13 @@ class contrail::compute::vrouter {
     ensure  => present,
     content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
   }
+  if contrail::compute_dpdk_enabled {
+    file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
+      ensure  => present,
+      content => template('contrail/contrail-vrouter-dpdk.ini.erb'),
+      require => Class[Contrail::Package],
+    }
+  }
 
   file {'/etc/init.d/fixup-vrouter':
     ensure => present,
@@ -49,7 +56,8 @@ class contrail::compute::vrouter {
     enable    => true,
     subscribe => [Package['contrail-openstack-vrouter','contrail-vrouter-dkms'],
                   File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
-                  '/etc/contrail/contrail-vrouter-nodemgr.conf']
+                  '/etc/contrail/contrail-vrouter-nodemgr.conf',
+                  '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini']
                   ],
   } ~>
   service {'fixup-vrouter':
