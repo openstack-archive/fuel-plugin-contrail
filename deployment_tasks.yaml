@@ -262,6 +262,17 @@
     timeout: 3600
     cwd: /
 
+# Set proper apt pin for Contrail repository
+- id: contrail-repository
+  type: puppet
+  groups: [compute]
+  required_for: [tools]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
   type: puppet
@@ -331,6 +342,18 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Disabled to workaround #1521539
+# Creates aggregate for DPDK
+#- id: controller-aggregate
+#  type: puppet
+#  role: [primary-controller]
+#  required_for: [post_deployment_end]
+#  requires: [controller-hiera-post]
+#  parameters:
+#    puppet_manifest: puppet/manifests/controller-aggregate.pp
+#    puppet_modules: puppet/modules:/etc/puppet/modules
+#    timeout: 120
+
 # Configure other OpenStack Controllers
 - id: openstack-controller-contrail
   type: puppet
@@ -342,11 +365,32 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Congirures DPDK-filter scheduler
+- id: controller-dpdk-scheduler
+  type: puppet
+  role: [primary-controller, controller]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-dpdk.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
 # Workaround for #1550450
 - id: enable_nova_compute_service
   type: skipped
 
-# Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
+# Set apt pin for packeges that need to be override
+- id: contrail-override-repository
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-hugepages]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Configures hugepages kernel settings if dpdk is enabled
 - id: contrail-compute-hugepages
   type: puppet
