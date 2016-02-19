@@ -19,6 +19,11 @@ class contrail::provision::db {
     path     => '/usr/bin:/bin:/sbin',
   }
 
+# VNC config for provision scripts
+  file { '/etc/contrail/vnc_api_lib.ini':
+    content => template('contrail/vnc_api_lib.ini.erb')
+  }
+
   notify {'Waiting for contrail API':} ->
 
   exec {'wait_for_api':

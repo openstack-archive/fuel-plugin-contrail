@@ -40,6 +40,12 @@ attributes:
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid target"
+  contrail_global_dpdk:
+    value: false
+    label: "Enable DPDK feature for this environment."
+    description: "Enable this option to unlock the DPDK feature.\nNOTE: You still have to assign DPDK-role to compute nodes to enable DPDK on them."
+    weight: 70
+    type: "checkbox"
   hugepages_size:
     type: 'select'
     weight: 120
@@ -51,6 +57,9 @@ attributes:
         label: '2M'
       - data: '1024'
         label: "1G"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)
   hugepages_amount:
     value: '10'
     label: 'Hugepages amount (%)'
@@ -60,3 +69,37 @@ attributes:
     regex:
       source: '^[1-9][0-9]?$|^100$'
       error: "Invalid amount of percent"
+    restrictions:
+      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+        action: "hide"
+  vrouter_core_mask:
+    value: "0x3"
+    label: "CPU pinning"
+    description: "Hexadecimal mask that determines how many and what exactly processors will be used for dpdk vrouter"
+    weight: 131
+    type: "text"
+    regex:
+      source: '0[xX][0-9a-fA-F]+'
+      error: "Invalid hexadecimal value"
+    restrictions:
+      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+        action: "hide"
+  install_contrail_nova:
+    value: true
+    label: "Override Nova"
+    description: "Override Nova packages from contrail repository."
+    weight: 140
+    type: "checkbox"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
+  install_contrail_qemu_lv:
+    value: true
+    label: "Override Qemu, Libvirt"
+    description: "Override Qemu and Libvirt packages from contrail repository"
+    weight: 150
+    type: "checkbox"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
+
