@@ -14,9 +14,10 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
-file { '/etc/apt/preferences.d/contrail-pin-110':
-  ensure => file,
-  source => 'puppet:///modules/contrail/contrail-pin-110',
+apt::pin { 'contrail-main':
+  explanation => 'Set priority for common contrail packages',
+  priority    => 200,
+  label       => 'contrail',
 }
 
 # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
