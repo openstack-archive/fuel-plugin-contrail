@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::compute {
+class contrail::compute::nova {
 
   nova_config {
     'DEFAULT/neutron_url': value => "http://${contrail::mos_mgmt_vip}:9696";
@@ -29,32 +29,6 @@ class contrail::compute {
   service { 'nova-compute':
     ensure => running,
     enable => true,
-  }
-
-  $ipv4_file = $::operatingsystem ? {
-      'Ubuntu' => '/etc/iptables/rules.v4',
-      'CentOS' => '/etc/sysconfig/iptables',
-  }
-
-  exec {'flush_nat':
-    command => '/sbin/iptables -t nat -F'
-  } ->
-
-  firewall {'0000 metadata service':
-    source  => '169.254.0.0/16',
-    iniface => 'vhost0',
-    action  => 'accept'
-  } ->
-
-  firewall {'0001 juniper contrail rules':
-    proto  => 'tcp',
-    dport  => ['2049','8085','9090','8102','33617','39704','44177','55970','60663'],
-    action => 'accept'
-  } ->
-
-  exec { 'persist-firewall':
-    command => "/sbin/iptables-save > ${ipv4_file}",
-    user    => 'root',
   }
 
 }
