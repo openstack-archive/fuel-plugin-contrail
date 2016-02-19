@@ -13,22 +13,26 @@
 #    under the License.
 
 class contrail::compute::nova {
-
   nova_config {
-    'DEFAULT/neutron_url': value => "http://${contrail::mos_mgmt_vip}:9696";
-    'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
-    'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
-    'DEFAULT/neutron_admin_tenant_name': value=> 'services';
-    'DEFAULT/neutron_admin_username': value=> 'neutron';
-    'DEFAULT/neutron_admin_password': value=> $contrail::service_token;
-    'DEFAULT/neutron_url_timeout': value=> '300';
-    'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
-    'DEFAULT/security_group_api': value=> 'neutron';
-    'DEFAULT/heal_instance_info_cache_interval': value=> '0';
-  } ~>
+    'DEFAULT/neutron_url':                       value => "http://${contrail::mos_mgmt_vip}:9696";
+    'DEFAULT/neutron_admin_auth_url':            value => "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
+    'DEFAULT/network_api_class':                 value => 'nova.network.neutronv2.api.API';
+    'DEFAULT/neutron_admin_tenant_name':         value => 'services';
+    'DEFAULT/neutron_admin_username':            value => 'neutron';
+    'DEFAULT/neutron_admin_password':            value => $contrail::service_token;
+    'DEFAULT/neutron_url_timeout':               value => '300';
+    'DEFAULT/firewall_driver':                   value => 'nova.virt.firewall.NoopFirewallDriver';
+    'DEFAULT/security_group_api':                value => 'neutron';
+    'DEFAULT/heal_instance_info_cache_interval': value => '0';
+  }
+  if $contrail::compute_dpdk_enabled {
+    nova_config {
+      'CONTRAIL/use_userspace_vhost':            value => true;
+    }
+  }
+  Nova_config <||> ~>
   service { 'nova-compute':
     ensure => running,
     enable => true,
   }
-
 }
