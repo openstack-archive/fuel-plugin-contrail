@@ -1,7 +1,0 @@
-Package: *
-Pin: release l=contrail
-Pin-Priority: 200
-
-Package: iproute2 haproxy libatm1
-Pin: release l=contrail
-Pin-Priority: 1200

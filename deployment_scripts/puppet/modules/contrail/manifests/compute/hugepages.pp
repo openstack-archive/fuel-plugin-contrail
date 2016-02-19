@@ -14,7 +14,7 @@
 
 class contrail::compute::hugepages {
 
-  if $contrail::dpdk_enabled {
+  if $contrail::compute_dpdk_enabled {
     # NOTE: To use hugepages we have to upgrade qemu packages to version 2.4
     # The kernel configuration for hugepages
     Kernel_parameter {
@@ -25,11 +25,9 @@ class contrail::compute::hugepages {
       sysctl::value { 'vm.nr_hugepages':
         value => "${contrail::hugepages_number} ",
       }
-
       kernel_parameter { 'hugepagesz':
         ensure => absent,
       }
-
       kernel_parameter { 'hugepages':
         ensure => absent,
       }
@@ -39,7 +37,6 @@ class contrail::compute::hugepages {
         ensure => present,
         value  => "${contrail::hugepages_size}M",
       } ->
-
       kernel_parameter { 'hugepages':
         ensure => present,
         value  => $contrail::hugepages_size,
@@ -51,8 +48,6 @@ class contrail::compute::hugepages {
         command => 'sysctl -w vm.nr_hugepages=256',
         onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
       }
-
-
       exec { 'reboot_require':
         path    => ['/bin', '/usr/bin'],
         command => 'touch /tmp/contrail-reboot-require',
