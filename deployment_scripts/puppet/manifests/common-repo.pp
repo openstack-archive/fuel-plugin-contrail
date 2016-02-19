@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -26,6 +26,12 @@ case $operatingsystem
     Ubuntu: {
       file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
         ensure => absent,
+      }
+      apt::pin { 'dependency-fix':
+        explanation => 'Temporary fix for contrail analytics',
+        packages    => 'libperl5.18',
+        priority    => 1400,
+        version     => '5.18.2-2ubuntu1.1',
       }
     }
     default: {}
