@@ -21,7 +21,7 @@ class contrail::compute::aggregate {
     }
   }
 
-  if $contrail::dpdk_enabled {
+  if $contrail::global_dpdk_enabled {
 
     $nodes_hash          = hiera('nodes')
     $dpdk_compute_nodes  = nodes_with_roles(['dpdk'], 'fqdn')
