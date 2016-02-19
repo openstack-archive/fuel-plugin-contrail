@@ -234,6 +234,62 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
+<<<<<<< HEAD
+=======
+# Configure default route on contrail nodes
+- id: contrail-default-route
+  type: puppet
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  requires: [post_deployment_start]
+  required_for: [contrail-dns-client]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/configure_default_route.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
+
+# Configure resolver on contrail nodes
+- id: contrail-dns-client
+  type: puppet
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  requires: [contrail-default-route]
+  required_for: [contrail-ntp-client]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/dns/dns-client.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
+
+# Configure ntp client on contrail nodes
+- id: contrail-ntp-client
+  type: puppet
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  requires: [contrail-dns-client]
+  required_for: [post_deployment_end]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/ntp/ntp-client.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
+
+# Set proper apt pin for Contrail repository
+- id: contrail-repository
+  type: puppet
+  groups: [compute]
+  required_for: [tools]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+>>>>>>> 13e758a... DPDK vrouter configuration management
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
   type: puppet
@@ -323,11 +379,32 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Congirures DPDK-filter scheduler
+- id: controller-dpdk-scheduler
+  type: puppet
+  role: [primary-controller, controller]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-dpdk.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
 # Workaround for #1550450
 - id: enable_nova_compute_service
   type: skipped
 
-# Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
+# Set apt pin for packeges that need to be override
+- id: contrail-override-repository
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-hugepages]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Configures hugepages kernel settings if dpdk is enabled
 - id: contrail-compute-hugepages
   type: puppet
