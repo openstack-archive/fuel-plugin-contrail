@@ -75,17 +75,29 @@ class contrail {
 
   # Network configuration
   prepare_network_config($network_scheme)
-  $interface     = get_network_role_property('neutron/mesh', 'interface')
-  $gateway       = $network_scheme['endpoints'][$interface]['gateway']
-  $address       = get_network_role_property('neutron/mesh', 'ipaddr')
-  $cidr          = get_network_role_property('neutron/mesh', 'cidr')
-  $netmask       = get_network_role_property('neutron/mesh', 'netmask')
-  $netmask_short = netmask_to_cidr($netmask)
-  $phys_dev      = get_private_ifname($interface)
+  $interface         = get_network_role_property('neutron/mesh', 'interface')
+  $gateway           = $network_scheme['endpoints'][$interface]['gateway']
+  $address           = get_network_role_property('neutron/mesh', 'ipaddr')
+  $cidr              = get_network_role_property('neutron/mesh', 'cidr')
+  $netmask           = get_network_role_property('neutron/mesh', 'netmask')
+  $netmask_short     = netmask_to_cidr($netmask)
+  $phys_dev          = get_private_ifname($interface)
+  $phys_dev_pci      = get_dev_pci_addr($phys_dev)
+  $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
 
   # DPDK settings
-  $dpdk_enabled      = 'dpdk' in hiera_array('roles')
+  $global_dpdk_enabled  = $settings['contrail_global_dpdk']
+  $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
+  # Package override
+  $install_contrail_nova    = pick($settings['install_contrail_nova'], false)
+  $install_contrail_qemu_lv = pick($settings['install_contrail_qemu_lv'], false )
+  
+  if $install_contrail_qemu_lv {
+    $libvirt_name = 'libvirt-bin'
+  } else {
+    $libvirt_name = 'libvird'
+  }
 
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
   $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
