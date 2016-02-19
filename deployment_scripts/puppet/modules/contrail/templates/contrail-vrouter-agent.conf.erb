@@ -4,6 +4,12 @@ log_file=/var/log/contrail/contrail-vrouter-agent.log
 log_level=SYS_NOTICE
 log_local=1
 headless_mode=true
+<%- if scope.lookupvar('contrail::compute_dpdk_enabled') == true then -%>
+platform=dpdk
+physical_interface_address=<%= scope.lookupvar('contrail::phys_dev_pci') %>
+<% phys_dev_fact = scope.lookupvar('contrail::phys_dev').gsub(/[^a-z0-9_]/i,"_") -%>
+physical_interface_mac=<%= scope.lookupvar("macaddress_#{ phys_dev_fact }") %>
+<%- end -%>
 [DISCOVERY]
 server=<%= scope.lookupvar('contrail::contrail_private_vip') %>
 max_control_nodes=2
