@@ -254,12 +254,48 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 # Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
-- id: compute-config
+- id: contrail-compute-provision
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-network]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+- id: contrail-compute-network
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-nova]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-network.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+- id: contrail-compute-nova
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-firewall]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-nova.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+- id: contrail-compute-firewall
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-vrouter]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-firewall.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+- id: contrail-compute-vrouter
   type: puppet
   role: [compute]
   required_for: [post_deployment_end]
   requires: [post_deployment_start]
   parameters:
-    puppet_manifest: puppet/manifests/compute-config.pp
+    puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
