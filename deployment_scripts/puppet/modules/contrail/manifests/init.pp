@@ -50,10 +50,13 @@ class contrail {
   $admin_tenant   = $admin_settings['tenant']
 
   # Contrail settings
-  $asnum        = $settings['contrail_asnum']
-  $external     = $settings['contrail_external']
-  $route_target = $settings['contrail_route_target']
-  $gateways     = split($settings['contrail_gateways'], ',')
+  $asnum            = $settings['contrail_asnum']
+  $external         = $settings['contrail_external']
+  $route_target     = $settings['contrail_route_target']
+  $gateways         = split($settings['contrail_gateways'], ',')
+  # Hugepages configuration for DPDK vrouter
+  $hugepages_size   = $settings['hugepages_size']
+  $hugepages_amount = $settings['hugepages_amount']
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
