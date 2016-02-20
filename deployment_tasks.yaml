@@ -9,6 +9,7 @@
   parameters:
     strategy:
       type: one_by_one
+
 - id: contrail-db
   type: group
   role: [contrail-db]
@@ -29,6 +30,7 @@
   parameters:
     strategy:
       type: one_by_one
+
 - id: contrail-config
   type: group
   role: [contrail-config]
@@ -49,6 +51,7 @@
   parameters:
     strategy:
       type: one_by_one
+
 - id: contrail-control
   type: group
   role: [contrail-control]
@@ -69,6 +72,7 @@
   parameters:
     strategy:
       type: parallel
+
 # Tasks
 # Install Contrail utils, java
 - id: contrail-utils
@@ -332,6 +336,17 @@
   type: skipped
 
 # Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
+# Configures hugepages kernel settings if dpdk is enabled
+- id: contrail-compute-hugepages
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-provision]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-hugepages.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 - id: contrail-compute-provision
   type: puppet
   role: [compute]
@@ -341,6 +356,7 @@
     puppet_manifest: puppet/manifests/contrail-compute-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 - id: contrail-compute-network
   type: puppet
   role: [compute]
@@ -350,6 +366,7 @@
     puppet_manifest: puppet/manifests/contrail-compute-network.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 - id: contrail-compute-nova
   type: puppet
   role: [compute]
@@ -359,6 +376,7 @@
     puppet_manifest: puppet/manifests/contrail-compute-nova.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 - id: contrail-compute-firewall
   type: puppet
   role: [compute]
@@ -368,12 +386,23 @@
     puppet_manifest: puppet/manifests/contrail-compute-firewall.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 - id: contrail-compute-vrouter
   type: puppet
   role: [compute]
-  required_for: [post_deployment_end]
+  required_for: [post_deployment_end, compute-reboot]
   requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Reboot compute nodes, if it need.
+- id: compute-reboot
+  type: shell
+  role: [compute]
+  required_for: [post_deployment_end]
+  requires: [configure_default_route]
+  parameters:
+    cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
     timeout: 720
