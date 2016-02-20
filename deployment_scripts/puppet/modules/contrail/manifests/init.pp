@@ -55,10 +55,14 @@ class contrail {
   $admin_tenant   = $admin_settings['tenant']
 
   # Contrail settings
-  $asnum        = $settings['contrail_asnum']
-  $external     = $settings['contrail_external']
-  $route_target = $settings['contrail_route_target']
-  $gateways     = split($settings['contrail_gateways'], ',')
+  $asnum            = $settings['contrail_asnum']
+  $external         = $settings['contrail_external']
+  $route_target     = $settings['contrail_route_target']
+  $gateways         = split($settings['contrail_gateways'], ',')
+  # Hugepages configuration for DPDK vrouter
+  $hugepages_size   = pick($settings['hugepages_size'],2)
+  $hugepages_amount = pick($settings['hugepages_amount'],10)
+  $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
@@ -78,6 +82,10 @@ class contrail {
   $netmask       = get_network_role_property('neutron/mesh', 'netmask')
   $netmask_short = netmask_to_cidr($netmask)
   $phys_dev      = get_private_ifname($interface)
+
+  # DPDK settings
+  $dpdk_enabled      = 'dpdk' in hiera_array('roles')
+
 
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
   $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
