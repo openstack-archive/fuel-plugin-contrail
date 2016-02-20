@@ -45,7 +45,7 @@ attributes:
     weight: 120
     value: '2'
     label: 'Hugepage size'
-    description: 'Choose the size of hugepages that will be used for dpdk feature'
+    description: 'Choose the size of hugepages that will be used for dpdk feature. Check if 1GB pages are supported on target compute node. # grep pdpe1gb /proc/cpuinfo | uniq'
     values:
       - data: '2'
         label: '2M'
