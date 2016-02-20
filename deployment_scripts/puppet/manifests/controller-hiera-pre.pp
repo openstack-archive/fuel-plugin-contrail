@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/controller-hiera.pp')
+notice('MODULAR: contrail/controller-hiera-pre.pp')
 
 include contrail
 
@@ -31,18 +31,11 @@ file {'/etc/hiera/override':
   ensure  => directory,
 }
 
-if empty($contrail::nets) {
-# Post-install
-  file { "${hiera_dir}/${plugin_yaml}":
-    ensure  => file,
-    content => template('contrail/plugins.yaml.erb'),
-    require => File['/etc/hiera/override']
-  }
-} else {
-# Pre-install
-  file { "${hiera_dir}/${plugin_yaml}":
-    ensure  => file,
-    content => 'quantum_settings:\n  predefined_networks: []',
-    require => File['/etc/hiera/override']
-  }
+# Pre-deploy
+# Empty predefined_networks to skip OSTF nets creation
+# in openstack-network-controller.pp
+file { "${hiera_dir}/${plugin_yaml}":
+  ensure  => file,
+  content => 'quantum_settings: { predefined_networks: [] }',
+  require => File['/etc/hiera/override']
 }
