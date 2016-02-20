@@ -9,6 +9,7 @@
   parameters:
     strategy:
       type: one_by_one
+
 - id: contrail-db
   type: group
   role: [contrail-db]
@@ -29,6 +30,7 @@
   parameters:
     strategy:
       type: one_by_one
+
 - id: contrail-config
   type: group
   role: [contrail-config]
@@ -49,6 +51,7 @@
   parameters:
     strategy:
       type: one_by_one
+
 - id: contrail-control
   type: group
   role: [contrail-control]
@@ -69,6 +72,7 @@
   parameters:
     strategy:
       type: parallel
+
 # Tasks
 # Install Contrail utils, java
 - id: contrail-utils
@@ -82,6 +86,7 @@
     puppet_manifest: puppet/manifests/contrail-utils.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 # Install Cassandra and wait cluster to bootstrap
 - id: contrail-db-seed
   type: puppet
@@ -92,6 +97,7 @@
     puppet_manifest: puppet/manifests/contrail-db.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
+
 # deploy other Cassandra servers
 - id: contrail-db-bootstrap
   type: puppet
@@ -102,6 +108,7 @@
     puppet_manifest: puppet/manifests/contrail-db.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
+
 # Configure haproxy on OpenStack Controllers
 - id: openstack-haproxy-contrail
   type: puppet
@@ -112,6 +119,7 @@
     puppet_manifest: puppet/manifests/controller-vip.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 # Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
 # this task is performed on one node initially to allow discovery service to start up
 - id: contrail-config-primary
@@ -123,6 +131,7 @@
     puppet_manifest: puppet/manifests/contrail-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+
 # Perform same actions on other contrail-config nodes
 - id: contrail-config-all
   type: puppet
@@ -133,6 +142,7 @@
     puppet_manifest: puppet/manifests/contrail-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+
 # Install and configure Contrail Control Node
 - id: contrail-control-primary
   type: puppet
@@ -143,6 +153,7 @@
     puppet_manifest: puppet/manifests/contrail-control.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+
 # Perform initial Contrail provisioning:
 # provision BGP, encapsulation types and metadata services
 - id: provision-contrail-control
@@ -154,6 +165,7 @@
     puppet_manifest: puppet/manifests/contrail-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+
 # Install other Contrail Control Nodes
 - id: contrail-control-all
   type: puppet
@@ -164,6 +176,7 @@
     puppet_manifest: puppet/manifests/contrail-control.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+
 # Configure default route on contrail nodes
 - id: contrail-default-route
   type: puppet
@@ -177,6 +190,7 @@
     puppet_modules: /etc/puppet/modules
     timeout: 3600
     cwd: /
+
 # Configure resolver on contrail nodes
 - id: contrail-dns-client
   type: puppet
@@ -190,6 +204,7 @@
     puppet_modules: /etc/puppet/modules
     timeout: 3600
     cwd: /
+
 # Configure ntp client on contrail nodes
 - id: contrail-ntp-client
   type: puppet
@@ -203,6 +218,7 @@
     puppet_modules: /etc/puppet/modules
     timeout: 3600
     cwd: /
+
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
   type: puppet
@@ -213,6 +229,7 @@
     puppet_manifest: puppet/manifests/controller-hiera.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
+
 # Create overrides for Hiera on Controllers: contrail-specific predefined_nets
 - id: controller-hiera-post
   type: puppet
@@ -223,6 +240,7 @@
     puppet_manifest: puppet/manifests/controller-hiera.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
+
 # Configuration for Neutron and Heat on Primary OpenStack Controller
 - id: openstack-controller-contrail-primary
   type: puppet
@@ -233,6 +251,7 @@
     puppet_manifest: puppet/manifests/controller-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 # Create networks for ostf-tests and provision route target
 - id: openstack-controller-provision
   type: puppet
@@ -243,6 +262,7 @@
     puppet_manifest: puppet/manifests/controller-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 # Configure other OpenStack Controllers
 - id: openstack-controller-contrail
   type: puppet
@@ -253,8 +273,20 @@
     puppet_manifest: puppet/manifests/controller-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 # Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
 - id: contrail-compute-vrouter
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-hugepages]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Configures hugepages kernel settings if dpdk is enabled
+- id: contrail-compute-hugepages
   type: puppet
   role: [compute]
   required_for: [post_deployment_end, contrail-compute-provision]
@@ -263,6 +295,7 @@
     puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 - id: contrail-compute-provision
   type: puppet
   role: [compute]
@@ -272,6 +305,7 @@
     puppet_manifest: puppet/manifests/contrail-compute-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 - id: contrail-compute-network
   type: puppet
   role: [compute]
@@ -281,6 +315,7 @@
     puppet_manifest: puppet/manifests/contrail-compute-network.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 - id: contrail-compute-nova
   type: puppet
   role: [compute]
@@ -290,6 +325,7 @@
     puppet_manifest: puppet/manifests/contrail-compute-nova.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
 - id: contrail-compute-firewall
   type: puppet
   role: [compute]
