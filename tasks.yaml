@@ -11,6 +11,6 @@
   type: puppet
   stage: pre_deployment
   parameters:
-    puppet_manifest: puppet/manifests/compute-repo.pp
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
