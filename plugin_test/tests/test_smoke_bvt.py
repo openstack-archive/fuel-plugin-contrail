@@ -14,6 +14,7 @@
 
 import os
 import os.path
+import time
 from proboscis import test
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
@@ -141,6 +142,9 @@ class ContrailPlugin(TestBasic):
 
         # deploy cluster
         openstack.deploy_cluster(self)
+
+        # FIXME: remove next line when bug #1516969 will be fixed
+        time.sleep(60*25)
 
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
