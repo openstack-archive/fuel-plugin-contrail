@@ -220,7 +220,7 @@
   type: puppet
   groups: [primary-controller]
   required_for: [openstack-network]
-  requires: [deploy_start]
+  requires: [deploy_start, globals]
   parameters:
     puppet_manifest: puppet/manifests/controller-hiera-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
