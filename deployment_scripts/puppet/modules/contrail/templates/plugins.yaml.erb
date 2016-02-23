@@ -6,6 +6,7 @@ floating_end=scope.function_get_last_ip([external_cidr])
 floating_start=scope.function_get_ip_from_range([external_gw,floating_end,external_netmask,'1','first'])
 %>
 quantum_settings:
+  neutron_agents: ['metadata']
   predefined_networks:
     net04_ext:
       shared: true
