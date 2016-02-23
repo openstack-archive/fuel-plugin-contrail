@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::compute::provision {
+class contrail::provision::compute {
 
   Exec {
     provider => 'shell',
