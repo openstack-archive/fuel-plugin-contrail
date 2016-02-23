@@ -143,8 +143,5 @@ class ContrailPlugin(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        # FIXME: remove next line when bug #1516969 will be fixed
-        time.sleep(60*25)
-
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)

@@ -54,7 +54,8 @@ def deploy_cluster(obj):
     """
     try:
         obj.fuel_web.deploy_cluster_wait(
-            obj.cluster_id, check_services=False)
+            obj.cluster_id, check_services=False,
+            timeout=180 * 60)
     except:
         nailgun_nodes = obj.env.fuel_web.client.list_cluster_nodes(
             obj.env.fuel_web.get_last_created_cluster())
@@ -86,9 +87,6 @@ def update_deploy_check(obj, nodes, delete=False, is_vsrx=True):
                               pending_deletion=delete)
     # deploy cluster
     openstack.deploy_cluster(obj)
-
-    # FIXME: remove next line when bug #1516969 will be fixed
-    time.sleep(60*25)
 
     # Run OSTF tests
     if is_vsrx:

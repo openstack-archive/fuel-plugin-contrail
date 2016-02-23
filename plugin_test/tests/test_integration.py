@@ -368,9 +368,6 @@ class IntegrationTests(TestBasic):
 
         openstack.deploy_cluster(self)
 
-        # FIXME: remove next line when bug #1516969 will be fixed
-        time.sleep(60*25)
-
         # TODO
         # Tests using north-south connectivity are expected to fail because
         # they require additional gateway nodes, and specific contrail
@@ -494,9 +491,6 @@ class IntegrationTests(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
-        # FIXME: remove next line when bug #1516969 will be fixed
-        time.sleep(60*25)
-
         # run OSTF tests
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
@@ -545,9 +539,6 @@ class IntegrationTests(TestBasic):
 
         # deploy cluster
         openstack.deploy_cluster(self)
-
-        # FIXME: remove next line when bug #1516969 will be fixed
-        time.sleep(60*25)
 
         # run OSTF tests
         if vsrx_setup_result:
@@ -606,9 +597,6 @@ class IntegrationTests(TestBasic):
 
         # deploy cluster
         openstack.deploy_cluster(self)
-
-        # FIXME: remove next line when bug #1516969 will be fixed
-        time.sleep(60*25)
 
         # run OSTF tests
         if vsrx_setup_result:
