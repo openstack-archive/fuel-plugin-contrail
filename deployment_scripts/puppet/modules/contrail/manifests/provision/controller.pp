@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::provision_controller {
+class contrail::provision::controller {
 
 contrail::create_network{$contrail::private_net:
   netdata  => $contrail::nets[$contrail::private_net],
