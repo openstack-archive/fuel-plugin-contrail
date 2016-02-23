@@ -63,6 +63,9 @@ class contrail::controller {
     'QUOTAS/quota_subnet': value => '-1';
     'QUOTAS/quota_port': value => '-1';
   } ->
+  file { '/etc/contrail/vnc_api_lib.ini':
+    content => template('contrail/vnc_api_lib.ini.erb')
+  } ->
   file {'/etc/neutron/plugins/opencontrail/ContrailPlugin.ini':
     content => template('contrail/ContrailPlugin.ini.erb'),
   } ->
@@ -96,7 +99,7 @@ class contrail::controller {
   $ceilometer_enabled = $contrail::ceilometer_hash['enabled']
 
   if ($ceilometer_enabled) {
-    # package { 'ceilometer-plugin-contrail': } ->
+    package { 'ceilometer-plugin-contrail': } ->
     file {'/etc/ceilometer/pipeline.yaml':
       ensure  => file,
       content => template('contrail/pipeline.yaml.erb'),
