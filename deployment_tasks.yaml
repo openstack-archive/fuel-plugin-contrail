@@ -218,7 +218,7 @@
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
   type: puppet
-  groups: [primary-controller]
+  groups: [primary-controller,controller]
   required_for: [openstack-network]
   requires: [deploy_start, globals]
   parameters:
@@ -229,7 +229,7 @@
 # Create overrides for Hiera on Controllers: contrail-specific predefined_nets
 - id: controller-hiera-post
   type: puppet
-  role: [primary-controller]
+  role: [primary-controller,controller]
   required_for: [post_deployment_end]
   requires: [post_deployment_start]
   parameters:
