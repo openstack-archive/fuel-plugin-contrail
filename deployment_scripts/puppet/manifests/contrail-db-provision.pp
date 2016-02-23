@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-provision.pp')
+notice('MODULAR: contrail/contrail-db-provision.pp')
 
 include contrail
-class { 'contrail::provision_contrail': }
+class { 'contrail::provision::db': }

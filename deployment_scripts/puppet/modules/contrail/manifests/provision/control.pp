@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::provision_contrail {
+class contrail::provision::control {
 
   Exec {
     provider => 'shell',
@@ -31,7 +31,7 @@ class contrail::provision_contrail {
   }
 
   notify {'Waiting for contrail API':} ->
-  
+
   exec {'wait_for_api':
     command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
 then exit 1; fi",
@@ -39,30 +39,19 @@ then exit 1; fi",
     try_sleep => 10,
   } ->
 
-  contrail::provision::prov_ext_bgp { $contrail::gateways:
-    require  => Exec['wait_for_api'],
-  } ->
-
-  exec { 'prov_metadata_services':
-    command => "python /opt/contrail/utils/provision_linklocal.py \
+  exec { 'prov_control_bgp':
+    command => "python /opt/contrail/utils/provision_control.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
---oper add \
---linklocal_service_name metadata --linklocal_service_ip 169.254.169.254 --linklocal_service_port 80 \
---ipfabric_service_ip ${contrail::mos_mgmt_vip} --ipfabric_service_port 8775  \
---admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' \
-&& touch /opt/contrail/prov_metadata_service-DONE",
-    require => Exec['wait_for_api'],
-    creates => '/opt/contrail/prov_metadata_service-DONE',
-  } ->
+--oper add --host_name ${::fqdn} --host_ip ${contrail::address} --router_asn ${contrail::asnum} \
+--admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
+&& touch /opt/contrail/prov_control_bgp-DONE",
+    creates => '/opt/contrail/prov_control_bgp-DONE',
+  }
 
-  exec { 'prov_encap_type':
-      command => "python /opt/contrail/utils/provision_encap.py \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
---oper add --encap_priority MPLSoUDP,MPLSoGRE,VXLAN \
---admin_user ${contrail::admin_username} --admin_password '${contrail::admin_password}' \
-&& touch /opt/contrail/prov_encap_type-DONE",
-    require => Exec['wait_for_api'],
-    creates => '/opt/contrail/prov_encap_type-DONE',
+  if $contrail::node_role == 'primary-contrail-config' {
+    contrail::provision::prov_ext_bgp { $contrail::gateways:
+      require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
+    }
   }
 
 }
