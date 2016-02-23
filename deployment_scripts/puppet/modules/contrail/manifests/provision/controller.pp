@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::provision_controller {
+class contrail::provision::controller {
 
 contrail::create_network{$contrail::private_net:
   netdata  => $contrail::nets[$contrail::private_net],
@@ -23,11 +23,15 @@ contrail::create_network{$contrail::floating_net:
   notify  => Exec['prov_route_target'],
 } ->
 
-neutron_router{$contrail::default_router:
-  ensure           => present,
-  internal_network => $contrail::private_net,
-  external_network => $contrail::floating_net,
-  tenant_name      => $contrail::admin_tenant
+neutron_router { $contrail::default_router:
+  ensure               => 'present',
+  gateway_network_name => $contrail::floating_net,
+  name                 => $contrail::default_router,
+  tenant_name          => $contrail::admin_tenant,
+} ->
+
+neutron_router_interface { "${contrail::default_router}:${contrail::private_net}__subnet":
+  ensure => 'present',
 }
 
 exec { 'prov_route_target':
