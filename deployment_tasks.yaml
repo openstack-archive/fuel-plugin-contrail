@@ -128,6 +128,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
+# Provision Primary Control config
+- id: contrail-config-provision-primary
+  type: puppet
+  groups: [primary-contrail-config]
+  required_for: [deploy_end]
+  requires: [contrail-config-primary]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
 # Perform same actions on other contrail-config nodes
 - id: contrail-config-all
   type: puppet
@@ -136,6 +147,17 @@
   requires: [contrail-utils]
   parameters:
     puppet_manifest: puppet/manifests/contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+# Provision Control config
+- id: contrail-config-provision
+  type: puppet
+  groups: [contrail-config]
+  required_for: [deploy_end]
+  requires: [contrail-config-all]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
@@ -150,15 +172,14 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
-# Perform initial Contrail provisioning:
-# provision BGP, encapsulation types and metadata services
-- id: provision-contrail-control
+# Provision Primary Contrail control
+- id: contrail-control-provision-primary
   type: puppet
   groups: [primary-contrail-control]
   required_for: [deploy_end]
-  requires: [contrail-control-all]
+  requires: [contrail-control-primary]
   parameters:
-    puppet_manifest: puppet/manifests/contrail-provision.pp
+    puppet_manifest: puppet/manifests/contrail-control-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
@@ -170,6 +191,28 @@
   requires: [contrail-utils]
   parameters:
     puppet_manifest: puppet/manifests/contrail-control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+# Provision Contrail control
+- id: contrail-control-provision
+  type: puppet
+  groups: [contrail-control]
+  required_for: [deploy_end]
+  requires: [contrail-control-all]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-control-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+# Provision Control db
+- id: contrail-db-provision
+  type: puppet
+  role: [primary-contrail-db,contrail-db]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-db-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
@@ -267,7 +310,7 @@
   type: puppet
   role: [primary-controller]
   required_for: [post_deployment_end]
-  requires: [openstack-network-networks]
+  requires: [openstack-controller-contrail-primary]
   parameters:
     puppet_manifest: puppet/manifests/controller-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
