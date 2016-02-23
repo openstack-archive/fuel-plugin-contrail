@@ -74,9 +74,6 @@ class contrail {
   $contrail_private_vip = $network_metadata['vips']['contrail_priv']['ipaddr']
   $contrail_mgmt_vip    = $contrail_private_vip
 
-  $disabled_services = ['neutron-plugin-openvswitch-agent','neutron-dhcp-agent',
-                        'neutron-metadata-agent','neutron-l3-agent']
-
   # Settings for RabbitMQ on contrail controllers
   $rabbit             = hiera('rabbit')
   $rabbit_password    = $rabbit['password']
