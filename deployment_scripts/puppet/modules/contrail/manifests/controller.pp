@@ -99,7 +99,7 @@ class contrail::controller {
   $ceilometer_enabled = $contrail::ceilometer_hash['enabled']
 
   if ($ceilometer_enabled) {
-    package { 'ceilometer-plugin-contrail': } ->
+    # package { 'ceilometer-plugin-contrail': } ->
     file {'/etc/ceilometer/pipeline.yaml':
       ensure  => file,
       content => template('contrail/pipeline.yaml.erb'),
