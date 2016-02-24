@@ -282,3 +282,49 @@ class IntegrationTests(TestBasic):
 
         openstack.update_deploy_check(self, conf_control,
                                       is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_add_config"])
+    @log_snapshot_after_test
+    def contrail_add_config(self):
+        """Verify that Contrail config role can be added after deploying
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add some controller, compute nodes
+            4. Add 1 node with "contrail-control", "contrail-config"
+               and "contrail-db" roles
+            5. Deploy cluster
+            6. Run OSTF tests
+            7. Check Controller and Contrail nodes status
+            8. Add one node with "contrail-config" role
+            9. Deploy changes
+            10. Run OSTF tests
+            11. Check Controller and Contrail nodes status
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        conf_nodes = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute'],
+            'slave-03': ['contrail-control',
+                         'contrail-config',
+                         'contrail-db'],
+        }
+        conf_config = {'slave-04': ['contrail-config']}
+
+        openstack.update_deploy_check(self, conf_nodes,
+                                      is_vsrx=vsrx_setup_result)
+
+        openstack.update_deploy_check(self, conf_config,
+                                      is_vsrx=vsrx_setup_result)
+
