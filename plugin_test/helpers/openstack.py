@@ -13,10 +13,11 @@
 #    under the License.
 
 import time
+from devops.helpers.helpers import wait
 from fuelweb_test import logger
 from fuelweb_test.settings import DEPLOYMENT_MODE
 from fuelweb_test.helpers.checkers import check_repo_managment
-import openstack
+from . import settings
 
 
 def assign_net_provider(obj, **options):
@@ -34,7 +35,7 @@ def assign_net_provider(obj, **options):
         "ceilometer": False,
     }
 
-    if not "assert_deny" in options:
+    if "assert_deny" not in options:
         assert all(p in default_settings.keys() for p in options), \
             'Invalid params for func %s' % options
     else:
@@ -48,13 +49,14 @@ def assign_net_provider(obj, **options):
     return obj.cluster_id
 
 
-def deploy_cluster(obj):
+def deploy_cluster(obj, wait_for_status='operational'):
     """
     Deploy cluster with additional time for waiting on node's availability
     """
     try:
         obj.fuel_web.deploy_cluster_wait(
-            obj.cluster_id, check_services=False)
+            obj.cluster_id, check_services=False,
+            timeout=180 * 60)
     except:
         nailgun_nodes = obj.env.fuel_web.client.list_cluster_nodes(
             obj.env.fuel_web.get_last_created_cluster())
@@ -63,6 +65,9 @@ def deploy_cluster(obj):
             check_repo_managment(
                 obj.env.d_env.get_ssh_to_remote(n['ip']))
             logger.info('ip is {0}'.format(n['ip'], n['name']))
+    if wait_for_status:
+        wait_for_cluster_status(obj, obj.cluster_id,
+                                status=wait_for_status)
 
 
 def assign_vlan(obj, **interface_tags):
@@ -85,11 +90,39 @@ def update_deploy_check(obj, nodes, delete=False, is_vsrx=True):
                               pending_addition=not delete,
                               pending_deletion=delete)
     # deploy cluster
-    openstack.deploy_cluster(obj)
-
-    # FIXME: remove next line when bug #1516969 will be fixed
-    time.sleep(60*25)
+    deploy_cluster(obj)
 
     # Run OSTF tests
     if is_vsrx:
         obj.fuel_web.run_ostf(cluster_id=obj.cluster_id)
+
+
+def wait_for_cluster_status(obj, cluster_id,
+                            status='operational',
+                            timeout=settings.DEPLOY_CLUSTER_TIMEOUT):
+    """Wait for cluster status until timeout is reached.
+        :param obj: Test case object, usually it is 'self'
+        :param cluster_id: cluster identifier
+        :param status: Cluster status, available values:
+
+          - new
+          - deployment
+          - stopped
+          - operational
+          - error
+          - remove
+          - update
+          - update_error
+        :param timeout: the time that we are waiting.
+        :return: time that we are actually waited.
+
+    """
+    def check_func():
+        for c in obj.fuel_web.client.list_clusters():
+            if c['id'] == cluster_id and c['status'] == status:
+                return True
+        return False
+    wtime = wait(check_func, interval=30, timeout=timeout)
+    logger.info('Wait cluster id:"{}" deploy done in {}sec.'.format(cluster_id,
+                                                                    wtime))
+    return wtime

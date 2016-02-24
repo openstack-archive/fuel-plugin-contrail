@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,9 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+notice('MODULAR: contrail/contrail-compute-provision.pp')
 
-import os
-
-VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH', False)
-
-DEPLOY_CLUSTER_TIMEOUT = 60*25  # 25 minutes
+include contrail
+class { 'contrail::compute::provision': }

@@ -55,7 +55,7 @@ class TestNetworkTemplates(TestNetworkTemplatesBase, TestBasic):
         else:
             raise Exception('Cannot find network template')
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_net_template"])
     @log_snapshot_after_test
     def contrail_net_template(self):
@@ -86,7 +86,7 @@ class TestNetworkTemplates(TestNetworkTemplatesBase, TestBasic):
 
         """
 
-        plugin.prepare_contrail_plugin(self, slaves=9)
+        plugin.prepare_contrail_plugin(self, slaves=5)
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
