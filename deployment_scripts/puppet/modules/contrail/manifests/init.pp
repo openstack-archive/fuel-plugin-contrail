@@ -54,10 +54,16 @@ class contrail {
   $external         = $settings['contrail_external']
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
-  # Hugepages configuration for DPDK vrouter
-  $hugepages_size   = $settings['hugepages_size']
-  $hugepages_amount = $settings['hugepages_amount']
-  $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
+
+  # DPDK settings
+  $global_dpdk       = $settings['contrail_global_dpdk']
+  if $global_dpdk {
+    $dpdk_enabled      = 'dpdk' in hiera_array('roles')
+    # Hugepages configuration for DPDK vrouter
+    $hugepages_size   = $settings['hugepages_size']
+    $hugepages_amount = $settings['hugepages_amount']
+    $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
+  }
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
@@ -72,8 +78,6 @@ class contrail {
   $netmask_short = netmask_to_cidr($netmask)
   $phys_dev      = get_private_ifname($interface)
 
-  # DPDK settings
-  $dpdk_enabled      = 'dpdk' in hiera_array('roles')
 
 
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']

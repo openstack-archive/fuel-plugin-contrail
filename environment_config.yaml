@@ -40,6 +40,12 @@ attributes:
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid target"
+  contrail_global_dpdk:
+    value: false
+    label: "Enable DPDK feature for this environment."
+    description: "Enable this option to unlock the DPDK feature.\nNOTE: You still have to assign DPDK-role to compute nodes to enable DPDK on them."
+    weight: 70
+    type: "checkbox"
   hugepages_size:
     type: 'select'
     weight: 120
@@ -51,8 +57,11 @@ attributes:
         label: '2M'
       - data: '1024'
         label: "1G"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)
   hugepages_amount:
-    value: '0'
+    value: '10'
     label: 'Hugepages amount (%)'
     description: 'The amount of memory allocated on each compute-node for hugepages in percent'
     weight: 130
@@ -60,3 +69,6 @@ attributes:
     regex:
       source: '^[1-9][0-9]?$|^100$'
       error: "Invalid amount of percent"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
