@@ -36,6 +36,6 @@ file {'/etc/hiera/override':
 # in openstack-network-controller.pp
 file { "${hiera_dir}/${plugin_yaml}":
   ensure  => file,
-  content => 'quantum_settings: { predefined_networks: [] }',
+  content => 'quantum_settings: { neutron_agents: [], predefined_networks: [] }',
   require => File['/etc/hiera/override']
 }

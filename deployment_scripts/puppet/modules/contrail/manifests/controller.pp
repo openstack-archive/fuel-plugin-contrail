@@ -92,9 +92,6 @@ class contrail::controller {
     require    => Package['contrail-heat'],
   }
 
-# Disable neutron agents
-  contrail::pcs_delete_resource { $contrail::disabled_services: }
-
 # Contrail-specific ceilometer settings
   $ceilometer_enabled = $contrail::ceilometer_hash['enabled']
 
