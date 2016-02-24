@@ -13,65 +13,61 @@
 #    under the License.
 
 class contrail::compute::hugepages {
-
-  if $contrail::dpdk_enabled {
-    # NOTE: To use hugepages we have to upgrade qemu packages to version 2.4
-    # The kernel configuration for hugepages
-    Kernel_parameter {
-      provider => 'grub2',
-    }
-
-    if $contrail::hugepages_size == 2 {
-      sysctl::value { 'vm.nr_hugepages':
-        value => "${contrail::hugepages_number} ",
+  if $contrail::global_dpdk {
+    if $contrail::dpdk_enabled {
+      # NOTE: To use hugepages we have to upgrade qemu packages to version 2.4
+      # The kernel configuration for hugepages
+      Kernel_parameter {
+        provider => 'grub2',
       }
 
-      kernel_parameter { 'hugepagesz':
-        ensure => absent,
+      if $contrail::hugepages_size == 2 {
+        sysctl::value { 'vm.nr_hugepages':
+          value => "${contrail::hugepages_number} ",
+        }
+        kernel_parameter { 'hugepagesz':
+          ensure => absent,
+        }
+        kernel_parameter { 'hugepages':
+          ensure => absent,
+        }
+      }
+      elsif $contrail::hugepages_size == 1024 {
+        kernel_parameter { 'hugepagesz':
+          ensure => present,
+          value  => "${contrail::hugepages_size}M",
+        } ->
+        kernel_parameter { 'hugepages':
+          ensure => present,
+          value  => $contrail::hugepages_size,
+        }
+
+        #This need for vrouter start when 1Gb hugepages not enabled yet
+        exec { 'temporary_add_hugepages':
+          path    => ['/sbin', '/usr/bin'],
+          command => 'sysctl -w vm.nr_hugepages=256',
+          onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
+        }
+        exec { 'reboot_require':
+          path    => ['/bin', '/usr/bin'],
+          command => 'touch /tmp/contrail-reboot-require',
+          onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
+        }
       }
 
-      kernel_parameter { 'hugepages':
-        ensure => absent,
-      }
-    }
-    elsif $contrail::hugepages_size == 1024 {
-      kernel_parameter { 'hugepagesz':
-        ensure => present,
-        value  => "${contrail::hugepages_size}M",
-      } ->
-
-      kernel_parameter { 'hugepages':
-        ensure => present,
-        value  => $contrail::hugepages_size,
+      file { '/etc/default/qemu-kvm':
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0644',
+        content => 'KVM_HUGEPAGES=1',
+        notify  => Service['libvirtd'],
       }
 
-      #This need for vrouter start when 1Gb hugepages not enabled yet
-      exec { 'temporary_add_hugepages':
-        path    => ['/sbin', '/usr/bin'],
-        command => 'sysctl -w vm.nr_hugepages=256',
-        onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
+      service { 'libvirtd':
+        ensure    => running,
+        enable    => true,
+        subscribe => File['/etc/default/qemu-kvm'],
       }
-
-
-      exec { 'reboot_require':
-        path    => ['/bin', '/usr/bin'],
-        command => 'touch /tmp/contrail-reboot-require',
-        onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
-      }
-    }
-
-    file { '/etc/default/qemu-kvm':
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => 'KVM_HUGEPAGES=1',
-      notify  => Service['libvirtd'],
-    }
-
-    service { 'libvirtd':
-      ensure    => running,
-      enable    => true,
-      subscribe => File['/etc/default/qemu-kvm'],
     }
   }
 }
