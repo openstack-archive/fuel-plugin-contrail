@@ -328,3 +328,49 @@ class IntegrationTests(TestBasic):
         openstack.update_deploy_check(self, conf_config,
                                       is_vsrx=vsrx_setup_result)
 
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_delete_conrol"])
+    @log_snapshot_after_test
+    def contrail_delete_conrol(self):
+        """Verify that Contrail control role can be deleted after deploying
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add some controller, compute nodes
+            4. Add 1 node with "contrail-control", "contrail-config" and
+               "contrail-db" roles and 1 node with "contrail-control" role
+            5. Deploy cluster
+            6. Run OSTF tests
+            7. Check Controller and Contrail nodes status
+            8. Delete one "contrail-control" role
+            9. Deploy changes
+            10. Run OSTF tests
+            11. Check Controller and Contrail nodes status
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        conf_no_control = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute'],
+            'slave-03': ['contrail-control',
+                         'contrail-config',
+                         'contrail-db'],
+            # Here slave-4
+        }
+        conf_control = {'slave-04': ['contrail-control']}
+
+        openstack.update_deploy_check(self,
+                                      dict(conf_no_control, **conf_control),
+                                      is_vsrx=vsrx_setup_result)
+        openstack.update_deploy_check(self,
+                                      conf_control, delete=True,
+                                      is_vsrx=vsrx_setup_result)
