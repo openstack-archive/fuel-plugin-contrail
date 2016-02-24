@@ -25,11 +25,9 @@ class contrail::compute::hugepages {
       sysctl::value { 'vm.nr_hugepages':
         value => "${contrail::hugepages_number} ",
       }
-
       kernel_parameter { 'hugepagesz':
         ensure => absent,
       }
-
       kernel_parameter { 'hugepages':
         ensure => absent,
       }
@@ -39,7 +37,6 @@ class contrail::compute::hugepages {
         ensure => present,
         value  => "${contrail::hugepages_size}M",
       } ->
-
       kernel_parameter { 'hugepages':
         ensure => present,
         value  => $contrail::hugepages_size,
@@ -51,8 +48,6 @@ class contrail::compute::hugepages {
         command => 'sysctl -w vm.nr_hugepages=256',
         onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
       }
-
-
       exec { 'reboot_require':
         path    => ['/bin', '/usr/bin'],
         command => 'touch /tmp/contrail-reboot-require',
@@ -67,7 +62,6 @@ class contrail::compute::hugepages {
       content => 'KVM_HUGEPAGES=1',
       notify  => Service['libvirtd'],
     }
-
     service { 'libvirtd':
       ensure    => running,
       enable    => true,

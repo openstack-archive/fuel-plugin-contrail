@@ -59,6 +59,10 @@ class contrail {
   $hugepages_amount = $settings['hugepages_amount']
   $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
+  # DPDK settings
+  $global_dpdk_enabled  = $settings['contrail_global_dpdk']
+  $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
+
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
 
