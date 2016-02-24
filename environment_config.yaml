@@ -13,6 +13,9 @@ attributes:
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid AS number"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true)
   contrail_gateways:
     value: '10.109.3.250'
     label: 'GW IP'
@@ -22,6 +25,9 @@ attributes:
     regex:
       source: '^(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:,\s*(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})*$'
       error: "Invalid IP address list"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true)
   contrail_external:
     value: '10.100.1.0/24'
     label: 'External IP CIDR'
@@ -31,6 +37,9 @@ attributes:
     regex:
       source: '^(?:(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2]\d|3[0-2])$'
       error: "Invalid CIDR"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true)
   contrail_route_target:
     value: '10000'
     label: 'Route Target'
@@ -40,6 +49,18 @@ attributes:
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid target"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true)
+  contrail_global_dpdk:
+    value: false
+    label: "Enable DPDK feature for this environment."
+    description: "Enable this option to unlock the DPDK feature.\nNOTE: You still have to assign DPDK-role to compute nodes to enable DPDK on them."
+    weight: 10
+    type: "checkbox"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true)
   hugepages_size:
     type: 'select'
     weight: 120
@@ -51,6 +72,9 @@ attributes:
         label: '2M'
       - data: '1024'
         label: "1G"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.enabled == true)
   hugepages_amount:
     value: '0'
     label: 'Hugepages amount (%)'
@@ -60,3 +84,6 @@ attributes:
     regex:
       source: '^[1-9][0-9]?$|^100$'
       error: "Invalid amount of percent"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.enabled == true)
