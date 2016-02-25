@@ -52,7 +52,7 @@ attributes:
       - data: '1024'
         label: "1G"
   hugepages_amount:
-    value: '0'
+    value: '10'
     label: 'Hugepages amount (%)'
     description: 'The amount of memory allocated on each compute-node for hugepages in percent'
     weight: 130
