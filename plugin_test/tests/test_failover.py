@@ -64,6 +64,6 @@ class FailoverTests(TestBasic):
                 'slave-03': ['contrail-db']
             })
 
-        openstack.deploy_cluster(self)
+        openstack.deploy_cluster(self, wait_for_status='error')
         cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
         assert_equal(cluster_info['status'], 'error'), "Error was expected"
