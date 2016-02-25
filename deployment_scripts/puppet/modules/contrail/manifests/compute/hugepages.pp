@@ -14,7 +14,7 @@
 
 class contrail::compute::hugepages {
 
-  if $contrail::dpdk_enabled {
+  if $contrail::compute_dpdk_enabled {
     # NOTE: To use hugepages we have to upgrade qemu packages to version 2.4
     # The kernel configuration for hugepages
     Kernel_parameter {
