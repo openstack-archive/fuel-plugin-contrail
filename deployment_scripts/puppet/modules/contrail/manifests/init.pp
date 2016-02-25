@@ -54,6 +54,8 @@ class contrail {
   $external         = $settings['contrail_external']
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
+  $external_lb      = $settings['external_lb']
+  $external_lb_ip   = $settings['external_lb_ip']
   # Hugepages configuration for DPDK vrouter
   $hugepages_size   = $settings['hugepages_size']
   $hugepages_amount = $settings['hugepages_amount']
