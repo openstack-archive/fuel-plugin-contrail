@@ -60,3 +60,22 @@ attributes:
     regex:
       source: '^[1-9][0-9]?$|^100$'
       error: "Invalid amount of percent"
+  external_lb:
+    label: "External load-balancer"
+    value: false
+    description: "Use external load-balancer for Contrail services"
+    weight: 140
+    type: "checkbox"
+  external_lb_ip:
+    value: '10.109.2.250'
+    label: 'External load-balancer IP'
+    description: 'Management IP of external LB'
+    weight: 145
+    type: "text"
+    restrictions:
+      - condition: "settings:contrail.external_lb.value != 'true'"
+        action: "disable"
+    regex:
+      source: '^(?:(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+      error: "Invalid IP"
+
