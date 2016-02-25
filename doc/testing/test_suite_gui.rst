@@ -44,8 +44,8 @@ Expected results
 Contrail Plugin Configure Checkboxes are available
 
 
-Check that Contrail UI settings fields are correct  in the Settings tab of the Fuel web UI
-------------------------------------------------------------------------------------------
+Check that Contrail UI settings fields are correct in the Settings tab of the Fuel web UI
+-----------------------------------------------------------------------------------------
 
 
 ID
@@ -88,3 +88,80 @@ Expected results
 
 Appropriate error message should appear in 11 and 12 steps
 
+
+Verify HTTPS on Contrail with selected TLS for OPenStack public endpoints
+-------------------------------------------------------------------------
+
+
+ID
+##
+
+https_TLS_selected
+
+
+Description
+###########
+
+Verify HTTPS on Contrail with selected TLS for OPenStack public endpoints
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Deploy Contrail cluster with selected TLS for OPenStack public endpoints
+    2. Login as admin to Openstack Horizon UI
+    3. Get fingerprints from certificate viewer
+    4. Login as admin to Contrail UI
+    5. Get fingerprints
+    6. Verify that keys from Horizon and Contrail UIs are identical
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Verify HTTPS on Contrail with deselected TLS for OPenStack public endpoints
+---------------------------------------------------------------------------
+
+
+ID
+##
+
+https_TLS_deselected
+
+
+Description
+###########
+
+Verify HTTPS on Contrail with deselected TLS for OPenStack public endpoints
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Deploy Contrail cluster with deselected TLS for OPenStack public endpoints
+    2. Login as admin to Openstack Horizon UI
+    3. Get fingerprints from certificate viewer
+    4. Login as admin to Contrail UI
+    5. Get fingerprints
+    6. Verify that keys from Horizon and Contrail UIs are different
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
