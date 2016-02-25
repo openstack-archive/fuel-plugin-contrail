@@ -154,17 +154,6 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
-# Provision Control db
-- id: contrail-db-provision
-  type: puppet
-  groups: [primary-contrail-db,contrail-db]
-  required_for: [deploy_end]
-  requires: [contrail-config-all]
-  parameters:
-    puppet_manifest: puppet/manifests/contrail-db-provision.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 1440
-
 # Install and configure Contrail Control Node
 - id: contrail-control-primary
   type: puppet
@@ -195,6 +184,17 @@
   requires: [contrail-control-all]
   parameters:
     puppet_manifest: puppet/manifests/contrail-control-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+# Provision Control db
+- id: contrail-db-provision
+  type: puppet
+  role: [primary-contrail-db,contrail-db]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_end]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-db-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
