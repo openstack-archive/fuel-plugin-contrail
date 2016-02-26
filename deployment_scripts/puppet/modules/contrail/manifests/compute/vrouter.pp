@@ -35,7 +35,7 @@ class contrail::compute::vrouter {
     ensure  => present,
     content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
   }
-  if contrail::compute_dpdk_enabled {
+  if $contrail::compute_dpdk_enabled {
     file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
       ensure  => present,
       content => template('contrail/contrail-vrouter-dpdk.ini.erb'),

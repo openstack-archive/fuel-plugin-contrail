@@ -26,7 +26,7 @@ class contrail::provision::compute {
     ensure => 'directory',
   }
 
-  if contrail::compute_dpdk_enabled {
+  if $contrail::compute_dpdk_enabled {
     exec { 'provision-vrouter':
       command => "contrail-provision-vrouter \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::mos_mgmt_vip} \
