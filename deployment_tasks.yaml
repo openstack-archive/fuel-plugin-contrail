@@ -192,7 +192,7 @@
   type: puppet
   role: [primary-contrail-db,contrail-db]
   required_for: [post_deployment_end]
-  requires: [post_deployment_end]
+  requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-db-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
