@@ -55,9 +55,16 @@ class contrail {
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
   # Hugepages configuration for DPDK vrouter
-  $hugepages_size   = pick($settings['hugepages_size'],2)
-  $hugepages_amount = pick($settings['hugepages_amount'],10)
+  $hugepages_size   = $settings['hugepages_size']
+  $hugepages_amount = $settings['hugepages_amount']
   $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
+
+  # SRIOV settings
+  $global_sriov_enabled  = $settings['contrail_global_sriov']
+  $compute_sriov_enabled = $global_sriov_enabled and 'sriov' in hiera_array('roles')
+  $sriov_physnet         = $settings['sriov_physnet']
+  $passthrough_whitelist = inline_template(
+    '<%= "[" + eval(scope.lookupvar("::sriov_devices")).map{ |dev, _| "{\"devname\":\"#{dev}\", \"physical_network\":\"#{sriov_physnet}\"}" }.join(", ") + "]" %>')
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
