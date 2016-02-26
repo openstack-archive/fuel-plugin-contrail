@@ -81,4 +81,22 @@ attributes:
     restrictions:
       - action: hide
         condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
-
+  contrail_global_sriov:
+    value: false
+    label: "Enable SRIOV feature for this environment."
+    description: >
+      Enable this option to unlock the SRIOV feature.
+      NOTE: You still have to assign SRIOV-role to compute nodes to enable SRIOV on them.
+    weight: 150
+    type: "checkbox"
+  sriov_devices:
+    value: ''
+    label: 'JSON with device names, number of VFs and physical net'
+    description: >
+      This devices will provide SRIOV Virtual Functions.
+      Example: { "device_name" : {"physnet" : "physnet_name"}}
+    weight: 160
+    type: 'text'
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.contrail_global_sriov.value == true)
