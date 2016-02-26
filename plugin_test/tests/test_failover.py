@@ -67,3 +67,69 @@ class FailoverTests(TestBasic):
         openstack.deploy_cluster(self, wait_for_status='error')
         cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
         assert_equal(cluster_info['status'], 'error'), "Error was expected"
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+          groups=["cannot_deploy_only_contrail_config"])
+    @log_snapshot_after_test
+    def cannot_deploy_only_contrail_config(self):
+        """Check can not deploy Contrail cluster with "contrail_config" only
+
+        Scenario:
+            1. Create an environment with
+               "Neutron with tunneling segmentation"
+               as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add 1 node with "Controller" and 1 node with "Compute" role
+            4. Add 1 nodes with "contrail-config" role
+            5. Deploy cluster and verify that it will fail
+        """
+
+        plugin.prepare_contrail_plugin(self, slaves=3)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller'],
+                'slave-02': ['compute'],
+                'slave-03': ['contrail-config']
+            })
+
+        openstack.deploy_cluster(self, wait_for_status='error')
+        cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
+        assert_equal(cluster_info['status'], 'error'), "Error was expected"
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+          groups=["cannot_deploy_only_contrail_control"])
+    @log_snapshot_after_test
+    def cannot_deploy_only_contrail_control(self):
+        """Check can not deploy Contrail cluster with "contrail_control" only
+
+        Scenario:
+            1. Create an environment with
+               "Neutron with tunneling segmentation"
+               as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add 1 node with "Controller" and 1 node with "Compute" role
+            4. Add 1 nodes with "contrail-control" role
+            5. Deploy cluster and verify that it will fail
+        """
+
+        plugin.prepare_contrail_plugin(self, slaves=3)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller'],
+                'slave-02': ['compute'],
+                'slave-03': ['contrail-control']
+            })
+
+        openstack.deploy_cluster(self, wait_for_status='error')
+        cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
+        assert_equal(cluster_info['status'], 'error'), "Error was expected"
