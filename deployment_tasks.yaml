@@ -307,14 +307,14 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
-# Congirures DPDK-filter scheduler
-- id: controller-dpdk-scheduler
+# Congirures DPDK and SR-IOV filters in nova-scheduler
+- id: controller-scheduler
   type: puppet
   role: [primary-controller, controller]
   required_for: [post_deployment_end]
   requires: [post_deployment_start]
   parameters:
-    puppet_manifest: puppet/manifests/controller-dpdk.pp
+    puppet_manifest: puppet/manifests/controller-scheduler.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
@@ -370,6 +370,17 @@
   requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-hugepages.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Configures sriov
+- id: contrail-compute-sriov
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-provision]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-sriov.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
