@@ -379,7 +379,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
-            timeout= 45 * 60,
+            timeout=45*60,
             should_fail=2,
             failed_test_name=[('Check network connectivity '
                                'from instance via floating IP'),
