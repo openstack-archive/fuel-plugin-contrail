@@ -59,6 +59,13 @@ class contrail {
   $hugepages_amount = $settings['hugepages_amount']
   $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
+  # SRIOV settings
+  $global_sriov_enabled  = $settings['contrail_global_sriov']
+  $compute_sriov_enabled = $global_sriov_enabled and 'sriov' in hiera_array('roles')
+  $sriov_physnet         = $settings['sriov_physnet']
+  # TODO generate proper whitelist dictionary
+  $passthrough_whitelist = '{"devname":"eth1", "physical_network":"physnet5"}'
+
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
 
