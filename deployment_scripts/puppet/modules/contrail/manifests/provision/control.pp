@@ -48,7 +48,7 @@ then exit 1; fi",
     creates => '/opt/contrail/prov_control_bgp-DONE',
   }
 
-  if $contrail::node_role == 'primary-contrail-config' {
+  if $contrail::node_role == 'primary-contrail-control' {
     contrail::provision::prov_ext_bgp { $contrail::gateways:
       require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
     }
