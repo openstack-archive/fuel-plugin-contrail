@@ -12,20 +12,24 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-# This facter returns the version and build for the python-contrail package.
-# It may be used to detect a version of contrail used in the environment.
 
-require 'facter'
-require 'puppet'
+define contrail::rclocal_vfs (
+  $network_device = $title,
+  $vf_user_specified,
+  $phys_name = "temp"
+  )
+{
 
-version = nil
+  if (versioncmp($::libnl_version, '3.2.21-1') > 0) {
+    $final_vf = $vf_user_specified
+  } else {
+    $final_vf = min($vf_user_specified, 30)
+  }
 
-pkg = Puppet::Type.type(:package).new(:name => 'libnl-3-200')
-v = pkg.retrieve[pkg.property(:ensure)].to_s
-version=v unless ["purged", "absent"].include?(v)
+  file_line {"sriov ${title}":
+    line  => "echo ${final_vf} > /sys/class/net/${network_device}/device/sriov_numvfs",
+    path  => '/etc/rc.local',
+    match => ".* /sys/class/net/${network_device}/device/sriov_numvfs"
+  }
 
-Facter.add("libnl_version") do
-  setcode do
-    version
-  end
-end
+}
