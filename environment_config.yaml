@@ -100,6 +100,6 @@ attributes:
     weight: 150
     type: "checkbox"
     restrictions:
-      - action: hide
-        condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
+      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+        action: "hide"
 
