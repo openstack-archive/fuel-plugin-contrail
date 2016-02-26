@@ -373,6 +373,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Configures sriov
+- id: contrail-compute-sriov
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-provision]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-sriov.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 - id: contrail-compute-provision
   type: puppet
   role: [compute]
