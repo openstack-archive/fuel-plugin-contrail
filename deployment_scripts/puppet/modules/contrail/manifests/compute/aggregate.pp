@@ -65,7 +65,7 @@ class contrail::compute::aggregate {
 # Create flavor for huge pages use
 #
     exec { 'create-m1.small.hpgs-flavor' :
-      command   => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 0 2"',
+      command   => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 20 2"',
       unless    => 'bash -c "nova flavor-list | grep -q m1.small.hpgs"',
     } ->
     exec { 'create-m1.small.hpgs-mempage' :
