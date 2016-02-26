@@ -63,6 +63,12 @@ class contrail {
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
   $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
+  # SRIOV settings
+  $global_sriov_enabled  = $settings['contrail_global_sriov']
+  $compute_sriov_enabled = $global_sriov_enabled and 'sriov' in hiera_array('roles')
+  $sriov_device = $settings['sriov_device']
+  $sriov_device_no = $settings['sriov_device_no']
+
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
 
