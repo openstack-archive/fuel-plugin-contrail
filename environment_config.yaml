@@ -150,3 +150,24 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
+  contrail_global_sriov:
+    value: false
+    label: "Enable SRIOV feature for this environment."
+    description: >
+      Enable this option to unlock the SRIOV feature.
+      NOTE: You still have to assign SRIOV-role to compute nodes to enable SRIOV on them.
+    weight: 210
+    type: "checkbox"
+  sriov_physnet:
+    value: 'physnet1'
+    label: 'Provide name for physical net'
+    description: >
+      This physical network will be provided over SRIOV capable interfaces.
+    weight: 220
+    type: 'text'
+    regex:
+      source: '^\w+$'
+      error: "Name has to be alphanumeric"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.contrail_global_sriov.value == true)
