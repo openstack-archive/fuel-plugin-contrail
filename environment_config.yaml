@@ -72,3 +72,30 @@ attributes:
     restrictions:
       - action: hide
         condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
+  contrail_global_sriov:
+    value: false
+    label: "Enable SRIOV feature for this environment."
+    description: "Enable this option to unlock the SRIOV feature.\nNOTE: You still have to assign SRIOV-role to compute nodes to enable SRIOV on them."
+    weight: 140
+    type: "checkbox"
+  sriov_device:
+    value: ''
+    label: 'Which device should provide VFs'
+    description: 'This device will provide SRIOV enabled interfaces'
+    weight: 150
+    type: 'text'
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.contrail_global_sriov.value == true)
+  sriov_device_no:
+    value: '32'
+    label: 'Number of VFs'
+    description: 'Desired  number of vifs, beetween 1 and 32.'
+    weight: 160
+    type: 'text'
+    regex:
+      source: '^[1-9]$|[1-2][0-9]|^3[0-2]$'
+      error: "Invalid number of interfaces"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.contrail_global_sriov.value == true)
