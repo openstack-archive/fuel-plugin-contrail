@@ -12,25 +12,35 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::controller::dpdk {
+class contrail::compute::sriov {
 
-  if $contrail::global_dpdk_enabled {
-    ini_subsetting {'add_aggregateinstanceextraspecsfilter':
-      ensure             => present,
-      section            => 'DEFAULT',
-      key_val_separator  => '=',
-      path               => '/etc/nova/nova.conf',
-      setting            => 'scheduler_default_filters',
-      subsetting         => 'AggregateInstanceExtraSpecsFilter',
-      subsetting_separator => ',',
-      notify             => Service['nova-scheduler'],
+  if $contrail::compute_sriov_enabled {
+
+    Kernel_parameter {
+      provider => 'grub2',
     }
 
-    service { 'nova-scheduler':
-      ensure    => $ensure,
-      enable    => $enabled,
-      hasstatus => true,
+    kernel_parameter { 'intel_iommu':
+      ensure => present,
+      value  => 'on',
     }
 
+    kernel_parameter { 'iommu':
+      ensure => present,
+      value  => 'pt',
+    }
+
+    create_resources(contrail::rclocal_vfs, $::contrail::sriov_hash)
+
+    file_line {"sriov ${title}":
+      ensure => absent,
+      path   => '/etc/rc.local',
+      line   => 'exit 0'
+    }
+
+    exec { 'reboot_require':
+      path    => ['/bin', '/usr/bin'],
+      command => 'touch /tmp/contrail-reboot-require'
+    }
   }
 }
