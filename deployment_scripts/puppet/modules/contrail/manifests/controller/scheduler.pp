@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::controller::dpdk {
+class contrail::controller::scheduler {
 
   if $contrail::global_dpdk_enabled {
     ini_subsetting {'add_aggregateinstanceextraspecsfilter':
@@ -22,6 +22,19 @@ class contrail::controller::dpdk {
       path               => '/etc/nova/nova.conf',
       setting            => 'scheduler_default_filters',
       subsetting         => 'AggregateInstanceExtraSpecsFilter',
+      subsetting_separator => ',',
+      notify             => Service['nova-scheduler'],
+    }
+  }
+
+  if $contrail::global_sriov_enabled {
+    ini_subsetting {'add_pci_passthrough_filter':
+      ensure             => present,
+      section            => 'DEFAULT',
+      key_val_separator  => '=',
+      path               => '/etc/nova/nova.conf',
+      setting            => 'scheduler_default_filters',
+      subsetting         => 'PciPassthroughFilter',
       subsetting_separator => ',',
       notify             => Service['nova-scheduler'],
     }
