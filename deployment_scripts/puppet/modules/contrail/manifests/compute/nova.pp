@@ -30,6 +30,11 @@ class contrail::compute::nova {
       'CONTRAIL/use_userspace_vhost':            value => true;
     }
   }
+  if $contrail::compute_sriov_enabled {
+    nova_config {
+      'DEFAULT/pci_passthrough_whitelist':       value => $contrail::passthrough_whitelist;
+    }
+  }
   Nova_config <||> ~>
   service { 'nova-compute':
     ensure => running,
