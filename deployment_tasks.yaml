@@ -269,7 +269,7 @@
   required_for: [post_deployment_end]
   requires: [controller-hiera-post]
   parameters:
-    puppet_manifest: puppet/manifests/controller/aggregate.pp
+    puppet_manifest: puppet/manifests/controller-aggregate.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
@@ -280,7 +280,7 @@
   required_for: [post_deployment_end]
   requires: [post_deployment_start]
   parameters:
-    puppet_manifest: puppet/manifests/controller/dpdk.pp
+    puppet_manifest: puppet/manifests/controller-dpdk.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
