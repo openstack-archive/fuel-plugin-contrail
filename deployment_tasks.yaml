@@ -132,6 +132,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
+# Provision Primary Control config
+- id: contrail-config-provision-primary
+  type: puppet
+  groups: [primary-contrail-config]
+  required_for: [deploy_end]
+  requires: [contrail-config-primary]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
 # Perform same actions on other contrail-config nodes
 - id: contrail-config-all
   type: puppet
@@ -146,7 +157,7 @@
 # Provision Control config
 - id: contrail-config-provision
   type: puppet
-  groups: [primary-contrail-config,contrail-config]
+  groups: [contrail-config]
   required_for: [deploy_end]
   requires: [contrail-config-all]
   parameters:
@@ -165,6 +176,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
+# Provision Primary Contrail control
+- id: contrail-control-provision-primary
+  type: puppet
+  groups: [primary-contrail-control]
+  required_for: [deploy_end]
+  requires: [contrail-control-primary]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-control-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
 # Install other Contrail Control Nodes
 - id: contrail-control-all
   type: puppet
@@ -179,7 +201,7 @@
 # Provision Contrail control
 - id: contrail-control-provision
   type: puppet
-  groups: [primary-contrail-control,contrail-control]
+  groups: [contrail-control]
   required_for: [deploy_end]
   requires: [contrail-control-all]
   parameters:
