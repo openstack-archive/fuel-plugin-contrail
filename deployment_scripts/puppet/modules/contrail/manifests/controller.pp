@@ -33,6 +33,15 @@ class contrail::controller {
   package { 'neutron-plugin-contrail': } ->
   package { 'contrail-heat': }
 
+# Install vCenter-specific contrail packages
+# TODO support vmware-compute node role
+  if $contrail::use_vcenter {
+    package { ['libxml-commons-external-java', 'libxml-commons-resolver1.1-java', 'libxerces2-java',
+               'libslf4j-java', 'libnetty-java', 'libjline-java', 'libzookeeper-java']: } ->
+    package { contrail-install-vcenter-plugin: } ->
+    package { ['contrail-vcenter-plugin','libcontrail-java-api','libcontrail-vijava','libcontrail-vrouter-java-api']: }
+ }
+
 # Nova configuration
   nova_config {
     'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
