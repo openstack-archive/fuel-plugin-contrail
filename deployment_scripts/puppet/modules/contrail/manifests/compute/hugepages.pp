@@ -67,5 +67,15 @@ class contrail::compute::hugepages {
       enable    => true,
       subscribe => File['/etc/default/qemu-kvm'],
     }
+    file { '/hugepages':
+      ensure => 'directory',
+    } ->
+    mount { '/hugepages':
+      ensure  => 'mounted',
+      fstype  => 'hugetlbfs',
+      device  => 'hugetlbfs',
+      options => 'defaults',
+      atboot  => true,
+    }
   }
 }
