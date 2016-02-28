@@ -78,6 +78,10 @@ class contrail {
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
   $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
+  # VCenter settings
+  $use_vcenter  = hiera_hash('use_vcenter', false)
+  $vcenter_hash = hiera_hash('vcenter_hash')
+
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
   $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
 
