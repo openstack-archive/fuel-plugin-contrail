@@ -36,7 +36,7 @@ class contrail::config {
   package { 'openjdk-7-jre-headless': }->
   package { 'ifmap-server': }->
   package { 'contrail-config': }->
-  package { 'contrail-openstack-config': }->
+  package { 'contrail-openstack-config': }
 
 # Java support files
   file {'/etc/java-7-openjdk/security/java.security':
