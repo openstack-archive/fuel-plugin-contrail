@@ -14,14 +14,6 @@
 
 class contrail::compute::vrouter {
 
-  class { 'contrail::package':
-    install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
-    remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
-  } ->
-  exec { 'remove-ovs-modules':
-    command => '/sbin/modprobe -r openvswitch'
-  }
-
   file {'/etc/contrail/agent_param':
     ensure  => present,
     content => template('contrail/agent_param.erb'),
@@ -36,12 +28,33 @@ class contrail::compute::vrouter {
     content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
   }
   if $contrail::compute_dpdk_enabled {
+    package { 'dpdk-depends-packages':
+      ensure => present,
+    } ->
+    exec {'setup_dpdk_repo':
+      command => '/bin/bash /opt/contrail/contrail_packages_dpdk/setup.sh',
+    } ->
+    class { 'contrail::package':
+      install => ['contrail-dpdk-kernel-modules-dkms','contrail-vrouter-dpdk','iproute2','haproxy','libatm1'],
+      remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
+    }
+    # TODO: upgrade libvirt and quemu packages
     file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
       ensure  => present,
       content => template('contrail/contrail-vrouter-dpdk.ini.erb'),
-      require => Class[Contrail::Package],
+      require => [Class[Contrail::Package],Package['dpdk-depends-packages']],
       notify  => Service['supervisor-vrouter'],
     }
+  }
+  else {
+    class { 'contrail::package':
+      install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
+      remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
+    }
+  }
+
+  exec { 'remove_ovs_modules':
+    command => '/sbin/modprobe -r openvswitch'
   }
 
   file {'/etc/init.d/fixup-vrouter':
@@ -55,7 +68,7 @@ class contrail::compute::vrouter {
   service {'supervisor-vrouter':
     ensure    => running,
     enable    => true,
-    subscribe => [Package['contrail-openstack-vrouter','contrail-vrouter-dkms'],
+    subscribe => [Class[Contrail::Package],Exec['remove_ovs_modules'],
                   File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
                   '/etc/contrail/contrail-vrouter-nodemgr.conf']
                   ],
