@@ -53,18 +53,10 @@ def deploy_cluster(obj, wait_for_status='operational'):
     """
     Deploy cluster with additional time for waiting on node's availability
     """
-    try:
-        obj.fuel_web.deploy_cluster_wait(
-            obj.cluster_id, check_services=False,
-            timeout=180 * 60)
-    except:
-        nailgun_nodes = obj.env.fuel_web.client.list_cluster_nodes(
-            obj.env.fuel_web.get_last_created_cluster())
-        time.sleep(420)
-        for n in nailgun_nodes:
-            check_repo_managment(
-                obj.env.d_env.get_ssh_to_remote(n['ip']))
-            logger.info('ip is {0}'.format(n['ip'], n['name']))
+    obj.fuel_web.deploy_cluster_wait(
+        obj.cluster_id, check_services=False,
+        timeout=180 * 60)
+
     if wait_for_status:
         wait_for_cluster_status(obj, obj.cluster_id,
                                 status=wait_for_status)
