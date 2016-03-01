@@ -14,17 +14,9 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
-include contrail
-
 file { '/etc/apt/preferences.d/contrail-pin-110':
   ensure => file,
   source => 'puppet:///modules/contrail/contrail-pin-110',
-}
-
-if $contrail::compute_dpdk_enabled {
-  exec {'setup_dpdk_repo':
-    command => '/bin/bash /opt/contrail/contrail_packages_dpdk/setup.sh',
-  }
 }
 
 # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
