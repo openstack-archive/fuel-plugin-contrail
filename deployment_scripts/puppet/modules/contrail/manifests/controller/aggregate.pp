@@ -19,12 +19,47 @@ class contrail::controller::aggregate {
     $nodes_hash          = hiera('nodes')
     $dpdk_compute_nodes  = nodes_with_roles($nodes_hash, ['dpdk'], 'fqdn')
     $dpdk_hosts          = join($dpdk_compute_nodes, ',')
+    $nova_hash           = hiera_hash('nova', {})
+    $keystone_tenant     = pick($nova_hash['tenant'], 'services')
+    $keystone_user       = pick($nova_hash['user'], 'nova')
+    $service_endpoint    = hiera('service_endpoint')
+    $region              = hiera('region', 'RegionOne')
+
+    Exec {
+      provider => 'shell',
+      path => '/sbin:/usr/sbin:/bin:/usr/bin',
+      environment => [
+        "OS_TENANT_NAME=${keystone_tenant}",
+        "OS_USERNAME=${keystone_user}",
+        "OS_PASSWORD=${nova_hash['user_password']}",
+        "OS_AUTH_URL=http://${service_endpoint}:5000/v2.0/",
+        'OS_ENDPOINT_TYPE=internalURL',
+        "OS_REGION_NAME=${region}",
+        'NOVA_ENDPOINT_TYPE=internalURL',
+      ],
+    }
 
     nova_aggregate { 'hpgs-aggr':
       ensure            => present,
       availability_zone => 'hpgs',
       metadata          => 'hpgs=true',
       hosts             => $dpdk_hosts,
+    } ->
+    exec { 'create-m1.small.hpgs-flavor' :
+      command   => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 2048 2"',
+      unless    => 'bash -c "nova flavor-list | grep -q m1.small.hpgs"',
+      tries     => 10,
+      try_sleep => 2,
+    } ->
+    exec { 'create-m1.small.hpgs-mempage' :
+      command   => 'bash -c "nova flavor-key m1.small.hpgs set hw:mem_page_size=2048"',
+      tries     => 10,
+      try_sleep => 2,
+    } ->
+    exec { 'create-m1.small.hpgs-aggregate' :
+      command   => 'bash -c "nova flavor-key m1.small.hpgs set aggregate_instance_extra_specs:hpgs=true"',
+      tries     => 10,
+      try_sleep => 2,
     }
   }
 }
