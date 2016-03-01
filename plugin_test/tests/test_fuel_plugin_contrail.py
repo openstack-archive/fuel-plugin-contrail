@@ -69,7 +69,7 @@ class ContrailPlugin(TestBasic):
 
     cluster_id = ''
 
-    pack_path = [CONTRAIL_PLUGIN_PACK_UB_PATH, CONTRAIL_PLUGIN_PACK_CEN_PATH]
+    pack_path = CONTRAIL_PLUGIN_PACK_UB_PATH
 
     NEUTRON_BOND_CONFIG = deepcopy(BOND_CONFIG)
     NEUTRON_INTERFACES = deepcopy(INTERFACES)

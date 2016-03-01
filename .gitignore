@@ -1,3 +1,4 @@
+.idea/
 .tox
 .build
 *.pyc
@@ -8,4 +9,3 @@ deployment_scripts/puppet/modules/stdlib
 build.sh
 *.rpm
 logs
-
