@@ -1,6 +1,5 @@
 #!/bin/bash
-
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -34,6 +33,8 @@ CENTOS_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm'
 
 VMWARE_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-vcenter-plugin*.deb' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4`
 
+DPDK_PKG=`find $PLUGIN_PATH -maxdepth 4 -name 'dpdk-depends-packages*.deb' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4`
+
 yum -y install dpkg-devel createrepo
 
 if [ ! -f "$UBUNTU_PKG" ] && [ ! -f "$CENTOS_PKG" ];
@@ -59,6 +60,12 @@ then
     dpkg -x $VMWARE_PKG $DEB2
     cp $DEB2/opt/contrail/contrail_vcenter_plugin_install_repo/*.deb $PLUGIN_PATH/repositories/ubuntu/
   fi
+  if [ -f "$DPDK_PKG" ];
+  then
+    DEB3=`mktemp -d`
+    cp $DPDK_PKG $DEB3
+    cd $DEB3 && ar vx dpdk-depends-packages*.deb && tar xf data.tar.xz && cp $DEB3/opt/contrail/contrail_install_repo_dpdk/contrail-dpdk-kernel-modules-dkms*.deb $PLUGIN_PATH/repositories/ubuntu/
+  fi
   dpkg-scanpackages ./ | gzip -c - > Packages.gz
 fi
 
@@ -75,6 +82,5 @@ then
 fi
 
 echo "DONE"
-
 
 
