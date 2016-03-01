@@ -55,8 +55,8 @@ class contrail {
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
   # Hugepages configuration for DPDK vrouter
-  $hugepages_size   = $settings['hugepages_size']
-  $hugepages_amount = $settings['hugepages_amount']
+  $hugepages_size   = pick($settings['hugepages_size'],2)
+  $hugepages_amount = pick($settings['hugepages_amount'],10)
   $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
   # Custom mount point for contrail-db
