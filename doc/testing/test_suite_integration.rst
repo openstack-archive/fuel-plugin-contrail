@@ -544,3 +544,66 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Check deploy Contrail VMWare with KVM/QEMU
+------------------------------------------
+
+
+ID
+##
+
+contrail_vmware_kvm
+
+
+Description
+###########
+
+Check deploy Contrail VMWare with KVM/QEMU
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Connect to a Fuel with preinstalled Contrail plugin.
+    2. Create a new environment with following parameters:
+       * Compute: KVM/QEMU + vCenter
+       * Networking: Neutron with tunneling segmentation
+       * Storage: Ceph
+       * Additional services: ceilometer
+    3. Run script that prepares vmware part for deployment (creates few Distributed
+       Switches and spawns virtual machine on each ESXi node)
+    4. Configure Contrail plugin settings:
+       * dedicated analytics DB
+       * Datastore name
+       * Datacenter name
+       * Uplink for DVS external
+       * Uplink for DVS private
+       * DVS external
+       * DVS internal
+       * DVS private
+    5. Add nodes with following roles:
+       * Controller + mongo
+       * 3 Compute + ceph-osd
+       * ComputeVMWare
+       * 2 contrail-vmware
+       * Contrail-config + contrail-control + contrail-db
+       * Contrail-analytics + contrail-analytics-db
+    6. Configure interfaces on nodes.
+    7. Configure network settings.
+    8. Configure VMware vCenter Settings:
+       Add and assign 1 vCenter clusters to compute-vmware.
+    9. Deploy the cluster.
+    10. Run OSTF tests.
+
+
+Expected results
+################
+
+Cluster should be deployed and all OSTF test cases should be passed.

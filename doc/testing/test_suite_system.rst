@@ -402,3 +402,179 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Check conection between instances in different availibility zones
+-----------------------------------------------------------------
+
+
+ID
+##
+
+contrail_vmware_cross_az
+
+
+Description
+###########
+
+Check connectivity between VMs in different availability zones.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Login to Openstack Horizon UI
+    2. Create net_1: net01__subnet, 192.168.1.0/24,
+        and attach it to the default router.
+    3. Launch instances with image TestVM
+        and flavor m1.micro in nova availability zone.
+    4. Launch instances with image TestVM-VMDK
+        and flavor m1.micro in vcenter availability zone.
+    5. Check that instances are displayed in Contrail UI.
+    6. Verify that instances on different hypervisors
+        should communicate between each other.
+        Send icmp ping from instances of vCenter to instances
+        from Qemu/KVM and vice versa.
+
+
+Expected results
+################
+
+VMs from different AZ should communicate via the same network. ICMP traffic is observed.
+
+
+Security group rules with remote group id simple.
+-------------------------------------------------
+
+
+ID
+##
+
+contrail_vmware_sg
+
+
+Description
+###########
+
+Verify that network traffic is allowed/prohibited to instances according security groups
+rules.
+
+
+Complexity
+##########
+
+core
+
+
+Steps
+#####
+
+    1. Login to Openstack Horizon UI
+    2. Create net_1: net01__subnet, 192.168.1.0/24, and attach it to the router01.
+    3. Create security groups:
+        SG1
+        SG2
+    4. Delete all defaults egress rules of SG1 and SG2.
+    5. Add icmp rule to SG1:
+       Ingress rule with ip protocol 'icmp ', port range any, SG group 'SG1'
+       Egress rule with ip protocol 'icmp ', port range any, SG group 'SG1'
+    6. Add icmp rule to SG2:
+       Ingress rule with ip protocol 'icmp ', port range any, SG group 'SG2'
+       Egress rule with ip protocol 'icmp ', port range any, SG group 'SG2'
+    7. Launch few instance of vcenter az with SG1 in net1(on each ESXI).
+    8. Launch few instance of vcenter az with SG2 in net1(on each ESXI).
+    9. Verify that icmp ping is enabled between VMs from SG1.
+    10. Verify that icmp ping is enabled between instances from SG2.
+    11. Verify that icmp ping is not enabled between instances from SG1 and VMs from SG2.
+
+
+Expected result
+###############
+
+Network traffic is allowed/prohibited to instances according security groups
+rules.
+
+
+Check creation instance of vcenter az in the one batch.
+--------------------------------------------------------
+
+
+ID
+##
+
+contrail_vmware_one_batch
+
+
+Description
+###########
+
+Create a batch of instances.
+
+
+Complexity
+##########
+
+core
+
+
+Steps
+#####
+
+    1. Login to Openstack Horizon UI
+    2. Launch few instances simultaneously with image TestVM-VMDK and flavor
+       m1.micro in vcenter availability zone in  default internal network.
+    3. Check connection between instances (ping, ssh).
+    4. Delete all instances from horizon simultaneously.
+
+
+Expected result
+###############
+
+All instances should be created and deleted without any error.
+
+
+Check connectivity via external Contrail network with floating IP
+-----------------------------------------------------------------
+
+
+ID
+##
+
+contrail_vmware_ping_with/without_fip
+
+
+Description
+###########
+
+Check connectivity VMs with external network with floating IP via Contrail network
+
+
+Complexity
+##########
+
+Advanced
+
+
+Steps
+#####
+
+    1. Login to Openstack Horizon UI
+    2. Launch a new instance in the default network.
+    3. Send ping from instance to 8.8.8.8 or any other IP outside the cloud
+    4. Assign a Floating IP to the instance
+    5. Send ping from instance to 8.8.8.8 or any other IP outside the cloud
+    6. Allow incoming ICMP from any address in default security group.
+    7. Send ping from external (HOST) machine to Floating IP (emulate external network)
+
+
+Expected results
+################
+
+Instance should get ping responce from 8.8.8.8 or any other IP outside the cloud.
+External (HOST) machine should get rping responce from instance.

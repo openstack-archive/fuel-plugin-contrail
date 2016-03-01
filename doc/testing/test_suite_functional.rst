@@ -29,18 +29,20 @@ Steps
 #####
 
     1. Create an environment
-    2. Enable and configure Contrail plugin
+    2. Enable and configure Contrail plugin with Vcenter
     3. Enable dedicated analytics DB
     4. Add 3 controllers, a compute and a storage nodes
     5. Add 3 nodes with "contrail-db", "contrail-config",
        "contrail-analytics" and "contrail-control" roles on all nodes
     6. Add a node with "contrail-analytics-db" role
-    7. Deploy cluster
-    8. Run OSTF tests
-    9. Delete a Controller node and deploy changes
+    7. Add a node  with "compute-vmware" role
+    8. Add a node  with "contrail-vmware" role
+    9. Deploy cluster
     10. Run OSTF tests
-    11. Add a node with "Controller" role and deploy changes
-    12. Run OSTF tests. All steps must be completed successfully,
+    11. Delete a Controller node and deploy changes
+    12. Run OSTF tests
+    13. Add a node with "Controller" role and deploy changes
+    14. Run OSTF tests. All steps must be completed successfully,
         without any errors.
 
 
@@ -171,18 +173,20 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration
-    2. Enable and configure Contrail plugin
+    2. Enable and configure Contrail plugin with Vcenter
     3. Enable dedicated analytics DB
     4. Add a controller and a compute+cinder nodes
     5. Add a node with "contrail-control",
        and "contrail-db" roles
     6. Add a node with "contrail-config" and "contrail-analytics" roles
     7. Add a node with "contrail-analytics-db" role
-    8. Deploy cluster
-    9. Run OSTF tests
-    10. Add one node with "contrail-control" role
-    11. Deploy changes
-    12. Run OSTF tests
+    8. Add a node with "compute-vmware" role
+    9. Add a node with "contrail-vmware" role
+    10. Deploy cluster
+    11. Run OSTF tests
+    12. Add one node with "contrail-control" role
+    13. Deploy changes
+    14. Run OSTF tests
 
 
 Expected results
@@ -585,7 +589,7 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and Ceph-OSD storage
-    2. Enable and configure Contrail plugin
+    2. Enable and configure Contrail plugin with Vcenter
     3. Enable dedicated analytics DB
     4. Add 3 nodes with "controller" + "ceph-osd" roles
     5. Add 2 nodes with "compute" + "ceph-osd" roles
@@ -593,9 +597,11 @@ Steps
        'contrail-db' roles
     7. Add a node with 'contrail-analytics'+'contrail-analytics-db'
        roles
-    8. Deploy cluster and run OSTF tests
-    9. Add a node with all compatible contrail roles
-    10. Deploy changes and run OSTF tests
+    8. Add compute-vmware node
+    9. Add contrail-vmware node
+    10. Deploy cluster and run OSTF tests
+    11. Add a node with all compatible contrail roles
+    12. Deploy changes and run OSTF tests
 
 
 Expected results
@@ -739,3 +745,123 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Contrail VMWare add contrail_vmware
+-----------------------------------
+
+
+ID
+##
+
+contrail_vmware_add_contrail_vmware
+
+
+Description
+###########
+
+Verify that Contrail-vmware role can be added after deploying
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling
+       segmentation" as a network configuration
+    3. Run script that prepares vmware part for deployment (creates few Distributed
+       Switches and spawns virtual machine on each ESXi node)
+    4. Configure Contrail plugin settings:
+       * Datastore name
+       * Datacenter name
+       * Uplink for DVS external
+       * Uplink for DVS private
+       * DVS external
+       * DVS internal
+       * DVS private
+    5. Configure Openstack settings:
+       * Set VMWare vCenter/ESXi datastore for images (Glance)VMWare
+         vCenter/ESXi datastore for images (Glance).
+    6. Deploy cluster with following node configuration:
+       * Controller
+       * Compute
+       * ComputeVMWare
+       * Contrail-config + contrail-db + contrail-control + contrail-analytics
+       * Contrail-vmware
+    7. Run OSTF tests
+    8. Add new ESXI host.
+    9. Run script that prepares vmware part for deployment
+    10. Add one node with contrail-vmware role
+    11. Deploy changes
+    12. Run OSTF tests
+    13. Run contrail health check tests
+
+
+Expected results
+################
+
+All steps should pass
+
+
+Contrail VMWare delete contrail_vmware
+--------------------------------------
+
+
+ID
+##
+
+contrail_vmware_delete_contrail_vmware
+
+
+Description
+###########
+
+Verify that Contrail-vmware role can be deleted after deploying
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling
+       segmentation" as a network configuration
+    3. Run script that prepares vmware part for deployment (creates few Distributed
+       Switches and spawns virtual machine on each ESXi node)
+    4. Configure Contrail plugin settings:
+       * Datastore name
+       * Datacenter name
+       * Uplink for DVS external
+       * Uplink for DVS private
+       * DVS external
+       * DVS internal
+       * DVS private
+    5. Deploy cluster with following node configuration:
+       * Controller
+       * Compute
+       * ComputeVMWare
+       * Contrail-config + contrail-db + contrail-control + contrail-analytics
+       * Contrail-vmware
+       * Contrail-vmware
+    6. Run OSTF tests
+    7. Remove one ESXI host.
+    8. Run script that prepares vmware part for deployment
+    9. Add one node with contrail-vmware role
+    10. Deploy changes
+    11. Run OSTF tests
+    12. Run contrail health check tests
+
+
+Expected results
+################
+
+All steps should pass
