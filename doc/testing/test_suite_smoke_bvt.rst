@@ -86,3 +86,63 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Contrail VMWare smoke
+---------------------
+
+
+ID
+##
+
+contrail_vmware_smoke
+
+
+Description
+###########
+
+Deploy a cluster with Contrail Plugin and VMWare
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Connect to a Fuel with preinstalled Contrail plugin.
+    2. Create a new environment with following parameters:
+       * Compute: vCenter
+       * Networking: Neutron with tunneling segmentation
+       * Storage: default
+       * Additional services: default
+    3. Run script that prepares vmware part for deployment (creates few Distributed
+       Switches and spawns virtual machine on each ESXi node)
+    4. Configure Contrail plugin settings:
+       * Datastore name
+       * Datacenter name
+       * Uplink for DVS external
+       * Uplink for DVS private
+       * DVS external
+       * DVS internal
+       * DVS private
+    5. Add nodes with following roles:
+       * Controller
+       * ComputeVMWare
+       * Contrail-vmware
+       * Contrail-config + contrail-control + contrail-db + contrail-analytics
+    6. Configure interfaces on nodes.
+    7. Configure network settings.
+    8. Configure VMware vCenter Settings:
+       Add and assign 1 vCenter clusters to compute-vmware.
+    9. Deploy the cluster.
+    10. Run OSTF tests.
+
+
+Expected results
+################
+
+Cluster should be deployed and all OSTF test cases should be passed.
