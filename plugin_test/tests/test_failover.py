@@ -1,3 +1,4 @@
+# coding=utf-8
 #    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -14,11 +15,14 @@
 
 import os
 from proboscis.asserts import assert_equal
+from proboscis.asserts import assert_false
+from proboscis.asserts import assert_true
 from proboscis import test
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+from fuelweb_test.models.nailgun_client import NailgunClient
 from helpers import plugin
 from helpers import openstack
 
@@ -133,3 +137,47 @@ class FailoverTests(TestBasic):
         openstack.deploy_cluster(self, wait_for_status='error')
         cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
         assert_equal(cluster_info['status'], 'error'), "Error was expected"
+
+    def cannot_uninstall_plugin_with_deployed_env(self):
+        """Check cannot uninstall Contrail plugin, which is enable for environment
+
+        Scenario:
+            1. Try to remove plugin and ensure that alert presents
+               in cli: “400 Client Error: Bad Request (Can not delete
+               plugin which is enabled for some environment.)”
+            2. Remove environment
+            3. Remove plugin
+            5. Check that it was removed successfully
+
+        """
+        # Try to remove plugin
+        plugin_name = "contrail"
+        plugin_version = os.environ.get('CONTRAIL_PLUGIN_PATH').split('-')[2]
+        expected_msg = '400 Client Error: Bad Request (Can\'t delete plugin which is enabled for some environment.)'
+
+        self.env.revert_snapshot("snapshot_for_test")
+
+        cmd = 'fuel plugins --remove {0}=={1}'.format(plugin_name,plugin_version)
+
+        msg = self.env.d_env.get_admin_remote().execute(cmd)['stdout']
+
+        # check alert in cli
+        assert_equal(msg, expected_msg), "Error: Wrong alert in cli"
+
+        # check plugin`s list
+        output = list(self.env.d_env.get_admin_remote().execute('fuel plugins list')['stdout'])
+
+        assert_false (plugin_name in output[-1],"Failed: Plugin has removed")
+
+        # remove environment
+        cluster_id = NailgunClient.list_clusters[0]['id']
+
+        NailgunClient.delete_cluster(cluster_id)
+
+        # remove plugin and verify it
+        self.env.d_env.get_admin_remote().execute(cmd)
+
+        output = list(self.env.d_env.get_admin_remote().execute('fuel plugins list')['stdout'])
+
+        assert_true (plugin_name in output[-1],"Failed: Plugin hasn`t removed")
+

@@ -143,5 +143,8 @@ class ContrailPlugin(TestBasic):
         # deploy cluster
         openstack.deploy_cluster(self)
 
+        self.env.make_snapshot("snapshot_for_tests", is_make=True)
+
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+
