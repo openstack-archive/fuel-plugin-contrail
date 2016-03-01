@@ -21,7 +21,7 @@ class contrail::controller::dpdk {
       key_val_separator  => '=',
       path               => '/etc/nova/nova.conf',
       setting            => 'scheduler_default_filters',
-      subsetting         => 'AggregateInstanceExtraSpecFilter',
+      subsetting         => 'AggregateInstanceExtraSpecsFilter',
       subsetting_separator => ',',
       notify             => Service['nova-scheduler'],
     }
