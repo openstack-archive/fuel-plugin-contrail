@@ -38,20 +38,6 @@ class contrail::config {
   package { 'contrail-config': }->
   package { 'contrail-openstack-config': }
 
-# Install vCenter-specific contrail packages
-  if $contrail::use_vcenter {
-    package { ['libxml-commons-external-java', 'libxml-commons-resolver1.1-java', 'libxerces2-java',
-              'libslf4j-java', 'libnetty-java', 'libjline-java', 'libzookeeper-java']: } ->
-    package { 'contrail-install-vcenter-plugin': } ->
-    package { ['libcontrail-java-api','libcontrail-vijava','libcontrail-vrouter-java-api']: } ->
-    package { 'contrail-vcenter-plugin': }
-    service { 'contrail-vcenter-plugin':
-      ensure    => running,
-      enable    => true,
-      subscribe => [Service ['supervisor-config'],Package['contrail-vcenter-plugin']],
-    }
-  }
-
 # Java support files
   file {'/etc/java-7-openjdk/security/java.security':
     owner   => 'root',
