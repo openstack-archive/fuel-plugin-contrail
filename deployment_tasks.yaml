@@ -339,6 +339,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Set proper apt pin for Contrail repo
+- id: contrail-repository
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, contrail-compute-hugepages]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Configures hugepages kernel settings if dpdk is enabled
 - id: contrail-compute-hugepages
   type: puppet
