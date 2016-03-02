@@ -13,12 +13,19 @@
 #    under the License.
 
 import os
-from proboscis.asserts import assert_equal
+import time
+from devops.helpers.helpers import wait
+from proboscis.asserts import assert_equal, assert_is_none
 from proboscis import test
+from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
-from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
+from fuelweb_test.settings import (CONTRAIL_PLUGIN_PACK_UB_PATH,
+                                   SERVTEST_USERNAME,
+                                   SERVTEST_PASSWORD,
+                                   SERVTEST_TENANT)
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+from fuelweb_test.helpers import os_actions
 from helpers import plugin
 from helpers import openstack
 
@@ -133,3 +140,186 @@ class FailoverTests(TestBasic):
         openstack.deploy_cluster(self, wait_for_status='error')
         cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
         assert_equal(cluster_info['status'], 'error'), "Error was expected"
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_ha_with_node_problems"])
+    @log_snapshot_after_test
+    def contrail_ha_with_node_problems(self):
+        """ Check Contrail HA using node problems
+            1. Deploy cluster in the following node configuration:
+                node-01: 'contrail-config'
+                node-02: 'contrail-control'
+                node-03: 'contrail-db'
+                node-04: 'controller'
+                node-05: 'compute'
+            2. Login as admin to Openstack Horizon UI
+            3. Launch 2 new instances
+            4. Run smoke test set to check connectivity
+            5. With a pause of 5 minutes turn off and turn on
+               each of Contrail Nodes
+            6. Run smoke test set to check connectivity
+        """
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        contrail_node_conf = {
+            'slave-01': ['contrail-config'],
+            'slave-02': ['contrail-control'],
+            'slave-03': ['contrail-db'],
+        }
+        os_node_conf = {
+            'slave-04': ['controller'],
+            'slave-05': ['compute'],
+        }
+
+        self.fuel_web.update_nodes(self.cluster_id,
+                                   dict(contrail_node_conf, **os_node_conf))
+        openstack.deploy_cluster(self)
+
+        def get_cluster_node(node_name):
+            # Shutdown contrail node
+            for node in self.fuel_web.client.list_cluster_nodes(self.cluster_id):
+                if node_name in node['name']:
+                    return self.fuel_web.get_devops_nodes_by_nailgun_nodes(node)
+            else:
+                return None
+
+        for conf_node_name, roles in contrail_node_conf.items():
+            cluster_node = get_cluster_node()
+            assert_is_none(cluster_node,
+                           'Cluster node "%s" not found' % conf_node_name)
+            logger.info('Shutdown node "%s"' % conf_node_name)
+
+            # Shutdown node
+            self.fuel_web.warm_shutdown_nodes([cluster_node])
+
+            time.sleep(60*5)  # Sleep for 5 minutes
+
+            # Check connectivity
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke'])
+
+            # Start node back
+            self.fuel_web.warm_start_nodes([cluster_node])
+
+            # Check connectivity again
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_ha_with_node_problems"])
+    @log_snapshot_after_test
+    def contrail_ha_with_node_problems(self):
+        """ Check Contrail HA using node problems
+            1. Deploy cluster in the following node configuration:
+                node-01: 'contrail-config'
+                node-02: 'contrail-control'
+                node-03: 'contrail-db'
+                node-04: 'controller'
+                node-05: 'compute'
+            2. Login as admin to Openstack Horizon UI
+            3. Launch 2 new instances
+            4. Run smoke test set to check connectivity
+            5. With a pause of 5 minutes stop and start
+               private and management interface on contrail-control node
+            6. Run smoke test set to check connectivity
+        """
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        os_node_conf = {
+            'slave-01': ['contrail-config'],
+            'slave-03': ['contrail-db'],
+            'slave-04': ['controller'],
+            'slave-05': ['compute'],
+        }
+
+        contrail_controller = {
+            'slave-02': ['contrail-control'],
+        }
+
+        self.fuel_web.update_nodes(self.cluster_id,
+                                   dict(contrail_controller, **os_node_conf))
+        openstack.deploy_cluster(self)
+
+        os_ip = self.fuel_web.get_public_vip(self.cluster_id)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+        srv_list = os_conn.get_servers()
+
+        def get_interfaces4node(node_name, interface_roles=[]):
+            # Return device names of specified roles for node
+            cluster_nodes = self.fuel_web.client.list_cluster_nodes(
+                self.cluster_id)
+            for node in cluster_nodes:
+                if node_name in node['name']:
+                        res = []
+                        for interface in node['network_data']:
+                            if (not interface_roles or
+                                    interface['name'] in interface_roles):
+                                res.append(interface['dev'])
+                        return res
+            else:
+                return None
+
+        def get_cluster_node(node_name):
+            for node in self.fuel_web.client.list_cluster_nodes(
+                    self.cluster_id):
+                if node_name in node['name']:
+                    return self.fuel_web.get_devops_nodes_by_nailgun_nodes(
+                        node)
+            else:
+                return None
+
+        def ifdown(node_ssh, devices):
+            commands = []
+            for dev in devices:
+                commands.append('ifdown {}'.format(dev))
+
+            for cmd in commands:
+                node_ssh.execute_async(cmd)
+                time.sleep(40)
+
+        def ifup(node_ssh, devices):
+            commands = []
+            for dev in devices:
+                commands.append('ifup {}'.format(dev))
+
+            for cmd in commands:
+                node_ssh.execute_async(cmd)
+                time.sleep(40)
+
+        for conf_node_name, roles in contrail_controller.items():
+            cluster_node = get_cluster_node(conf_node_name)
+            node_ssh = self.fuel_web.get_ssh_for_node(cluster_node.name)
+            openstack.check_connection_vms(os_conn=os_conn,
+                                           srv_list=srv_list,
+                                           remote=node_ssh)
+
+            assert_is_none(cluster_node,
+                           'Cluster node "%s" not found' % conf_node_name)
+            logger.info('Shutdown node "%s"' % conf_node_name)
+
+            if_devices = get_interfaces4node(conf_node_name,
+                                             ['private', 'management'])
+            # Stop private and management interfaces on contrail-control
+            ifdown(node_ssh, if_devices)
+            time.sleep(60*5)  # Sleep for 5 minutes
+
+            # Check connectivity
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke'])
+
+            # Start private and management interfaces on contrail-control
+            ifup(node_ssh, if_devices)
+            time.sleep(60*5)  # Sleep for 5 minutes
+
+            # Check connectivity again
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke'])
