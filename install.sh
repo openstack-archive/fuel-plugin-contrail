@@ -33,8 +33,6 @@ CENTOS_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm'
 
 VMWARE_PKG=`find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-vcenter-plugin*.deb' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4`
 
-DPDK_PKG=`find $PLUGIN_PATH -maxdepth 4 -name 'dpdk-depends-packages*.deb' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4`
-
 yum -y install dpkg-devel createrepo
 
 if [ ! -f "$UBUNTU_PKG" ] && [ ! -f "$CENTOS_PKG" ];
@@ -60,12 +58,15 @@ then
     dpkg -x $VMWARE_PKG $DEB2
     cp $DEB2/opt/contrail/contrail_vcenter_plugin_install_repo/*.deb $PLUGIN_PATH/repositories/ubuntu/
   fi
+
+  DPDK_PKG=`find $PLUGIN_PATH -maxdepth 4 -name 'dpdk-depends-packages*.deb' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4`
   if [ -f "$DPDK_PKG" ];
   then
     DEB3=`mktemp -d`
     cp $DPDK_PKG $DEB3
     cd $DEB3 && ar vx dpdk-depends-packages*.deb && tar xf data.tar.xz && cp $DEB3/opt/contrail/contrail_install_repo_dpdk/contrail-dpdk-kernel-modules-dkms*.deb $PLUGIN_PATH/repositories/ubuntu/
   fi
+  cd $PLUGIN_PATH/repositories/ubuntu/
   dpkg-scanpackages ./ | gzip -c - > Packages.gz
 fi
 
