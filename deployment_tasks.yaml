@@ -262,6 +262,18 @@
     timeout: 3600
     cwd: /
 
+# Set proper apt pin for Contrail repository
+- id: contrail-repository
+  type: puppet
+  groups: [compute]
+  required_for: [tools]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
   type: puppet
@@ -339,14 +351,14 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-# Set proper apt pin for Contrail repo
-- id: contrail-repository
+# Set apt pin for packeges that need to be override
+- id: contrail-override-repository
   type: puppet
   role: [compute]
   required_for: [post_deployment_end, contrail-compute-hugepages]
   requires: [post_deployment_start]
   parameters:
-    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
+    puppet_manifest: puppet/manifests/contrail-compute-override.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
