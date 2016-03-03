@@ -27,5 +27,3 @@ case $operatingsystem
     }
     default: {}
 }
-
-

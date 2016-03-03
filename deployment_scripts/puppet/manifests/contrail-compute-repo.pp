@@ -37,4 +37,3 @@ apt::pin { 'contrail-override':
   label       => 'contrail',
   packages    => $override_pkg,
 }
-
