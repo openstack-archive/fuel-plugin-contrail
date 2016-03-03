@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,20 +12,28 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/common-repo.pp')
+notice('MODULAR: contrail/contrail-compute-repo.pp')
 
-case $operatingsystem
-{
-    CentOS: {
-      yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
-      package {'yum-plugin-priorities': ensure => present }
-    }
-    Ubuntu: {
-      file { '/etc/apt/preferences.d/contrail-3.0.0.pref':
-        ensure => absent,
-      }
-    }
-    default: {}
+include contrail
+
+$common_pkg = ['iproute2', 'haproxy', 'libatm1']
+$nova_pkg   = ['nova-compute', 'nova-common', 'python-nova', 'python-urllib3']
+
+if $contrail::compute_dpdk_enabled and $contrail::install_contrail_nova {
+  $override_pkg = concat($common_pkg, $nova_pkg)
+} else {
+  $override_pkg = $common_pkg
 }
 
+apt::pin { 'contrail-main':
+  explanation => 'Set priority for common contrail packages',
+  priority    => 200,
+  label       => 'contrail',
+}
 
+apt::pin { 'contrail-override':
+  explanation => 'Set priority for packages that need to override from contrail repository',
+  priority    => 1200,
+  label       => 'contrail',
+  packages    => $override_pkg,
+}
