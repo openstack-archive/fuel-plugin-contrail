@@ -72,3 +72,13 @@ attributes:
     restrictions:
       - action: hide
         condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
+  install_contrail_nova:
+    value: true
+    label: "Override Nova"
+    description: "Override Nova packages from contrail repository."
+    weight: 140
+    type: "checkbox"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
+
