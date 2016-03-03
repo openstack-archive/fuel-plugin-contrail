@@ -78,6 +78,15 @@ class contrail {
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
   $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
+  # vCenter settings
+  $use_vcenter                                = hiera('use_vcenter', false)
+  $vcenter_hash                               = hiera_hash('vcenter_hash')
+  $contrail_vcenter_datacenter                = $settings['contrail_vcenter_datacenter']
+  $contrail_vcenter_dvswitch                  = $settings['contrail_vcenter_dvswitch']
+  $contrail_vcenter_dvportgroup               = $settings['contrail_vcenter_dvportgroup']
+  $contrail_vcenter_dvportgroup_numberofports = $settings['contrail_vcenter_dvportgroup_numberofports']
+  $contrail_vcenter_esxi_for_fabric           = $settings['contrail_vcenter_esxi_for_fabric']
+
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
   $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
 
