@@ -14,64 +14,107 @@
 
 class contrail::compute::vrouter {
 
-  class { 'contrail::package':
-    install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
-    remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
-  } ->
-  exec { 'remove-ovs-modules':
-    command => '/sbin/modprobe -r openvswitch'
-  }
-
-  if $contrail::compute_dpdk_enabled and $contrail::install_contrail_nova {
-    #TODO rewrite using package
-    exec { 'override-nova':
-      command => 'apt-get install --yes -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::="--force-confold" nova-compute',
-      path => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
-    }
-  }
-
-  file {'/etc/contrail/agent_param':
-    ensure  => present,
-    content => template('contrail/agent_param.erb'),
-    require => Class[Contrail::Package],
-  } ->
-  file {'/etc/contrail/contrail-vrouter-agent.conf':
-    ensure  => present,
-    content => template('contrail/contrail-vrouter-agent.conf.erb'),
-  } ->
-  file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
-    ensure  => present,
-    content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
-  }
   if $contrail::compute_dpdk_enabled {
-    file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
+#
+    file { 'create_supervisor_vrouter_override':
+      path    => "/etc/init/supervisor-vrouter.override",
       ensure  => present,
-      content => template('contrail/contrail-vrouter-dpdk.ini.erb'),
+      content => "manual",
+    }->
+    class { 'contrail::package':
+      install => ['contrail-openstack-vrouter','contrail-vrouter-dpdk-init','iproute2','haproxy','libatm1'],
+      remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
+    } ->
+    exec { 'remove-ovs-modules':
+      command => '/sbin/modprobe -r openvswitch'
+    }
+    if $contrail::install_contrail_nova {
+      exec { 'override-nova':
+        command => 'apt-get install --yes -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::="--force-confold" nova-compute',
+        path => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
+      }
+    }
+    file {'/etc/contrail/agent_param':
+      ensure  => present,
+      content => template('contrail/agent_param.erb'),
       require => Class[Contrail::Package],
-      notify  => Service['supervisor-vrouter'],
+    } ->
+    file {'/etc/contrail/contrail-vrouter-agent.conf':
+      ensure  => present,
+      content => template('contrail/contrail-vrouter-agent.conf.erb'),
+    } ->
+    file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
+      ensure  => present,
+      content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
+    }
+    if $contrail::compute_dpdk_enabled {
+      file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
+        ensure  => present,
+        content => template('contrail/contrail-vrouter-dpdk.ini.erb'),
+        require => Class[Contrail::Package],
+        notify  => Service['supervisor-vrouter'],
+      }
+    }
+
+    exec { 'remove_supervisor_override':
+      command => "rm -rf /etc/init/supervisor-vrouter.override",
+      provider => shell,
+    } ->
+    service {'supervisor-vrouter':
+      ensure    => running,
+      enable    => true,
+      subscribe => [Package['contrail-openstack-vrouter'],
+                    File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
+                    '/etc/contrail/contrail-vrouter-nodemgr.conf']
+                    ],
+    } ~>
+    service {'fixup-vrouter':
+      ensure => running,
+      enable => true,
+    }
+  } else {
+    class { 'contrail::package':
+      install => ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1'],
+      remove  => ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api'],
+    } ->
+    exec { 'remove-ovs-modules':
+      command => '/sbin/modprobe -r openvswitch'
+    }
+
+    file {'/etc/contrail/agent_param':
+      ensure  => present,
+      content => template('contrail/agent_param.erb'),
+      require => Class[Contrail::Package],
+    } ->
+    file {'/etc/contrail/contrail-vrouter-agent.conf':
+      ensure  => present,
+      content => template('contrail/contrail-vrouter-agent.conf.erb'),
+    } ->
+    file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
+      ensure  => present,
+      content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
+    }
+
+    file {'/etc/init.d/fixup-vrouter':
+      ensure => present,
+      mode   => '0755',
+      owner  => 'root',
+      group  => 'root',
+      source => 'puppet:///modules/contrail/fixup-vrouter.init',
+    } ->
+
+    service {'supervisor-vrouter':
+      ensure    => running,
+      enable    => true,
+      subscribe => [Package['contrail-openstack-vrouter','contrail-vrouter-dkms'],
+                    File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
+                    '/etc/contrail/contrail-vrouter-nodemgr.conf']
+                    ],
+    } ~>
+    service {'fixup-vrouter':
+      ensure => running,
+      enable => true,
     }
   }
-
-  file {'/etc/init.d/fixup-vrouter':
-    ensure => present,
-    mode   => '0755',
-    owner  => 'root',
-    group  => 'root',
-    source => 'puppet:///modules/contrail/fixup-vrouter.init',
-  } ->
-
-  service {'supervisor-vrouter':
-    ensure    => running,
-    enable    => true,
-    subscribe => [Package['contrail-openstack-vrouter','contrail-vrouter-dkms'],
-                  File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
-                  '/etc/contrail/contrail-vrouter-nodemgr.conf']
-                  ],
-  } ~>
-  service {'fixup-vrouter':
-    ensure => running,
-    enable => true,
-  }
-
 }
 
