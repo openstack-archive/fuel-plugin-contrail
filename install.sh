@@ -64,7 +64,7 @@ then
   then
     DEB3=`mktemp -d`
     cp $DPDK_PKG $DEB3
-    cd $DEB3 && ar vx dpdk-depends-packages*.deb && tar xf data.tar.xz && cp $DEB3/opt/contrail/contrail_install_repo_dpdk/contrail-dpdk-kernel-modules-dkms*.deb $PLUGIN_PATH/repositories/ubuntu/
+    cd $DEB3 && ar vx dpdk-depends-packages*.deb && tar xf data.tar.xz && cp $DEB3/opt/contrail/contrail_install_repo_dpdk/*.deb $PLUGIN_PATH/repositories/ubuntu/
   fi
   cd $PLUGIN_PATH/repositories/ubuntu/
   dpkg-scanpackages ./ | gzip -c - > Packages.gz
