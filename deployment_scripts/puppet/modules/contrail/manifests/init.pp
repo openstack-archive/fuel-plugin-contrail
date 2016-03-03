@@ -82,6 +82,15 @@ class contrail {
   $install_contrail_nova    = pick($settings['install_contrail_nova'], false)
   $install_contrail_qemu_lv = pick($settings['install_contrail_qemu_lv'], false )
 
+  # vCenter settings
+  $use_vcenter                                = hiera('use_vcenter', false)
+  $vcenter_hash                               = hiera_hash('vcenter_hash', {})
+  $contrail_vcenter_datacenter                = $settings['contrail_vcenter_datacenter']
+  $contrail_vcenter_dvswitch                  = $settings['contrail_vcenter_dvswitch']
+  $contrail_vcenter_dvportgroup               = $settings['contrail_vcenter_dvportgroup']
+  $contrail_vcenter_dvportgroup_numberofports = $settings['contrail_vcenter_dvportgroup_numberofports']
+  $contrail_vcenter_esxi_for_fabric           = $settings['contrail_vcenter_esxi_for_fabric']
+
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
   $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
 
