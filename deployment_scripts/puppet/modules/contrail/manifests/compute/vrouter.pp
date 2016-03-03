@@ -22,14 +22,6 @@ class contrail::compute::vrouter {
     command => '/sbin/modprobe -r openvswitch'
   }
 
-  if $contrail::compute_dpdk_enabled and $contrail::install_contrail_nova {
-    #TODO rewrite using package
-    exec { 'override-nova':
-      command => 'apt-get install --yes -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::="--force-confold" nova-compute',
-      path => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
-    }
-  }
-
   file {'/etc/contrail/agent_param':
     ensure  => present,
     content => template('contrail/agent_param.erb'),
@@ -43,6 +35,7 @@ class contrail::compute::vrouter {
     ensure  => present,
     content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
   }
+
   if $contrail::compute_dpdk_enabled {
     file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
       ensure  => present,
