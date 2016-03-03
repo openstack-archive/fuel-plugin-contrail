@@ -79,7 +79,7 @@ class contrail {
   $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
   # Package override
-  $install_contrail_nova = $settings['install_contrail_nova']
+  $install_contrail_nova = pick($settings['install_contrail_nova'], true)
 
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
   $mos_public_vip = $network_metadata['vips']['public']['ipaddr']

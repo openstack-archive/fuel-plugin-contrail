@@ -14,27 +14,17 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
-include contrail
-
-$common_pkg = ['iproute2', 'haproxy', 'libatm1']
-$nova_pkg   = ['nova-compute', 'nova-common', 'python-nova', 'python-urllib3']
-
-if $contrail::compute_dpdk_enabled and $contrail::install_contrail_nova {
-  $override_pkg = concat($common_pkg, $nova_pkg)
-} else {
-  $override_pkg = $common_pkg
+file { '/etc/apt/preferences.d/contrail-pin-110':
+  ensure => file,
+  source => 'puppet:///modules/contrail/contrail-pin-110',
 }
 
-apt::pin { 'contrail-main':
-  explanation => 'Set priority for common contrail packages',
-  priority    => 200,
-  label       => 'contrail',
+# Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
+exec {'no_network_reconfigure':
+  command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
+  onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
 }
-
-apt::pin { 'contrail-override':
-  explanation => 'Set priority for packages that need to override from contrail repository',
-  priority    => 1200,
-  label       => 'contrail',
-  packages    => $override_pkg,
+exec {'no_openstack_network_reconfigure':
+  command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
+  onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
 }
-
