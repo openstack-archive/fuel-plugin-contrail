@@ -273,7 +273,6 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
   type: puppet
@@ -293,28 +292,6 @@
   requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/controller-hiera-post.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 120
-
-# Creates aggregate for DPDK
-- id: controller-aggregate
-  type: puppet
-  role: [primary-controller]
-  required_for: [post_deployment_end]
-  requires: [controller-hiera-post]
-  parameters:
-    puppet_manifest: puppet/manifests/controller-aggregate.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 120
-
-# Congirures DPDK-filter scheduler
-- id: controller-dpdk-scheduler
-  type: puppet
-  role: [primary-controller, controller]
-  required_for: [post_deployment_end]
-  requires: [post_deployment_start]
-  parameters:
-    puppet_manifest: puppet/manifests/controller-dpdk.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
@@ -340,6 +317,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Creates aggregate for DPDK
+- id: controller-aggregate
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [openstack-controller-provision]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-aggregate.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
 # Configure other OpenStack Controllers
 - id: openstack-controller-contrail
   type: puppet
@@ -350,6 +338,17 @@
     puppet_manifest: puppet/manifests/controller-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
+# Congirures DPDK-filter scheduler
+- id: controller-dpdk-scheduler
+  type: puppet
+  role: [primary-controller, controller]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-dpdk.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
 
 # Set apt pin for packeges that need to be override
 - id: contrail-override-repository
