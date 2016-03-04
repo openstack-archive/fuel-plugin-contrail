@@ -53,7 +53,7 @@ then
   tar -xzvf $DEB/opt/contrail/contrail_packages/contrail_debs.tgz -C $PLUGIN_PATH/repositories/ubuntu/
   if [ -f "$VMWARE_PKG" ];
   then
-    cp $VMWARE_PKG $PLUGIN_PATH/repositories/ubuntu/
+    cp $VMWARE_PKG $PLUGIN_PATH/repositories/ubuntu/ && chmod +rx $PLUGIN_PATH/repositories/ubuntu/contrail-install-vcenter-plugin*.deb
     DEB2=`mktemp -d`
     dpkg -x $VMWARE_PKG $DEB2
     cp $DEB2/opt/contrail/contrail_vcenter_plugin_install_repo/*.deb $PLUGIN_PATH/repositories/ubuntu/
