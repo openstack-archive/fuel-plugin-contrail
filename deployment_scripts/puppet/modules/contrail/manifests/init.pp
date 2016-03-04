@@ -83,8 +83,13 @@ class contrail {
   $install_contrail_qemu_lv = pick($settings['install_contrail_qemu_lv'], false )
 
   # vCenter settings
-  $use_vcenter                                = hiera('use_vcenter', false)
-  $vcenter_hash                               = hiera_hash('vcenter_hash', {})
+  $use_vcenter       = hiera('use_vcenter', false)
+  $vcenter_hash      = hiera_hash('vcenter_hash', {})
+  $vcenter_computes  = $vcenter_hash['computes']
+  $vc_host           = $vcenter_computes[0]['vc_host']
+  $vc_user           = $vcenter_computes[0]['vc_user']
+  $vc_password       = $vcenter_computes[0]['vc_password']
+
   $contrail_vcenter_datacenter                = $settings['contrail_vcenter_datacenter']
   $contrail_vcenter_dvswitch                  = $settings['contrail_vcenter_dvswitch']
   $contrail_vcenter_dvportgroup               = $settings['contrail_vcenter_dvportgroup']
