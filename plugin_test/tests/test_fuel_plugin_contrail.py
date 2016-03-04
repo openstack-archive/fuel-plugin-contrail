@@ -206,17 +206,9 @@ class ContrailPlugin(TestBasic):
         """
         Deploy cluster with additional time for waiting on node's availability
         """
-        try:
-            self.fuel_web.deploy_cluster_wait(
-                self.cluster_id, check_services=False)
-        except:
-            nailgun_nodes = self.env.fuel_web.client.list_cluster_nodes(
-                self.env.fuel_web.get_last_created_cluster())
-            time.sleep(420)
-            for n in nailgun_nodes:
-                check_repo_managment(
-                    self.env.d_env.get_ssh_to_remote(n['ip']))
-                logger.info('ip is {0}'.format(n['ip'], n['name']))
+        self.fuel_web.deploy_cluster_wait(
+            self.cluster_id, check_services=False,
+            timeout=180*60)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["install_contrail"])
