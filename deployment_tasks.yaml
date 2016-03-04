@@ -91,7 +91,7 @@
   type: puppet
   groups: [primary-contrail-db, contrail-db,
     primary-contrail-config,contrail-config,
-    primary-contrail-control,contrail-control]
+    primary-contrail-control,contrail-control,compute-vmware]
   required_for: [deploy_end]
   requires: [deploy_start, hosts]
   parameters:
@@ -369,6 +369,17 @@
   requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Deploy contrail vCenter plugin
+- id: contrail-compute-vmware
+  type: puppet
+  role: [compute-vmware]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
