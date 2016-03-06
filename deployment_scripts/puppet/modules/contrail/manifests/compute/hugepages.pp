@@ -24,6 +24,7 @@ class contrail::compute::hugepages {
     if $contrail::hugepages_size == 2 {
       sysctl::value { 'vm.nr_hugepages':
         value => "${contrail::hugepages_number} ",
+        notify  => Service['qemu-kvm'],
       }
       kernel_parameter { 'hugepagesz':
         ensure => absent,
@@ -47,6 +48,7 @@ class contrail::compute::hugepages {
         path    => ['/sbin', '/usr/bin'],
         command => 'sysctl -w vm.nr_hugepages=256',
         onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
+        notify  => Service['qemu-kvm'],
       }
       exec { 'reboot_require':
         path    => ['/bin', '/usr/bin'],
@@ -55,6 +57,10 @@ class contrail::compute::hugepages {
       }
     }
 
+    service { 'qemu-kvm':
+      ensure => running,
+      enable => true,
+    }
     file { '/etc/default/qemu-kvm':
       owner   => 'root',
       group   => 'root',
