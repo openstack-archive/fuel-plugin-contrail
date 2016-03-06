@@ -1,0 +1,163 @@
+<%-
+openstack_hash=scope.lookupvar('contrail::rabbit_nodes_hash')
+cfgm_hash=scope.lookupvar('contrail::contrail_config_nodes_hash')
+control_hash=scope.lookupvar('contrail::contrail_control_nodes_hash')
+all_hash=scope.lookupvar('contrail::all_testbed_nodes_hash')
+-%>
+from fabric.api import env
+
+#Management ip addresses of hosts in the cluster
+<%- all_hash.each_pair do |node_name, node_props| -%>
+<%= node_name %> = 'root@<%= node_props['network_roles']['neutron/mesh']%>'
+<%- end -%>
+
+#Host from which the fab commands are triggered to install and provision
+host_build = 'root@<%= scope.lookupvar('contrail::address') %>'
+
+#Role definition of the hosts.
+env.roledefs = {
+    'all': [<%= scope.function_keys([all_hash]).join(',') %>],
+    'cfgm': [<%= scope.function_keys([cfgm_hash]).join(',') %>],
+    'openstack': [<%= scope.function_keys([openstack_hash]).join(',') %>],
+    'control': [<%= scope.function_keys([control_hash]).join(',') %>],
+    'compute': [],
+    'build': [<%= @hostname %>],
+}
+
+#Openstack admin password
+env.openstack_admin_password = '<%= scope.lookupvar('contrail::admin_password') %>'
+
+# Passwords of each host
+# for passwordless login's no need to set env.passwords,
+# instead populate env.key_filename in testbed.py with public key.
+env.passwords = {
+<%- all_hash.each_pair do |node_name, node_props| -%>
+    <%= node_name %>: 'r00tme',
+<%- end -%>
+    host_build: 'r00tme',
+}
+
+env.keystone = {
+    'admin_token'     : '<%= scope.lookupvar('contrail::admin_token') %>',
+    'service_tenant'  : 'services',
+    'manage_neutron'  : 'no',
+}
+
+env.ha = {
+    'internal_vip'   : '<%= scope.lookupvar('contrail::mos_mgmt_vip') %>',
+    'external_vip'   : '<%= scope.lookupvar('contrail::mos_public_vip') %>',
+    'contrail_internal_vip'   : '<%= scope.lookupvar('contrail::contrail_private_vip') %>',
+    'contrail_external_vip'   : '<%= scope.lookupvar('contrail::contrail_private_vip') %>',
+}
+
+env.openstack = {
+    'service_token' : '<%= scope.lookupvar('contrail::admin_token') %>',
+}
+
+####################################################################################
+#vcenter provisioning
+#server is the vcenter server ip
+#port is the port on which vcenter is listening for connection
+#username is the vcenter username credentials
+#password is the vcenter password credentials
+#auth is the autentication type used to talk to vcenter, http or https
+#datacenter is the datacenter name we are operating on
+#cluster is the clustername we are operating on
+#vcenter_compute is the nova-compute node for this vcenter cluster,
+#         applicable only for vcenter-as-compute mode
+#dv_switch_fab section contains distributed switch related params for fab network
+#       dv_switch_name
+#dv_port_group_fab section contains distributed port group params for fab network
+#       dv_portgroup_name and the number of ports the group has
+#dv_switch_sr_iov section contains distributed switch related params for sr-iov based fab network
+#       dv_switch_name
+#dv_port_group_sr_iov section contains distributed port group params for sr-iov based fab network
+#       dv_portgroup_name and the number of ports the group has
+#dvswitch section contains distributed switch related params for overlay network
+#       dv_switch_name
+#dvportgroup section contains distributed port group info for overlay network
+#       dv_portgroup_name and the number of ports the group has
+####################################################################################
+#env.vcenter_servers = {
+#        'vcenter1': {
+#                  'server':'127.0.0.1',
+#                  'port': '443',
+#                  'username': 'administrator@vsphere.local',
+#                  'password': 'Contrail123!',
+#                  'auth': 'https',
+#                  'datacenter': 'kd_dc',
+#                  'cluster': ['kd_cluster_1','kd_cluster_2'],
+#                  'vcenter_compute' : '1.1.1.2',
+#                  'dv_switch_fab': {'dv_switch_name': 'dvs-lag'},
+#                  'dv_port_group_fab': {
+#                          'dv_portgroup_name': 'fab-pg',
+#                          'number_of_ports': '3',
+#                  },
+#                  'dv_switch_sr_iov': {'dv_switch_name': 'dvs-sr-iov'},
+#                  'dv_port_group_sr_iov': {
+#                          'dv_portgroup_name': 'sr-iov-pg',
+#                          'number_of_ports': '2',
+#                  },
+#                 'dv_switch': { 'dv_switch_name': 'kd_dvswitch'},
+#                 'dv_port_group': {
+#                          'dv_portgroup_name': 'kd_dvportgroup',
+#                          'number_of_ports': '3',
+#                 },
+#        },
+#}
+<%= scope.lookupvar('contrail::vcenter_servers') %>
+
+######################################################################################
+# The compute vm provisioning on ESXI host
+# This section is used to copy a vmdk on to the ESXI box and bring it up
+# the contrailVM which comes up will be setup as a compute node with only
+# vrouter running on it. Each host has an associated esxi to it.
+#
+# esxi_host information:
+#    ip: the esxi ip on which the contrailvm(host/compute) runs
+#    username: username used to login to esxi
+#    password: password for esxi
+#    fabric_vswitch: the name of the underlay vswitch that runs on esxi
+#                    optional, defaults to 'vswitch0'
+#    fabric_port_group: the name of the underlay port group for esxi
+#                       optional, defaults to contrail-fab-pg'
+#    uplink_nic: the nic used for underlay
+#                 optional, defaults to None
+#    data_store: the datastore on esxi where the vmdk is copied to
+#    vcenter_server: the vcenter_server name which manages this esxi
+#    cluster: name of the cluster to which this esxi is added
+#    contrail_vm information:
+#        mac: the virtual mac address for the contrail vm
+#        host: the contrail_vm ip in the form of 'user@contrailvm_ip'
+#        mode: the mode is 'openstack' or 'vcenter'
+#               optional, defaults to env.orchestrator value
+#        pci_devices: pci_devices information
+#            nic: pci_id of the pass-through interfaces
+#        sr_iov_nics: virtual functions enabled physical interface's name
+#        vmdk: the absolute path of the contrail-vmdk used to spawn vm
+#              optional, if vmdk_download_path is specified
+#        vmdk_download_path: download path of the contrail-vmdk.vmdk used to spawn vm
+#                            optional, if vmdk is specified
+######################################################################################
+#esxi_hosts = {
+#       'esxi': {
+#             'ip': '10.1.1.1',
+#             'username': 'root',
+#             'password': 'c0ntrail123',
+#             'datastore': "/vmfs/volumes/ds1", 
+#             'vcenter_server': "vcenter1",
+#             'cluster': "kd_cluster_1",
+#             'contrail_vm': {
+#                   'mac': "00:50:56:05:ba:ba",
+#                   'host': "root@1.1.1.4",
+#                   'mode': "vcenter",
+#                   'pci_devices': {
+#                        nic: ["04:00.0", "04:00.1"],
+#                    },
+#                   'sr_iov_nics': ["vmnic0"],
+#                   'vmdk_download_path': "http://10.84.5.100/vmware/vmdk/ContrailVM-disk1.vmdk",
+#             }
+#       }
+#}
+######################################################################################
+<%= scope.lookupvar('contrail::esxi_hosts') %>
