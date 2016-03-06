@@ -328,6 +328,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
+# Create testbed.py and provision vmware
+- id: openstack-controller-provision-vmware
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [openstack-controller-provision]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-provision-vmware.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Configure other OpenStack Controllers
 - id: openstack-controller-contrail
   type: puppet
