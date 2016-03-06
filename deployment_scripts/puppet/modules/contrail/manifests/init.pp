@@ -92,11 +92,13 @@ class contrail {
 
   # vCenter settings
   $use_vcenter       = hiera('use_vcenter', false)
-  $vcenter_hash      = hiera_hash('vcenter_hash', {})
-  $vcenter_computes  = $vcenter_hash['computes']
-  $vc_host           = $vcenter_computes[0]['vc_host']
-  $vc_user           = $vcenter_computes[0]['vc_user']
-  $vc_password       = $vcenter_computes[0]['vc_password']
+  if $use_vcenter {
+    $vcenter_hash      = hiera_hash('vcenter_hash', {})
+    $vcenter_computes  = $vcenter_hash['computes']
+    $vc_host           = $vcenter_computes[0]['vc_host']
+    $vc_user           = $vcenter_computes[0]['vc_user']
+    $vc_password       = $vcenter_computes[0]['vc_password']
+  }
 
   $contrail_vcenter_datacenter                = $settings['contrail_vcenter_datacenter']
   $contrail_vcenter_dvswitch                  = $settings['contrail_vcenter_dvswitch']
@@ -133,4 +135,17 @@ class contrail {
   # Contrail Config nodes Private IP list
   $contrail_config_nodes_hash     = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-config', 'contrail-config'])
   $contrail_config_ips            = values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh'))
+
+  if $use_vcenter {
+    # Compute-vmware nodes hash
+    $compute_vmware_nodes_hash      = get_nodes_hash_by_roles(hiera('network_metadata'), ['compute-vmware'])
+    # A hash for testbed
+    $all_testbed_roles              = ['primary-controller', 'controller',
+                                      'primary-contrail-db', 'contrail-db',
+                                      'primary-contrail-control', 'contrail-control',
+                                      'primary-contrail-config', 'contrail-config',
+                                      'compute-vmware',
+                                      ]
+    $all_testbed_nodes_hash         = get_nodes_hash_by_roles(hiera('network_metadata'), $all_testbed_roles)
+  }
 }
