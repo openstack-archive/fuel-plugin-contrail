@@ -72,6 +72,18 @@ attributes:
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
         action: "hide"
+  vrouter_core_mask:
+    value: "0x3"
+    label: "CPU pinning"
+    description: "Hexadecimal mask that determines how many and what exactly processors will be used for dpdk vrouter"
+    weight: 131
+    type: "text"
+    regex:
+      source: '0[xX][0-9a-fA-F]+'
+      error: "Invalid hexadecimal value"
+    restrictions:
+      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+        action: "hide"
   install_contrail_nova:
     value: true
     label: "Override Nova"
@@ -83,7 +95,7 @@ attributes:
         action: "hide"
   install_contrail_qemu_lv:
     value: true
-    label: "Override Qemu,Libvirt"
+    label: "Override Qemu, Libvirt"
     description: "Override Qemu and Libvirt packages from contrail repository"
     weight: 150
     type: "checkbox"
