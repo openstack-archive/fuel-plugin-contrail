@@ -15,4 +15,5 @@
 notice('MODULAR: contrail/controller-provision-vmware.pp')
 
 include contrail
-class { contrail::testbed: }
+class { 'contrail::testbed': }
+# TODO: class { 'contrail::provision::vmware': }

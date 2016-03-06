@@ -125,4 +125,16 @@ class contrail {
   # Contrail Config nodes Private IP list
   $contrail_config_nodes_hash     = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-config', 'contrail-config'])
   $contrail_config_ips            = values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh'))
+  
+  # Compute-vmware nodes hash
+  $compute_vmware_nodes_hash      = get_nodes_hash_by_roles(hiera('network_metadata'), ['compute-vmware'])
+  
+  # A hash for testbed
+  $all_testbed_roles              = ['primary-controller', 'controller',
+                                    'primary-contrail-db', 'contrail-db',
+                                    'primary-contrail-control', 'contrail-control',
+                                    'primary-contrail-config', 'contrail-config',
+                                    'compute-vmware',
+                                    ]
+  $all_testbed_nodes_hash         = get_node_hash_by_roles(hiera('network_metadata'), $all_testbed_roles)
 }
