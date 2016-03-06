@@ -12,8 +12,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-
-notice('MODULAR: contrail/controller-provision.pp')
-
-include contrail
-class { 'contrail::provision::controller': }
+class contrail::testbed {
+  file {'/opt/contrail/utils/fabfile/testbeds/testbed.py':
+    ensure  => present,
+    content => template('contrail/testbed.py.erb'),
+  }
+}
