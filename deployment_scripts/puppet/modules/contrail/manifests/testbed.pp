@@ -12,7 +12,19 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/controller-provision.pp')
+class contrail::testbed {
 
-include contrail
-class { 'contrail::provision::controller': }
+  $pkgs = ['python-crypto','python-netaddr','python-paramiko','patch',
+          'contrail-fabric-utils','contrail-setup']
+  $pip_pkgs = ['Fabric-1.7.5']
+
+  class { 'contrail::package':
+    install     => $pkgs,
+    pip_install => $pip_pkgs,
+  } ->
+
+  file {'/opt/contrail/utils/fabfile/testbeds/testbed.py':
+    ensure  => present,
+    content => template('contrail/testbed.py.erb'),
+  }
+}

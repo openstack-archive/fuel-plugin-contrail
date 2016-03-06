@@ -12,7 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/controller-provision.pp')
+notice('MODULAR: contrail/controller-provision-vmware.pp')
 
 include contrail
-class { 'contrail::provision::controller': }
+class { 'contrail::testbed': }
+# TODO: class { 'contrail::provision::vmware': }

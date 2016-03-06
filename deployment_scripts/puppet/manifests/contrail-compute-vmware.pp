@@ -16,5 +16,9 @@ notice('MODULAR: contrail/contrail-compute-vmware.pp')
 
 include contrail
 
+class { 'contrail::ssh':
+  password_auth => 'yes',
+  root_login    => 'yes'
+} ->
 class { 'contrail::compute::vmware': }
 
