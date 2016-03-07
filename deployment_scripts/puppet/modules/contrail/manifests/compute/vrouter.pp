@@ -13,7 +13,15 @@
 #    under the License.
 
 class contrail::compute::vrouter {
+  $dev_mac = getvar("::macaddress_${contrail::phys_dev}")  
+
   if $contrail::compute_dpdk_enabled {
+    if empty($dev_mac) {
+      $dpdk_dev_mac = get_mac_from_vrouter()
+    } else {
+      $dpdk_dev_mac = $dev_mac
+    }
+
     $install_packages = ['contrail-openstack-vrouter','contrail-vrouter-dpdk-init','iproute2','haproxy','libatm1']
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
     file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
