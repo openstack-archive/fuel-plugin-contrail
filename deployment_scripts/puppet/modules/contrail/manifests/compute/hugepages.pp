@@ -55,17 +55,33 @@ class contrail::compute::hugepages {
       }
     }
 
-    file { '/etc/default/qemu-kvm':
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => 'KVM_HUGEPAGES=1',
-      notify  => Service['libvirtd'],
-    }
+    file { '/hugepages':
+      ensure => 'directory',
+      group  => 'kvm',
+    } ->
+
+    mount { '/hugepages':
+      ensure  => 'mounted',
+      fstype  => 'hugetlbfs',
+      device  => 'hugetlbfs',
+      options => 'mode=775,gid=kvm',
+      atboot  => true,
+    } ->
+
+    file_line { 'hugepages_mountpoint':
+      path  => '/etc/libvirt/qemu.conf',
+      match => '#hugetlbfs_mount',
+      line  => 'hugetlbfs_mount = "/hugepages"',
+    } ~>
+
+    service { 'qemu-kvm':
+      ensure => running,
+      enable => true,
+    } ~>
+
     service { 'libvirtd':
       ensure    => running,
       enable    => true,
-      subscribe => File['/etc/default/qemu-kvm'],
     }
   }
 }
