@@ -54,6 +54,7 @@ class contrail::compute::vrouter {
   exec { 'remove_supervisor_override':
     command  => 'rm -rf /etc/init/supervisor-vrouter.override',
     provider => shell,
+    require  => Class[Contrail::Package],
   } ->
   service {'supervisor-vrouter':
     ensure    => running,
