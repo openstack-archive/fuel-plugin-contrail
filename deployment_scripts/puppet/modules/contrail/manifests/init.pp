@@ -12,92 +12,93 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail {
+class contrail(
 
   # General configuration
-  $settings = hiera('contrail', {})
+  $settings = hiera('contrail', {}),
 
   # TODO
-  #$plugin_version = $settings['metadata']['plugin_version']
-  $plugin_version = '3.0'
-  $distribution   = 'juniper'
+  #$plugin_version = $settings['metadata']['plugin_version'],
+  $plugin_version = '3.0',
+  $distribution   = 'juniper',
 
-  $network_scheme   = hiera_hash('network_scheme', {})
-  $network_metadata = hiera_hash('network_metadata', {})
-  $uid              = hiera('uid')
-  $master_ip        = hiera('master_ip')
-  $node_role        = hiera('role')
-  $node_name        = hiera('user_node_name')
-  $nodes            = hiera('nodes')
+  $network_scheme   = hiera_hash('network_scheme', {}),
+  $network_metadata = hiera_hash('network_metadata', {}),
+  $uid              = hiera('uid'),
+  $master_ip        = hiera('master_ip'),
+  $node_role        = hiera('role'),
+  $node_name        = hiera('user_node_name'),
+  $nodes            = hiera('nodes'),
 
-  $public_ssl_hash  = hiera('public_ssl')
-  $public_ssl       = $public_ssl_hash['services']
+  $public_ssl_hash  = hiera('public_ssl'),
+  $public_ssl       = $public_ssl_hash['services'],
 
-  $neutron_config   = hiera_hash('neutron_config', {})
-  $floating_net     = try_get_value($neutron_config, 'default_floating_net', 'net04_ext')
-  $private_net      = try_get_value($neutron_config, 'default_private_net', 'net04')
-  $default_router   = try_get_value($neutron_config, 'default_router', 'router04')
-  $nets             = $neutron_config['predefined_networks']
+  $neutron_config   = hiera_hash('neutron_config', {}),
+  $floating_net     = try_get_value($neutron_config, 'default_floating_net', 'net04_ext'),
+  $private_net      = try_get_value($neutron_config, 'default_private_net', 'net04'),
+  $default_router   = try_get_value($neutron_config, 'default_router', 'router04'),
+  $nets             = $neutron_config['predefined_networks'],
 
-  $default_ceilometer_hash = { 'enabled' => false }
-  $ceilometer_hash         = hiera_hash('ceilometer', $default_ceilometer_hash)
+  $default_ceilometer_hash = { 'enabled' => false },
+  $ceilometer_hash         = hiera_hash('ceilometer', $default_ceilometer_hash),
 
-  $keystone        = hiera_hash('keystone', {})
-  $admin_token     = $keystone['admin_token']
-  $service_token   = $neutron_config['keystone']['admin_password']
-  $metadata_secret = $neutron_config['metadata']['metadata_proxy_shared_secret']
+  $keystone        = hiera_hash('keystone', {}),
+  $admin_token     = $keystone['admin_token'],
+  $service_token   = $neutron_config['keystone']['admin_password'],
+  $metadata_secret = $neutron_config['metadata']['metadata_proxy_shared_secret'],
 
-  $admin_settings = hiera_hash('access', {})
-  $admin_username = $admin_settings['user']
-  $admin_password = $admin_settings['password']
-  $admin_tenant   = $admin_settings['tenant']
+  $admin_settings = hiera_hash('access', {}),
+  $admin_username = $admin_settings['user'],
+  $admin_password = $admin_settings['password'],
+  $admin_tenant   = $admin_settings['tenant'],
 
   # Contrail settings
-  $asnum        = $settings['contrail_asnum']
-  $external     = $settings['contrail_external']
-  $route_target = $settings['contrail_route_target']
-  $gateways     = split($settings['contrail_gateways'], ',')
+  $asnum        = $settings['contrail_asnum'],
+  $external     = $settings['contrail_external'],
+  $route_target = $settings['contrail_route_target'],
+  $gateways     = split($settings['contrail_gateways'], ','),
 
   # Custom mount point for contrail-db
-  $cassandra_path = '/var/lib/contrail_db'
+  $cassandra_path = '/var/lib/contrail_db',
 
   # Network configuration
-  prepare_network_config($network_scheme)
-  $interface     = get_network_role_property('neutron/mesh', 'interface')
-  $gateway       = $network_scheme['endpoints'][$interface]['gateway']
-  $address       = get_network_role_property('neutron/mesh', 'ipaddr')
-  $cidr          = get_network_role_property('neutron/mesh', 'cidr')
-  $netmask       = get_network_role_property('neutron/mesh', 'netmask')
-  $netmask_short = netmask_to_cidr($netmask)
-  $phys_dev      = get_private_ifname($interface)
+  prepare_network_config($network_scheme),
+  $interface     = get_network_role_property('neutron/mesh', 'interface'),
+  $gateway       = $network_scheme['endpoints'][$interface]['gateway'],
+  $address       = get_network_role_property('neutron/mesh', 'ipaddr'),
+  $cidr          = get_network_role_property('neutron/mesh', 'cidr'),
+  $netmask       = get_network_role_property('neutron/mesh', 'netmask'),
+  $netmask_short = netmask_to_cidr($netmask),
+  $phys_dev      = get_private_ifname($interface),
 
-  $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
-  $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
+  $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr'],
+  $mos_public_vip = $network_metadata['vips']['public']['ipaddr'],
 
-  $contrail_private_vip = $network_metadata['vips']['contrail_priv']['ipaddr']
-  $contrail_mgmt_vip    = $contrail_private_vip
+  $contrail_private_vip = $network_metadata['vips']['contrail_priv']['ipaddr'],
+  $contrail_mgmt_vip    = $contrail_private_vip,
 
   # Settings for RabbitMQ on contrail controllers
-  $rabbit             = hiera('rabbit')
-  $rabbit_password    = $rabbit['password']
-  $rabbit_hosts_ports = hiera('amqp_hosts')
+  $rabbit             = hiera('rabbit'),
+  $rabbit_password    = $rabbit['password'],
+  $rabbit_hosts_ports = hiera('amqp_hosts'),
 
   # RabbitMQ nodes Mgmt IP list
-  $rabbit_nodes_hash  = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-controller', 'controller'])
-  $rabbit_ips         = values(get_node_to_ipaddr_map_by_network_role($rabbit_nodes_hash, 'mgmt/messaging'))
+  $rabbit_nodes_hash  = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-controller', 'controller']),
+  $rabbit_ips         = values(get_node_to_ipaddr_map_by_network_role($rabbit_nodes_hash, 'mgmt/messaging')),
 
   # Contrail DB nodes Private IP list
-  $primary_contrail_db_nodes_hash = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-db'])
-  $primary_contrail_db_ip         = values(get_node_to_ipaddr_map_by_network_role($primary_contrail_db_nodes_hash, 'neutron/mesh'))
+  $primary_contrail_db_nodes_hash = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-db']),
+  $primary_contrail_db_ip         = values(get_node_to_ipaddr_map_by_network_role($primary_contrail_db_nodes_hash, 'neutron/mesh')),
 
-  $contrail_db_nodes_hash         = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-db', 'contrail-db'])
-  $contrail_db_ips                = values(get_node_to_ipaddr_map_by_network_role($contrail_db_nodes_hash, 'neutron/mesh'))
+  $contrail_db_nodes_hash         = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-db', 'contrail-db']),
+  $contrail_db_ips                = values(get_node_to_ipaddr_map_by_network_role($contrail_db_nodes_hash, 'neutron/mesh')),
 
   # Contrail Control nodes Private IP list
-  $contrail_control_nodes_hash    = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-control', 'contrail-control'])
-  $contrail_control_ips           = values(get_node_to_ipaddr_map_by_network_role($contrail_control_nodes_hash, 'neutron/mesh'))
+  $contrail_control_nodes_hash    = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-control', 'contrail-control']),
+  $contrail_control_ips           = values(get_node_to_ipaddr_map_by_network_role($contrail_control_nodes_hash, 'neutron/mesh')),
 
   # Contrail Config nodes Private IP list
-  $contrail_config_nodes_hash     = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-config', 'contrail-config'])
-  $contrail_config_ips            = values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh'))
+  $contrail_config_nodes_hash     = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-contrail-config', 'contrail-config']),
+  $contrail_config_ips            = values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')),
+) {
 }
