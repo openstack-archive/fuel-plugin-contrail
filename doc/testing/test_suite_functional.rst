@@ -467,3 +467,42 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Uninstall of plugin
+-------------------
+
+
+ID
+##
+
+uninstall_contrail_plugin
+
+
+Description
+###########
+
+Uninstall of plugin
+Remove plugin: fuel plugins --remove <fuel-plugin-name>==<fuel-plugin-version>
+Check that it was removed successfully: fuel plugins
+Expected Result
+Contrail plugin was removed successfully.
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Remove plugin: fuel plugins --remove <fuel-plugin-name>==<fuel-plugin-version>
+    2. Check that it was removed successfully: fuel plugins
+
+
+Expected results
+################
+
+Contrail plugin was removed successfully
