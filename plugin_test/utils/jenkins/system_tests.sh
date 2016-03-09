@@ -31,9 +31,6 @@ if [ -z $ADMIN_NODE_CPU ]; then export ADMIN_NODE_CPU=4; fi
 if [ -z $SLAVE_NODE_MEMORY ]; then export SLAVE_NODE_MEMORY=4096; fi
 if [ -z $SLAVE_NODE_CPU ]; then export SLAVE_NODE_CPU=4; fi
 
-# Init and update submodule
-git submodule init && git submodule update
-
 sudo /sbin/iptables -F
 sudo /sbin/iptables -t nat -F
 sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
