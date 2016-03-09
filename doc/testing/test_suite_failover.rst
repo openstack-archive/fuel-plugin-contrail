@@ -217,3 +217,39 @@ Expected results
 
 Deploy must failed
 
+
+Uninstall of plugin with deployed environment
+---------------------------------------------
+
+
+ID
+##
+
+uninstall_contrail_plugin_with_deployed_environment
+
+
+Description
+###########
+
+Uninstall of plugin with deployed environment
+
+
+Complexity
+##########
+
+core
+
+
+Steps
+#####
+
+    1. Try to remove plugin and ensure that alert presents in cli: “400 Client Error: Bad Request (Can not delete plugin which is enabled for some environment.)”
+    2. Remove environment
+    3. Remove plugin
+    4. Check that it was removed successfully
+
+
+Expected results
+################
+
+Alert is present when we try to remove plugin which is attached to enabled environment. When environment was removed, plugin is removed successfully too.
