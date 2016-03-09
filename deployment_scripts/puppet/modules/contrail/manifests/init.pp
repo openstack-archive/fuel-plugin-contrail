@@ -63,7 +63,7 @@ class contrail {
   $global_sriov_enabled  = $settings['contrail_global_sriov']
   $compute_sriov_enabled = $global_sriov_enabled and 'sriov' in hiera_array('roles')
   $sriov_physnet         = $settings['sriov_physnet']
-  $sriov_hash            = parsejson($::sriov_devices)
+  $sriov_hash            = get_sriov_devices()
   $passthrough_whitelist = inline_template(
     '<%= "[" + scope.lookupvar("::contrail::sriov_hash").map{ |dev, _| "{\"devname\":\"#{dev}\", \"physical_network\":\"#{sriov_physnet}\"}" }.join(", ") + "]" %>')
 
