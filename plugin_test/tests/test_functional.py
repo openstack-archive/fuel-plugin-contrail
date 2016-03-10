@@ -239,9 +239,9 @@ class IntegrationTests(TestBasic):
                 check_node_state(self.cluster_id, node_name, 'ready')
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_add_conrol"])
+          groups=["contrail_add_control"])
     @log_snapshot_after_test
-    def contrail_add_conrol(self):
+    def contrail_add_control(self):
         """Verify that Contrail control role can be added after deploying
 
         Scenario:
@@ -329,9 +329,9 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_delete_conrol"])
+          groups=["contrail_delete_control"])
     @log_snapshot_after_test
-    def contrail_delete_conrol(self):
+    def contrail_delete_control(self):
         """Verify that Contrail control role can be deleted after deploying
 
         Scenario:
