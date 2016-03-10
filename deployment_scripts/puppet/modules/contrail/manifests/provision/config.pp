@@ -25,7 +25,7 @@ class contrail::provision::config {
     command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
 then exit 1; fi",
     tries     => 10,
-    try_sleep => 10,
+    try_sleep => 30,
   } ->
 
   exec { 'prov_config_node':
