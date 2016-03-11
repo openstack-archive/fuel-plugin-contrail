@@ -12,11 +12,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-
 define contrail::rclocal_vfs (
   $totalvfs,
   $numvfs,
-  $physnet        = $::contrail::sriov_physnet,
   $network_device = $title,
   )
 {
@@ -31,6 +29,12 @@ define contrail::rclocal_vfs (
     line  => "echo ${final_vf} > /sys/class/net/${network_device}/device/sriov_numvfs",
     path  => '/etc/rc.local',
     match => ".* /sys/class/net/${network_device}/device/sriov_numvfs"
+  }
+
+  file_line {'remove exit line'
+    ensure => absent,
+    path   => '/etc/rc.local',
+    line   => 'exit 0'
   }
 
 }

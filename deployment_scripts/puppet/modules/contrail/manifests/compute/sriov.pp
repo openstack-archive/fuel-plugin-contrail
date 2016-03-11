@@ -32,12 +32,6 @@ class contrail::compute::sriov {
 
     create_resources(contrail::rclocal_vfs, $::contrail::sriov_hash)
 
-    file_line {"sriov ${title}":
-      ensure => absent,
-      path   => '/etc/rc.local',
-      line   => 'exit 0'
-    }
-
     exec { 'reboot_require':
       path    => ['/bin', '/usr/bin'],
       command => 'touch /tmp/contrail-reboot-require'
