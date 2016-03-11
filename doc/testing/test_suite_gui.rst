@@ -80,7 +80,7 @@ Steps
     9. Open the Settings tab of the Fuel web UI
     10. Select the Contrail plugin checkbox
     11. Verify validation of the field 'AS number' with: set as empty, set  literal value, set 0 or 65536, other settings leave as default
-    12. Verify validation 'GW IP' field with: verify that  this field may be empty if gateway is not used, set invalid ip address ('256.256.256.256'), other settings leave as default
+    12. Verify validation 'GW IP' field with: verify that  this field can not be empty if gateway is not used, set invalid ip address ('256.256.256.256'), other settings leave as default
 
 
 Expected results
