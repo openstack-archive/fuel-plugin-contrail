@@ -79,9 +79,9 @@ class contrail::compute::hugepages {
       enable => true,
     } ~>
 
-    service { 'libvirtd':
-      ensure    => running,
-      enable    => true,
+    service { 'libvirt-bin':
+      ensure => running,
+      enable => true,
     }
   }
 }

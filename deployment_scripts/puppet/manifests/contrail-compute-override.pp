@@ -37,7 +37,7 @@ if $contrail::compute_dpdk_enabled {
   } ->
   exec {'setup_dpdk_repo':
     command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh',
-    path => $path_cmd,
+    path    => $path_cmd,
   }
 
   # Override nova packages if it set on Fuel UI
@@ -51,7 +51,7 @@ if $contrail::compute_dpdk_enabled {
     #TODO rewrite using package
     exec { 'override-nova':
       command => "${install_cmd} nova-compute",
-      path => $path_cmd,
+      path    => $path_cmd,
     }
   }
 
@@ -74,8 +74,8 @@ if $contrail::compute_dpdk_enabled {
     #TODO rewrite using package
     exec { 'override-libvirt':
       command => "${install_cmd} libvirt-bin libvirt0",
-      path => $path_cmd,
-    } ~>
+      path    => $path_cmd,
+    } ->
     # With a new libvirt packages this init script must be stopped
     service { 'libvirtd':
       ensure => stopped,
@@ -102,4 +102,3 @@ if $contrail::compute_dpdk_enabled {
     }
   }
 }
-
