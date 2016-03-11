@@ -32,10 +32,14 @@ class contrail::compute::sriov {
 
     create_resources(contrail::rclocal_vfs, $::contrail::sriov_hash)
 
-    file_line {"sriov ${title}":
-      ensure => absent,
-      path   => '/etc/rc.local',
-      line   => 'exit 0'
+    $sriov_devices_number = inline_template('<%= scope.lookupvar("::contrail::sriov_hash").length %>')
+
+    if $sriov_devices_number > 0 {
+      file_line {'remove exit line':
+        ensure => absent,
+        path   => '/etc/rc.local',
+        line   => 'exit 0'
+      }
     }
 
     exec { 'reboot_require':

@@ -12,11 +12,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-
 define contrail::rclocal_vfs (
   $totalvfs,
   $numvfs,
-  $physnet        = $::contrail::sriov_physnet,
   $network_device = $title,
   )
 {
