@@ -27,6 +27,11 @@ define contrail::rclocal_vfs (
     $final_vf = min(30, $::contrail::sriov_hash[$network_device]['totalvfs'])
   }
 
+  file_line {"autostart interface ${title}":
+    line => "auto ${title}",
+    path => '/etc/network/interface'
+  }
+
   file_line {"sriov ${title}":
     line  => "echo ${final_vf} > /sys/class/net/${network_device}/device/sriov_numvfs",
     path  => '/etc/rc.local',
