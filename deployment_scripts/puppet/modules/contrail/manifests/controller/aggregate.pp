@@ -46,7 +46,7 @@ class contrail::controller::aggregate {
       hosts             => $dpdk_hosts,
     } ->
     exec { 'create-m1.small.hpgs-flavor' :
-      command   => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 0 2"',
+      command   => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 20 2"',
       unless    => 'bash -c "nova flavor-list | grep -q m1.small.hpgs"',
       tries     => 10,
       try_sleep => 2,
