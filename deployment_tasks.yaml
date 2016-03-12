@@ -26,7 +26,7 @@
   role: [primary-contrail-config]
   tasks: [hiera, globals, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
-  requires: [deploy_start, contrail-db]
+  requires: [deploy_start, contrail-db, primary-controller]
   parameters:
     strategy:
       type: one_by_one
