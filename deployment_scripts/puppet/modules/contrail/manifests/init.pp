@@ -89,6 +89,12 @@ class contrail {
   # Package override
   $install_contrail_nova    = pick($settings['install_contrail_nova'], false)
   $install_contrail_qemu_lv = pick($settings['install_contrail_qemu_lv'], false )
+  
+  if $install_contrail_qemu_lv {
+    $libvirt_name = 'libvirt-bin'
+  } else {
+    $libvirt_name = 'libvird'
+  }
 
   # vCenter settings
   $use_vcenter                                = hiera('use_vcenter', false)
