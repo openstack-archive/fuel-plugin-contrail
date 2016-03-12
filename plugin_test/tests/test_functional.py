@@ -90,7 +90,16 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self,
                                       conf_ctrl, delete=True,
-                                      is_vsrx=vsrx_setup_result)
+                                      is_vsrx=False)
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id,
+            test_sets=['smoke', 'sanity', 'ha'],
+            timeout= 45 * 60,
+            should_fail=1,
+            failed_test_name=[('Check that required services are running', )
+                              ]
+        )
+
         openstack.update_deploy_check(self,
                                       conf_ctrl,
                                       is_vsrx=vsrx_setup_result)
