@@ -476,3 +476,126 @@ class IntegrationTests(TestBasic):
         openstack.update_deploy_check(self,
                                       conf_db, delete=True,
                                       is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_db_multirole"])
+    @log_snapshot_after_test
+    def contrail_db_multirole(self):
+        """Deploy Environment with Contrail DB + Ceph multirole
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add some controller, compute nodes
+            4. Add 1 node with "contrail-db" + "Ceph-OSD" role, one
+               node with "contrail-control" + "storage-cinder" and
+               1 node with "contrail-config" + "Ceph-OSD"
+            5. Deploy cluster
+            6. Run OSTF tests
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        conf_db = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute'],
+            'slave-03': ['contrail-db',
+                         'ceph-osd'],
+            'slave-04': ['contrail-control',
+                         'cinder'],
+            'slave-05': ['contrail-config',
+                         'ceph-osd']
+        }
+
+        openstack.update_deploy_check(self,
+                                      conf_db,
+                                      is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_control_multirole"])
+    @log_snapshot_after_test
+    def contrail_control_multirole(self):
+        """Deploy Environment with Contrail Control  + Ceph multirole
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add some controller, compute + "Ceph-OSD" nodes
+            4. Add 1 node with "contrail-control" + "contrail-config" +
+               "Ceph-OSD" multirole and 1 node with "contrail-db" +
+               "storage-cinder"
+            5. Deploy cluster
+            6. Run OSTF tests
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        conf_control = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute',
+                         'ceph-osd'],
+            'slave-03': ['contrail-db',
+                         'cinder'],
+            'slave-04': ['contrail-control',
+                         'contrail-config',
+                         'ceph-osd'],
+        }
+
+        openstack.update_deploy_check(self,
+                                      conf_control,
+                                      is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_config_multirole"])
+    @log_snapshot_after_test
+    def contrail_config_multirole(self):
+        """Deploy Environment with Contrail Control  + Ceph multirole
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add some controller, compute + "Ceph-OSD" nodes
+            4. Add 1 node with "contrail-config" + "Ceph-OSD" +
+               "storage-cinder" multirole and one node with "contrail-db"
+               + "contrail-control"
+            5. Deploy cluster
+            6. Run OSTF tests
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        conf_config = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute',
+                         'ceph-osd'],
+            'slave-03': ['contrail-db',
+                         'contrail-control'],
+            'slave-04': ['contrail-config',
+                         'ceph-osd',
+                         'cinder'],
+        }
+
+        openstack.update_deploy_check(self,
+                                      conf_config,
+                                      is_vsrx=vsrx_setup_result)
