@@ -7,6 +7,8 @@ contrail-db:
   conflicts:
     - controller
     - compute
+    - ceph-osd
+    - cinder
 
 contrail-config:
   name: Contrail - Config
@@ -19,6 +21,8 @@ contrail-config:
   conflicts:
     - controller
     - compute
+    - ceph-osd
+    - cinder
 
 contrail-control:
   name: Contrail - Control
@@ -30,6 +34,8 @@ contrail-control:
   conflicts:
     - controller
     - compute
+    - ceph-osd
+    - cinder
 
 dpdk:
   name: DPDK compute
