@@ -32,10 +32,8 @@ file {'/etc/hiera/override':
 }
 # Post-install
 # Create predefined_networks for OSTF-nets in controller-provision.pp
-if empty($contrail::nets) {
-  file { "${hiera_dir}/${plugin_yaml}":
-    ensure  => file,
-    content => template('contrail/plugins.yaml.erb'),
-    require => File['/etc/hiera/override']
-  }
+file { "${hiera_dir}/${plugin_yaml}":
+  ensure  => file,
+  content => template('contrail/plugins.yaml.erb'),
+  require => File['/etc/hiera/override']
 }
