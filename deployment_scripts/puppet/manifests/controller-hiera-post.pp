@@ -22,6 +22,11 @@ $plugin_yaml = "${plugin_name}.yaml"
 
 $contrail_plugin = hiera('contrail', undef)
 
+file_line {"${plugin_name}_hiera_override":
+  path  => '/etc/hiera.yaml',
+  line  => "  - override/${plugin_name}",
+  after => '  - override/module/%{calling_module}',
+} ->
 file {'/etc/hiera/override':
   ensure  => directory,
 }
