@@ -96,8 +96,7 @@ class IntegrationTests(TestBasic):
             test_sets=['smoke', 'sanity', 'ha'],
             timeout= 45 * 60,
             should_fail=1,
-            failed_test_name=[('Check that required services are running', )
-                              ]
+            failed_test_name=['Check that required services are running']
         )
 
         openstack.update_deploy_check(self,
