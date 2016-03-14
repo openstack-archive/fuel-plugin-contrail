@@ -83,7 +83,7 @@ class contrail {
   $rabbit_hosts_ports = hiera('amqp_hosts')
 
   # RabbitMQ nodes Mgmt IP list
-  $rabbit_ips         = inline_template("<%= @rabbit_hosts_ports.split(',').map {|c| c.strip.gsub(/:[0-9]*$/,'')} %>")
+  $rabbit_ips         = split(inline_template("<%= @rabbit_hosts_ports.split(',').map {|c| c.strip.gsub(/:[0-9]*$/,'')}.join(',') %>"),',')
 
   # Contrail DB nodes Private IP list
   $primary_contrail_db_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-db'])
