@@ -10,7 +10,7 @@ This document provides sample configuration with network template.
 It is designed to get customers up and running quickly.
 The provided template utilizes 3 networks: Admin (PXE), Public and Private.
 
-#.  First do steps 5.1-5.7 from :doc:`/install_guide`
+#.  First do steps 5.3.1 - 5.3.7 from :doc:`/install_guide`
 
 #.  Configure interfaces as shown on figure:
 

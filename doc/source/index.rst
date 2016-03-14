@@ -13,6 +13,7 @@ Guide to the Contrail plugin version 3.0 for Fuel 7.0
     sys_reqs
     install_guide
     using_network_templates
+    enable_sriov
     contrail_ui_intro
     appendix
 
