@@ -46,7 +46,7 @@ html_show_copyright = False
 highlight_language = 'none'
 
 #version = subprocess.check_output(['make', '-sRrC', '../../', 'showversion']).decode('utf-8')
-version = 3.0
+version = '3.0'
 release = version
 
 master_doc = 'index'
