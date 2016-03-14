@@ -18,9 +18,7 @@ include contrail
 
 # Post-install
 # Create predefined_networks for OSTF-nets in controller-provision.pp
-if empty($contrail::nets) {
-  file { '/etc/hiera/plugins/contrail.yaml':
-    ensure  => file,
-    content => template('contrail/plugins.yaml.erb'),
-  }
+file { '/etc/hiera/plugins/contrail.yaml':
+  ensure  => file,
+  content => template('contrail/plugins.yaml.erb'),
 }
