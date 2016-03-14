@@ -101,7 +101,12 @@ class IntegrationTests(TestBasic):
 
         openstack.update_deploy_check(self,
                                       conf_ctrl,
-                                      is_vsrx=vsrx_setup_result)
+                                      is_vsrx=False)
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id,
+            test_sets=['smoke', 'ha'],
+            timeout= 45 * 60)
+
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_plugin_add_delete_compute_node"])
@@ -137,7 +142,6 @@ class IntegrationTests(TestBasic):
             'slave-01': ['controller'],
             'slave-02': ['controller'],
             'slave-03': ['controller'],
-            'slave-04': ['controller'],
             'slave-05': ['compute', 'cinder'],
             'slave-06': ['compute', 'cinder'],
             'slave-07': ['compute', 'cinder'],
@@ -154,9 +158,21 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self,
                                       conf_compute, delete=True,
-                                      is_vsrx=vsrx_setup_result)
+                                      is_vsrx=False)
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id,
+            test_sets=['smoke', 'sanity', 'ha'],
+            timeout= 45 * 60,
+            should_fail=1,
+            failed_test_name=['Check that required services are running']
+        )
+
         openstack.update_deploy_check(self, conf_compute,
-                                      is_vsrx=vsrx_setup_result)
+                                      is_vsrx=False)
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id,
+            test_sets=['smoke', 'ha'],
+            timeout= 45 * 60)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha_with_shutdown_contrail_node"])
@@ -433,9 +449,9 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_add_del_db"])
+          groups=["contrail_add_db"])
     @log_snapshot_after_test
-    def contrail_add_del_db(self):
+    def contrail_add_db(self):
         """Verify that Contrail DB role can be added and deleted after
         deploying
 
@@ -451,10 +467,6 @@ class IntegrationTests(TestBasic):
             7. Add one node with "contrail-db" role
             8. Deploy changes
             9. Run OSTF tests
-            10. Delete node with "contrail-db", which was added before
-            11. Deploy changes
-            12. Run OSTF tests
-            13. Check Controller and Contrail nodes status
 
         """
         plugin.prepare_contrail_plugin(self, slaves=5)
@@ -480,7 +492,4 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self,
                                       conf_db,
-                                      is_vsrx=vsrx_setup_result)
-        openstack.update_deploy_check(self,
-                                      conf_db, delete=True,
                                       is_vsrx=vsrx_setup_result)

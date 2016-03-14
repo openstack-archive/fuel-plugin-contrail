@@ -309,14 +309,14 @@ Expected results
 All steps must be completed successfully, without any errors.
 
 
-Verify that Contrail DB role can be added and deleted after deploying
----------------------------------------------------------------------
+Verify that Contrail DB role can be added after deploying
+---------------------------------------------------------
 
 
 ID
 ##
 
-contrail_add_del_db
+contrail_add_db
 
 
 Description
@@ -343,10 +343,6 @@ Steps
     7. Add one node with "contrail-db" role
     8. Deploy changes
     9. Run OSTF tests
-    10. Delete node with "contrail-db", which was added before
-    11. Deploy changes
-    12. Run OSTF tests
-    13. Check Controller and Contrail nodes status
 
 
 Expected results
