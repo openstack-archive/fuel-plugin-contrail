@@ -14,3 +14,6 @@ New features in plugin version 3.0.0
     Now it is possible to deploy a Contrail-enabled environment with reduced set of logical networks, e.g. Public, Management and Private nets can share the same interface.
     This simplifies routing configuration for large environments distributed across different L2 segments. More detailed information here :doc:`/using_network_templates`
 
+*   DPDK-based vRouter. :doc:`/dpdk`
+
+*   SR-IOV :doc:`/enable_sriov`
