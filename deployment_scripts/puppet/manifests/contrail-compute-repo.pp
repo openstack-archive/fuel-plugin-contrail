@@ -14,17 +14,23 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
-file { '/etc/apt/preferences.d/contrail-pin-110':
-  ensure => file,
-  source => 'puppet:///modules/contrail/contrail-pin-110',
+class contrail__compute_repo {
+  file { '/etc/apt/preferences.d/contrail-pin-110':
+    ensure => file,
+    source => 'puppet:///modules/contrail/contrail-pin-110',
+  }
+
+  # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
+  exec {'no_network_reconfigure':
+    command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
+    onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
+  }
+  exec {'no_openstack_network_reconfigure':
+    command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
+    onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
+  }
 }
 
-# Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
-exec {'no_network_reconfigure':
-  command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
-  onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
-}
-exec {'no_openstack_network_reconfigure':
-  command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
-  onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
-}
+include ::contrail__compute_repo
+
+# vim: set ts=2 sw=2 et :

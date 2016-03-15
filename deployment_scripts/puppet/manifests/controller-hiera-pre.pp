@@ -14,10 +14,16 @@
 
 notice('MODULAR: contrail/controller-hiera-pre.pp')
 
-# Pre-deploy
-# Empty predefined_networks to skip OSTF nets creation
-# in openstack-network-controller.pp
-file { '/etc/hiera/plugins/contrail.yaml':
-  ensure  => file,
-  content => 'neutron_config: { predefined_networks: [] }',
+class contrail__controller_hiera_pre {
+  # Pre-deploy
+  # Empty predefined_networks to skip OSTF nets creation
+  # in openstack-network-controller.pp
+  file { '/etc/hiera/plugins/contrail.yaml':
+    ensure  => file,
+    content => 'neutron_config: { predefined_networks: [] }',
+  }
 }
+
+include ::contrail__controller_hiera_pre
+
+# vim: set ts=2 sw=2 et :

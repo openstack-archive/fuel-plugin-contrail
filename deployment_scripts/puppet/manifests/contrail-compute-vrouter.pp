@@ -14,5 +14,11 @@
 
 notice('MODULAR: contrail/contrail-compute-vrouter.pp')
 
-include contrail
-class { 'contrail::compute::vrouter': }
+class contrail__compute_vrouter {
+  include contrail
+  class { 'contrail::compute::vrouter': }
+}
+
+include ::contrail__compute_vrouter
+
+# vim: set ts=2 sw=2 et :

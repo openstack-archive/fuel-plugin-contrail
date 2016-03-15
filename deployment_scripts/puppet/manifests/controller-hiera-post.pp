@@ -14,11 +14,17 @@
 
 notice('MODULAR: contrail/controller-hiera-post.pp')
 
-include contrail
+class contrail__controller_hiera_post {
+  include contrail
 
-# Post-install
-# Create predefined_networks for OSTF-nets in controller-provision.pp
-file { '/etc/hiera/plugins/contrail.yaml':
-  ensure  => file,
-  content => template('contrail/plugins.yaml.erb'),
+  # Post-install
+  # Create predefined_networks for OSTF-nets in controller-provision.pp
+  file { '/etc/hiera/plugins/contrail.yaml':
+    ensure  => file,
+    content => template('contrail/plugins.yaml.erb'),
+  }
 }
+
+include ::contrail__controller_hiera_post
+
+# vim: set ts=2 sw=2 et :

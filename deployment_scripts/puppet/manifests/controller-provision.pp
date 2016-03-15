@@ -14,5 +14,11 @@
 
 notice('MODULAR: contrail/controller-provision.pp')
 
-include contrail
-class { 'contrail::provision::controller': }
+class contrail__controller_provision {
+  include contrail
+  class { 'contrail::provision::controller': }
+}
+
+include ::contrail__controller_provision
+
+# vim: set ts=2 sw=2 et :

@@ -14,5 +14,11 @@
 
 notice('MODULAR: contrail/contrail-compute-network.pp')
 
-include contrail
-class { 'contrail::compute::network': }
+class contrail__compute_network {
+  include contrail
+  class { 'contrail::compute::network': }
+}
+
+include ::contrail__compute_network
+
+# vim: set ts=2 sw=2 et :

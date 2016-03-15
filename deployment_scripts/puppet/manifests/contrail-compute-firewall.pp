@@ -14,5 +14,11 @@
 
 notice('MODULAR: contrail/contrail-compute-firewall.pp')
 
-include contrail
-class { 'contrail::compute::firewall': }
+class contrail__compute_firewall {
+  include contrail
+  class { 'contrail::compute::firewall': }
+}
+
+include ::contrail__compute_firewall
+
+# vim: set ts=2 sw=2 et :

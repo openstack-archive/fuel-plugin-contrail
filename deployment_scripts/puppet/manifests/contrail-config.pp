@@ -14,9 +14,13 @@
 
 notice('MODULAR: contrail/contrail-config.pp')
 
-include contrail
-class { 'contrail::config': } ->
-class { 'contrail::analytics': } ->
-class { 'contrail::webui': }
+class contrail__config {
+  include contrail
+  class { 'contrail::config': } ->
+  class { 'contrail::analytics': } ->
+  class { 'contrail::webui': }
+}
 
+include ::contrail__config
 
+# vim: set ts=2 sw=2 et :

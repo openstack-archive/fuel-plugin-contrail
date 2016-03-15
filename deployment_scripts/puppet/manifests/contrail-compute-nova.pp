@@ -14,5 +14,11 @@
 
 notice('MODULAR: contrail/contrail-compute-nova.pp')
 
-include contrail
-class { 'contrail::compute::nova': }
+class contrail__compute_nova {
+  include contrail
+  class { 'contrail::compute::nova': }
+}
+
+include ::contrail__compute_nova
+
+# vim: set ts=2 sw=2 et :

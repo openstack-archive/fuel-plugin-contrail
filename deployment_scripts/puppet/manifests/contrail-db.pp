@@ -14,5 +14,11 @@
 
 notice('MODULAR: contrail/contrail-db.pp')
 
-include contrail
-class { 'contrail::database': }
+class contrail__db {
+  include contrail
+  class { 'contrail::database': }
+}
+
+include ::contrail__db
+
+# vim: set ts=2 sw=2 et :
