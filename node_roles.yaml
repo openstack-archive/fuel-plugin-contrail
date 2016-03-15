@@ -43,7 +43,7 @@ dpdk:
     Enable Contrail DPDK feature on compute node. NOTE: Use this role only together with Compute role to enable DPDK feature in other cases it will not have any effect.
   has_primary: false
   public_ip_required: false
-  weight: 100
+  weight: 90
   conflicts:
     - controller
     - contrail-db
@@ -56,7 +56,7 @@ sriov:
     Enable SRIOV feature on compute node. NOTE: Use this role only together with Compute role to enable SRIOV feature in other cases it will not have any effect.
   has_primary: false
   public_ip_required: false
-  weight: 100
+  weight: 90
   conflicts:
     - controller
     - contrail-db
