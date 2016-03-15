@@ -27,9 +27,13 @@ class contrail::analytics {
 
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
+  tweaks::ubuntu_service_override { 'supervisor-analytics':
+    package_name => 'contrail-analytics',
+  }
+
 # Packages
   package { 'redis-server': } ->
-  package { 'contrail-analytics': } ->
+  package { 'contrail-analytics': }
   package { 'contrail-openstack-analytics': }
 
 # Analytics config files
@@ -81,9 +85,9 @@ class contrail::analytics {
   }
 
   service { 'supervisor-analytics':
-    ensure    => running,
+    ensure    => $contrail::service_ensure,
     enable    => true,
-    require   => [Package['contrail-openstack-analytics'],
+    require   => [Package['contrail-openstack-analytics'],Package['contrail-analytics'],
                     Service['redis-server'],
                     Service['contrail-alarm-gen']],
     subscribe => [File['/etc/contrail/contrail-analytics-api.conf'],
