@@ -15,8 +15,6 @@
 notice('MODULAR: contrail/contrail-config.pp')
 
 include contrail
-class { 'contrail::config': } ->
-class { 'contrail::analytics': } ->
+class { 'contrail::config': }
+class { 'contrail::analytics': }
 class { 'contrail::webui': }
-
-
