@@ -30,9 +30,13 @@ class contrail::control {
     path     => '/usr/bin:/bin:/sbin',
   }
 
+  tweaks::ubuntu_service_override { 'supervisor-control':
+    package_name => 'contrail-control',
+  }
+
 # Packages
   package { 'contrail-dns': }
-  package { 'contrail-control': } ->
+  package { 'contrail-control': }
   package { 'contrail-openstack-control': }
 
 # Contrail control config files
@@ -72,9 +76,9 @@ class contrail::control {
                   ]
   }
   service { 'supervisor-control':
-    ensure    => running,
+    ensure    => $contrail::service_ensure,
     enable    => true,
-    require   => Package['contrail-openstack-control'],
+    require   => [Package['contrail-openstack-control'],Package['contrail-control']],
     subscribe => [File['/etc/contrail/contrail-control.conf'],
                     File['/etc/contrail/contrail-dns.conf'],
                     ],
