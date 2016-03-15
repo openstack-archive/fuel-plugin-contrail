@@ -14,9 +14,14 @@
 
 notice('MODULAR: contrail/compute-hiera-pre.pp')
 
-# prevent to install and run open vSwitch on compute nodes
-
-file { '/etc/hiera/plugins/contrail.yaml':
-  ensure  => file,
-  content => 'use_ovs: false',
+class contrail__compute_hiera_pre {
+  # prevent to install and run open vSwitch on compute nodes
+  file { '/etc/hiera/plugins/contrail.yaml':
+    ensure  => file,
+    content => 'use_ovs: false',
+  }
 }
+
+include ::contrail__compute_hiera_pre
+
+# vim: set ts=2 sw=2 et :

@@ -14,8 +14,8 @@
 
 notice('MODULAR: contrail/common-repo.pp')
 
-case $operatingsystem
-{
+class contrail__common_repo {
+  case $operatingsystem {
     CentOS: {
       yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
       package {'yum-plugin-priorities': ensure => present }
@@ -26,6 +26,9 @@ case $operatingsystem
       }
     }
     default: {}
+  }
 }
 
+include ::contrail__common_repo
 
+# vim: set ts=2 sw=2 et :
