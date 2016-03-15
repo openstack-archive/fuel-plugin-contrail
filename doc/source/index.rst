@@ -15,5 +15,6 @@ Guide to the Contrail plugin version 3.0 for Fuel 7.0
     dpdk
     enable_sriov
     using_network_templates
+    verification
     contrail_ui_intro
     appendix
