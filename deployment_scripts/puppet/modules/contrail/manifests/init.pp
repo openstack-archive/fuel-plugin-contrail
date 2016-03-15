@@ -61,6 +61,12 @@ class contrail {
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
 
+  # Control of automatic services startup
+  $service_ensure = hiera('upgrade','false') ? {
+    true    => 'stopped',
+    default => 'running',
+    }
+
   # Network configuration
   prepare_network_config($network_scheme)
   $interface     = get_network_role_property('neutron/mesh', 'interface')

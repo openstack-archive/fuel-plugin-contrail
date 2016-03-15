@@ -81,7 +81,7 @@ class contrail::analytics {
   }
 
   service { 'supervisor-analytics':
-    ensure    => running,
+    ensure    => $contrail::service_ensure,
     enable    => true,
     require   => [Package['contrail-openstack-analytics'],
                     Service['redis-server'],
