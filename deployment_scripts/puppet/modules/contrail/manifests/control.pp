@@ -30,6 +30,11 @@ class contrail::control {
     path     => '/usr/bin:/bin:/sbin',
   }
 
+####### Disable upstart startup on install #######
+  tweaks::ubuntu_service_override { 'supervisor-control':
+    package_name => 'contrail-control',
+  }
+
 # Packages
   package { 'contrail-dns': }
   package { 'contrail-control': } ->
@@ -72,9 +77,9 @@ class contrail::control {
                   ]
   }
   service { 'supervisor-control':
-    ensure    => running,
+    ensure    => $contrail::service_ensure,
     enable    => true,
-    require   => Package['contrail-openstack-control'],
+    require   => [Package['contrail-openstack-control'],Tweaks::Ubuntu_service_override['supervisor-control']],
     subscribe => [File['/etc/contrail/contrail-control.conf'],
                     File['/etc/contrail/contrail-dns.conf'],
                     ],
