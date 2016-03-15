@@ -268,6 +268,17 @@
     puppet_manifest: puppet/manifests/controller-hiera-pre.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
+#
+# Create overrides for Hiera on Controllers: empty predefined_nets
+- id: compute-hiera-pre
+  type: puppet
+  groups: [compute]
+  required_for: [netconfig]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/compute-hiera-pre.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
 
 # Skip L3 and DHCP Neutron agents
 - id: primary-openstack-network-agents-l3
