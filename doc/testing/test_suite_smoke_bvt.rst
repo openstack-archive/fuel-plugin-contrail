@@ -22,7 +22,7 @@ Deploy a cluster with Contrail Plugin.
 Complexity
 ##########
 
-smoke
+core
 
 
 Steps
@@ -61,7 +61,7 @@ BVT test for contrail plugin. Deploy cluster with a controller, a compute, a con
 Complexity
 ##########
 
-smoke
+core
 
 
 Steps
