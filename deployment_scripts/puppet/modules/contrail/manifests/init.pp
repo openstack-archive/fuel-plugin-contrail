@@ -30,8 +30,10 @@ class contrail {
   $node_name        = hiera('user_node_name')
   $nodes            = hiera('nodes')
 
-  $public_ssl_hash  = hiera_hash('public_ssl')
-  $public_ssl       = $public_ssl_hash['services']
+  $public_ssl_hash    = hiera_hash('public_ssl', {})
+  $ssl_hash           = hiera_hash('use_ssl', {})
+  $public_ssl         = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'usage', false)
+  $public_ssl_path    = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'path', [''])
 
   $neutron_config   = hiera_hash('neutron_config', {})
   $floating_net     = try_get_value($neutron_config, 'default_floating_net', 'net04_ext')

@@ -16,8 +16,10 @@ class contrail::vip {
 
   if $contrail::public_ssl {
     $ui_backend_port = 8080
+    $mode = 'http'
   } else {
     $ui_backend_port = 8143
+    $mode = 'tcp'
   }
 
   Openstack::Ha::Haproxy_service {
@@ -34,6 +36,7 @@ class contrail::vip {
     public                 => true,
     internal               => true,
     public_ssl             => $contrail::public_ssl,
+    public_ssl_path        => $contrail::public_ssl_path,
     haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check'],
                                 'balance'        => 'roundrobin',
                                 'tcp-check'      => 'connect port 6379',
@@ -50,6 +53,7 @@ class contrail::vip {
     public                 => true,
     internal               => true,
     public_ssl             => $contrail::public_ssl,
+    public_ssl_path        => $contrail::public_ssl_path,
     haproxy_config_options => { 'option'  => 'nolinger',
                                 'balance' => 'roundrobin',
                                 'timeout' => ['server 3m', 'client 3m'] },
@@ -78,11 +82,12 @@ class contrail::vip {
     public                 => true,
     internal               => false,
     public_ssl             => $contrail::public_ssl,
+    public_ssl_path        => $contrail::public_ssl_path,
     haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check'],
                                 'balance'        => 'source',
                                 'tcp-check'      => "connect port ${ui_backend_port}",
                                 'default-server' => 'error-limit 1 on-error mark-down',
-                                'mode'           => 'tcp' },
+                                'mode'           => $mode },
     balancermember_options => 'check inter 2000 rise 2 fall 3',
   }
 
