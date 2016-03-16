@@ -191,3 +191,5 @@ Not Run test cases - this metric shows a count of test cases which should be run
 .. include:: test_suite_failover.rst
 .. include:: test_suite_gui.rst
 .. include:: test_suite_system.rst
+.. include:: test_suite_dpdk.rst
+.. include:: test_suite_sriov.rst
