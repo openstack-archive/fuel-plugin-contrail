@@ -89,7 +89,7 @@ Expected results
 All steps must be completed successfully, without any errors.
 
 
-Verify HA with deleting Contrail roles
+Verify HA with shutdown Contrail roles
 --------------------------------------
 
 
@@ -102,7 +102,7 @@ contrail_ha_with_shutdown_contrail_node
 Description
 ###########
 
-Verify HA with deleting Contrail roles
+Verify HA with shutdown Contrail roles
 
 
 Complexity
@@ -344,120 +344,6 @@ Steps
     8. Deploy changes
     9. Run OSTF tests
 
-
-Expected results
-################
-
-All steps must be completed successfully, without any errors.
-
-
-Deploy Environment with Contrail DB + Ceph multirole
-----------------------------------------------------
-
-
-ID
-##
-
-contrail_db_multirole
-
-
-Description
-###########
-
-Deploy Environment with Contrail DB + Ceph multirole
-
-
-Complexity
-##########
-
-Core
-
-
-Steps
-#####
-
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
-    2. Enable and configure Contrail plugin
-    3. Add some controller, compute nodes
-    4. Add 1 node with "contrail-db" + "Ceph-OSD" role, one node with "contrail-control" + "storage-cinder" and 1 node with "contrail-config" + "Ceph-OSD"
-    5. Deploy cluster
-    6. Run OSTF tests
-
-Expected results
-################
-
-All steps must be completed successfully, without any errors.
-
-
-Deploy Environment with Contrail Control  + Ceph multirole
-----------------------------------------------------------
-
-
-ID
-##
-
-contrail_control_multirole
-
-
-Description
-###########
-
-Deploy Environment with Contrail Control  + Ceph multirole
-
-
-Complexity
-##########
-
-Core
-
-
-Steps
-#####
-
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
-    2. Enable and configure Contrail plugin
-    3. Add some controller, compute + "Ceph-OSD" nodes
-    4. Add 1 node with "contrail-control" + "contrail-config" + "Ceph-OSD" multirole and 1 node with "contrail-db" + "storage-cinder"
-    5. Deploy cluster
-    6. Run OSTF tests
-
-Expected results
-################
-
-All steps must be completed successfully, without any errors.
-
-
-Deploy Environment with Contrail Config + Ceph multirole
---------------------------------------------------------
-
-
-ID
-##
-
-contrail_config_multirole
-
-
-Description
-###########
-
-Deploy Environment with Contrail Config + Ceph multirole
-
-
-Complexity
-##########
-
-Core
-
-
-Steps
-#####
-
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
-    2. Enable and configure Contrail plugin
-    3. Add some controller, compute + "Ceph-OSD" nodes
-    4. Add 1 node with "contrail-config" + "Ceph-OSD" + "storage-cinder" multirole and one node with "contrail-db" + "contrail-control"
-    5. Deploy cluster
-    6. Run OSTF tests
 
 Expected results
 ################

@@ -113,8 +113,8 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin
-    3. Add 2 nodes with "controller" role and 1 node with "controller" + "MongoDB" multirole
-    4. Add 1 node with "compute" and "ceph-OSD" and 1 node with "compute" + "ceph-OSD" + " MongoDB" multiroles
+    3. Add 3 nodes with controller role
+    4. Add 2 nodes with "compute" and "Ceph-OSD" roles
     5. Add a node with "MongoDB" role
     6. Add a node with "contrail-config", "contrail-control" and "contrail-db" roles
     7. Deploy cluster with plugin
@@ -155,7 +155,7 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Add a node with controller role
-    4. Add 2 nodes with "compute" and "Ceph-OSD" roles
+    4. Add 2 nodes with "compute" and "Storage-cinder" roles
     5. Add a node with "contrail-config", "contrail-control" and "contrail-db" roles
     6. Add 2 nodes with "contrail-config", "contrail-control" roles
     7. Configure MTU on network interfaces (Jumbo-frames)
@@ -367,6 +367,53 @@ Steps
     6. Deploy cluster with plugin
     8. Run OSTF tests
 
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Deploy cluster with Contrail plugin and network template
+--------------------------------------------------------
+
+
+ID
+##
+
+contrail_net_template
+
+
+Description
+###########
+
+Deploy cluster with Contrail plugin and network template
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Configure interfaces
+    2. Next we need to set gateway for private network with Fuel CLI:
+       * Login with ssh to Fuel master node.
+       * List existing network-groups
+       fuel network-group --env 1
+    3. Remove and create again network-group private to set a gateway
+       fuel network-group --delete --network 5
+       fuel network-group --create --name private --cidr 10.109.3.0/24 --gateway 10.109.3.1 --nodegroup 1
+    4. Set the render_addr_mask parameter to internal for this network by typing:
+       fuel network-group --set --network 6 --meta '{"name": "private", "notation": "cidr", "render_type": null, "map_priority": 2, "configurable": true, "use_gateway": true, "render_addr_mask": "internal", "vlan_start": null, "cidr": "10.109.3.0/24"}'
+    5. Save sample :download:
+       network template<examples/network_template_1.yaml>
+    6. Upload the network template by typing:
+       fuel --env 1 network-template --upload --dir /root/
+    7. Start deploy, pressing "Deploy changes" button.
 
 Expected results
 ################
