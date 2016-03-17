@@ -98,7 +98,7 @@ class contrail {
   $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
   # Package override
-  $install_contrail_nova    = pick($settings['install_contrail_nova'], false)
+  $patch_nova               = pick($settings['patch_nova'], false)
   $install_contrail_qemu_lv = pick($settings['install_contrail_qemu_lv'], false )
 
   if $install_contrail_qemu_lv and $global_dpdk_enabled {
