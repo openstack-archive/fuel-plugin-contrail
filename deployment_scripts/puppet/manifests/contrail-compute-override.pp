@@ -16,12 +16,14 @@ notice('MODULAR: contrail/contrail-compute-override.pp')
 
 include contrail
 
-$common_pkg  = ['iproute2', 'haproxy', 'libatm1']
-$nova_pkg    = ['nova-compute', 'nova-common', 'python-nova', 'python-urllib3']
+$common_pkg  = ['iproute2', 'haproxy', 'libatm1', 'libxen-4.4']
 $libvirt_pkg = ['libvirt-bin', 'libvirt0']
+$qemu_pkg    = ['qemu','qemu-*']
 
-$install_cmd = 'apt-get install --yes -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::="--force-confold"'
+$keep_config_files = '-o Dpkg::Options::="--force-confold"'
+$force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
 $path_cmd    = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin']
+$patch_path  = '/usr/lib/python2.7/dist-packages'
 
 apt::pin { 'contrail-override-common':
   explanation => 'Set priority for packages that need to override from contrail repository',
@@ -35,30 +37,47 @@ if $contrail::compute_dpdk_enabled {
   package { 'dpdk-depends-packages':
     ensure => present,
   } ->
+  file {'/opt/contrail/contrail_install_repo_dpdk/Release':
+    ensure  => file,
+    content => 'Label: dpdk-depends-packages',
+  } ->
   exec {'setup_dpdk_repo':
-    command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh',
+    command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh && touch /opt/contrail/dpdk-repo-DONE',
     path    => $path_cmd,
+    creates => '/opt/contrail/dpdk-repo-DONE',
   }
 
-  # Override nova packages if it set on Fuel UI
-  if $contrail::install_contrail_nova {
-    apt::pin { 'contrail-override-nova':
-      explanation => 'Set priority for packages that need to override from contrail repository',
+  # Patch nova packages if it set on Fuel UI
+  if $contrail::patch_nova {
+    apt::pin { 'contrail-pin-nova':
+      explanation => 'Prevent patched python-nova from upgrades',
       priority    => 1200,
-      label       => 'contrail',
-      packages    => $nova_pkg,
+      label       => '1:2015.1.1-1~u14.04+mos19665',
+      packages    => 'python-nova',
     } ->
-    #TODO rewrite using package
-    exec { 'override-nova':
-      command => "${install_cmd} nova-compute",
+    file { "${patch_path}/nova-dpdk-vrouter.patch":
+      ensure  => present,
+      mode    => '0644',
+      source  => 'puppet:///modules/contrail/nova-dpdk-vrouter.patch',
+    }->
+    exec { 'patch-python-nova':
+      command => 'patch -p1 < nova-dpdk-vrouter.patch && touch python-nova-patch-DONE',
       path    => $path_cmd,
+      cwd     => $patch_path,
+      creates => "${patch_path}/python-nova-patch-DONE",
     }
   }
 
   # Override libvirt and qemu packages if it set on Fuel UI
   if $contrail::install_contrail_qemu_lv {
     # For qemu you don't need additional pinning, only dpdk repository
-    package { 'qemu-system-x86':
+    apt::pin { 'contrail-pin-qemu':
+      explanation => 'Install qemu from dpdk-depends',
+      priority    => 1200,
+      label       => 'dpdk-depends-packages',
+      packages    => $qemu_pkg,
+    } ->
+    package { ['qemu-kvm','qemu-system-x86']:
       ensure => 'latest',
     } ~>
     service { 'qemu-kvm':
@@ -69,12 +88,17 @@ if $contrail::compute_dpdk_enabled {
       explanation => 'Set priority for packages that need to override from contrail repository',
       packages    => $libvirt_pkg,
       priority    => 1200,
-      version     => '2:1.2.12-0ubuntu7+contrail2',
+      label       => 'dpdk-depends-packages',
     } ->
-    #TODO rewrite using package
+# Install options are supported starting from puppet 3.5.1
+#    package { $libvirt_pkg:
+#      ensure          => '2:1.2.12-0ubuntu7+contrail2',
+#      install_options => [$keep_config_files, $force_overwrite],
+#    } ->
     exec { 'override-libvirt':
-      command => "${install_cmd} libvirt-bin libvirt0",
+      command => "apt-get install --yes ${keep_config_files} ${force_overwrite} libvirt-bin libvirt0",
       path    => $path_cmd,
+      unless  => 'dpkg -l | grep libvirt0 | grep contrail',
     } ->
     # With a new libvirt packages this init script must be stopped
     service { 'libvirtd':
