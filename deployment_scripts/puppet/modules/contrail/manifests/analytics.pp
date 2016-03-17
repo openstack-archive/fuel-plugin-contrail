@@ -27,11 +27,6 @@ class contrail::analytics {
 
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
-####### Disable upstart startup on install #######
-  tweaks::ubuntu_service_override { 'supervisor-analytics':
-    package_name => 'contrail-analytics',
-  }
-
 # Packages
   package { 'redis-server': } ->
   package { 'contrail-analytics': } ->
@@ -90,7 +85,7 @@ class contrail::analytics {
     enable    => true,
     require   => [Package['contrail-openstack-analytics'],
                     Service['redis-server'],
-                    Tweaks::Ubuntu_service_override['supervisor-analytics']],
+                    Service['contrail-alarm-gen']],
     subscribe => [File['/etc/contrail/contrail-analytics-api.conf'],
                     File['/etc/contrail/contrail-collector.conf'],
                     File['/etc/contrail/contrail-query-engine.conf'],

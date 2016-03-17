@@ -32,11 +32,6 @@ class contrail::config {
     require => Package['contrail-openstack-config'],
   }
 
-####### Disable upstart startup on install #######
-  tweaks::ubuntu_service_override { 'supervisor-config':
-    package_name => 'contrail-config',
-  }
-
 # Packages
   package { 'openjdk-7-jre-headless': }->
   package { 'ifmap-server': }->
@@ -133,9 +128,9 @@ class contrail::config {
   }
 
   service { 'supervisor-config':
-    ensure    => $contrail::service_ensure,
+    ensure    => running,
     enable    => true,
-    require   => [Package['contrail-openstack-config'],Tweaks::Ubuntu_service_override['supervisor-config']],
+    require   => Package['contrail-openstack-config'],
     subscribe => [File['/etc/contrail/contrail-api.conf'],
                   File['/etc/contrail/supervisord_config_files/contrail-api.ini'],
                   File['/etc/contrail/contrail-discovery.conf'],
