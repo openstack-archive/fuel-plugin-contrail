@@ -13,10 +13,16 @@
 #    under the License.
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
-
+file { '/etc/apt/sources.list.d/contrail-3.0.0.list':
+  ensure => present,
+  content => 'deb http://10.20.0.2:8080/plugins/contrail-3.0/repositories/ubuntu/ / # This file is managed by Puppet. DO NOT EDIT.'
+} ->
 file { '/etc/apt/preferences.d/contrail-pin-110':
   ensure => file,
   source => 'puppet:///modules/contrail/contrail-pin-110',
+} ->
+exec { "apt-get update":
+  command => "/usr/bin/apt-get update",
 }
 
 # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
