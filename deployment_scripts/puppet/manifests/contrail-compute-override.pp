@@ -17,11 +17,12 @@ notice('MODULAR: contrail/contrail-compute-override.pp')
 include contrail
 
 $common_pkg  = ['iproute2', 'haproxy', 'libatm1']
-$nova_pkg    = ['nova-compute', 'nova-common', 'python-nova', 'python-urllib3']
 $libvirt_pkg = ['libvirt-bin', 'libvirt0']
 
-$install_cmd = 'apt-get install --yes -o Dpkg::Options::="--force-overwrite" -o Dpkg::Options::="--force-confold"'
+$keep_config_files = '-o Dpkg::Options::="--force-confold"'
+$force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
 $path_cmd    = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin']
+$patch_path  = '/usr/lib/python2.7/dist-packages'
 
 apt::pin { 'contrail-override-common':
   explanation => 'Set priority for packages that need to override from contrail repository',
@@ -36,22 +37,29 @@ if $contrail::compute_dpdk_enabled {
     ensure => present,
   } ->
   exec {'setup_dpdk_repo':
-    command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh',
+    command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh && touch /opt/contrail/dpdk-repo-DONE',
     path    => $path_cmd,
+    creates => '/opt/contrail/dpdk-repo-DONE',
   }
 
-  # Override nova packages if it set on Fuel UI
+  # Patch nova packages if it set on Fuel UI
   if $contrail::install_contrail_nova {
-    apt::pin { 'contrail-override-nova':
-      explanation => 'Set priority for packages that need to override from contrail repository',
+    apt::pin { 'contrail-pin-nova':
+      explanation => 'Prevent patched python-nova from upgrades',
       priority    => 1200,
-      label       => 'contrail',
-      packages    => $nova_pkg,
+      label       => '1:2015.1.1-1~u14.04+mos19665',
+      packages    => 'python-nova',
     } ->
-    #TODO rewrite using package
-    exec { 'override-nova':
-      command => "${install_cmd} nova-compute",
+    file { "${patch_path}/nova-dpdk-vrouter.patch":
+      ensure  => present,
+      mode    => '0644',
+      source  => 'puppet:///modules/contrail/nova-dpdk-vrouter.patch',
+    }->
+    exec { 'patch-python-nova':
+      command => 'patch -p1 < nova-dpdk-vrouter.patch && touch python-nova-patch-DONE',
       path    => $path_cmd,
+      cwd     => $patch_path,
+      creates => "${patch_path}/python-nova-patch-DONE",
     }
   }
 
@@ -71,10 +79,9 @@ if $contrail::compute_dpdk_enabled {
       priority    => 1200,
       version     => '2:1.2.12-0ubuntu7+contrail2',
     } ->
-    #TODO rewrite using package
-    exec { 'override-libvirt':
-      command => "${install_cmd} libvirt-bin libvirt0",
-      path    => $path_cmd,
+    package { $libvirt_pkg:
+      ensure          => present,
+      install_options => "${keep_config_files} ${force_overwrite}",
     } ->
     # With a new libvirt packages this init script must be stopped
     service { 'libvirtd':

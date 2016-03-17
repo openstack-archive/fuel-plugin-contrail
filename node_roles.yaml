@@ -49,8 +49,6 @@ dpdk:
     - contrail-db
     - contrail-config
     - contrail-control
-    - ceph-osd
-    - cinder
 
 sriov:
   name: SRIOV compute
