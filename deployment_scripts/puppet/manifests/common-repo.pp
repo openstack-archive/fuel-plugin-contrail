@@ -21,6 +21,13 @@ case $operatingsystem
       package {'yum-plugin-priorities': ensure => present }
     }
     Ubuntu: {
+      file { '/etc/apt/sources.list.d/contrail-3.0.0.list':
+        ensure => present,
+        content => 'deb http://10.20.0.2:8080/plugins/contrail-3.0/repositories/ubuntu/ / # This file is managed by Puppet. DO NOT EDIT.'
+      } ->
+      exec { 'apt-get-update':
+         command => '/usr/bin/apt-get update',
+      }
       file { '/etc/apt/preferences.d/contrail-3.0.1.pref':
         ensure => absent,
       }
