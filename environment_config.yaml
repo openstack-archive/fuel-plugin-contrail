@@ -84,10 +84,10 @@ attributes:
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
         action: "hide"
-  install_contrail_nova:
+  patch_nova:
     value: true
-    label: "Override Nova"
-    description: "Override Nova packages from contrail repository."
+    label: "Patch Nova"
+    description: "Patch Nova packages for dpdk-vrouter"
     weight: 140
     type: "checkbox"
     restrictions:
@@ -95,8 +95,8 @@ attributes:
         condition: not (settings:contrail.metadata.enabled == true  and settings:contrail.contrail_global_dpdk.value == true)
   install_contrail_qemu_lv:
     value: true
-    label: "Override Qemu, Libvirt"
-    description: "Override Qemu and Libvirt packages from contrail repository"
+    label: "Install Qemu and Libvirt from Contrail"
+    description: "Install Qemu and Libvirt packages from contrail repository"
     weight: 150
     type: "checkbox"
     restrictions:
