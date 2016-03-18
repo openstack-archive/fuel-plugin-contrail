@@ -66,9 +66,11 @@ class IntegrationTests(TestBasic):
 
         """
 
-        plugin.prepare_contrail_plugin(
-            self, slaves=9, options={'images_ceph': True}
-        )
+        plugin.prepare_contrail_plugin(self, slaves=9,
+                                       options={'images_ceph': True,
+                                                'volumes_ceph': True,
+                                                'ephemeral_ceph': True,
+                                                'objects_ceph': True})
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -92,7 +94,8 @@ class IntegrationTests(TestBasic):
         openstack.deploy_cluster(self)
 
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha_baseos"])
@@ -158,7 +161,7 @@ class IntegrationTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Add 2 nodes with "controller" role
             4. Add a node with "controller" + "MongoDB" multirole
-            5. Add a node with "compute"+"ceph-OSD"+"cinder" multiroles
+            5. Add a node with "compute" + "ceph-OSD" + "cinder" multiroles
             6. Add node with "compute" + "ceph-OSD" + " MongoDB" multiroles
             7. Add a node with "MongoDB" role
             8. Add a node with "contrail-config", "contrail-control" and
@@ -169,7 +172,6 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-
         plugin.prepare_contrail_plugin(
             self,
             slaves=9,
@@ -493,7 +495,8 @@ class IntegrationTests(TestBasic):
 
         # run OSTF tests
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_cinder_multirole"])
@@ -542,7 +545,8 @@ class IntegrationTests(TestBasic):
 
         # run OSTF tests
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_cinder_ceph_multirole"])
@@ -600,4 +604,5 @@ class IntegrationTests(TestBasic):
 
         # run OSTF tests
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'])

@@ -22,6 +22,7 @@ from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
 from helpers import openstack
+from helpers import settings
 
 
 @test(groups=["plugins"])
@@ -94,7 +95,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
-            timeout= 45 * 60,
+            timeout=settings.OSFT_RUN_TIMEOUT,
             should_fail=1,
             failed_test_name=['Check that required services are running']
         )
@@ -105,8 +106,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'ha'],
-            timeout= 45 * 60)
-
+            timeout=settings.OSFT_RUN_TIMEOUT)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_plugin_add_delete_compute_node"])
@@ -117,7 +117,7 @@ class IntegrationTests(TestBasic):
         Scenario:
             1. Create an environment with
                "Neutron with tunneling segmentation"
-               as a network configuration and CEPH storage
+               as a network configuration and Cinder storage
             2. Enable and configure Contrail plugin
             3. Add some controller, compute + storage (at least 4) nodes
             4. Add a node with "contrail-db", "contarail-config" and
@@ -162,7 +162,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
-            timeout= 45 * 60,
+            timeout=settings.OSFT_RUN_TIMEOUT,
             should_fail=1,
             failed_test_name=['Check that required services are running']
         )
@@ -172,7 +172,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'ha'],
-            timeout= 45 * 60)
+            timeout=settings.OSFT_RUN_TIMEOUT)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha_with_shutdown_contrail_node"])
@@ -238,7 +238,8 @@ class IntegrationTests(TestBasic):
         openstack.update_deploy_check(self,
                                       dict(conf_no_contrail,
                                            **conf_contrail),
-                                      is_vsrx=vsrx_setup_result)
+                                      is_vsrx=vsrx_setup_result,
+                                      ostf_suites=['smoke', 'sanity', 'ha'])
 
         # Check all nodes are 'ready'
         for node_name in dict(conf_no_contrail, **conf_contrail):
@@ -254,7 +255,8 @@ class IntegrationTests(TestBasic):
 
         # Run OSTF tests again
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'])
 
         # Check controller and contrail nodes states
         node_roles = {'controller', 'contrail-config'}
@@ -492,4 +494,55 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self,
                                       conf_db,
+                                      is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_add_db"])
+    @log_snapshot_after_test
+    def contrail_plugin_add_delete_compute_ceph(self):
+        """Verify that Contrail DB role can be added and deleted after
+        deploying
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Add some controller, compute nodes
+            4. Add 1 node with "contrail-control", "contrail-config" and
+               "contrail-db" roles
+            5. Deploy cluster
+            6. Check Controller and Contrail nodes status
+            7. Add one node with "contrail-db" role
+            8. Deploy changes
+            9. Run OSTF tests
+
+        """
+        plugin.prepare_contrail_plugin(self, slaves=5,
+                                       options={
+                                           'images_ceph': True,
+                                           'volumes_ceph': True,
+                                           'ephemeral_ceph': True,
+                                           'objects_ceph': True,
+                                           'ceilometer': True})
+        # enable plugin in contrail settings
+        plugin.activate_plugin(self)
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        conf_no_db = {
+            'slave-01': ['controller', 'mongo'],
+            'slave-02': ['compute', 'ceph-osd'],
+            'slave-03': ['compute', 'ceph-osd'],
+            'slave-04': ['contrail-control',
+                         'contrail-config',
+                         'contrail-db'],
+            # Here slave-5
+        }
+        conf_db = {'slave-05': ['compute']}
+
+        openstack.update_deploy_check(self, conf_no_db,
+                                      is_vsrx=vsrx_setup_result)
+        openstack.update_deploy_check(self, conf_db,
+                                      is_vsrx=vsrx_setup_result)
+        openstack.update_deploy_check(self, conf_db, delete=True,
                                       is_vsrx=vsrx_setup_result)

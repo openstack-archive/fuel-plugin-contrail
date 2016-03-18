@@ -18,3 +18,4 @@ import os
 VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH', False)
 
 DEPLOY_CLUSTER_TIMEOUT = 60*25  # 25 minutes
+OSFT_RUN_TIMEOUT = 45*60  # 45 minutes
