@@ -71,7 +71,7 @@ advanced
 Steps
 #####
 
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and Cinder storage
     2. Enable and configure Contrail plugin
     3. Add some controller, compute + storage nodes
     4. Add a node with "contrail-db", "contarail-config" and "contrail-control" roles
