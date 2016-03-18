@@ -199,3 +199,39 @@ Expected results
 ################
 
 All steps should pass
+
+
+Check updating core repos with Contrail plugin and DPDK
+-------------------------------------------------------
+
+
+ID
+##
+
+contrail_dpdk_update_core_repos
+
+
+Description
+###########
+
+Check updating core repos with Contrail plugin and DPDK
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Deploy cluster with some controller+mongo, compute+ceph-osd, compute+dpdk and contrail-specified nodes
+    2. Run “fuel-createmirror -M” on the master node
+    3. Update repos for all deployed nodes with command "fuel --env <ENV_ID> node --node-id <NODE_ID1>, <NODE_ID2>, <NODE_ID_N> --tasks upload_core_repos" on the master node
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors
