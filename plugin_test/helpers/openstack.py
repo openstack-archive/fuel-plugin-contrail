@@ -75,7 +75,8 @@ def assign_vlan(obj, **interface_tags):
     obj.fuel_web.client.update_network(obj.cluster_id, networks=nets)
 
 
-def update_deploy_check(obj, nodes, delete=False, is_vsrx=True):
+def update_deploy_check(obj, nodes, delete=False, is_vsrx=True,
+                        ostf_timeout=0, ostf_suites=[], ostf_fail_tests=[]):
     # Cluster configuration
     obj.fuel_web.update_nodes(obj.cluster_id,
                               nodes_dict=nodes,
@@ -86,7 +87,15 @@ def update_deploy_check(obj, nodes, delete=False, is_vsrx=True):
 
     # Run OSTF tests
     if is_vsrx:
-        obj.fuel_web.run_ostf(cluster_id=obj.cluster_id)
+        ostf_params = {}
+        if ostf_timeout:
+            ostf_params['timeout'] = ostf_timeout
+        if ostf_suites:
+            ostf_params['test_sets'] = ostf_suites
+        if ostf_fail_tests:
+            ostf_params['should_fail'] = len(ostf_fail_tests)
+            ostf_params['failed_test_name'] = ostf_fail_tests
+        obj.fuel_web.run_ostf(cluster_id=obj.cluster_id, **ostf_params)
 
 
 def wait_for_cluster_status(obj, cluster_id,
