@@ -70,7 +70,8 @@ class IntegrationTests(TestBasic):
                                        options={'images_ceph': True,
                                                 'volumes_ceph': True,
                                                 'ephemeral_ceph': True,
-                                                'objects_ceph': True})
+                                                'objects_ceph': True,
+                                                'volumes_lvm': False})
 
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
@@ -468,7 +469,7 @@ class IntegrationTests(TestBasic):
                 'volumes_ceph': True,
                 'ephemeral_ceph': True,
                 'objects_ceph': True,
-                "volumes_lvm": False
+                'volumes_lvm': False
             })
 
         # enable plugin in contrail settings
