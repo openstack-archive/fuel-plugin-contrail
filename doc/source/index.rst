@@ -14,5 +14,5 @@ Guide to the Contrail plugin version 3.0 for Fuel 7.0
     install_guide
     using_network_templates
     contrail_ui_intro
+    dpdk
     appendix
-
