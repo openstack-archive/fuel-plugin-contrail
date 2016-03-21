@@ -17,13 +17,13 @@ Log into Contrail UI using the `OpenStack admin credentials.
 Checking services status
 ------------------------
 
-Verify the status of Contrail Control Analytics and Config nodes along with vRouters in *Infrastructure* using­ *Dashboard*
+Verify the status of Contrail Control Analytics and Config nodes along with vRouters in *Infrastructure* using *Dashboard*
 tab of the left-hand *Monitor* menu.
 
 .. image:: images/contrail-services.png
 
 
-Сreating the virtual networks
+Creating the virtual networks
 -----------------------------
 
 
