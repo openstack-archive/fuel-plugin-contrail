@@ -20,3 +20,4 @@ New features in plugin version 3.0.0
 
 *   HTTPS on public endpoints. If HTTPS is enabled in Fuel UI, same certificate will be used for Contrail API and Contrail WebUI.
 
+*   Contrail specific Ceilometer meters now supported.

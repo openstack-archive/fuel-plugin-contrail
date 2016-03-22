@@ -6,10 +6,6 @@ Prerequisites
 
 This guide assumes that you have `installed Fuel <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html>`_
 and all the nodes of your future environment are discovered and functional.
-Note, if you want to use Juniper Contrail instead of OpenContrail, you need to get proprietary Contrail packages
-for your operating system.
-They can be obtained from Juniper as a part of your support subscription.
-OpenContrail packages are provided within the plugin package.
 
 Installing Contrail Plugin
 --------------------------
@@ -67,9 +63,6 @@ Configuring Contrail Plugin
        :width: 80%
 
 #.  Activate the plugin and fill configuration fields with correct values:
-
-    *   Select the Contrail packages distribution: OpenContrail from plugin package or proprietary Contrail packages
-        from Juniper.
 
     *   AS number for BGP Gateway nodes communication: (defaults to 64512).
 
