@@ -497,23 +497,25 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_add_db"])
+          groups=["contrail_plugin_add_delete_compute_ceph"])
     @log_snapshot_after_test
     def contrail_plugin_add_delete_compute_ceph(self):
-        """Verify that Contrail DB role can be added and deleted after
-        deploying
+        """Verify that compute node can be added and deleted in env with Ceph
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Add some controller, compute nodes
-            4. Add 1 node with "contrail-control", "contrail-config" and
+            3. Add 1 node with "controller" + "mongo" roles and
+               2 nodes with "compute" + "ceph-osd" roles
+            4. Add node with "contrail-control", "contrail-config" and
                "contrail-db" roles
             5. Deploy cluster
             6. Check Controller and Contrail nodes status
-            7. Add one node with "contrail-db" role
+            7. Add node with "compute" role
             8. Deploy changes
+            9. Delete node with "compute" role
+            10. Deploy changes
             9. Run OSTF tests
 
         """
@@ -523,7 +525,8 @@ class IntegrationTests(TestBasic):
                                            'volumes_ceph': True,
                                            'ephemeral_ceph': True,
                                            'objects_ceph': True,
-                                           'ceilometer': True})
+                                           'ceilometer': True,
+                                           'volumes_lvm': False})
         # enable plugin in contrail settings
         plugin.activate_plugin(self)
         # activate vSRX image
@@ -545,4 +548,5 @@ class IntegrationTests(TestBasic):
         openstack.update_deploy_check(self, conf_db,
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self, conf_db, delete=True,
-                                      is_vsrx=vsrx_setup_result)
+                                      is_vsrx=vsrx_setup_result,
+                                      ostf_fail_tests=['Check that required services are running'])
