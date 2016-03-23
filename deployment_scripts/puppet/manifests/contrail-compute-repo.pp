@@ -14,6 +14,13 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
+File {
+  ensure  => present,
+  mode    => '0644',
+  owner   => root,
+  group   => root,
+}
+
 apt::pin { 'contrail-main':
   explanation => 'Set priority for common contrail packages',
   priority    => 200,
@@ -21,11 +28,28 @@ apt::pin { 'contrail-main':
 }
 
 # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
+$osnailyfacter_path = '/etc/puppet/modules/osnailyfacter'
+
 exec {'no_network_reconfigure':
-  command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
+  command => "/bin/echo '#NOOP here. Modified by contrail plugin' > ${osnailyfacter_path}/modular/netconfig/netconfig.pp",
   onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
 }
+
 exec {'no_openstack_network_reconfigure':
-  command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
+  command => "/bin/echo '#NOOP here. Modified by contrail plugin' > ${osnailyfacter_path}/modular/openstack-network/openstack-network-compute.pp",
   onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
+}
+
+file { "${osnailyfacter_path}/lib/puppet/parser/functions/roles_include.rb":
+  source  => 'puppet:///modules/contrail/roles_include.rb',
+}
+
+file { "${osnailyfacter_path}/lib/puppet/parser/functions/get_node_key_name.rb":
+  source  => 'puppet:///modules/contrail/get_node_key_name.rb',
+}
+
+file_line { 'roles':
+  path  => '/etc/puppet/modules/ceph/manifests/init.pp',
+  line  => " if roles_include(['primary-controller', 'controller', 'ceph-mon', 'ceph-osd', 'compute', 'cinder']) {",
+  match => 'controller\|ceph\|compute\|cinder',
 }
