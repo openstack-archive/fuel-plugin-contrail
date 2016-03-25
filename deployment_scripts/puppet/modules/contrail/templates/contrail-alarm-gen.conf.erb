@@ -1,5 +1,5 @@
 [DEFAULTS]
-#host_ip = 127.0.0.1
+host_ip = <%= scope.lookupvar('contrail::address') %>
 #collectors = 127.0.0.1:8086
 #http_server_port = 5995
 log_local = 1
