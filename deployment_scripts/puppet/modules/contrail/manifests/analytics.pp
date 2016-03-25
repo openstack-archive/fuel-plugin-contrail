@@ -78,18 +78,11 @@ class contrail::analytics {
     subscribe => File['/etc/redis/redis.conf'],
   }
 
-  service { 'contrail-alarm-gen':
-    ensure  => stopped,
-    enable  => false,
-    require => Package['contrail-openstack-analytics'],
-  }
-
   service { 'supervisor-analytics':
     ensure    => $contrail::service_ensure,
     enable    => true,
     require   => [Package['contrail-openstack-analytics'],
-                    Service['redis-server'],
-                    Service['contrail-alarm-gen']],
+                    Service['redis-server']],
     subscribe => [File['/etc/contrail/contrail-analytics-api.conf'],
                     File['/etc/contrail/contrail-collector.conf'],
                     File['/etc/contrail/contrail-query-engine.conf'],
