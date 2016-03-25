@@ -1,13 +1,12 @@
 [DEFAULTS]
 host_ip = <%= scope.lookupvar('contrail::address') %>
 cassandra_server_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
-collectors = <%= scope.lookupvar('contrail::address') %>:8086
 http_server_port = 8090
 rest_api_port = 9081
-rest_api_ip = 0.0.0.0 
+rest_api_ip = 0.0.0.0
 log_local = 1
 log_level = SYS_NOTICE
-log_category = 
+log_category =
 log_file = /var/log/contrail/contrail-analytics-api.log
 
 # Time-to-live in hours of the various data stored by collector into
