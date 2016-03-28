@@ -64,8 +64,8 @@ See Contrail Plugin 3.0.x Proposal for more details
 The project test approach consists of BVT, Integration/System, Regression and Acceptance test levels.
 
 
-3.1. Criterias for test process starting
-########################################
+3.1. Criteria for test process starting
+#######################################
 
 Before test process can be started it is needed to make some preparation actions - to execute important preconditions.
 The following steps must be executed successfully for starting test phase:
@@ -112,8 +112,8 @@ Project testing activities are to be resulted in the following reporting documen
 * Test run report from TestRail;
 
 
-4.2. Acceptance criterias
-#########################
+4.2. Acceptance criteria
+########################
 
 90% of automation tests should be passed. Critical and high issues are fixed.
 Such manual tests should be executed and passed (100% of them):

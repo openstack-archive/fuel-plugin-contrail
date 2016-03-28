@@ -1,13 +1,13 @@
 Verification
 ============
-After deploy finishes, you can verify your installation. First proceed with basic checks described below.
+After deploy finishes, you can verify your installation. First, proceed with basic checks described below.
 
 Basic checks
 ------------
 
 #.  Check that Contrail services are running.
 
-    Login to Contrail controller node and run contrail-status command. All services should be in active state:
+    Login to Contrail controller node and run contrail-status command. All services should be in "active" state:
     ::
 
         # contrail-status
@@ -47,7 +47,7 @@ Basic checks
             contrail-database-nodemgr     active
             kafka                         active
 
-#. Check list of peers and peering status
+#. Check the list of peers and peering status
 
     Login to Contrail WebUI, go to Monitor -> Control nodes, choose any and select a “Peers” tab. You should see your compute nodes(vRouters) and external router in a list of peers. Status should be “Established”
 
@@ -68,7 +68,7 @@ OSTF tests
 
 - **Prerequisites for OSTF:**
 
-    #. OSTF tests require two pre-defined networks created - net04 and net04_ext. The networks are created by Fuel during deployment. This section includes instructions how to create them if they where accidentally deleted. Floating IP addresses from net04_ext should be accessible from Fuel master node.
+    #. OSTF tests require two pre-defined networks created - net04 and net04_ext. The networks are created by Fuel during deployment. This section includes instructions how to create them if they were accidentally deleted. Floating IP addresses from net04_ext should be accessible from Fuel master node.
     #. 3 tests from “Functional tests” set require floating IP addresses. They  should be configured on external router, routable from Fuel master node and     populated in Contrail/Openstack environment.
     #. HA tests require at least 3 Openstack controllers.
     #. “Platform services functional tests.” require Ceilometer and Mongo.

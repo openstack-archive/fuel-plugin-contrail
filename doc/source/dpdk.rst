@@ -4,9 +4,9 @@ DPDK-based vRouter
 Description
 -----------
 
-The Data Plane Development Kit (DPDK) is a set of data plane libraries and network interface controller drivers for fast packet processing. The DPDK provides a programming framework for Intel x86 processors and enables faster development of high speed data packet networking applications.
+The Data Plane Development Kit (DPDK) is a set of data plane libraries and network interface controller drivers for fast packet processing. The DPDK provides a programming framework for Intel x86 processors and enables faster development of high-speed data packet networking applications.
 
-By default contrail virtual router (vrouter) is running as a kernel module on Linux.
+By default, contrail virtual router (vrouter) is running as a kernel module on Linux.
 
     .. image:: images/vrouter_in_kernelspace.png
        :width: 60%
@@ -25,17 +25,17 @@ Prerequisites
 
 - Installed `Fuel 7.0 <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html>`_
 - Installed contrail plugin :doc:`/install_guide`
-- Environment must created with "KVM" for compute virtualization and "Neutron with tunneling segmentation" for networking
-- Network card must supports DPDK. List of compatible adapters can be found on `DPDK website <http://dpdk.org/doc/guides/nics/index.html>`_
+- Environment must be created with "KVM" for compute virtualization and "Neutron with tunneling segmentation" for networking
+- Network card must support DPDK. List of compatible adapters can be found on `DPDK website <http://dpdk.org/doc/guides/nics/index.html>`_
 
 Restrictions
 ------------
 
-- Only compute hosts can be configured with DPDK role. "DPDK role" is just a mark that enables DPDK feature on certain compute. If you try to use it with another roles it wouldn't have any affect.
+- Only compute hosts can be configured with DPDK role. "DPDK role" is just a mark that enables DPDK feature on certain compute. If you try to use it with other roles it wouldn't have any effect.
 
 - Contrail DPDK feature doesn't work with qemu virtualization as far as with nested KVM. This means that for current release DPDK-based vRouter works only on baremetal computes.
 
-- Contrail DPDK vrouter permanently uses 1GB of hugepages that's why it is nessesary to allocate enough amount of hugepages to run DPDK vrouter and VM's(with DPDK) respectively.
+- Contrail DPDK vrouter permanently uses 1GB of hugepages, therefore, it is necessary to allocate enough amount of hugepages to run DPDK vrouter and VM's(with DPDK) respectively.
 
 
 Configuration
@@ -53,8 +53,8 @@ To enable DPDK you must proceed few steps:
     .. image:: images/enable_contrail_dpdk.png
         :width: 90%
 
-#. Choose size and ammount of HugePages to allocate. They will be used for both vRouter process and VMs backing.
-   2MB sized HugePages can be added on-fly, 1GB sized require reboot. Also it is nessesary to leave some amount of memory for operating system itself.
+#. Choose the size and amount of huge pages to allocate. They will be used for both vRouter process and VMs backing.
+   2MB sized huge pages can be added on-fly, 1GB sized require a reboot. Also, it is necessary to leave some amount of memory for the operating system itself.
 
 
 #. Add DPDK role on computes where you want to have DPDK-based vRouter. **Computes that are not marked with DPDK role will use kernel-based vRouter.**
@@ -78,7 +78,7 @@ To enable DPDK you must proceed few steps:
 Verification
 ------------
 
-After deploy finishes, you can verify your installation. First proceed with basic checks.
+After deploy finishes, you can verify your installation. First, proceed with basic checks.
 
 #. Check that Contrail services and DPDK vrouter are running on compute node:
     ::
@@ -191,8 +191,8 @@ DPDK related options
 In this chapter described DPDK related options that you can change from Fuel UI:
 
 - *"Enable DPDK feature for this environment."* - this option enable DPDK globally, remember that you anyway must use "DPDK" role to mark compute where you want to have DPDK
-- *"Hugepage size"* - Choose the size of hugepages that will be used for dpdk feature. Check if 1GB pages are supported on target compute node. # grep pdpe1gb /proc/cpuinfo | uniq
-- *"Hugepages amount (%)"* - set amount of memory allocated on each compute-node for hugepages. It will be take % of all memory available on compute. Remember that DPDK vrouter permanently use 1G hugepages and not all application can use hugepages that is why set this parameter carefully.
-- *"CPU pinning"* - this hexadecimal value describe how many and what exactly processors will be used for dpdk vrouter. CPU pinning implemented using `taskset util <http://www.linuxcommand.org/man_pages/taskset1.html>`_
-- *"Patch Nova"* - current release (7.0) of MOS nova doesn't have support for DPDK-based vRouter. In future nessesary patches will be included in MOS maintanance updates.
-- *"Install Qemu and Libvirt from Contrail"* - DPDK-based vRouter needs HugePages memory-backing for guests. MOS 7.0 ships with qemu and libvirt that don't support it. This is needed only for DPDK feature and will be implemented only on nodes where we have "DPDK" role.
+- *"Hugepage size"* - Choose the size of huge pages that will be used for a dpdk feature. Check if 1GB pages are supported on the target compute node. # grep pdpe1gb /proc/cpuinfo | uniq
+- *"Hugepages amount (%)"* - set amount of memory allocated on each compute node for huge pages. It will use % of all memory available on compute. Remember that DPDK vrouter permanently use 1GB of huge pages and other applications running on compute node may not support huge pages, so this parameter should be used carefully.
+- *"CPU pinning"* - this hexadecimal value describes how many and which exact processors will be used by dpdk-vrouter. CPU pinning is implemented using `taskset util <http://www.linuxcommand.org/man_pages/taskset1.html>`_
+- *"Patch Nova"* - current release (7.0) of MOS nova doesn't have support for DPDK-based vRouter. In future, necessary patches will be included in MOS maintenance updates.
+- *"Install Qemu and Libvirt from Contrail"* - DPDK-based vRouter needs huge pages memory-backing for guests. MOS 7.0 ships with qemu and libvirt that don't support it. This is needed only for DPDK feature and will be implemented only on nodes where we have "DPDK" role.
