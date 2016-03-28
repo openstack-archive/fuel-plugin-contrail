@@ -34,7 +34,7 @@ Creating the virtual networks
 
  *  To create an external network, you need to add ``Shared`` and ``External``  flags to the created network using
     the ``Advanced Options`` sections and provide a proper Routing mark in Route Targets section to let this network to be
-    announced to public routing table.
+    announced to the public routing table.
     The Routing mark is two numbers divided by a semicolon, e.g. 64512:10000.
 
     .. image:: images/contrail-create-ext-net.png

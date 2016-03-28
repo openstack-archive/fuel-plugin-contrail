@@ -41,7 +41,7 @@ Installing Contrail Plugin
 Configuring Contrail Plugin
 ---------------------------
 
-#.  First you need to `create environment <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#create-a-new-openstack-environment>`_ in Fuel UI.
+#.  First, you need to `create environment <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#create-a-new-openstack-environment>`_ in Fuel UI.
 
     .. image:: images/name_and_release.png
        :width: 80%
@@ -66,7 +66,7 @@ Configuring Contrail Plugin
 
     *   AS number for BGP Gateway nodes communication: (defaults to 64512).
 
-    *   Gateway nodes IP addresses (provided as comma-separated list) - peer addresses for BGP interaction with border routers.
+    *   Gateway nodes IP addresses (provided as a comma-separated list) - peer addresses for BGP interaction with border routers.
 
 #.  Add nodes and assign them the following roles:
 
@@ -79,13 +79,13 @@ Configuring Contrail Plugin
 
     *   If you plan to use Heat with autoscaling, in addition to Ceilometer you need to add node with MongoDB role
 
-    This 3 roles are not necessary need to be on same node.
+    These 3 roles are not necessary need to be on the same node.
     You can place them on different nodes if needed.
 
     .. image:: images/contrail-roles.png
        :width: 80%
 
-    Sample node configuration is provided on picture below.
+    Sample node configuration is provided on a picture below.
 
     .. image:: images/node-roles.png
        :width: 80%
@@ -103,17 +103,17 @@ Configuring Contrail Plugin
         .. image:: images/conf-interfaces.png
            :width: 80%
 
-    *   Set *Private* network to the separate network interface as untagged network.
+    *   Set *Private* network to the separate network interface as the untagged network.
         **DO NOT USE THIS PHYSICAL INTERFACE FOR ANY OTHER NETWORK.**
-        This interface will be used by contrail vRouter as untagged port.
-        It is recommended to set set the bigger MTU for Private interfaces (e.g. 9000) if the switching hardware supports
+        This interface will be used by contrail vRouter as the untagged port.
+        It is recommended to set the bigger MTU for Private interfaces (e.g. 9000) if the switching hardware supports
         Jumbo Frames.
         This will enhance contrail network performance by avoiding packet fragmentation within Private network.
 
 
     For other networking options please refer to `Mirantis OpenStack User Guide <https://docs.mirantis.com/openstack/fuel
     /fuel-7.0/user-guide.html#network-settings-ug>`_.
-    In case of using multiple L2 segments you may need to configure networking according to the `Operations Guide
+    In case of using multiple L2 segments, you may need to configure networking according to the `Operations Guide
     <https://docs.mirantis.com/openstack/fuel/fuel-7.0/operations.html#configuring-multiple-cluster-networks>`_ and supply
     static routes to BGP peers and other cluster networks in network_1.yaml file.
 
@@ -124,7 +124,7 @@ Configuring Contrail Plugin
 
     *   Public, Management and Storage networks on the same interface with Admin net, using tagged VLANs
 
-    *   Second interface is dedicated for Contrail operations as untagged (Private network)
+    *   The second interface is dedicated for Contrail operations as untagged (Private network)
 
     .. image:: images/conf-interfaces2.png
 
@@ -135,11 +135,11 @@ Configuring Contrail Plugin
     After installation is finished, `Contrail Web UI <http://www.juniper.net/techpubs/en_US/contrail2.0/topics/task/configuration
     /monitor-dashboard-vnc.html>`_ can be accessed by the same IP address as Horizon, but using HTTPS protocol and port 8143.
     For example, if you configured public network as described on screenshot below, then Contrail Web UI can be accessed by
-    **https://172.16.0.2:8143**
+    **https://10.109.1.3:8143**
 
     .. image:: images/public-net.png
 
     .. note::
 
-        WARNING! first usable addresses from Private network will be used as VIP for Contrail controllers.
+        WARNING! first usable addresses from the Private network will be used as VIP for Contrail controllers.
         For example, if your Private network CIDR is 192.168.200.0/24, then Contrail VIP will be **192.168.200.1**.

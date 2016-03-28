@@ -1,10 +1,10 @@
 Using network templates
 =======================
 
-Starting from Fuel 7.0 it is possible to reduce amount of logical networks.
-This is implemented with function called network templates.
+Starting from Fuel 7.0 it is possible to reduce the number of logical networks.
+This is implemented with the function called network templates.
 For detailed information on this feature, refer to
-`Opeations guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/operations.html#using-networking-templates>`_
+`Operations guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/operations.html#using-networking-templates>`_
 
 This document provides sample configuration with network template.
 It is designed to get customers up and running quickly.
@@ -16,7 +16,7 @@ The provided template utilizes 3 networks: Admin (PXE), Public and Private.
 
     .. image:: images/conf-interfaces2.png
 
-#.  Next we need to set gateway for private network.
+#.  Next, we need to set gateway for the private network.
     Here is how to do it with Fuel CLI:
 
     *   Login with ssh to Fuel master node.
