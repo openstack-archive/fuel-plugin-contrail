@@ -22,8 +22,8 @@ Quoting `Mirantis blog post: <https://www.mirantis.com/blog/carrier-grade-mirant
 
 SR-IOV is a PCI Special Interest Group (PCI-SIG) specification for virtualizing network interfaces, representing each physical resource as a configurable entity (called a PF for Physical Function), and creating multiple virtual interfaces (VFs or Virtual Functions) with limited configurability on top of it, recruiting support for doing so from the system BIOS, and conventionally, also from the host OS or hypervisor. Among other benefits, SR-IOV makes it possible to run a very large number of network-traffic-handling VMs per compute without increasing the number of physical NICs/ports, and provides means for pushing processing for this down into the hardware layer, off-loading the hypervisor and significantly improving both throughput and deterministic network performance.
 
-How check if network inteface is sriov capable, and how many VFs are available/enabled
---------------------------------------------------------------------------------------
+How check if network interface is sriov capable, and how many VFs are available/enabled
+---------------------------------------------------------------------------------------
 
 Issue following command on boostraped host::
 

@@ -53,8 +53,8 @@ To enable DPDK you must proceed few steps:
     .. image:: images/enable_contrail_dpdk.png
         :width: 90%
 
-#. Choose size and ammount of HugePages to allocate. They will be used for both vRouter process and VMs backing.
-   2MB sized HugePages can be added on-fly, 1GB sized require reboot. Also it is nessesary to leave some amount of memory for operating system itself.
+#. Choose size and amount of HugePages to allocate. They will be used for both vRouter process and VMs backing.
+   2MB sized HugePages can be added on-fly, 1GB sized require reboot. Also it is necessary to leave some amount of memory for operating system itself.
 
 
 #. Add DPDK role on computes where you want to have DPDK-based vRouter. **Computes that are not marked with DPDK role will use kernel-based vRouter.**
@@ -194,5 +194,5 @@ In this chapter described DPDK related options that you can change from Fuel UI:
 - *"Hugepage size"* - Choose the size of hugepages that will be used for dpdk feature. Check if 1GB pages are supported on target compute node. # grep pdpe1gb /proc/cpuinfo | uniq
 - *"Hugepages amount (%)"* - set amount of memory allocated on each compute-node for hugepages. It will be take % of all memory available on compute. Remember that DPDK vrouter permanently use 1G hugepages and not all application can use hugepages that is why set this parameter carefully.
 - *"CPU pinning"* - this hexadecimal value describe how many and what exactly processors will be used for dpdk vrouter. CPU pinning implemented using `taskset util <http://www.linuxcommand.org/man_pages/taskset1.html>`_
-- *"Patch Nova"* - current release (7.0) of MOS nova doesn't have support for DPDK-based vRouter. In future nessesary patches will be included in MOS maintanance updates.
+- *"Patch Nova"* - current release (7.0) of MOS nova doesn't have support for DPDK-based vRouter. In future nessesary patches will be included in MOS maintenance updates.
 - *"Install Qemu and Libvirt from Contrail"* - DPDK-based vRouter needs HugePages memory-backing for guests. MOS 7.0 ships with qemu and libvirt that don't support it. This is needed only for DPDK feature and will be implemented only on nodes where we have "DPDK" role.

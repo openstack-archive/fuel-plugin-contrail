@@ -135,7 +135,7 @@ Configuring Contrail Plugin
     After installation is finished, `Contrail Web UI <http://www.juniper.net/techpubs/en_US/contrail2.0/topics/task/configuration
     /monitor-dashboard-vnc.html>`_ can be accessed by the same IP address as Horizon, but using HTTPS protocol and port 8143.
     For example, if you configured public network as described on screenshot below, then Contrail Web UI can be accessed by
-    **https://172.16.0.2:8143**
+    **https://10.109.1.3:8143**
 
     .. image:: images/public-net.png
 
