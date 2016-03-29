@@ -12,7 +12,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::controller::aggregate {
+class contrail::compute::aggregate {
+
+  define contrail::provision::aggr_add_host {
+    exec { "aggr_add_host_${name}":
+      command => "bash -c \"nova aggregate-add-host hpgs-aggr ${name}\"",
+      returns => [0,1],
+    }
+  }
+
 
   if $contrail::global_dpdk_enabled {
 
@@ -26,8 +34,10 @@ class contrail::controller::aggregate {
     $region              = hiera('region', 'RegionOne')
 
     Exec {
-      provider => 'shell',
-      path => '/sbin:/usr/sbin:/bin:/usr/bin',
+      provider    => 'shell',
+      path        => '/sbin:/usr/sbin:/bin:/usr/bin',
+      tries       => 10,
+      try_sleep   => 2,
       environment => [
         "OS_TENANT_NAME=${keystone_tenant}",
         "OS_USERNAME=${keystone_user}",
@@ -39,27 +49,41 @@ class contrail::controller::aggregate {
       ],
     }
 
-    nova_aggregate { 'hpgs-aggr':
-      ensure            => present,
-      availability_zone => 'hpgs',
-      metadata          => 'hpgs=true',
-      hosts             => $dpdk_hosts,
+# Can't use nova provider, auth variables are missing in nova.conf on computes.
+#
+#    nova_aggregate { 'hpgs-aggr':
+#      ensure            => present,
+#      availability_zone => 'hpgs',
+#      metadata          => 'hpgs=true',
+#      hosts             => $dpdk_hosts,
+#    }
+
+    exec {'create-hpgs-aggr':
+      command => 'bash -c "nova aggregate-create hpgs-aggr hpgs"',
+      unless  => 'bash -c "nova aggregate-list | grep -q hpgs-aggr"',
     } ->
+    exec {'aggr-set-metadata':
+      command => 'bash -c "nova aggregate-set-metadata hpgs-aggr hpgs=true"',
+      unless  => 'bash -c "nova aggregate-details hpgs-aggr | grep hpgs=true"',
+    }
+    if $dpdk_hosts {
+      contrail::provision::aggr_add_host { $dpdk_hosts:
+        require => Exec['aggr-set-metadata'],
+      }
+    }
+
+# Create flavor for huge pages use
+#
     exec { 'create-m1.small.hpgs-flavor' :
       command   => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 20 2"',
       unless    => 'bash -c "nova flavor-list | grep -q m1.small.hpgs"',
-      tries     => 10,
-      try_sleep => 2,
     } ->
     exec { 'create-m1.small.hpgs-mempage' :
       command   => 'bash -c "nova flavor-key m1.small.hpgs set hw:mem_page_size=large"',
-      tries     => 10,
-      try_sleep => 2,
     } ->
     exec { 'create-m1.small.hpgs-aggregate' :
       command   => 'bash -c "nova flavor-key m1.small.hpgs set aggregate_instance_extra_specs:hpgs=true"',
-      tries     => 10,
-      try_sleep => 2,
+      require   => Exec['aggr-set-metadata'],
     }
   }
 }
