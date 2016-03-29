@@ -252,15 +252,24 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
-# Skip L3 and DHCP Neutron agents
+# Skip L2, L3, DHCP and Metadata Neutron agents
 - id: primary-openstack-network-agents-l3
   type: skipped
 - id: openstack-network-agents-l3
+  type: skipped
+- id: primary-openstack-network-plugins-l2
+  type: skipped
+- id: openstack-network-plugins-l2
   type: skipped
 - id: primary-openstack-network-agents-dhcp
   type: skipped
 - id: openstack-network-agents-dhcp
   type: skipped
+- id: primary-openstack-network-agents-metadata
+  type: skipped
+- id: openstack-network-agents-metadata
+  type: skipped
+# Skip default fuel networks and routers
 - id: openstack-network-networks
   type: skipped
 - id: openstack-network-routers
