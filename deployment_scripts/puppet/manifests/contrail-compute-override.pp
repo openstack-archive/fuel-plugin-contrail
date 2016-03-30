@@ -18,6 +18,7 @@ include contrail
 
 $common_pkg  = ['iproute2', 'haproxy', 'libatm1']
 $libvirt_pkg = ['libvirt-bin', 'libvirt0']
+$qemu_pkg    = ['qemu','qemu-*']
 
 $keep_config_files = '-o Dpkg::Options::="--force-confold"'
 $force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
@@ -35,6 +36,11 @@ if $contrail::compute_dpdk_enabled {
   # Create local dpdk repository
   package { 'dpdk-depends-packages':
     ensure => present,
+  } ->
+  file { 'dpdk-label':
+    path    => '/opt/contrail/contrail_install_repo_dpdk/Release',
+    ensure  => file,
+    content => 'Label: dpdk-depends-packages',
   } ->
   exec {'setup_dpdk_repo':
     command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh && touch /opt/contrail/dpdk-repo-DONE',
@@ -65,14 +71,20 @@ if $contrail::compute_dpdk_enabled {
 
   # Override libvirt and qemu packages if it set on Fuel UI
   if $contrail::install_contrail_qemu_lv {
-    # For qemu you don't need additional pinning, only dpdk repository
-    package { 'qemu-system-x86':
+    apt::pin { 'contrail-pin-qemu':
+      explanation => 'Install qemu from dpdk-depends',
+      priority    => 1200,
+      label       => 'dpdk-depends-packages',
+      packages    => $qemu_pkg,
+      requires    => File['dpdk-label'],
+    } ->
+    package { ['qemu-kvm','qemu-system-x86']:
       ensure => 'latest',
     } ~>
     service { 'qemu-kvm':
       ensure => running,
       enable => true,
-    } ->
+    }
     apt::pin { 'contrail-override-libvirt':
       explanation => 'Set priority for packages that need to override from contrail repository',
       packages    => $libvirt_pkg,
