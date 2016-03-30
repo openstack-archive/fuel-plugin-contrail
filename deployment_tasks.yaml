@@ -329,6 +329,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Configure vmware integration
+- id: openstack-controller-vmware-primary
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [controller-hiera-post]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-vmware-integration.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Create networks for ostf-tests and provision route target
 - id: openstack-controller-provision
   type: puppet
@@ -359,6 +370,52 @@
   requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: copy_vmware_key_to_primary_controller
+  type: copy_files
+  role: [primary-controller]
+  required_for: [pre_deployment_end]
+  requires: [generate_vmware_key]
+  parameters:
+    files:
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware.pub
+        dst: /root/.ssh/vmware_id_rsa.pub
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware
+        dst: /root/.ssh/vmware_id_rsa
+    permissions: '0600'
+    dir_permissions: '0700'
+
+- id: copy_vmware_key_to_vmware_compute
+  type: copy_files
+  role: [compute-vmware]
+  required_for: [pre_deployment_end]
+  requires: [generate_vmware_key]
+  parameters:
+    files:
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware.pub
+        dst: /root/.ssh/vmware_id_rsa.pub
+    permissions: '0600'
+    dir_permissions: '0700'
+
+- id: generate_vmware_key
+  type: shell
+  role: [master]
+  requires: [pre_deployment_start]
+  required_for: [copy_vmware_key_to_primary_controller, copy_vmware_key_to_vmware_compute]
+  parameters:
+    cmd: sh /etc/puppet/modules/osnailyfacter/modular/astute/generate_keys.sh -i {CLUSTER_ID} -s 'vmware' -p /var/lib/fuel/keys/
+    timeout: 180
+
+# Deploy contrail vCenter plugin
+- id: contrail-compute-vmware
+  type: puppet
+  role: [compute-vmware]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
