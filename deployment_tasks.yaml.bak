@@ -62,8 +62,6 @@
     strategy:
       type: parallel
 
-#
-# Group for post-deployment tasks
 - id: contrail-post-deploy
   type: group
   role: [primary-contrail-db, contrail-db,
@@ -125,8 +123,8 @@
     puppet_manifest: puppet/manifests/contrail-compute-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-
 # Configure haproxy on OpenStack Controllers
+
 - id: openstack-haproxy-contrail
   type: puppet
   version: 2.0.0
@@ -271,16 +269,11 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
-# Skip L2, L3, DHCP and Metadata Neutron agents
+# Skip L3 and DHCP Neutron agents
 - id: primary-openstack-network-agents-l3
   type: skipped
   version: 2.0.0
 - id: openstack-network-agents-l3
-  type: skipped
-- id: primary-openstack-network-plugins-l2
-  type: skipped
-  version: 2.0.0
-- id: openstack-network-plugins-l2
   type: skipped
   version: 2.0.0
 - id: primary-openstack-network-agents-dhcp
@@ -288,14 +281,7 @@
   version: 2.0.0
 - id: openstack-network-agents-dhcp
   type: skipped
-- id: primary-openstack-network-agents-metadata
-  type: skipped
   version: 2.0.0
-- id: openstack-network-agents-metadata
-  type: skipped
-  version: 2.0.0
-
-# Skip default fuel networks and routers
 - id: openstack-network-networks
   type: skipped
   version: 2.0.0
@@ -364,7 +350,7 @@
   version: 2.0.0
   groups: [compute]
   required_for: [deploy_end]
-  requires: [top-role-compute]
+  requires: [contrail-compute-hugepages, contrail-compute-sriov]
   cross_depends:
     - name: openstack-haproxy-contrail
     - name: contrail-config-all
@@ -376,6 +362,29 @@
 
 # Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
 # Configures hugepages kernel settings if dpdk is enabled
+- id: contrail-compute-hugepages
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [contrail-compute-provision]
+  requires: [top-role-compute]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-hugepages.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Configures sriov
+- id: contrail-compute-sriov
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [contrail-compute-provision]
+  requires: [top-role-compute]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-sriov.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 - id: contrail-compute-network
   type: puppet
   version: 2.0.0
@@ -419,3 +428,15 @@
     puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
+# Congirures DPDK and SR-IOV filters in nova-scheduler
+- id: controller-scheduler
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [controller-hiera-post]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-scheduler.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
