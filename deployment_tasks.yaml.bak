@@ -1,0 +1,442 @@
+# Groups
+# Contrail - DB
+- id: primary-contrail-db
+  type: group
+  role: [primary-contrail-db]
+  tasks: [hiera, setup_repositories, globals, tools, logging, netconfig, hosts, ntp-client, dns-client]
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: one_by_one
+
+- id: contrail-db
+  type: group
+  role: [contrail-db]
+  tasks: [hiera, setup_repositories, globals, tools, logging, netconfig, hosts, ntp-client, dns-client]
+  required_for: [deploy_end]
+  requires: [deploy_start, primary-contrail-db]
+  parameters:
+    strategy:
+      type: parallel
+#
+# Contrail - Config
+- id: primary-contrail-config
+  type: group
+  role: [primary-contrail-config]
+  tasks: [hiera, setup_repositories, globals, tools, logging, netconfig, hosts, ntp-client, dns-client]
+  required_for: [deploy_end]
+  requires: [deploy_start, contrail-db, primary-controller]
+  parameters:
+    strategy:
+      type: one_by_one
+
+- id: contrail-config
+  type: group
+  role: [contrail-config]
+  tasks: [hiera, setup_repositories, globals, tools, logging, netconfig, hosts, ntp-client, dns-client]
+  required_for: [deploy_end]
+  requires: [deploy_start, primary-contrail-config]
+  parameters:
+    strategy:
+      type: parallel
+#
+# Contrail - Control
+- id: primary-contrail-control
+  type: group
+  role: [primary-contrail-control]
+  tasks: [hiera, setup_repositories, globals, tools, logging, netconfig, hosts, ntp-client, dns-client]
+  required_for: [deploy_end]
+  requires: [deploy_start, contrail-config]
+  parameters:
+    strategy:
+      type: one_by_one
+
+- id: contrail-control
+  type: group
+  role: [contrail-control]
+  tasks: [hiera, setup_repositories, globals, tools, logging, netconfig, hosts, ntp-client, dns-client]
+  required_for: [deploy_end]
+  requires: [deploy_start, primary-contrail-control]
+  parameters:
+    strategy:
+      type: parallel
+
+- id: contrail-post-deploy
+  type: group
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  tasks: [configure_default_route, dns-client, ntp-client]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    strategy:
+      type: parallel
+
+#
+# Compute dpdk feature
+- id: dpdk
+  type: group
+  role: [dpdk]
+  tasks: []
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: parallel
+
+#
+# Compute sriov feature
+- id: sriov
+  type: group
+  role: [sriov]
+  tasks: []
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: parallel
+
+# Tasks
+# Install Contrail utils, java
+# Remove apt pin for Contrail repo
+- id: contrail-common-repo
+  groups: ["/.*/"]
+  type: puppet
+  requires: [deploy_start, setup_repositories]
+  required_for: [tools]
+  version: 2.0.0
+  parameters:
+    puppet_manifest: puppet/manifests/common-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Set proper apt pin for Contrail repo
+- id: contrail-compute-repo
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  requires: [deploy_start, setup_repositories]
+  required_for: [tools]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+# Configure haproxy on OpenStack Controllers
+
+- id: openstack-haproxy-contrail
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  required_for: [primary-database, database]
+  requires: [deploy_start, primary-cluster-haproxy, cluster-haproxy]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-vip.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Install Contrail utils, java
+- id: contrail-utils
+  type: puppet
+  version: 2.0.0
+  groups: ["/(primary-)?contrail.*/"]
+  required_for: [deploy_end]
+  requires: [deploy_start, contrail-common-repo, hosts]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-utils.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# deploy other Cassandra servers
+- id: contrail-db-bootstrap
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-db, contrail-db]
+  required_for: [deploy_end]
+  requires: [contrail-utils]
+  cross-depends:
+    - name: contrail-utils
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-db.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+
+
+# Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
+# this task is performed on one node initially to allow discovery service to start up
+
+- id: contrail-config-all
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-config,contrail-config]
+  required_for: [deploy_end]
+  requires: [contrail-utils]
+  cross-depends:
+    - name: contrail-utils
+    - name: /(primary-)?openstack-controller$/
+    - name: openstack-haproxy-contrail
+    - name: contrail-db-bootstrap
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+# Provision Control config
+- id: contrail-config-provision
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-config, contrail-config]
+  required_for: [deploy_end]
+  requires: [contrail-utils, contrail-config-all]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-config-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+# Provision Control db
+- id: contrail-db-provision
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-db, contrail-db]
+  required_for: [deploy_end]
+  requires: [contrail-db-bootstrap]
+  cross-depends:
+    - name: contrail-config-provision
+    - name: openstack-haproxy-contrail
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-db-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+    strategy:
+      type: parallel
+
+# Install and configure Contrail Control Node
+- id: contrail-control-all
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-control,contrail-control]
+  required_for: [deploy_end]
+  requires: [contrail-utils]
+  cross-depends:
+    - name: contrail-config-provision
+    - name: contrail-db-provision
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+    strategy:
+      type: parallel
+
+# Provision Primary Contrail control
+- id: contrail-control-provision
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-control,contrail-control]
+  required_for: [deploy_end]
+  requires: [contrail-control-all]
+  cross-depends:
+    - name: contrail-db-provision
+    - name: contrail-config-provision
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-control-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+    strategy:
+      type: parallel
+
+# Create overrides for Hiera on Controllers: empty predefined_nets
+- id: controller-hiera-pre
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller,controller]
+  required_for: [openstack-network-start]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-hiera-pre.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
+# Create overrides for Hiera on Computes
+- id: compute-hiera
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [netconfig]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/compute-hiera.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
+# Skip L3 and DHCP Neutron agents
+- id: primary-openstack-network-agents-l3
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-agents-l3
+  type: skipped
+  version: 2.0.0
+- id: primary-openstack-network-agents-dhcp
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-agents-dhcp
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-networks
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-routers
+  type: skipped
+  version: 2.0.0
+
+# Create overrides for Hiera on Controllers: contrail-specific predefined_nets
+- id: controller-hiera-post
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller,controller]
+  required_for: [deploy_end]
+  requires: [openstack-network-end]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-hiera-post.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
+# Configuration for Neutron and Heat on Primary OpenStack Controller
+- id: openstack-controller-contrail
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller,controller]
+  required_for: [deploy_end]
+  requires: [controller-hiera-post]
+  cross-depends:
+    - name: /(primary-)?openstack-controller$/
+      role: self
+    - name: /(primary-)?heat/
+      role: self
+    - name: /openstack-network-end/ 
+      role: self
+    - name: /contrail-common-repo/ 
+      role: self
+    - name: contrail-config-all
+  parameters:
+    puppet_manifest: puppet/manifests/controller-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Create networks for ostf-tests, provision route target
+- id: openstack-controller-provision
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller]
+  required_for: [deploy_end]
+  requires: [openstack-network-end]
+  cross-depends:
+    - name: controller-hiera-post
+    - name: openstack-controller-contrail
+    - name: contrail-config-all
+  parameters:
+    puppet_manifest: puppet/manifests/controller-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Workaround for #1550450
+- id: enable_nova_compute_service
+  type: skipped
+  version: 2.0.0
+
+# Provision vRouter
+- id: contrail-compute-provision
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [deploy_end]
+  requires: [contrail-compute-hugepages, contrail-compute-sriov]
+  cross_depends:
+    - name: openstack-haproxy-contrail
+    - name: contrail-config-all
+    - name: openstack-controller-contrail
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
+# Configures hugepages kernel settings if dpdk is enabled
+- id: contrail-compute-hugepages
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [contrail-compute-provision]
+  requires: [top-role-compute]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-hugepages.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Configures sriov
+- id: contrail-compute-sriov
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [contrail-compute-provision]
+  requires: [top-role-compute]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-sriov.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-compute-network
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [deploy_end]
+  requires: [top-role-compute, contrail-compute-provision]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-network.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-compute-firewall
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [deploy_end]
+  requires: [firewall]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-firewall.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-compute-nova
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [deploy_end]
+  requires: [top-role-compute]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-nova.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-compute-vrouter
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [deploy_end]
+  requires: [contrail-compute-nova,contrail-compute-network,contrail-compute-firewall]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Congirures DPDK and SR-IOV filters in nova-scheduler
+- id: controller-scheduler
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [controller-hiera-post]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-scheduler.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
