@@ -329,6 +329,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Configure vmware integration
+- id: openstack-controller-vmware-primary
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [controller-hiera-post]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-vmware-integration.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Create networks for ostf-tests and provision route target
 - id: openstack-controller-provision
   type: puppet
