@@ -46,6 +46,13 @@ fi
 
 if [ -f "$UBUNTU_PKG" ];
 then
+  #Create link to newest version of contrail deb package
+  if [ -h $PLUGIN_PATH/contrail-install-packages.deb ];
+  then
+    unlink $PLUGIN_PATH/contrail-install-packages.deb
+  fi
+  ln -s $UBUNTU_PKG $PLUGIN_PATH/contrail-install-packages.deb
+
   DEB=`mktemp -d`
   dpkg -x $UBUNTU_PKG $DEB
   cd $PLUGIN_PATH/repositories/ubuntu/
