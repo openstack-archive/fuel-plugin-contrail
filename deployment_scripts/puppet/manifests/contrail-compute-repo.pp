@@ -14,11 +14,20 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
+$settings = hiera('contrail', {})
+$global_dpdk_enabled  = $settings['contrail_global_dpdk']
+$compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
+
 File {
   ensure  => present,
   mode    => '0644',
   owner   => root,
   group   => root,
+}
+
+Exec {
+  provider => 'shell',
+  path     => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin',
 }
 
 apt::pin { 'contrail-main':
@@ -40,6 +49,7 @@ exec {'no_openstack_network_reconfigure':
   onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
 }
 
+# Temporary fix for ceph manifests from fuel-library
 file { "${osnailyfacter_path}/lib/puppet/parser/functions/roles_include.rb":
   source  => 'puppet:///modules/contrail/roles_include.rb',
 }
@@ -52,4 +62,19 @@ file_line { 'roles':
   path  => '/etc/puppet/modules/ceph/manifests/init.pp',
   line  => " if roles_include(['primary-controller', 'controller', 'ceph-mon', 'ceph-osd', 'compute', 'cinder']) {",
   match => 'controller\|ceph\|compute\|cinder',
+}
+
+if $contrail::compute_dpdk_enabled {
+  # Create local dpdk repository
+  package { 'dpdk-depends-packages':
+    ensure => present,
+  } ->
+  file { '/opt/contrail/contrail_install_repo_dpdk/Release':
+    ensure  => file,
+    content => 'Label: dpdk-depends-packages',
+  } ->
+  exec {'setup_dpdk_repo':
+    command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh && touch /opt/contrail/dpdk-repo-DONE',
+    creates => '/opt/contrail/dpdk-repo-DONE',
+  }
 }
