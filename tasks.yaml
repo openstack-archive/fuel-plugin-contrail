@@ -1,4 +1,3 @@
-# Remove apt pin for Contrail repo
 - role: '*'
   type: puppet
   stage: pre_deployment

@@ -40,8 +40,7 @@ class contrail::provision::compute {
       creates => '/opt/contrail/provision-vrouter-DONE',
       require => File['/opt/contrail'],
     }
-  }
-  else {
+  } else {
     exec { 'provision-vrouter':
       command => "contrail-provision-vrouter \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::keystone_address} \
