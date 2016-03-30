@@ -64,9 +64,8 @@ class FailoverTests(TestBasic):
                 'slave-03': ['contrail-db']
             })
 
-        openstack.deploy_cluster(self, wait_for_status='error')
-        cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
-        assert_equal(cluster_info['status'], 'error'), "Error was expected"
+        task = self.fuel_web.deploy_cluster(self.cluster_id)
+        self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["cannot_deploy_only_contrail_config"])
@@ -97,9 +96,8 @@ class FailoverTests(TestBasic):
                 'slave-03': ['contrail-config']
             })
 
-        openstack.deploy_cluster(self, wait_for_status='error')
-        cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
-        assert_equal(cluster_info['status'], 'error'), "Error was expected"
+        task = self.fuel_web.deploy_cluster(self.cluster_id)
+        self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["cannot_deploy_only_contrail_control"])
@@ -130,6 +128,6 @@ class FailoverTests(TestBasic):
                 'slave-03': ['contrail-control']
             })
 
-        openstack.deploy_cluster(self, wait_for_status='error')
-        cluster_info = self.fuel_web.client.get_cluster(self.cluster_id)
-        assert_equal(cluster_info['status'], 'error'), "Error was expected"
+        task = self.fuel_web.deploy_cluster(self.cluster_id)
+        self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
+
