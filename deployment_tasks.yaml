@@ -86,6 +86,47 @@
       type: parallel
 
 # Tasks
+
+#Overrides for generating vmware keypair
+- id: copy_keys
+  type: copy_files
+  role: '*'
+  required_for: [pre_deployment_end]
+  requires: [generate_keys]
+  parameters:
+    files:
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/neutron/neutron.pub
+        dst: /var/lib/astute/neutron/neutron.pub
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/neutron/neutron
+        dst: /var/lib/astute/neutron/neutron
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/nova/nova.pub
+        dst: /var/lib/astute/nova/nova.pub
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/nova/nova
+        dst: /var/lib/astute/nova/nova
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/mysql/mysql.pub
+        dst: /var/lib/astute/mysql/mysql.pub
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/mysql/mysql
+        dst: /var/lib/astute/mysql/mysql
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/mongodb/mongodb.key
+        dst: /var/lib/astute/mongodb/mongodb.key
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware
+        dst: /var/lib/astute/vmware/vmware
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware.pub
+        dst: /var/lib/astute/vmware/vmware.pub
+    permissions: '0600'
+    dir_permissions: '0700'
+    cwd: /
+
+- id: generate_keys
+  type: shell
+  role: master
+  requires: [pre_deployment_start]
+  required_for: [copy_keys]
+  parameters:
+    cmd: sh /etc/puppet/modules/osnailyfacter/modular/astute/generate_keys.sh -i {CLUSTER_ID} -o 'mongodb' -s 'neutron nova mysql vmware' -p /var/lib/fuel/keys/
+    timeout: 180
+    cwd: /
+
 # Install Contrail utils, java
 - id: contrail-utils
   type: puppet
@@ -334,6 +375,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
+# Configure vmware integration
+- id: openstack-controller-vmware-primary
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [controller-hiera-post]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-vmware-integration.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Create networks for ostf-tests and provision route target
 - id: openstack-controller-provision
   type: puppet
@@ -369,6 +421,17 @@
   requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Deploy contrail vCenter plugin
+- id: contrail-compute-vmware
+  type: puppet
+  role: [compute-vmware]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 

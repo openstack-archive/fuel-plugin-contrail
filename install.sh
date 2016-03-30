@@ -24,7 +24,17 @@
 #   - Just ./install.sh
 
 
+
 set -ex
+
+function relink {
+  LINK=$1
+  PACKAGE=$2
+  if [ -h $LINK ]; then
+    unlink $LINK
+  fi
+  ln -s $PACKAGE $LINK
+}
 
 PLUGIN_PATH="/var/www/nailgun/plugins/contrail-3.0"
 #Now uses the latest package file
@@ -46,6 +56,12 @@ fi
 
 if [ -f "$UBUNTU_PKG" ];
 then
+  #Create link to latest version of contrail package
+  relink $PLUGIN_PATH/latest-contrail-install-packages.deb $UBUNTU_PKG
+
+  #Create link to latest version of contrail vcenter plugin package
+  relink $PLUGIN_PATH/latest-contrail-install-vcenter-plugin.deb $VMWARE_PKG
+
   DEB=`mktemp -d`
   dpkg -x $UBUNTU_PKG $DEB
   cd $PLUGIN_PATH/repositories/ubuntu/
