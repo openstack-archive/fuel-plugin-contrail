@@ -18,11 +18,16 @@ include contrail
 
 $common_pkg  = ['iproute2', 'haproxy', 'libatm1']
 $libvirt_pkg = ['libvirt-bin', 'libvirt0']
+$qemu_pkg    = ['qemu','qemu-*']
 
 $keep_config_files = '-o Dpkg::Options::="--force-confold"'
 $force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
-$path_cmd    = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin']
 $patch_path  = '/usr/lib/python2.7/dist-packages'
+
+Exec {
+  provider => 'shell',
+  path     => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin',
+}
 
 apt::pin { 'contrail-override-common':
   explanation => 'Set priority for packages that need to override from contrail repository',
@@ -32,15 +37,6 @@ apt::pin { 'contrail-override-common':
 }
 
 if $contrail::compute_dpdk_enabled {
-  # Create local dpdk repository
-  package { 'dpdk-depends-packages':
-    ensure => present,
-  } ->
-  exec {'setup_dpdk_repo':
-    command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh && touch /opt/contrail/dpdk-repo-DONE',
-    path    => $path_cmd,
-    creates => '/opt/contrail/dpdk-repo-DONE',
-  }
 
   # Patch nova packages if it set on Fuel UI
   if $contrail::patch_nova {
@@ -57,7 +53,6 @@ if $contrail::compute_dpdk_enabled {
     }->
     exec { 'patch-python-nova':
       command => 'patch -p1 < nova-dpdk-vrouter.patch && touch python-nova-patch-DONE',
-      path    => $path_cmd,
       cwd     => $patch_path,
       creates => "${patch_path}/python-nova-patch-DONE",
     }
@@ -65,14 +60,19 @@ if $contrail::compute_dpdk_enabled {
 
   # Override libvirt and qemu packages if it set on Fuel UI
   if $contrail::install_contrail_qemu_lv {
-    # For qemu you don't need additional pinning, only dpdk repository
-    package { 'qemu-system-x86':
+    apt::pin { 'contrail-pin-qemu':
+      explanation => 'Install qemu from dpdk-depends',
+      priority    => 1200,
+      label       => 'dpdk-depends-packages',
+      packages    => $qemu_pkg,
+    } ->
+    package { ['qemu-kvm','qemu-system-x86']:
       ensure => 'latest',
     } ~>
     service { 'qemu-kvm':
       ensure => running,
       enable => true,
-    } ->
+    }
     apt::pin { 'contrail-override-libvirt':
       explanation => 'Set priority for packages that need to override from contrail repository',
       packages    => $libvirt_pkg,
@@ -86,7 +86,6 @@ if $contrail::compute_dpdk_enabled {
 #    } ->
     exec { 'override-libvirt':
       command => "apt-get install --yes ${keep_config_files} ${force_overwrite} libvirt-bin libvirt0",
-      path    => $path_cmd,
       unless  => 'dpkg -l | grep libvirt0 | grep contrail',
     } ->
     # With a new libvirt packages this init script must be stopped
