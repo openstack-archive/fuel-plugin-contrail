@@ -494,7 +494,8 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self,
                                       conf_db,
-                                      is_vsrx=vsrx_setup_result)
+                                      is_vsrx=vsrx_setup_result,
+                                      ostf_fail_tests=['Check that required services are running'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_add_db"])
