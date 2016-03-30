@@ -26,7 +26,6 @@ class contrail {
   $network_metadata = hiera_hash('network_metadata', {})
   $uid              = hiera('uid')
   $master_ip        = hiera('master_ip')
-  $node_role        = hiera('role')
   $node_name        = hiera('user_node_name')
   $nodes            = hiera('nodes')
 
