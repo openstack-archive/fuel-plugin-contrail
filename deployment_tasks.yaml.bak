@@ -276,12 +276,6 @@
 - id: openstack-network-agents-l3
   type: skipped
   version: 2.0.0
-- id: primary-openstack-network-plugins-l2
-  type: skipped
-  version: 2.0.0
-- id: openstack-network-plugins-l2
-  type: skipped
-  version: 2.0.0
 - id: primary-openstack-network-agents-dhcp
   type: skipped
   version: 2.0.0
@@ -356,7 +350,7 @@
   version: 2.0.0
   groups: [compute]
   required_for: [deploy_end]
-  requires: [top-role-compute]
+  requires: [contrail-compute-hugepages, contrail-compute-sriov]
   cross_depends:
     - name: openstack-haproxy-contrail
     - name: contrail-config-all
@@ -368,6 +362,29 @@
 
 # Remove Open vSwitch packages, install and configure Contrail vRouter dkms kernel module
 # Configures hugepages kernel settings if dpdk is enabled
+- id: contrail-compute-hugepages
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [contrail-compute-provision]
+  requires: [top-role-compute]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-hugepages.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Configures sriov
+- id: contrail-compute-sriov
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [contrail-compute-provision]
+  requires: [top-role-compute]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-sriov.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 - id: contrail-compute-network
   type: puppet
   version: 2.0.0
@@ -410,3 +427,16 @@
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Congirures DPDK and SR-IOV filters in nova-scheduler
+- id: controller-scheduler
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [controller-hiera-post]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-scheduler.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
