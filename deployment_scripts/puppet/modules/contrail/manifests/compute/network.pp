@@ -13,7 +13,6 @@
 #    under the License.
 
 class contrail::compute::network {
-  $node_role = 'compute'
   $address = $contrail::address
   $ifname = $contrail::phys_dev
   $netmask = $contrail::netmask_short
