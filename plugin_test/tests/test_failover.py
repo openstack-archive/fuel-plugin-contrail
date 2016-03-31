@@ -51,11 +51,14 @@ class FailoverTests(TestBasic):
             5. Deploy cluster and verify that it will fail
         """
 
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
+        self.show_step(3)
+        self.show_step(4)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -64,6 +67,7 @@ class FailoverTests(TestBasic):
                 'slave-03': ['contrail-db']
             })
 
+        self.show_step(5)
         task = self.fuel_web.deploy_cluster(self.cluster_id)
         self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
 
@@ -83,11 +87,14 @@ class FailoverTests(TestBasic):
             5. Deploy cluster and verify that it will fail
         """
 
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
+        self.show_step(3)
+        self.show_step(4)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -96,6 +103,7 @@ class FailoverTests(TestBasic):
                 'slave-03': ['contrail-config']
             })
 
+        self.show_step(5)
         task = self.fuel_web.deploy_cluster(self.cluster_id)
         self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
 
@@ -115,11 +123,14 @@ class FailoverTests(TestBasic):
             5. Deploy cluster and verify that it will fail
         """
 
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
+        self.show_step(3)
+        self.show_step(4)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -128,6 +139,7 @@ class FailoverTests(TestBasic):
                 'slave-03': ['contrail-control']
             })
 
+        self.show_step(5)
         task = self.fuel_web.deploy_cluster(self.cluster_id)
         self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
 
