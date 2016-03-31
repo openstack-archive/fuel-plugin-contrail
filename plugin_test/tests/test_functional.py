@@ -60,14 +60,17 @@ class IntegrationTests(TestBasic):
             10. Run OSTF tests. All steps must be completed successfully,
                 without any errors.
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_step(3)
+        self.show_step(4)
         conf_no_controller = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
@@ -86,12 +89,16 @@ class IntegrationTests(TestBasic):
         }
         conf_ctrl = {'slave-03': ['controller']}
 
+        self.show_step(5)
+        self.show_step(6)
         openstack.update_deploy_check(self,
                                       dict(conf_no_controller, **conf_ctrl),
                                       is_vsrx=vsrx_setup_result)
+        self.show_step(7)
         openstack.update_deploy_check(self,
                                       conf_ctrl, delete=True,
                                       is_vsrx=False)
+        self.show_step(8)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
@@ -99,10 +106,11 @@ class IntegrationTests(TestBasic):
             should_fail=1,
             failed_test_name=['Check that required services are running']
         )
-
+        self.show_step(9)
         openstack.update_deploy_check(self,
                                       conf_ctrl,
                                       is_vsrx=False)
+        self.show_step(10)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'ha'],
@@ -130,14 +138,17 @@ class IntegrationTests(TestBasic):
             10. Run OSTF tests
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_step(3)
+        self.show_step(4)
         conf_no_controller = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
@@ -153,12 +164,16 @@ class IntegrationTests(TestBasic):
         }
         conf_compute = {'slave-08': ['compute', 'cinder']}
 
+        self.show_step(5)
+        self.show_step(6)
         openstack.update_deploy_check(self,
                                       dict(conf_no_controller, **conf_compute),
                                       is_vsrx=vsrx_setup_result)
+        self.show_step(7)
         openstack.update_deploy_check(self,
                                       conf_compute, delete=True,
                                       is_vsrx=False)
+        self.show_step(8)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
@@ -166,9 +181,10 @@ class IntegrationTests(TestBasic):
             should_fail=1,
             failed_test_name=['Check that required services are running']
         )
-
+        self.show_step(9)
         openstack.update_deploy_check(self, conf_compute,
                                       is_vsrx=False)
+        self.show_step(10)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'ha'],
@@ -198,10 +214,14 @@ class IntegrationTests(TestBasic):
             11. Check Controller and Contrail nodes status
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
-        plugin.activate_plugin(self)  # enable plugin in contrail settings
+        self.show_step(2)
+        plugin.activate_plugin(self)
         vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
 
+        self.show_step(3)
+        self.show_step(4)
         conf_no_contrail = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
@@ -234,18 +254,19 @@ class IntegrationTests(TestBasic):
                                  'Nailgun node status is not %s but %s' % (
                                      node_state, node['status']))
 
-        # Deploy cluster and run OSTF
+        self.show_step(5)
+        self.show_step(6)
         openstack.update_deploy_check(self,
                                       dict(conf_no_contrail,
                                            **conf_contrail),
                                       is_vsrx=vsrx_setup_result,
                                       ostf_suites=['smoke', 'sanity', 'ha'])
 
-        # Check all nodes are 'ready'
+        self.show_step(7)
         for node_name in dict(conf_no_contrail, **conf_contrail):
             check_node_state(self.cluster_id, node_name, 'ready')
 
-        # Shutdown contrail node
+        self.show_step(8)
         for node in self.fuel_web.client.list_cluster_nodes(self.cluster_id):
             if 'slave-06' in node['name']:
                 logger.info('Shutdown node "%s"' % node['name'])
@@ -253,12 +274,12 @@ class IntegrationTests(TestBasic):
                     self.fuel_web.get_devops_nodes_by_nailgun_nodes([node]))
                 break
 
-        # Run OSTF tests again
+        self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
 
-        # Check controller and contrail nodes states
+        self.show_step(11)
         node_roles = {'controller', 'contrail-config'}
         for node_name, roles in conf_no_contrail.items():
             if node_roles & set(roles):
@@ -286,14 +307,17 @@ class IntegrationTests(TestBasic):
             11. Check Controller and Contrail nodes status
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_step(3)
+        self.show_step(4)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -303,9 +327,14 @@ class IntegrationTests(TestBasic):
         }
         conf_control = {'slave-04': ['contrail-control']}
 
+        self.show_step(5)
+        self.show_step(6)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
+        self.show_step(8)
+        self.show_step(9)
+        self.show_step(10)
         openstack.update_deploy_check(self, conf_control,
                                       is_vsrx=vsrx_setup_result)
 
@@ -331,14 +360,17 @@ class IntegrationTests(TestBasic):
             11. Check Controller and Contrail nodes status
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_step(3)
+        self.show_step(4)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -348,9 +380,14 @@ class IntegrationTests(TestBasic):
         }
         conf_config = {'slave-04': ['contrail-config']}
 
+        self.show_step(5)
+        self.show_step(6)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
+        self.show_step(8)
+        self.show_step(9)
+        self.show_step(10)
         openstack.update_deploy_check(self, conf_config,
                                       is_vsrx=vsrx_setup_result)
 
@@ -376,14 +413,17 @@ class IntegrationTests(TestBasic):
             11. Check Controller and Contrail nodes status
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_step(3)
+        self.show_step(4)
         conf_no_control = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -394,9 +434,14 @@ class IntegrationTests(TestBasic):
         }
         conf_control = {'slave-04': ['contrail-control']}
 
+        self.show_step(5)
+        self.show_step(6)
         openstack.update_deploy_check(self,
                                       dict(conf_no_control, **conf_control),
                                       is_vsrx=vsrx_setup_result)
+        self.show_step(8)
+        self.show_step(9)
+        self.show_step(10)
         openstack.update_deploy_check(self,
                                       conf_control, delete=True,
                                       is_vsrx=vsrx_setup_result)
@@ -424,14 +469,17 @@ class IntegrationTests(TestBasic):
             11. Check Controller and Contrail nodes status
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_step(3)
+        self.show_step(4)
         conf_no_config = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -443,9 +491,14 @@ class IntegrationTests(TestBasic):
         }
         conf_config = {'slave-05': ['contrail-config']}
 
+        self.show_step(5)
+        self.show_step(6)
         openstack.update_deploy_check(self,
                                       dict(conf_no_config, **conf_config),
                                       is_vsrx=vsrx_setup_result)
+        self.show_step(8)
+        self.show_step(9)
+        self.show_step(10)
         openstack.update_deploy_check(self,
                                       conf_config, delete=True,
                                       is_vsrx=vsrx_setup_result)
@@ -471,14 +524,17 @@ class IntegrationTests(TestBasic):
             9. Run OSTF tests
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_step(3)
+        self.show_step(4)
         conf_no_db = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -489,9 +545,13 @@ class IntegrationTests(TestBasic):
         }
         conf_db = {'slave-04': ['contrail-db']}
 
+        self.show_step(5)
         openstack.update_deploy_check(self,
                                       conf_no_db,
                                       is_vsrx=vsrx_setup_result)
+        self.show_step(7)
+        self.show_step(8)
+        self.show_step(9)
         openstack.update_deploy_check(self,
                                       conf_db,
                                       is_vsrx=vsrx_setup_result)
@@ -516,9 +576,10 @@ class IntegrationTests(TestBasic):
             8. Deploy changes
             9. Delete node with "compute" role
             10. Deploy changes
-            9. Run OSTF tests
+            11. Run OSTF tests
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5,
                                        options={
                                            'images_ceph': True,
@@ -527,11 +588,13 @@ class IntegrationTests(TestBasic):
                                            'objects_ceph': True,
                                            'ceilometer': True,
                                            'volumes_lvm': False})
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_step(3)
+        self.show_step(4)
         conf_no_db = {
             'slave-01': ['controller', 'mongo'],
             'slave-02': ['compute', 'ceph-osd'],
@@ -543,10 +606,16 @@ class IntegrationTests(TestBasic):
         }
         conf_db = {'slave-05': ['compute']}
 
+        self.show_step(5)
         openstack.update_deploy_check(self, conf_no_db,
                                       is_vsrx=vsrx_setup_result)
+        self.show_step(7)
+        self.show_step(8)
         openstack.update_deploy_check(self, conf_db,
                                       is_vsrx=vsrx_setup_result)
+        self.show_step(9)
+        self.show_step(10)
+        self.show_step(11)
         openstack.update_deploy_check(self, conf_db, delete=True,
                                       is_vsrx=vsrx_setup_result,
                                       ostf_fail_tests=['Check that required services are running'])
