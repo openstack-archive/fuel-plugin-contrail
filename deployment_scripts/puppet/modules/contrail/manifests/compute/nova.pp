@@ -14,6 +14,19 @@
 
 class contrail::compute::nova {
 
+  $cgroup_acl_string='["/dev/null", "/dev/full", "/dev/zero","/dev/random", "/dev/urandom","/dev/ptmx","/dev/kvm", "/dev/kqemu","/dev/rtc","/dev/hpet", "/dev/vfio/vfio","/dev/net/tun"]'
+
+  ini_setting { 'set_cgroup_acl_string':
+    ensure  => present,
+    path    => '/etc/libvirt/qemu.conf',
+    setting => 'cgroup_device_acl',
+    value   => $cgroup_acl_string,
+  } ~>
+  service { 'libvirtd' :
+    ensure   => 'running',
+    enable   => true
+  }
+
   nova_config {
     'DEFAULT/neutron_url': value => "http://${contrail::mos_mgmt_vip}:9696";
     'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
