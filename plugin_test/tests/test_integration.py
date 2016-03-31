@@ -78,9 +78,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
+        conf_ha = {
                 'slave-01': ['controller'],
                 'slave-02': ['controller'],
                 'slave-03': ['controller'],
@@ -89,14 +87,12 @@ class IntegrationTests(TestBasic):
                 'slave-06': ['contrail-config'],
                 'slave-07': ['contrail-control'],
                 'slave-08': ['contrail-db'],
-            })
+        }
 
-        # deploy cluster
-        openstack.deploy_cluster(self)
-
-        if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'])
+        # deploy cluster and run ostf
+        openstack.update_deploy_check(self, conf_ha,
+                                      is_vsrx=vsrx_setup_result,
+                                      ostf_suits=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha_baseos"])
@@ -126,9 +122,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
+        conf_ha_baseos = {
                 'slave-01': ['controller'],
                 'slave-02': ['compute', 'cinder'],
                 'slave-03': ['compute', 'cinder'],
@@ -142,13 +136,11 @@ class IntegrationTests(TestBasic):
                 'slave-07': ['contrail-config',
                              'contrail-control',
                              'contrail-db'],
-            })
+        }
 
-        # deploy cluster
-        openstack.deploy_cluster(self)
-
-        if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+        # deploy cluster and run ostf
+        openstack.update_deploy_check(self, conf_ha_baseos,
+                                      is_vsrx=vsrx_setup_result)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ceilometer"])
@@ -422,9 +414,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
+        conf_vlan = {
                 'slave-01': ['controller'],
                 'slave-02': ['controller'],
                 'slave-03': ['controller'],
@@ -433,15 +423,12 @@ class IntegrationTests(TestBasic):
                 'slave-06': ['contrail-config', 'contrail-db'],
                 'slave-07': ['contrail-control', 'contrail-db'],
                 'slave-08': ['contrail-db'],
-            })
+        }
 
-        # deploy cluster
-        openstack.deploy_cluster(self)
-
-        if vsrx_setup_result:
-            self.fuel_web.run_ostf(
-                cluster_id=self.cluster_id,
-                test_sets=['smoke', 'sanity', 'ha'])
+        # deploy cluster and run ostf
+        openstack.update_deploy_check(self, conf_vlan,
+                                      is_vsrx=vsrx_setup_result,
+                                      test_suits=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ceph_multirole"])
@@ -478,9 +465,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
+        conf_ceph_multirole = {
                 'slave-01': ['controller', 'ceph-osd'],
                 'slave-02': ['controller', 'ceph-osd'],
                 'slave-03': ['controller', 'ceph-osd'],
@@ -489,15 +474,11 @@ class IntegrationTests(TestBasic):
                 'slave-06': ['contrail-config',
                              'contrail-control',
                              'contrail-db'],
-            })
+        }
 
-        # deploy cluster
-        openstack.deploy_cluster(self)
-
-        # run OSTF tests
-        if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'])
+        # deploy cluster and run ostf
+        openstack.update_deploy_check(self, conf_ceph_multirole,
+                                      ostf_suits=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_cinder_multirole"])
@@ -526,9 +507,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
+        conf_cinder_multirole = {
                 'slave-01': ['controller', 'cinder'],
                 'slave-02': ['controller', 'cinder'],
                 'slave-03': ['controller', 'cinder'],
@@ -539,15 +518,12 @@ class IntegrationTests(TestBasic):
                 'slave-06': ['contrail-config',
                              'contrail-control',
                              'contrail-db'],
-            })
+            }
 
-        # deploy cluster
-        openstack.deploy_cluster(self)
-
-        # run OSTF tests
-        if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'])
+        # deploy cluster and run ostf
+        openstack.update_deploy_check(self, conf_cinder_multirole,
+                                      is_vsrx=vsrx_setup_result,
+                                      ostf_suits=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_cinder_ceph_multirole"])
@@ -581,9 +557,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
+        conf_cinder_ceph = {
                 'slave-01': ['controller', 'cinder', 'ceph-osd'],
                 'slave-02': ['controller', 'cinder'],
                 'slave-03': ['controller', 'ceph-osd'],
@@ -598,12 +572,10 @@ class IntegrationTests(TestBasic):
                 'slave-08': ['contrail-config',
                              'contrail-control',
                              'contrail-db']
-            })
+        }
 
-        # deploy cluster
-        openstack.deploy_cluster(self)
+        # deploy cluster and run ostf
+        openstack.update_deploy_check(self, conf_cinder_ceph,
+                                      is_vsrx=vsrx_setup_result,
+                                      ostf_suits=['smoke', 'sanity', 'ha'])
 
-        # run OSTF tests
-        if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'])
