@@ -91,22 +91,15 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self,
                                       conf_ctrl, delete=True,
-                                      is_vsrx=False)
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            test_sets=['smoke', 'sanity', 'ha'],
-            timeout=settings.OSFT_RUN_TIMEOUT,
-            should_fail=1,
-            failed_test_name=['Check that required services are running']
-        )
-
+                                      is_vsrx=False,
+                                      ostf_timeout=settings.OSFT_RUN_TIMEOUT,
+                                      ostf_suits=['smoke', 'sanity', 'ha'],
+                                      ostf_fail_test=['Check that required services are running'])
         openstack.update_deploy_check(self,
                                       conf_ctrl,
-                                      is_vsrx=False)
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            test_sets=['smoke', 'ha'],
-            timeout=settings.OSFT_RUN_TIMEOUT)
+                                      is_vsrx=False,
+                                      ostf_timeout=settings.OSFT_RUN_TIMEOUT,
+                                      ostf_suits=['smoke', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_plugin_add_delete_compute_node"])
@@ -149,7 +142,6 @@ class IntegrationTests(TestBasic):
             'slave-09': ['contrail-db',
                          'contrail-config',
                          'contrail-control'],
-
         }
         conf_compute = {'slave-08': ['compute', 'cinder']}
 
@@ -158,21 +150,14 @@ class IntegrationTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
         openstack.update_deploy_check(self,
                                       conf_compute, delete=True,
-                                      is_vsrx=False)
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            test_sets=['smoke', 'sanity', 'ha'],
-            timeout=settings.OSFT_RUN_TIMEOUT,
-            should_fail=1,
-            failed_test_name=['Check that required services are running']
-        )
-
+                                      is_vsrx=False,
+                                      ostf_timeout=settings.OSFT_RUN_TIMEOUT,
+                                      ostf_suits=['smoke', 'sanity', 'ha'],
+                                      osts_fail_tests=['Check that required services are running'])
         openstack.update_deploy_check(self, conf_compute,
-                                      is_vsrx=False)
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            test_sets=['smoke', 'ha'],
-            timeout=settings.OSFT_RUN_TIMEOUT)
+                                      is_vsrx=False,
+                                      ostf_timeout=settings.OSFT_RUN_TIMEOUT,
+                                      ostf_suits=['smoke', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha_with_shutdown_contrail_node"])
