@@ -33,7 +33,7 @@ module Puppet::Parser::Functions
            bridge_interfaces.push(entry['name'])
          end
          if entry.has_key?('bond_properties') and entry['action'] == "add-bond"
-           bond_interfaces.push(entry['interfaces'])
+           bond_interfaces.push(*entry['interfaces'])
          end
       end
     end
