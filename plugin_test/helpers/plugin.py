@@ -171,3 +171,9 @@ def net_group_preparation(obj):
     for i in commands:
         node_ssh.execute_async(i)
         time.sleep(40)
+
+
+def show_range(self, start_value, end_value):
+    """Show several steps"""
+    for i in range(start_value, end_value):
+        self.show_step(i)
