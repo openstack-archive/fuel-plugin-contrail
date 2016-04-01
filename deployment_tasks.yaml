@@ -121,17 +121,6 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
 
-# Configure haproxy on OpenStack Controllers
-- id: openstack-haproxy-contrail
-  type: puppet
-  groups: [primary-controller, controller]
-  required_for: [deploy_end]
-  requires: [deploy_start, openstack-haproxy, rabbitmq]
-  parameters:
-    puppet_manifest: puppet/manifests/controller-vip.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
-
 # Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
 # this task is performed on one node initially to allow discovery service to start up
 - id: contrail-config-primary
@@ -274,16 +263,10 @@
     timeout: 3600
     cwd: /
 
-# Set proper apt pin for Contrail repository
-- id: contrail-repository
-  type: puppet
-  groups: [compute]
-  required_for: [tools]
-  requires: [deploy_start, globals]
-  parameters:
-    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+##############################################################
+#  Openstack Controller tasks section
+##############################################################
+
 
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
@@ -293,6 +276,50 @@
   requires: [deploy_start, globals]
   parameters:
     puppet_manifest: puppet/manifests/controller-hiera-pre.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
+# Configure haproxy on OpenStack Controllers
+- id: openstack-haproxy-contrail
+  type: puppet
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [deploy_start, openstack-haproxy, rabbitmq]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-vip.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Configuration for Nova, Neutron, Heat, Ceilometer on OpenStack Controllers
+- id: openstack-controller-contrail
+  type: puppet
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [controller_remaining_tasks]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Congirures DPDK and SR-IOV filters in nova-scheduler
+- id: controller-scheduler
+  type: puppet
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [openstack-controller-contrail]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-scheduler.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
+# Creates aggregate for DPDK
+- id: contrail-controller-aggregate
+  type: puppet
+  groups: [primary-controller]
+  required_for: [deploy_end]
+  requires: [controller-scheduler]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-controller-aggregate.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
@@ -307,47 +334,30 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
-# Congirures DPDK and SR-IOV filters in nova-scheduler
-- id: controller-scheduler
-  type: puppet
-  role: [primary-controller, controller]
-  required_for: [post_deployment_end]
-  requires: [post_deployment_start]
-  parameters:
-    puppet_manifest: puppet/manifests/controller-scheduler.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 120
-
-# Configuration for Neutron and Heat on Primary OpenStack Controller
-- id: openstack-controller-contrail-primary
-  type: puppet
-  role: [primary-controller]
-  required_for: [post_deployment_end]
-  requires: [controller-hiera-post]
-  parameters:
-    puppet_manifest: puppet/manifests/controller-config.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
-
 # Create networks for ostf-tests and provision route target
 - id: openstack-controller-provision
   type: puppet
   role: [primary-controller]
   required_for: [post_deployment_end]
-  requires: [openstack-controller-contrail-primary]
+  requires: [controller-hiera-post]
   parameters:
     puppet_manifest: puppet/manifests/controller-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-# Configure other OpenStack Controllers
-- id: openstack-controller-contrail
+##############################################################
+#  Compute tasks section
+##############################################################
+
+
+# Set proper apt pin for Contrail repository
+- id: contrail-repository
   type: puppet
-  role: [controller]
-  required_for: [post_deployment_end]
-  requires: [post_deployment_start]
+  groups: [compute]
+  required_for: [tools]
+  requires: [deploy_start, globals]
   parameters:
-    puppet_manifest: puppet/manifests/controller-config.pp
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
@@ -434,7 +444,7 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-# Creates aggregate for DPDK
+# Adds node to nova aggregate for DPDK
 - id: contrail-compute-aggregate
   type: puppet
   role: [compute]
