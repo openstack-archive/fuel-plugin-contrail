@@ -69,8 +69,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_no_controller = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
@@ -89,8 +88,7 @@ class IntegrationTests(TestBasic):
         }
         conf_ctrl = {'slave-03': ['controller']}
 
-        self.show_step(5)
-        self.show_step(6)
+        plugin.show_range(5, 7)
         openstack.update_deploy_check(self,
                                       dict(conf_no_controller, **conf_ctrl),
                                       is_vsrx=vsrx_setup_result)
@@ -147,8 +145,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_no_controller = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
@@ -164,8 +161,7 @@ class IntegrationTests(TestBasic):
         }
         conf_compute = {'slave-08': ['compute', 'cinder']}
 
-        self.show_step(5)
-        self.show_step(6)
+        plugin.show_range(5, 7)
         openstack.update_deploy_check(self,
                                       dict(conf_no_controller, **conf_compute),
                                       is_vsrx=vsrx_setup_result)
@@ -220,8 +216,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self)
         vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_no_contrail = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
@@ -254,8 +249,7 @@ class IntegrationTests(TestBasic):
                                  'Nailgun node status is not %s but %s' % (
                                      node_state, node['status']))
 
-        self.show_step(5)
-        self.show_step(6)
+        plugin.show_range(5, 7)
         openstack.update_deploy_check(self,
                                       dict(conf_no_contrail,
                                            **conf_contrail),
@@ -316,8 +310,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -327,14 +320,11 @@ class IntegrationTests(TestBasic):
         }
         conf_control = {'slave-04': ['contrail-control']}
 
-        self.show_step(5)
-        self.show_step(6)
+        plugin.show_range(5, 7)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
-        self.show_step(8)
-        self.show_step(9)
-        self.show_step(10)
+        plugin.show_range(8, 11)
         openstack.update_deploy_check(self, conf_control,
                                       is_vsrx=vsrx_setup_result)
 
@@ -369,8 +359,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -380,14 +369,11 @@ class IntegrationTests(TestBasic):
         }
         conf_config = {'slave-04': ['contrail-config']}
 
-        self.show_step(5)
-        self.show_step(6)
+        plugin.show_range(5, 7)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
-        self.show_step(8)
-        self.show_step(9)
-        self.show_step(10)
+        plugin.show_range(8, 11)
         openstack.update_deploy_check(self, conf_config,
                                       is_vsrx=vsrx_setup_result)
 
@@ -422,8 +408,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_no_control = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -434,14 +419,11 @@ class IntegrationTests(TestBasic):
         }
         conf_control = {'slave-04': ['contrail-control']}
 
-        self.show_step(5)
-        self.show_step(6)
+        plugin.show_range(5, 7)
         openstack.update_deploy_check(self,
                                       dict(conf_no_control, **conf_control),
                                       is_vsrx=vsrx_setup_result)
-        self.show_step(8)
-        self.show_step(9)
-        self.show_step(10)
+        plugin.show_range(8, 11)
         openstack.update_deploy_check(self,
                                       conf_control, delete=True,
                                       is_vsrx=vsrx_setup_result)
@@ -478,8 +460,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_no_config = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -491,14 +472,11 @@ class IntegrationTests(TestBasic):
         }
         conf_config = {'slave-05': ['contrail-config']}
 
-        self.show_step(5)
-        self.show_step(6)
+        plugin.show_range(5, 7)
         openstack.update_deploy_check(self,
                                       dict(conf_no_config, **conf_config),
                                       is_vsrx=vsrx_setup_result)
-        self.show_step(8)
-        self.show_step(9)
-        self.show_step(10)
+        plugin.show_range(8, 11)
         openstack.update_deploy_check(self,
                                       conf_config, delete=True,
                                       is_vsrx=vsrx_setup_result)
@@ -533,8 +511,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_no_db = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
@@ -549,9 +526,7 @@ class IntegrationTests(TestBasic):
         openstack.update_deploy_check(self,
                                       conf_no_db,
                                       is_vsrx=vsrx_setup_result)
-        self.show_step(7)
-        self.show_step(8)
-        self.show_step(9)
+        plugin.show_range(7, 10)
         openstack.update_deploy_check(self,
                                       conf_db,
                                       is_vsrx=vsrx_setup_result)
@@ -593,8 +568,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         conf_no_db = {
             'slave-01': ['controller', 'mongo'],
             'slave-02': ['compute', 'ceph-osd'],
@@ -609,13 +583,10 @@ class IntegrationTests(TestBasic):
         self.show_step(5)
         openstack.update_deploy_check(self, conf_no_db,
                                       is_vsrx=vsrx_setup_result)
-        self.show_step(7)
-        self.show_step(8)
+        plugin.show_range(7, 9)
         openstack.update_deploy_check(self, conf_db,
                                       is_vsrx=vsrx_setup_result)
-        self.show_step(9)
-        self.show_step(10)
-        self.show_step(11)
+        plugin.show_range(9, 12)
         openstack.update_deploy_check(self, conf_db, delete=True,
                                       is_vsrx=vsrx_setup_result,
                                       ostf_fail_tests=['Check that required services are running'])

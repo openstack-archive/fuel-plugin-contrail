@@ -111,12 +111,16 @@ class TestNetworkTemplates(TestNetworkTemplatesBase, TestBasic):
             },
         )
 
+        plugin.show_range(2, 5)
         plugin.net_group_preparation(self)
 
+        self.show_step(5)
         network_template = self.get_network_templ('network_template_1')
+        self.show_step(6)
         self.fuel_web.client.upload_network_template(
             cluster_id=self.cluster_id, network_template=network_template)
 
+        self.show_step(7)
         openstack.deploy_cluster(self)
 
         # run OSTF tests
