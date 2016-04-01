@@ -44,11 +44,6 @@ class IntegrationTests(TestBasic):
 
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
-    def show_range(self, start_value, end_value):
-        """Show several steps"""
-        for i in range(start_value, end_value):
-            self.show_step(i)
-
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha"])
     @log_snapshot_after_test
@@ -83,7 +78,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_range(3, 8)
+        plugin.show_range(3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -133,7 +128,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_range(3, 7)
+        plugin.show_range(3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -193,7 +188,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_range(3, 9)
+        plugin.show_range(3, 9)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -283,7 +278,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_range(3, 7)
+        plugin.show_range(3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -354,7 +349,7 @@ class IntegrationTests(TestBasic):
         # configure vlan on storage and management interfaces
         openstack.assign_vlan(self, private=101, storage=102)
 
-        self.show_range(3, 6)
+        plugin.show_range(3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -440,7 +435,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_range(3, 8)
+        plugin.show_range(3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -498,7 +493,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_range(3, 6)
+        plugin.show_range(3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -547,7 +542,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_range(3, 6)
+        plugin.show_range(3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -603,7 +598,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_range(3, 7)
+        plugin.show_range(3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {

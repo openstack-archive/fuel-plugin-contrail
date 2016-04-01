@@ -57,8 +57,7 @@ class FailoverTests(TestBasic):
         self.show_step(2)
         plugin.activate_plugin(self)
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -93,8 +92,7 @@ class FailoverTests(TestBasic):
         self.show_step(2)
         plugin.activate_plugin(self)
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -129,8 +127,7 @@ class FailoverTests(TestBasic):
         self.show_step(2)
         plugin.activate_plugin(self)
 
-        self.show_step(3)
-        self.show_step(4)
+        plugin.show_range(3, 5)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
