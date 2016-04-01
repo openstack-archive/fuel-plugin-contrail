@@ -44,6 +44,11 @@ class IntegrationTests(TestBasic):
 
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
+    def show_range(self, start_value, end_value):
+        """Show several steps"""
+        for i in range(start_value, end_value):
+            self.show_step(i)
+
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha"])
     @log_snapshot_after_test
@@ -65,7 +70,7 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True,
                                                 'volumes_ceph': True,
@@ -73,11 +78,12 @@ class IntegrationTests(TestBasic):
                                                 'objects_ceph': True,
                                                 'volumes_lvm': False})
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_range(3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -91,9 +97,9 @@ class IntegrationTests(TestBasic):
                 'slave-08': ['contrail-db'],
             })
 
-        # deploy cluster
+        self.show_step(8)
         openstack.deploy_cluster(self)
-
+        self.show_step(9)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
@@ -119,13 +125,15 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_range(3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -144,9 +152,9 @@ class IntegrationTests(TestBasic):
                              'contrail-db'],
             })
 
-        # deploy cluster
+        self.show_step(7)
         openstack.deploy_cluster(self)
-
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
@@ -173,17 +181,19 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(
             self,
             slaves=9,
             options={'images_ceph': True,
                      'ceilometer': True})
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_range(3, 9)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -197,9 +207,9 @@ class IntegrationTests(TestBasic):
                              'contrail-control',
                              'contrail-db'],
             })
-        # deploy cluster
+        self.show_step(9)
         openstack.deploy_cluster(self)
-
+        self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
@@ -227,7 +237,7 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-
+        self.show_step(1)
         plugin.prepare_contrail_plugin(
             self, slaves=9, options={'images_ceph': True}
         )
@@ -251,7 +261,7 @@ class IntegrationTests(TestBasic):
             logger.debug("New {0} interface properties:\n{1}"
                          .format(iface, jumbo.get_host_iface(iface)))
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         interfaces = {
@@ -273,6 +283,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_range(3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -288,6 +299,7 @@ class IntegrationTests(TestBasic):
                              'contrail-control'],
                 })
 
+        self.show_step(7)
         slave_nodes = \
             self.fuel_web.client.list_cluster_nodes(self.cluster_id)
         for node in slave_nodes:
@@ -295,9 +307,10 @@ class IntegrationTests(TestBasic):
                 node['id'], interfaces,
                 override_ifaces_params=interfaces_update)
 
-        # deploy cluster
+        self.show_step(8)
         openstack.deploy_cluster(self)
 
+        self.show_step(9)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
@@ -332,15 +345,16 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # configure vlan on storage and management interfaces
         openstack.assign_vlan(self, private=101, storage=102)
 
+        self.show_range(3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -363,12 +377,14 @@ class IntegrationTests(TestBasic):
 
         cluster_nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
 
+        self.show_step(6)
         for node in cluster_nodes:
             self.fuel_web.update_node_networks(
                 node['id'],
                 interfaces_dict=deepcopy(plugin.INTERFACES),
                 raw_data=deepcopy(plugin.BOND_CONFIG))
 
+        self.show_step(7)
         openstack.deploy_cluster(self)
 
         # TODO
@@ -379,6 +395,7 @@ class IntegrationTests(TestBasic):
         # When it will be done 'should_fail=2' and
         # 'failed_test_name' parameter should be removed.
 
+        self.show_step(8)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
@@ -411,17 +428,19 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
-        # configure vlan on storage and management interfaces
+        self.show_step(8)
         openstack.assign_vlan(self, storage=101, management=102)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_range(3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -435,9 +454,10 @@ class IntegrationTests(TestBasic):
                 'slave-08': ['contrail-db'],
             })
 
-        # deploy cluster
+        self.show_step(9)
         openstack.deploy_cluster(self)
 
+        self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
@@ -461,7 +481,7 @@ class IntegrationTests(TestBasic):
             7. Run OSTF tests
 
         """
-
+        self.show_step(1)
         plugin.prepare_contrail_plugin(
             self, slaves=9,
             options={
@@ -472,12 +492,13 @@ class IntegrationTests(TestBasic):
                 'volumes_lvm': False
             })
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_range(3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -491,10 +512,10 @@ class IntegrationTests(TestBasic):
                              'contrail-db'],
             })
 
-        # deploy cluster
+        self.show_step(6)
         openstack.deploy_cluster(self)
 
-        # run OSTF tests
+        self.show_step(7)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
@@ -517,15 +538,16 @@ class IntegrationTests(TestBasic):
             8. Run OSTF tests
 
         """
-
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_range(3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -541,10 +563,10 @@ class IntegrationTests(TestBasic):
                              'contrail-db'],
             })
 
-        # deploy cluster
+        self.show_step(6)
         openstack.deploy_cluster(self)
 
-        # run OSTF tests
+        self.show_step(7)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
@@ -570,17 +592,18 @@ class IntegrationTests(TestBasic):
             8. Run OSTF tests
 
         """
-
+        self.show_step(1)
         plugin.prepare_contrail_plugin(
             self, slaves=9, options={'images_ceph': True}
         )
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        self.show_range(3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -600,10 +623,10 @@ class IntegrationTests(TestBasic):
                              'contrail-db']
             })
 
-        # deploy cluster
+        self.show_step(7)
         openstack.deploy_cluster(self)
 
-        # run OSTF tests
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
