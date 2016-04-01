@@ -274,17 +274,6 @@
     timeout: 3600
     cwd: /
 
-# Set proper apt pin for Contrail repository
-- id: contrail-repository
-  type: puppet
-  groups: [compute]
-  required_for: [tools]
-  requires: [deploy_start, globals]
-  parameters:
-    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
-
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
   type: puppet
@@ -340,6 +329,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Creates aggregate for DPDK
+- id: contrail-controller-aggregate
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [openstack-controller-contrail-primary]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-controller-aggregate.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
 # Configure other OpenStack Controllers
 - id: openstack-controller-contrail
   type: puppet
@@ -348,6 +348,17 @@
   requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/controller-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Set proper apt pin for Contrail repository
+- id: contrail-repository
+  type: puppet
+  groups: [compute]
+  required_for: [tools]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
@@ -434,7 +445,7 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-# Creates aggregate for DPDK
+# Adds node to nova aggregate for DPDK
 - id: contrail-compute-aggregate
   type: puppet
   role: [compute]
