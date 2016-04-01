@@ -12,19 +12,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::compute::aggregate {
+class contrail::controller::aggregate {
 
-  if $contrail::compute_dpdk_enabled {
+  if $contrail::global_dpdk_enabled {
 
-    $nodes_hash          = hiera('nodes')
-    $dpdk_compute_nodes  = nodes_with_roles($nodes_hash, ['dpdk'], 'fqdn')
-    $dpdk_hosts          = join($dpdk_compute_nodes, ',')
     $nova_hash           = hiera_hash('nova', {})
     $keystone_tenant     = pick($nova_hash['tenant'], 'services')
     $keystone_user       = pick($nova_hash['user'], 'nova')
     $service_endpoint    = hiera('service_endpoint')
     $region              = hiera('region', 'RegionOne')
 
+# Set the environment
     Exec {
       provider    => 'shell',
       path        => '/sbin:/usr/sbin:/bin:/usr/bin',
@@ -41,10 +39,27 @@ class contrail::compute::aggregate {
       ],
     }
 
-    exec { 'aggr_add_host':
-      command => "bash -c \"nova aggregate-add-host hpgs-aggr ${::fqdn}\" && touch /opt/contrail/aggr_add_host-DONE",
-      creates => '/opt/contrail/aggr_add_host-DONE',
+# Create host aggregate for huge pages
+    exec {'create-hpgs-aggr':
+      command => 'bash -c "nova aggregate-create hpgs-aggr hpgs"',
+      unless  => 'bash -c "nova aggregate-list | grep -q hpgs-aggr"',
+    } ->
+    exec {'aggr-set-metadata':
+      command => 'bash -c "nova aggregate-set-metadata hpgs-aggr hpgs=true"',
+      unless  => 'bash -c "nova aggregate-details hpgs-aggr | grep hpgs=true"',
+    }
+
+# Create flavor for huge pages
+    exec { 'create-m1.small.hpgs-flavor' :
+      command   => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 20 2"',
+      unless    => 'bash -c "nova flavor-list | grep -q m1.small.hpgs"',
+    } ->
+    exec { 'create-m1.small.hpgs-mempage' :
+      command   => 'bash -c "nova flavor-key m1.small.hpgs set hw:mem_page_size=large"',
+    } ->
+    exec { 'create-m1.small.hpgs-aggregate' :
+      command   => 'bash -c "nova flavor-key m1.small.hpgs set aggregate_instance_extra_specs:hpgs=true"',
+      require   => Exec['aggr-set-metadata'],
     }
   }
 }
-
