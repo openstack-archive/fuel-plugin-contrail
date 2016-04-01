@@ -340,6 +340,17 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Creates aggregate for DPDK
+- id: contrail-controller-aggregate
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [openstack-controller-contrail-primary]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-controller-aggregate.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
 # Configure other OpenStack Controllers
 - id: openstack-controller-contrail
   type: puppet
@@ -434,7 +445,7 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-# Creates aggregate for DPDK
+# Adds node to nova aggregate for DPDK
 - id: contrail-compute-aggregate
   type: puppet
   role: [compute]
