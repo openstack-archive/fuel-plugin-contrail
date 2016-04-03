@@ -21,7 +21,6 @@ from fuelweb_test.helpers import checkers
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PATH
 from proboscis.asserts import assert_true
 from settings import VSRX_TEMPLATE_PATH
-from fuelweb_test.tests import base_test_case
 import openstack
 
 
@@ -174,7 +173,7 @@ def net_group_preparation(obj):
         time.sleep(40)
 
 
-def show_range(start_value, end_value):
+def show_range(obj, start_value, end_value):
     """Show several steps"""
     for i in range(start_value, end_value):
-        base_test_case.show_step(i)
+        obj.show_step(i)

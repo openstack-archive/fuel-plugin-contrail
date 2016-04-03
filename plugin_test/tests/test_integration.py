@@ -78,7 +78,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 8)
+        plugin.show_range(self, 3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -128,7 +128,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 7)
+        plugin.show_range(self, 3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -188,7 +188,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 9)
+        plugin.show_range(self, 3, 9)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -278,7 +278,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 7)
+        plugin.show_range(self, 3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -349,7 +349,7 @@ class IntegrationTests(TestBasic):
         # configure vlan on storage and management interfaces
         openstack.assign_vlan(self, private=101, storage=102)
 
-        plugin.show_range(3, 6)
+        plugin.show_range(self, 3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -435,7 +435,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 8)
+        plugin.show_range(self, 3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -493,7 +493,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 6)
+        plugin.show_range(self, 3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -542,7 +542,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 6)
+        plugin.show_range(self, 3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -598,7 +598,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 7)
+        plugin.show_range(self, 3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {

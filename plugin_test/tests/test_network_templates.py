@@ -111,7 +111,7 @@ class TestNetworkTemplates(TestNetworkTemplatesBase, TestBasic):
             },
         )
 
-        plugin.show_range(2, 5)
+        plugin.show_range(self, 2, 5)
         plugin.net_group_preparation(self)
 
         self.show_step(5)

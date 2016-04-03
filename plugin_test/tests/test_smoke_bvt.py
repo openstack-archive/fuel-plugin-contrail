@@ -56,7 +56,7 @@ class ContrailPlugin(TestBasic):
         Duration 20 min
 
         """
-        plugin.show_range(1, 6)
+        plugin.show_range(self, 1, 6)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
@@ -84,7 +84,7 @@ class ContrailPlugin(TestBasic):
         self.show_step(2)
         plugin.activate_plugin(self)
 
-        plugin.show_range(3, 6)
+        plugin.show_range(self, 3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -130,7 +130,7 @@ class ContrailPlugin(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(3, 8)
+        plugin.show_range(self, 3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
