@@ -14,13 +14,15 @@
 
 class contrail::controller::vmware {
 
-  if $::contrail::use_vcenter == true {
+  if $contrail::use_vcenter {
+    
+    $pkgs = ['contrail-fabric-utils','contrail-setup']
+    $pip_pkgs = ['Fabric-1.7.5']
 
-    file {'/opt/contrail':
-      ensure => directory,
-      mode   => '0755',
+    class { 'contrail::package':
+      install     => $pkgs,
+      pip_install => $pip_pkgs,
     } ->
-
     exec {'retrive install packages':
       command => "/usr/bin/curl -fLO http://${::contrail::master_ip}:8080/plugins/contrail-3.0/latest-contrail-install-packages.deb",
       creates => '/opt/contrail/contrail-install-packages.deb',
@@ -37,8 +39,10 @@ class contrail::controller::vmware {
       command => "/usr/bin/curl -fLO http://${::contrail::master_ip}:8080/plugins/contrail-3.0/ContrailVM-disk1.vmdk",
       creates => '/opt/contrail/ContrailVM-disk1.vmdk',
       cwd     => '/opt/contrail'
+    } ->
+
+    file { '/opt/contrail/utils/fabfile/testbeds/testbed.py':
+      content => template('contrail/vmware_testbed.py.erb'),
     }
-
   }
-
 }
