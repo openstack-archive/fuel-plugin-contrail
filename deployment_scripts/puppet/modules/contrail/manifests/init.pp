@@ -104,12 +104,27 @@ class contrail {
 
   # vCenter settings
   $use_vcenter                                = hiera('use_vcenter', false)
-  $vcenter_hash                               = hiera_hash('vcenter_hash', {})
-  $contrail_vcenter_datacenter                = $settings['contrail_vcenter_datacenter']
-  $contrail_vcenter_dvswitch                  = $settings['contrail_vcenter_dvswitch']
-  $contrail_vcenter_dvportgroup               = $settings['contrail_vcenter_dvportgroup']
-  $contrail_vcenter_dvportgroup_numberofports = $settings['contrail_vcenter_dvportgroup_numberofports']
-  $contrail_vcenter_esxi_for_fabric           = $settings['contrail_vcenter_esxi_for_fabric']
+
+  if $use_vcenter and 'primary-controller' in hiera_array('roles') {
+    $vcenter_hash                               = hiera('vcenter', {})
+    $vcenter_server_ip                          = $vcenter_hash['computes'][0]['vc_host']
+    $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']
+    $vcenter_server_pass                        = $vcenter_hash['computes'][0]['vc_password']
+    $vcenter_server_cluster                     = $vcenter_hash['computes'][0]['vc_cluster']
+    $vcenter_server_name                        = $vcenter_hash['computes'][0]['availability_zone_name']
+    $contrail_vcenter_datacenter                = $settings['contrail_vcenter_datacenter']
+    $contrail_vcenter_dvswitch                  = $settings['contrail_vcenter_dvswitch']
+    $contrail_vcenter_dvportgroup               = $settings['contrail_vcenter_dvportgroup']
+    $contrail_vcenter_dvportgroup_numberofports = $settings['contrail_vcenter_dvportgroup_numberofports']
+    $contrail_vcenter_esxi_for_fabric           = $settings['contrail_vcenter_esxi_for_fabric']
+    $contrail_vcenter_vm_ips                    = get_contrailvm_ips()
+    $contrail_compute_vmware_nodes_hash         = get_nodes_hash_by_roles(hiera('network_metadata'), ['compute-vmware'])
+    $contrail_compute_vmware_ips                = values(get_node_to_ipaddr_map_by_network_role($contrail_compute_vmware_nodes_hash, 'admin/pxe'))
+    $contrail_fab_build_node_hash               = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-controller'])
+    $contrail_fab_build_ip                      = values(get_node_to_ipaddr_map_by_network_role($contrail_fab_build_node_hash, 'admin/pxe'))
+    $contrail_fab_default                       = {'vmdk' => '/opt/contrail/ContrailVM-disk1.vmdk', 'vcenter_server' => 'vcenter1', 'mode' => 'vcenter'}
+  }
+
 
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
   $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
