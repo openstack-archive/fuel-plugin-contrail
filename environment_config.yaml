@@ -155,7 +155,7 @@ attributes:
     label: "vCenter ESXi data for fabric"
     description: "vCenter ESXi data for fabric"
     weight: 200
-    type: "text"
+    type: "textarea"
     regex:
       source: '.'
       error: "Invalid vCenter ESXi data for fabric"
