@@ -14,6 +14,9 @@
 
 notice('MODULAR: contrail/common-repo.pp')
 
+$settings = hiera('contrail', {})
+$plugin_version = $settings['metadata']['plugin_version']
+
 case $operatingsystem
 {
     CentOS: {
@@ -21,7 +24,7 @@ case $operatingsystem
       package {'yum-plugin-priorities': ensure => present }
     }
     Ubuntu: {
-      file { '/etc/apt/preferences.d/contrail-3.0.1.pref':
+      file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
         ensure => absent,
       }
     }
