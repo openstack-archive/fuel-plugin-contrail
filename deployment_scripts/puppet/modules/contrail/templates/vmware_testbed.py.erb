@@ -1,0 +1,60 @@
+from fabric.api import env
+
+#Role definition of the hosts.
+env.roledefs = {
+    'compute': <%= scope.lookupvar('contrail::contrail_vcenter_vm_ips') %>,
+    'vcenter_compute': <%= scope.lookupvar('contrail::contrail_compute_vmware_ips') %>,
+    'build': <%= scope.lookupvar('contrail::contrail_fab_build_ip') %>,
+}
+
+#Openstack admin password
+env.openstack_admin_password = '<%= scope.lookupvar('contrail::admin_password') %>'
+
+#env.key_filename = '/root/.ssh/id_rsa.pub'
+env.key_filename = '/root/.ssh/id_rsa.pub'
+
+env.keystone = {
+    'admin_token' : '<%= scope.lookupvar('contrail::admin_token') %>',
+    'service_tenant' : 'services',
+    'manage_neutron' : 'no',
+}
+
+env.ha = {
+    'internal_vip' : '<%= scope.lookupvar('contrail::mos_mgmt_vip') %>',
+    'external_vip' : '<%= scope.lookupvar('contrail::mos_public_vip') %>',
+    'contrail_internal_vip' : '<%= scope.lookupvar('contrail::contrail_private_vip') %>',
+    'contrail_external_vip' : '<%= scope.lookupvar('contrail::contrail_private_vip') %>',
+}
+
+env.openstack = {
+    'service_token' : '<%= scope.lookupvar('contrail::admin_token') %>',
+}
+
+#service token need to define to do  restore of backup data
+service_token = '<%= scope.lookupvar('contrail::admin_token') %>'
+
+#To disable installing contrail interface rename package
+env.interface_rename = False
+
+#vcenter provisioning
+
+env.vcenter_servers = {
+        '<%= scope.lookupvar('contrail::vcenter_server_name') %>': {
+                  'server':'<%= scope.lookupvar('contrail::vcenter_server_ip') %>',
+                  'port': '443',
+                  'username': '<%= scope.lookupvar('contrail::vcenter_server_user') %>',
+                  'password': '<%= scope.lookupvar('contrail::vcenter_server_pass') %>',
+                  'auth': 'https',
+                  'datacenter': '<%= scope.lookupvar('contrail::contrail_vcenter_datacenter') %>',
+                  'cluster': ['<%= scope.lookupvar('contrail::vcenter_server_cluster') %>'],
+                  'vcenter_compute': '<%= scope.lookupvar('contrail::contrail_compute_vmware_ips')[0] %>',
+                  'dv_switch': { 'dv_switch_name': '<%= scope.lookupvar('contrail::contrail_vcenter_dvswitch') %>',},
+                  'dv_port_group': {
+                           'dv_portgroup_name': '<%= scope.lookupvar('contrail::contrail_vcenter_dvportgroup') %>',
+                           'number_of_ports': '<%= scope.lookupvar('contrail::contrail_vcenter_dvportgroup_numberofports') %>',
+                  },
+        },
+}
+
+# The compute vm provisioning on ESXI host
+<%= scope.lookupvar('contrail::contrail_vcenter_esxi_for_fabric') %>
