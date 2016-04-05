@@ -69,12 +69,18 @@ if $compute_dpdk_enabled {
   package { 'dpdk-depends-packages':
     ensure => present,
   } ->
-  file { '/opt/contrail/contrail_install_repo_dpdk/Release':
+  exec { 'update-dpdk-repo':
+    command => 'dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz',
+    cwd     => '/opt/contrail/contrail_install_repo_dpdk',
+  } ->
+  file {'/opt/contrail/contrail_install_repo_dpdk/Release':
     ensure  => file,
     content => 'Label: dpdk-depends-packages',
   } ->
-  exec {'setup_dpdk_repo':
-    command => 'bash /opt/contrail/contrail_packages_dpdk/setup.sh && touch /opt/contrail/dpdk-repo-DONE',
-    creates => '/opt/contrail/dpdk-repo-DONE',
+  apt::source { 'dpdk-depends-repo':
+    location    => 'file:/opt/contrail/contrail_install_repo_dpdk',
+    repos       => './',
+    release     => '',
+    include_src => false,
   }
 }
