@@ -140,7 +140,7 @@ Verify that Contrail control role can be added after deploying
 ID
 ##
 
-contrail_add_conrol
+contrail_add_control
 
 
 Description
@@ -228,7 +228,7 @@ Verify that Contrail control role can be deleted after deploying
 ID
 ##
 
-contrail_delete_conrol
+contrail_delete_control
 
 
 Description
