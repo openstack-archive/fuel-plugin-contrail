@@ -1,0 +1,16 @@
+Verified+1: Plugins CI <plugins.ci@mirantis.com>
+Code-Review+1: Yevgeniy Shapovalov <yshapovalov@mirantis.com>
+Code-Review+1: Iryna Vovk <ivovk@mirantis.com>
+Code-Review+1: Shreyas <shreyas.sudarshan@ericsson.com>
+Code-Review+1: Fuel TPI CI <pi-ci@mirantis.com>
+Code-Review+1: Kshitiz Arora <kshitiz.arora@ericsson.com>
+Code-Review+1: Anil Vashistha <anil.vashistha@ericsson.com>
+Code-Review+1: Abhishek S Nandakumar <abhishek.kumar.srirangam.nandakumar@ericsson.com>
+Code-Review+2: Illia Polliul <ipolliul@mirantis.com>
+Workflow+1: Illia Polliul <ipolliul@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 06 Apr 2016 15:34:42 +0000
+Reviewed-on: https://review.openstack.org/301523
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/stable/3.0
