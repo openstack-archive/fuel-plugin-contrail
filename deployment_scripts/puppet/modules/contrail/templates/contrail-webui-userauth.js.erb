@@ -6,9 +6,9 @@
  * Specify the authentication parameters for admin user
  ****************************************************************************/
 var auth = {};
-auth.admin_user = 'neutron';
+auth.admin_user = '<%= scope.lookupvar('contrail::neutron_user') %>';
 auth.admin_password = '<%= scope.lookupvar('contrail::service_token') %>';
 auth.admin_token = '<%= scope.lookupvar('contrail::admin_token') %>';
-auth.admin_tenant_name = 'services';
+auth.admin_tenant_name = '<%= scope.lookupvar('contrail::service_tenant') %>';
 
 module.exports = auth;
