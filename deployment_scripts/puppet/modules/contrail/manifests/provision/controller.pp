@@ -41,7 +41,7 @@ exec { 'prov_route_target':
 --routing_instance_name default-domain:${contrail::admin_tenant}:${contrail::floating_net}:${contrail::floating_net} \
 --route_target_number ${contrail::route_target} --router_asn ${contrail::asnum} \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
---admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' \
+--admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /etc/contrail/prov_route_target-DONE",
   creates  => '/etc/contrail/prov_route_target-DONE',
   require  => Contrail::Create_Network[$contrail::floating_net],

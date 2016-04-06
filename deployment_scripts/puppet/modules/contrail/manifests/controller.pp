@@ -36,9 +36,7 @@ class contrail::controller {
 # Nova configuration
   nova_config {
     'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
-    'DEFAULT/neutron_url': value => "http://${contrail::mos_mgmt_vip}:9696";
     'DEFAULT/neutron_url_timeout': value=> '300';
-    'DEFAULT/neutron_admin_auth_url': value=> "http://${contrail::mos_mgmt_vip}:35357/v2.0";
     'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
     'DEFAULT/enabled_apis': value=> 'ec2,osapi_compute,metadata';
     'DEFAULT/security_group_api': value=> 'neutron';
@@ -56,9 +54,6 @@ class contrail::controller {
     'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin';
     'DEFAULT/allow_overlapping_ips': value => 'True';
     'service_providers/service_provider': value => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
-    'keystone_authtoken/auth_host': value => $contrail::mos_mgmt_vip;
-    'keystone_authtoken/auth_port': value => '35357';
-    'keystone_authtoken/auth_protocol': value => 'http';
     'QUOTAS/quota_network': value => '-1';
     'QUOTAS/quota_subnet': value => '-1';
     'QUOTAS/quota_port': value => '-1';
@@ -78,9 +73,9 @@ class contrail::controller {
   heat_config {
     'DEFAULT/plugin_dirs': value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat';
     'clients_contrail/contrail-user': value=> 'neutron';
-    'clients_contrail/user': value=> 'neutron';
+    'clients_contrail/user': value=> $contrail::neutron_user;
     'clients_contrail/password': value=> $contrail::service_token;
-    'clients_contrail/tenant': value=> 'services';
+    'clients_contrail/tenant': value=> $contrail::service_tenant;
     'clients_contrail/api_server': value=> $contrail::contrail_mgmt_vip;
     'clients_contrail/auth_host_ip': value=> $contrail::mos_mgmt_vip;
     'clients_contrail/api_base_url': value=> '/';
@@ -103,14 +98,24 @@ class contrail::controller {
     file {'/etc/ceilometer/pipeline.yaml':
       ensure  => file,
       content => template('contrail/pipeline.yaml.erb'),
-    } ~>
-    service {'ceilometer-agent-central':
-      ensure     => running,
-      name       => 'p_ceilometer-agent-central',
-      enable     => true,
-      hasstatus  => true,
-      hasrestart => true,
-      provider   => 'pacemaker',
+    }
+    if $contrail::ceilometer_ha_mode {
+      service {'ceilometer-agent-central':
+        ensure     => running,
+        name       => 'p_ceilometer-agent-central',
+        enable     => true,
+        hasstatus  => true,
+        hasrestart => true,
+        provider   => 'pacemaker',
+        subscribe  => File['/etc/ceilometer/pipeline.yaml'],
+      }
+    }
+    else {
+      service {['ceilometer-api','ceilometer-polling']:
+        ensure    => running,
+        enable    => true,
+        subscribe => File['/etc/ceilometer/pipeline.yaml'],
+      }
     }
   }
 
