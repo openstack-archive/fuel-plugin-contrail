@@ -30,23 +30,52 @@ class contrail {
   $node_name        = hiera('user_node_name')
   $nodes            = hiera('nodes')
 
+  # Network configuration
+  prepare_network_config($network_scheme)
+  $interface         = get_network_role_property('neutron/mesh', 'interface')
+  $gateway           = $network_scheme['endpoints'][$interface]['gateway']
+  $address           = get_network_role_property('neutron/mesh', 'ipaddr')
+  $cidr              = get_network_role_property('neutron/mesh', 'cidr')
+  $netmask           = get_network_role_property('neutron/mesh', 'netmask')
+  $netmask_short     = netmask_to_cidr($netmask)
+  $phys_dev          = get_private_ifname($interface)
+  $phys_dev_pci      = get_dev_pci_addr($phys_dev)
+  $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+
+  # VIPs
+  $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
+  $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
+
+  $contrail_private_vip = $network_metadata['vips']['contrail_priv']['ipaddr']
+  $contrail_mgmt_vip    = $contrail_private_vip
+
+  # Public SSL for Contrail WebUI
   $public_ssl_hash    = hiera_hash('public_ssl', {})
   $ssl_hash           = hiera_hash('use_ssl', {})
   $public_ssl         = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'usage', false)
   $public_ssl_path    = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'path', [''])
 
+  # Internal SSL for keystone connections
+  $keystone_ssl       = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'usage', false)
+  $keystone_protocol  = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'protocol', 'http')
+  $keystone_address   = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'hostname', [$mos_mgmt_vip])
+  $auth_url           = "${keystone_protocol}://${keystone_address}:35357/v2.0"
+  
   $neutron_config   = hiera_hash('neutron_config', {})
   $floating_net     = try_get_value($neutron_config, 'default_floating_net', 'net04_ext')
   $private_net      = try_get_value($neutron_config, 'default_private_net', 'net04')
   $default_router   = try_get_value($neutron_config, 'default_router', 'router04')
   $nets             = $neutron_config['predefined_networks']
+  $neutron_user     = $neutron_config['keystone']['admin_user']
+  $service_token    = $neutron_config['keystone']['admin_password']
+  $service_tenant   = pick($neutron_config['keystone']['admin_tenant'], 'services')
 
   $default_ceilometer_hash = { 'enabled' => false }
   $ceilometer_hash         = hiera_hash('ceilometer', $default_ceilometer_hash)
+  $ceilometer_ha_mode      = pick($ceilometer_hash['ha_mode'], true)
 
   $keystone        = hiera_hash('keystone', {})
   $admin_token     = $keystone['admin_token']
-  $service_token   = $neutron_config['keystone']['admin_password']
   $metadata_secret = $neutron_config['metadata']['metadata_proxy_shared_secret']
 
   $admin_settings = hiera_hash('access', {})
@@ -79,19 +108,7 @@ class contrail {
   $service_ensure = hiera('upgrade',false) ? {
     true    => 'stopped',
     default => 'running',
-    }
-
-  # Network configuration
-  prepare_network_config($network_scheme)
-  $interface         = get_network_role_property('neutron/mesh', 'interface')
-  $gateway           = $network_scheme['endpoints'][$interface]['gateway']
-  $address           = get_network_role_property('neutron/mesh', 'ipaddr')
-  $cidr              = get_network_role_property('neutron/mesh', 'cidr')
-  $netmask           = get_network_role_property('neutron/mesh', 'netmask')
-  $netmask_short     = netmask_to_cidr($netmask)
-  $phys_dev          = get_private_ifname($interface)
-  $phys_dev_pci      = get_dev_pci_addr($phys_dev)
-  $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+  }
 
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
@@ -106,12 +123,6 @@ class contrail {
   } else {
     $libvirt_name = 'libvird'
   }
-
-  $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
-  $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
-
-  $contrail_private_vip = $network_metadata['vips']['contrail_priv']['ipaddr']
-  $contrail_mgmt_vip    = $contrail_private_vip
 
   # Settings for RabbitMQ on contrail controllers
   $rabbit             = hiera_hash('rabbit')

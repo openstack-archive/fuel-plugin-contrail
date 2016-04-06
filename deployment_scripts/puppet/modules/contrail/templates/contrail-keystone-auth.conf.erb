@@ -1,11 +1,11 @@
 [KEYSTONE]
 auth_host=<%= scope.lookupvar('contrail::mos_mgmt_vip') %>
-auth_protocol=http
+auth_protocol=<%= scope.lookupvar('contrail::keystone_protocol') %>
 auth_port=35357
-auth_url=http://<%= scope.lookupvar('contrail::mos_mgmt_vip') %>:35357/v2.0
-admin_user=neutron
+auth_url=<%= scope.lookupvar('contrail::auth_url') %>
+admin_user=<%= scope.lookupvar('contrail::neutron_user') %>
 admin_password=<%= scope.lookupvar('contrail::service_token') %>
 admin_token=<%= scope.lookupvar('contrail::admin_token') %>
-admin_tenant_name=services
+admin_tenant_name=<%= scope.lookupvar('contrail::service_tenant') %>
 insecure=False
 memcache_servers=127.0.0.1:11211

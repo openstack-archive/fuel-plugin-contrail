@@ -9,8 +9,8 @@ analytics_api_ip = <%= scope.lookupvar('contrail::contrail_mgmt_vip') %>
 analytics_api_port = 8081
 
 [KEYSTONE]
-auth_url = http://<%= scope.lookupvar('contrail::mos_mgmt_vip') %>:35357/v2.0
+auth_url = <%= scope.lookupvar('contrail::auth_url') %>
 admin_token = <%= scope.lookupvar('contrail::admin_token') %>
-admin_user=neutron
+admin_user=<%= scope.lookupvar('contrail::neutron_user') %>
 admin_password=<%= scope.lookupvar('contrail::service_token') %>
-admin_tenant_name=services
+admin_tenant_name=<%= scope.lookupvar('contrail::service_tenant') %>
