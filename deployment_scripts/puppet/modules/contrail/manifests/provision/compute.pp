@@ -31,7 +31,8 @@ class contrail::provision::compute {
       command => "contrail-provision-vrouter \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::mos_mgmt_vip} \
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
---admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' --dpdk_enabled \
+--admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
+--dpdk_enabled \
 && touch /opt/contrail/provision-vrouter-DONE",
       creates => '/opt/contrail/provision-vrouter-DONE',
       require => File['/opt/contrail'],
@@ -42,7 +43,7 @@ class contrail::provision::compute {
       command => "contrail-provision-vrouter \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::mos_mgmt_vip} \
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
---admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' \
+--admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/provision-vrouter-DONE",
       creates => '/opt/contrail/provision-vrouter-DONE',
       require => File['/opt/contrail'],

@@ -10,7 +10,7 @@ BASE_URL = /
 ; Authentication settings (optional)
 [auth]
 AUTHN_TYPE = keystone
-AUTHN_PROTOCOL = http
-AUTHN_SERVER = <%= scope.lookupvar('contrail::mos_mgmt_vip') %>
+AUTHN_PROTOCOL = <%= scope.lookupvar('contrail::keystone_protocol') %>
+AUTHN_SERVER = <%= scope.lookupvar('contrail::keystone_address') %>
 AUTHN_PORT = 35357
 AUTHN_URL = /v2.0/tokens
