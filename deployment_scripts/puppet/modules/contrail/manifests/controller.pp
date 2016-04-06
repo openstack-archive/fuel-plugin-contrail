@@ -54,6 +54,9 @@ class contrail::controller {
     'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin';
     'DEFAULT/allow_overlapping_ips': value => 'True';
     'service_providers/service_provider': value => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
+    'keystone_authtoken/auth_host': value => $contrail::keystone_address,
+    'keystone_authtoken/auth_port': value => '35357',
+    'keystone_authtoken/auth_protocol': value => $contrail::keystone_protocol,
     'QUOTAS/quota_network': value => '-1';
     'QUOTAS/quota_subnet': value => '-1';
     'QUOTAS/quota_port': value => '-1';
