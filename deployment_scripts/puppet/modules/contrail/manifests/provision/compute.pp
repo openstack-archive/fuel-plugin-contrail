@@ -22,6 +22,9 @@ class contrail::provision::compute {
   package { 'contrail-utils':
     ensure => present,
   } ->
+  file { '/etc/contrail/vnc_api_lib.ini':
+    content => template('contrail/vnc_api_lib.ini.erb')
+  } ->
   file { '/opt/contrail':
     ensure => 'directory',
   }
@@ -29,7 +32,7 @@ class contrail::provision::compute {
   if $contrail::compute_dpdk_enabled {
     exec { 'provision-vrouter':
       command => "contrail-provision-vrouter \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::mos_mgmt_vip} \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::keystone_address} \
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 --dpdk_enabled \
@@ -41,7 +44,7 @@ class contrail::provision::compute {
   else {
     exec { 'provision-vrouter':
       command => "contrail-provision-vrouter \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::mos_mgmt_vip} \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 --openstack_ip ${contrail::keystone_address} \
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/provision-vrouter-DONE",
