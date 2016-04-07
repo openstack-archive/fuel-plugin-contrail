@@ -235,3 +235,83 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors
+
+
+Contrail DPDK add controller
+----------------------------
+
+
+ID
+##
+
+contrail_dpdk_add_controller
+
+
+Description
+###########
+
+Verify that controller node can be added after deploy
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+    2. Enable and configure Contrail plugin
+    3. Deploy cluster with some controller+mongo, compute+ceph-osd, compute+dpdk and contrail-specified nodes
+    4. Run OSTF tests
+    5. Add node with "controller" role
+    6. Deploy changes
+    7. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors
+
+
+Contrail DPDK delete controller
+-------------------------------
+
+
+ID
+##
+
+contrail_dpdk_delete_controller
+
+
+Description
+###########
+
+Verify that controller node can be deleted after deploy
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+    2. Enable and configure Contrail plugin
+    3. Deploy cluster with some controller, controller+mongo, compute+ceph-osd, compute+dpdk and contrail-specified nodes
+    4. Run OSTF tests
+    5. Delete node with "controller" role
+    6. Deploy changes
+    7. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors

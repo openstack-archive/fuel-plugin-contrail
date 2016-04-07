@@ -384,3 +384,47 @@ Expected results
 ################
 
 Contrail plugin was removed successfully
+
+
+Verify that contrail nodes can be added after deploying with dpdk and sriov
+---------------------------------------------------------------------------
+
+
+ID
+##
+
+contrail_add_to_dpdk_sriov
+
+
+Description
+###########
+
+Verify that contrail nodes can be added after deploying with dpdk and sriov
+
+
+Complexity
+##########
+
+Advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+    2. Enable and configure Contrail plugin
+    3  Enable dpdk and sriov
+    4. Add some controller, compute nodes with storage
+    5. Add dpdk node
+    6  Add sriov node
+    7. Deploy cluster
+    8. Run OSTF
+    9. Add "contrail-config", "contrail-control", "contrail-db" roles
+    10. Deploy changes
+    11. Run OSTF
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.

@@ -165,3 +165,43 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Verify that login and password can be changed
+---------------------------------------------
+
+
+ID
+##
+
+contrail_login_password
+
+
+Description
+###########
+
+Verify that login and password can be changed
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Deploy Contrail cluster
+    2. Login as admin to Openstack Horizon UI
+    3. Create new user
+    4. Login as user to Openstack Horizon UI
+    5. Change login and password for user
+    6. Login to Openstack Horizon UI with new credentials
+    7. Login to Contrail Ui with sane credentials
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.

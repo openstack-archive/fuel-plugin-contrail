@@ -235,3 +235,83 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors
+
+
+Conrail SRIOV add controller
+----------------------------
+
+
+ID
+##
+
+contrail_sriov_add_controller
+
+
+Description
+###########
+
+Verify that controller node can be added after deploy
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
+    2. Enable and configure Contrail plugin
+    3. Deploy cluster with some controller, compute+cinder, compute+sriov and contrail-specified nodes
+    4. Run OSTF tests
+    5. Add a node with "controller" role
+    6. Deploy changes
+    7. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors
+
+
+Conrail SRIOV delete controller
+-------------------------------
+
+
+ID
+##
+
+contrail_sriov_delete_controller
+
+
+Description
+###########
+
+Verify that controller node can be added and deleted after deploy
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
+    2. Enable and configure Contrail plugin
+    3. Deploy cluster with some controller, compute+cinder, compute+sriov and contrail-specified nodes
+    4. Run OSTF tests
+    5. Delete a node with "controller" role
+    6. Deploy changes
+    7. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors

@@ -139,4 +139,3 @@ class FailoverTests(TestBasic):
         self.show_step(5)
         task = self.fuel_web.deploy_cluster(self.cluster_id)
         self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
-
