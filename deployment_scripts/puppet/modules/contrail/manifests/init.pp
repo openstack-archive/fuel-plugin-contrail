@@ -50,6 +50,7 @@ class contrail {
   $admin_tenant   = $admin_settings['tenant']
 
   # Contrail settings
+  $env              = $settings['contrail_environment']
   $asnum            = $settings['contrail_asnum']
   $external         = $settings['contrail_external']
   $route_target     = $settings['contrail_route_target']
