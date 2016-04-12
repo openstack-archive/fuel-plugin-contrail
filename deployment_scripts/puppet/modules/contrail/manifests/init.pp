@@ -94,12 +94,8 @@ class contrail {
   $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
   # SRIOV settings
-  $global_sriov_enabled  = $settings['contrail_global_sriov']
-  $compute_sriov_enabled = $global_sriov_enabled and 'sriov' in hiera_array('roles')
-  $sriov_physnet         = $settings['sriov_physnet']
-  $sriov_hash            = get_sriov_devices()
-  $passthrough_whitelist = inline_template(
-    '<%= "[" + scope.lookupvar("::contrail::sriov_hash").map{ |dev, _| "{\"devname\":\"#{dev}\", \"physical_network\":\"#{sriov_physnet}\"}" }.join(", ") + "]" %>')
+  $global_sriov_enabled  = pick($neutron_config['supported_pci_vendor_devs'], false)
+  $passthrough_whitelist = get_nic_passthrough_whitelist('sriov')
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
