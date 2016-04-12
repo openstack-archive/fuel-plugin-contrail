@@ -278,6 +278,8 @@
   type: skipped
 - id: openstack-network-agents-metadata
   type: skipped
+- id: openstack-network-agents-sriov
+  type: skipped
 # Skip default fuel networks and routers
 - id: openstack-network-networks
   type: skipped
