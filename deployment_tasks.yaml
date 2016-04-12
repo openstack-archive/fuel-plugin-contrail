@@ -151,18 +151,6 @@
     strategy:
       type: parallel
 
-#
-# Compute sriov feature
-- id: sriov
-  type: group
-  role: [sriov]
-  tasks: []
-  required_for: [deploy_end]
-  requires: [deploy_start]
-  parameters:
-    strategy:
-      type: parallel
-
 # Tasks
 #############
 #1. Install Contrail utils, java
@@ -505,6 +493,8 @@
   roles: '*'
   type: skipped
   version: 2.0.0
+- id: openstack-network-agents-sriov
+  type: skipped
 # Skip default fuel networks and routers
 - id: openstack-network-networks
   roles: '*'
@@ -773,18 +763,6 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-# Configures sriov
-#- id: contrail-compute-sriov
-#  type: puppet
-#  version: 2.0.0
-#  groups: [compute]
-#  required_for: [post_deployment_end, contrail-compute-provision]
-#  requires: [post_deployment_start]
-#  parameters:
-#    puppet_manifest: puppet/manifests/contrail-compute-sriov.pp
-#    puppet_modules: puppet/modules:/etc/puppet/modules
-#    timeout: 720
-
 - id: contrail-compute-provision
   type: puppet
   version: 2.0.0
@@ -869,6 +847,9 @@
   parameters:
     cmd: if [ -f /tmp/contrail-reboot-require ]; then nohup /sbin/shutdown -r +1 &> /dev/null & fi
     timeout: 720
+
+- id: sriov_iommu_check
+  type: skipped
 
 - id: sahara
   type: skipped
