@@ -284,7 +284,7 @@ Steps
     4. Add 1 node with "compute" role
     5. Add 2 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
     6. Deploy cluster with plugin
-    8. Run OSTF tests
+    7. Run OSTF tests
 
 
 Expected results
@@ -324,7 +324,7 @@ Steps
     4. Add 2 nodes with "compute" role
     5. Add 1 node with "contrail-config", "contrail-control" and "contrail-db" roles
     6. Deploy cluster with plugin
-    8. Run OSTF tests
+    7. Run OSTF tests
 
 
 Expected results
@@ -362,9 +362,9 @@ Steps
     2. Enable and configure Contrail plugin
     3. Add 1 node with "controller" + "storage-cinder" + "Ceph-OSD" multirole
     4. Add 1 node with "controller" + "storage-cinder" and 1 node with "controller" + "Ceph-OSD" multiroles
-    4. Add 2 nodes with "compute" role
-    5. Add 3 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
-    6. Deploy cluster with plugin
+    5. Add 2 nodes with "compute" role
+    6. Add 3 nodes with "contrail-config", "contrail-control" and "contrail-db" roles
+    7. Deploy cluster with plugin
     8. Run OSTF tests
 
 
