@@ -409,6 +409,33 @@
     timeout: 720
 
 ##############################################################
+#  Compute vmware tasks section
+##############################################################
+
+
+# Set proper apt pin for Contrail repository
+- id: contrail-repository-pinning
+  type: puppet
+  groups: [compute-vmware]
+  required_for: [globals]
+  requires: [deploy_start]
+  parameters:
+    puppet_manifest: puppet/manifests/repository-pinning.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Deploy contrail vCenter plugin
+- id: contrail-compute-vmware
+  type: puppet
+  role: [compute-vmware]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+##############################################################
 #  Compute tasks section
 ##############################################################
 
@@ -432,17 +459,6 @@
   requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-override.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
-
-# Deploy contrail vCenter plugin
-- id: contrail-compute-vmware
-  type: puppet
-  role: [compute-vmware]
-  required_for: [post_deployment_end]
-  requires: [post_deployment_start]
-  parameters:
-    puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
