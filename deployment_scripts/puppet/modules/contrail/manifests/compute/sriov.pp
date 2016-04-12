@@ -30,8 +30,6 @@ class contrail::compute::sriov {
       value  => 'pt',
     }
 
-    create_resources(contrail::rclocal_vfs, $::contrail::sriov_hash)
-
     file_line {"sriov ${title}":
       ensure => absent,
       path   => '/etc/rc.local',
