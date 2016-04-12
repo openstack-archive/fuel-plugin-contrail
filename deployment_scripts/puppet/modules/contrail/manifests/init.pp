@@ -108,11 +108,6 @@ class contrail {
   $hugepages_amount = pick($settings['hugepages_amount'],10)
   $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
-  # SRIOV settings
-  $global_sriov_enabled  = $settings['contrail_global_sriov']
-  $compute_sriov_enabled = $global_sriov_enabled and 'sriov' in hiera_array('roles')
-  $sriov_physnet         = $settings['sriov_physnet']
-
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
   $dpdk_on_vf           = $settings['dpdk_on_vf']
@@ -130,7 +125,6 @@ class contrail {
     $tor_agents_configurations = parseyaml($settings['tor_agents_configurations'])
   }
 
-
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
 
@@ -144,7 +138,7 @@ class contrail {
   $patch_nova               = pick($settings['patch_nova'], false)
   $install_contrail_qemu_lv = pick($settings['install_contrail_qemu_lv'], false )
 
-  if $install_contrail_qemu_lv and ( $compute_dpdk_enabled or $compute_sriov_enabled ) {
+  if $install_contrail_qemu_lv and $compute_dpdk_enabled {
     $libvirt_name = 'libvirt-bin'
   } else {
     $libvirt_name = 'libvirtd'

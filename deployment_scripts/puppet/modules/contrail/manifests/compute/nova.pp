@@ -46,18 +46,7 @@ class contrail::compute::nova {
       content => '',
     }
   }
-  if $contrail::compute_sriov_enabled {
-    $pci_wl = generate_passthrough_whitelist(
-      $contrail::sriov_physnet,
-      $contrail::compute_dpkd_on_vf,
-      $contrail::phys_dev,
-      $contrail::dpdk_vf_number
-      )
 
-    nova_config {
-      'DEFAULT/pci_passthrough_whitelist':       value => $pci_wl;
-    }
-  }
   Nova_config <||> ~>
   service { 'nova-compute':
     ensure => running,
