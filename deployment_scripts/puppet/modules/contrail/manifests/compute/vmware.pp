@@ -24,4 +24,47 @@ class contrail::compute::vmware {
     line => file('/var/lib/astute/vmware/vmware.pub')
   }
 
+  #Create a pinning
+  $vcenter_compute_pkgs = [
+    'nova-compute', 'nova-compute-kvm',
+    'python-novaclient', 'python-bitstring',
+    'contrail-utils', 'openjdk-7-jre-headless',
+    'nova-common']
+
+  exec { 'fix wrong tzdata':
+    command => 'apt-get install tzdata -y --force-yes',
+    path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+    unless  => "apt-cache policy tzdata | grep '*' -A 2 | grep contrail"
+  } ->
+
+  apt::pin { 'favor contrail packages':
+    priority => 1400,
+    label    => 'contrail',
+    packages => $vcenter_compute_pkgs
+  }
+
+  package { $vcenter_compute_pkgs:
+    ensure  => installed,
+    require => Apt::Pin['favor contrail packages'],
+  }
+
+  $vcenter_plugin_depend_pkgs = [
+    'libxml-commons-external-java', 'libxml-commons-resolver1.1-java',
+    'libxerces2-java', 'libslf4j-java', 'libnetty-java', 'libjline-java',
+    'libzookeeper-java']
+
+  $vcenter_plugin_pkgs = [
+    'contrail-vcenter-plugin', 'libcontrail-java-api',
+    'libcontrail-vijava', 'libcontrail-vrouter-java-api']
+
+  package { $vcenter_plugin_depend_pkgs:
+    ensure  => installed,
+    require => Apt::Pin['favor contrail packages'],
+  } ->
+
+  package { $vcenter_plugin_pkgs :
+    ensure  => installed,
+    require => Apt::Pin['favor contrail packages'],
+  }
+
 }
