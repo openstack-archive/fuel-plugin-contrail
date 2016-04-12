@@ -24,4 +24,41 @@ class contrail::compute::vmware {
     line => file('/var/lib/astute/vmware/vmware.pub')
   }
 
+  $vcenter_compute_pkgs = [
+    'nova-compute',
+    'nova-compute-kvm',
+    'python-novaclient',
+    'python-bitstring',
+    'contrail-utils',
+    'openjdk-7-jre-headless']
+
+  package { $vcenter_compute_pkgs:
+    ensure => installed,
+  }
+
+  $vcenter_plugin_depend_pkgs = [
+    'libxml-commons-external-java',
+    'libxml-commons-resolver1.1-java',
+    'libxerces2-java',
+    'libslf4j-java',
+    'libnetty-java',
+    'libjline-java',
+    'libzookeeper-java'
+  ]
+
+  $vcenter_plugin_pkgs = [
+    'contrail-vcenter-plugin',
+    'libcontrail-java-api',
+    'libcontrail-vijava',
+    'libcontrail-vrouter-java-api',
+  ]
+
+  package { $vcenter_plugin_depend_pkgs:
+    ensure => installed,
+  } ->
+
+  package { $vcenter_plugin_pkgs :
+    ensure => installed,
+  }
+
 }
