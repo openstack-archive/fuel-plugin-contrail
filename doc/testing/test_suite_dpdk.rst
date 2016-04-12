@@ -150,9 +150,9 @@ Steps
     2. Enable and configure Contrail plugin
     3. Deploy cluster with some controller+mongo, compute+ceph-osd, compute+dpdk and contrail-specified nodes
     4. Run OSTF tests
-    6. Add a node with "compute+dpdk" roles
-    7. Deploy changes
-    8. Run OSTF tests
+    5. Add a node with "compute+dpdk" roles
+    6. Deploy changes
+    7. Run OSTF tests
 
 
 Expected results
