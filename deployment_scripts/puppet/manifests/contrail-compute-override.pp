@@ -51,7 +51,7 @@ if $contrail::compute_dpdk_enabled {
   apt::source { 'dpdk-depends-repo':
     location    => 'file:/opt/contrail/contrail_install_repo_dpdk',
     repos       => './',
-    release     => '',
+    release     => ' ',
     include_src => false,
   }
 
