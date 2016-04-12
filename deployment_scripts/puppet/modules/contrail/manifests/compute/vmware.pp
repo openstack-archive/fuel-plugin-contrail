@@ -14,17 +14,32 @@
 
 class contrail::compute::vmware {
 
-  $pkgs = ['contrail-fabric-utils','contrail-setup']
-  $pip_pkgs = ['Fabric-1.7.5']
+  Package { ensure => installed }
 
-  class { 'contrail::package':
-    install     => $pkgs,
-    pip_install => $pip_pkgs,
-  }
+  #Create a pinning
+  $vcenter_compute_pkgs = [
+    'nova-compute', 'nova-compute-kvm',
+    'nova-common', 'nova-compute-libvirt',
+    'python-novaclient', 'python-bitstring',
+    'tzdata','openjdk-7-jre-headless']
 
-  file_line{'vmware pub authorized keys':
-    path => '/root/.ssh/authorized_keys',
-    line => file('/var/lib/astute/vmware/vmware.pub')
-  }
+  apt::pin { 'favor_contrail_packages':
+    priority => 1400,
+    label    => 'contrail',
+    packages => $vcenter_compute_pkgs
+  } ->
+  exec { 'fix wrong tzdata':
+    command => 'apt-get install tzdata -y --force-yes',
+    path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+    unless  => "apt-cache policy tzdata | grep '*' -A 2 | grep contrail"
+  } ->
+  package { $vcenter_compute_pkgs: }
+
+# Install vCenter-specific contrail packages
+  package { ['libxml-commons-external-java', 'libxml-commons-resolver1.1-java', 'libxerces2-java',
+            'libslf4j-java', 'libnetty-java', 'libjline-java', 'libzookeeper-java']: } ->
+  package { 'contrail-install-vcenter-plugin': } ->
+  package { ['libcontrail-java-api','libcontrail-vijava','libcontrail-vrouter-java-api']: } ->
+  package { 'contrail-vcenter-plugin': }
 
 }
