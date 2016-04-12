@@ -14,9 +14,12 @@
 
 class contrail::compute::vmware {
 
-  file{'/root/.ssh/authorized_keys':
-    ensure => present,
-    mode   => '0600',
+  $pkgs = ['contrail-fabric-utils','contrail-setup']
+  $pip_pkgs = ['Fabric-1.7.5']
+
+  class { 'contrail::package':
+    install     => $pkgs,
+    pip_install => $pip_pkgs,
   }
 
   file_line{'vmware pub authorized keys':
