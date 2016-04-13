@@ -32,33 +32,34 @@ Issue following command on boostraped host::
 How to enable SR-IOV in fuel
 ---------------------------
 
-#.  Enable SR-IOV in plugin settings and configure unique physnet name. 
+#. Enable SR-IOV in plugin settings and configure unique physnet name.
 
     .. image:: images/enable_sriov_settings.png
-       :width: 80%
 
-#.  Assign SR-IOV role to compute hosts. SR-IOV will be enabled on all SR-IOV capable interfaces, not assigned to Fuel bridges(networks in Fuel UI)
+#. Assign SR-IOV role to compute hosts. SR-IOV will be enabled on all SR-IOV
+capable interfaces, not assigned to Fuel bridges(networks in Fuel UI).
 
     .. image:: images/enable_sriov_role_node.png
-       :width: 80%
 
-#.  Perform deploy as in 5.3.10 :doc:`/install_guide`
+#. Perform deploy as in 5.3.10 :doc:`/install_guide`
 
 How to create VM with sriov device
 ----------------------------------
 
-#.  Create VN with configured physical network and vlan id::
+#. Create VN with configured physical network and vlan id::
 
-        neutron net-create --provider:physical_network=<physical network from contrail settings tab> --provider: segmentation_id=<Vlan_id> <Network_Name>
+    neutron net-create --provider:physical_network=<physical network from contrail settings tab> \
+    --provider: segmentation_id=<Vlan_id> <Network_Name>
 
-#.  Create a subnet::
+#. Create a subnet::
 
-        neutron subnet-create <Network_name> <Subnet>
+    neutron subnet-create <Network_name> <Subnet>
 
-#.  Create a Port::
+#. Create a Port::
 
-        neutron port-create --fixed-ip subnet_id=<subnet uuid>,ip_address=<IP address from above subnet> --name <name of port> <vn uuid> --binding:vnic_type direct
+    neutron port-create --fixed-ip subnet_id=<subnet uuid>,ip_address=<IP address from above subnet> \
+    --name <name of port> <vn uuid> --binding:vnic_type direct
 
-#.  Boot VM with the port::
+#. Boot VM with the port::
 
-        nova boot --flavor m1.large --image <image name> --nic port-id=<uuid of above port> <vm name>
+    nova boot --flavor m1.large --image <image name> --nic port-id=<uuid of above port> <vm name>
