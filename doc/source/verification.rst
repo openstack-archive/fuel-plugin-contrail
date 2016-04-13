@@ -76,32 +76,39 @@ OSTF tests
 - **OSTF networks and floating IPs configuration:**
 
     To create networks go to Contrail WebUI -> Configure -> Networking -> Networks
-    
+
     #. Create network “net04”
-    
+
         .. image:: images/create_network_net04.png
            :width: 80%
-    
+
     #. Create network “net04_ext”.
-    
+
         .. image:: images/create_network_net04_ext.png
            :width: 80%
-    
+
         It should be marked as “shared” and “external”
-    
+
         .. image:: images/create_network_net04_ext2.png
             :width: 80%
-    
+
         And have same route target as configured in external router
-    
+
         .. image:: images/create_network_net04_ext3.png
            :width: 80%
-    
+
     #. Allocate floating IP addresses from net04_ext
-    
+
         Go to Contrail WebUI --> Configure -> Networking -> Manage Floating IPs
-    
+
         .. image:: images/allocate_floating_ip_addresses.png
            :width: 80%
 
-After configuring networks and floating IP addresses, start OSTF tests. For more details, refer to `Fuel user-guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#post-deployment-check>`_.
+After checking networks and floating IP addresses, start OSTF tests. For more details, refer to `Fuel user-guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#post-deployment-check>`_.
+
+Troubleshooting
+---------------
+
+Start with checking output of contrail-status command. Then check the logs for corresponding serivice.
+Contrail logs are located in /var/log/contrail/ directory, and log names match with contrail service name.
+Cassandra logs are located in  /var/log/cassandra/, zookeeper's is in /var/log/zookeeper/.

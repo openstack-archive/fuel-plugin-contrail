@@ -5,6 +5,10 @@ This document describes very basic operations with Contrail UI.
 For detailed information on Contrail operations, please refer to official `Juniper documentation
 <http://www.juniper.net/techpubs/en_US/contrail2.0/information-products/pathway-pages/getting-started.html#configuration>`_.
 
+.. raw:: latex
+
+   \pagebreak
+
 Logging in
 ----------
 
@@ -13,6 +17,9 @@ Log into Contrail UI using the `OpenStack admin credentials.
 
 .. image:: images/contrail-login.png
 
+.. raw:: latex
+
+   \pagebreak
 
 Checking services status
 ------------------------
