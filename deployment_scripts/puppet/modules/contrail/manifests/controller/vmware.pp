@@ -15,10 +15,15 @@
 class contrail::controller::vmware {
 
   if $contrail::use_vcenter {
-    
+
     $pkgs = ['contrail-fabric-utils','contrail-setup']
     $pip_pkgs = ['Fabric-1.7.5']
 
+    apt::pin {'fix_python_ecdsa':
+      priority => 1400,
+      label    => 'contrail',
+      packages => 'python-ecdsa'
+    } ->
     class { 'contrail::package':
       install     => $pkgs,
       pip_install => $pip_pkgs,
