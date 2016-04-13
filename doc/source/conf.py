@@ -1,6 +1,41 @@
 from distutils.version import LooseVersion
 from sphinx import __version__ as sphinx_version
 
+'''
+from sphinx.highlighting import PygmentsBridge
+from pygments.formatters.latex import LatexFormatter
+
+class CustomLatexFormatter(LatexFormatter):
+    def __init__(self, **options):
+        super(CustomLatexFormatter, self).__init__(**options)
+        self.verboptions = r"formatcom=\scriptsize"
+
+PygmentsBridge.latex_formatter = CustomLatexFormatter
+'''
+
+mypreamble=ur'''
+\renewcommand{\Verbatim}[1][1]{%
+  % list starts new par, but we don't want it to be set apart vertically
+  \bgroup\parskip=0pt%
+  \smallskip%
+  % The list environement is needed to control perfectly the vertical
+  % space.
+  \list{}{%
+  \setlength\parskip{0pt}%
+  \setlength\itemsep{0ex}%
+  \setlength\topsep{0ex}%
+  \setlength\partopsep{0pt}%
+  \setlength\leftmargin{10pt}%
+  }%
+  \item\MakeFramed {\FrameRestore}%
+  \tiny  % <---------------- To be changed!
+  \OriginalVerbatim[#1]%
+}
+'''
+
+
+
+
 source_suffix = '.rst'
 master_doc = 'index'
 
@@ -25,6 +60,7 @@ latex_elements = {
     # remove blank pages
     'classoptions': ',openany,oneside',
     'babel': '\\usepackage[english]{babel}',
+    'preamble':mypreamble,
 }
 
 if LooseVersion(sphinx_version) >= LooseVersion('1.3.1'):

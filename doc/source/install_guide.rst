@@ -11,28 +11,24 @@ Installing Contrail Plugin
 --------------------------
 
 #.  Download Contrail plugin from the `Fuel Plugins Catalog <https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/>`_.
-#.  Copy the rpm downloaded at previous step to the Fuel Master node and install the plugin:
-    ::
+#.  Copy the rpm downloaded at previous step to the Fuel Master node and install the plugin::
 
-        scp contrail-3.0-3.0.0-1.noarch.rpm  <Fuel Master node ip>:/tmp/
+    scp contrail-3.0-3.0.0-1.noarch.rpm  <Fuel Master node ip>:/tmp/
 
-#.  Log into the Fuel Master node and install the plugin
-    ::
+#.  Log into the Fuel Master node and install the plugin::
 
-        ssh <the Fuel Master node ip>
-        fuel plugins --install /tmp/contrail-3.0.0.noarch.rpm
+    ssh <the Fuel Master node ip>
+    fuel plugins --install /tmp/contrail-3.0.0.noarch.rpm
 
-    You should get the following output
-    ::
+You should get the following output::
 
-        Plugin <plugin-name-version>.rpm was successfully installed
+    Plugin <plugin-name-version>.rpm was successfully installed
 
-#.  Copy Juniper contrail install package (obtained from Juniper by subscription, see Prerequisites above) to the Fuel Master node and run the installation script to unpack the vendor package and populate plugin repository
-    ::
+#.  Copy Juniper contrail install package (obtained from Juniper by subscription, see Prerequisites above) to the Fuel Master node and run the installation script to unpack the vendor package and populate plugin repository::
 
-        scp contrail-install-packages_3.0.0.0-2723~kilo_all.deb \
-        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-3.0/
-        ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-3.0/install.sh
+    scp contrail-install-packages_3.0.0.0-2723~kilo_all.deb \
+    <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-3.0/
+    ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-3.0/install.sh
 
 .. raw:: latex
 
@@ -44,23 +40,23 @@ Configuring Contrail Plugin
 #.  First, you need to `create environment <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#create-a-new-openstack-environment>`_ in Fuel UI.
 
     .. image:: images/name_and_release.png
-       :width: 80%
+
 
 #.  Please select KVM or QEMU hypervisor type for your environment
 
     .. image:: images/compute.png
-       :width: 80%
+
 
 #.  Please select Neutron with tunneling segmentation network model.
     GRE segmentation is also supported, but you need to set it from Fuel CLI
 
     .. image:: images/networking_setup.png
-       :width: 80%
+
 
 #.  If you plan to use Heat orchestration with autoscaling, you need to install Ceilometer too.
 
     .. image:: images/additional_services.png
-       :width: 80%
+
 
 #.  Activate the plugin and fill configuration fields with correct values:
 
@@ -83,14 +79,14 @@ Configuring Contrail Plugin
     You can place them on different nodes if needed.
 
     .. image:: images/contrail-roles.png
-       :width: 80%
+
 
     Sample node configuration is provided on a picture below.
 
     .. image:: images/node-roles.png
-       :width: 80%
 
-#.  `Configure the disks <https://docs.mirantis.com/openstack/fuel/fuel-master/user-guide.html#id46>`_ on nodes with
+
+#.  `Configure the disks <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#customize-partitions-ug>`_ on nodes with
     Contrail-DB role selected.
     The recommended size of partition for Contrail database is 256 GB or more.
 
@@ -101,7 +97,7 @@ Configuring Contrail Plugin
         Select all the nodes, push **Configure interfaces** button
 
         .. image:: images/conf-interfaces.png
-           :width: 80%
+
 
     *   Set *Private* network to the separate network interface as the untagged network.
         **DO NOT USE THIS PHYSICAL INTERFACE FOR ANY OTHER NETWORK.**
@@ -139,7 +135,7 @@ Configuring Contrail Plugin
 
     .. image:: images/public-net.png
 
-    .. note::
+    .. warning::
 
-        WARNING! first usable addresses from the Private network will be used as VIP for Contrail controllers.
+        WARNING! First usable addresses from the Private network will be used as VIP for Contrail controllers.
         For example, if your Private network CIDR is 192.168.200.0/24, then Contrail VIP will be **192.168.200.1**.
