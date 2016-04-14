@@ -13,6 +13,11 @@
 #    under the License.
 
 class contrail::compute::vrouter {
+
+  Exec {
+    path => '/sbin:/usr/sbin:/bin:/usr/bin',
+  }
+
   $dev_mac = getvar("::macaddress_${contrail::phys_dev}")
 
   if $contrail::compute_dpdk_enabled {
@@ -39,17 +44,21 @@ class contrail::compute::vrouter {
     path    => '/etc/init/supervisor-vrouter.override',
     content => 'manual',
   } ->
-  class { 'contrail::package':
-    install => [$install_packages],
-    remove  => [$delete_packages],
+  package { $delete_packages:
+    ensure => purged,
+    tag    => ['delete'],
+  } ->
+  package { $install_packages:
+    ensure => present,
+    tag    => ['install'],
   } ->
   exec { 'remove-ovs-modules':
-    command => '/sbin/modprobe -r openvswitch'
+    command => 'modprobe -r openvswitch'
   } ->
   file {'/etc/contrail/agent_param':
     ensure  => present,
     content => template('contrail/agent_param.erb'),
-    require => Class[Contrail::Package],
+    require => Package[$install_packages],
   } ->
   file {'/etc/contrail/contrail-vrouter-agent.conf':
     ensure  => present,
@@ -62,12 +71,14 @@ class contrail::compute::vrouter {
   exec { 'remove_supervisor_override':
     command  => 'rm -rf /etc/init/supervisor-vrouter.override',
     provider => shell,
-    require  => Class[Contrail::Package],
+    require  => Package[$install_packages],
   } ->
   service {'supervisor-vrouter':
-    ensure    => running,
-    enable    => true,
-    subscribe => [Class[Contrail::Package],Exec['remove-ovs-modules'],
+    ensure     => running,
+    enable     => true,
+    hasrestart => false,
+    restart    => 'service supervisor-vrouter stop && modprobe -r vrouter && service supervisor-vrouter start',
+    subscribe  => [Package[$install_packages],Exec['remove-ovs-modules'],
                   File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
                   '/etc/contrail/contrail-vrouter-nodemgr.conf']
                   ],
