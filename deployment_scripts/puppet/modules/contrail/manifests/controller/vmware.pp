@@ -47,6 +47,20 @@ class contrail::controller::vmware {
       pip_install => $pip_pkgs,
     }
 
+    file { '/opt/contrail/utils/fabfile/tasks/additional_tasks.py':
+      mode    => '0644',
+      source  => 'puppet:///modules/contrail/additional_tasks.py',
+      before  => Exec['fab_prepare_contrailvm'],
+      require => Class['contrail::package'],
+    }
+
+    file_line { 'add_additional_tasks':
+      path    => '/opt/contrail/utils/fabfile/__init__.py',
+      line    => 'from tasks.additional_tasks import *',
+      before  => Exec['fab_prepare_contrailvm'],
+      require => Class['contrail::package'],
+    }
+
     exec {'retrive install packages':
       command => "/usr/bin/curl -fLO http://${::contrail::master_ip}:8080/plugins/contrail-3.0/latest-contrail-install-packages.deb",
       creates => '/opt/contrail/contrail-install-packages.deb',
@@ -79,11 +93,20 @@ class contrail::controller::vmware {
     }
 
     exec { 'fab_prov_esxi':
-        path    => '/usr/local/bin:/bin:/usr/bin/',
-        cwd     => '/opt/contrail/utils',
-        command => 'fab prov_esxi && touch /opt/contrail/fab_prov_esxi-DONE',
-        creates => '/opt/contrail/fab_prov_esxi-DONE',
+      path    => '/usr/local/bin:/bin:/usr/bin/',
+      cwd     => '/opt/contrail/utils',
+      command => 'fab prov_esxi && touch /opt/contrail/fab_prov_esxi-DONE',
+      creates => '/opt/contrail/fab_prov_esxi-DONE',
     }
+
+    exec { 'fab_prepare_contrailvm':
+      path    => '/usr/local/bin:/bin:/usr/bin/',
+      cwd     => '/opt/contrail/utils',
+      command => 'fab prepare_contrailvm:/opt/contrail/latest-contrail-install-packages.deb && touch /opt/contrail/fab_prepare_contrailvm-DONE',
+      creates => '/opt/contrail/fab_prepare_contrailvm-DONE',
+      require => Exec['fab_prov_esxi'],
+   }
+
 
   }
 }
