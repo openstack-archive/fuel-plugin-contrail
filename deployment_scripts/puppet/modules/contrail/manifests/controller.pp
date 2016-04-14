@@ -128,13 +128,12 @@ class contrail::controller {
     }
   }
 
+  Neutron_config <||> ~>
   service { 'neutron-server':
     ensure    => running,
     enable    => true,
-    require   => [Package['neutron-server'],
-                    Package['neutron-plugin-contrail'],
-                    ],
-    subscribe => [File['/etc/neutron/plugins/opencontrail/contrailplugin.ini'],
+    subscribe => [Package['neutron-server'],Package['neutron-plugin-contrail'],
+                    File['/etc/neutron/plugins/opencontrail/contrailplugin.ini'],
                     File['/etc/neutron/plugin.ini'],
                     File_line['add_neutron_defaults'],
                     ],

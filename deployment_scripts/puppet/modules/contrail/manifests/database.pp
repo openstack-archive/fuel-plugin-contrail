@@ -48,8 +48,9 @@ class contrail::database {
   service { 'zookeeper':
     ensure    => running,
     enable    => true,
-    require   => [Package['zookeeper'],Package['contrail-openstack-database']],
-    subscribe => [File['/etc/zookeeper/conf/zoo.cfg'],
+    require   => Package['contrail-openstack-database'],
+    subscribe => [Package['zookeeper'],
+                  File['/etc/zookeeper/conf/zoo.cfg'],
                   File['/etc/zookeeper/conf/myid'],
                   ],
   }
@@ -74,8 +75,8 @@ class contrail::database {
   service { 'kafka':
     ensure    => running,
     enable    => true,
-    require   => Package['kafka'],
-    subscribe => [File['/usr/share/kafka/config/log4j.properties'],
+    subscribe => [Package['kafka'],
+                  File['/usr/share/kafka/config/log4j.properties'],
                   File['/usr/share/kafka/config/server.properties'],
                   File['/tmp/kafka-logs/meta.properties'],
                   ],
@@ -108,8 +109,8 @@ class contrail::database {
   service { 'contrail-database':
     ensure    => running,
     enable    => true,
-    require   => [File[$contrail::cassandra_path],Package['contrail-openstack-database']],
-    subscribe => [
+    require   => File[$contrail::cassandra_path],
+    subscribe => [Package['contrail-openstack-database'],
       File['/etc/cassandra/cassandra.yaml'],
       File['/etc/cassandra/cassandra-env.sh'],
     ],
