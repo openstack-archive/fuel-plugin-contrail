@@ -1,6 +1,6 @@
 [DEFAULTS]
 host_ip = <%= scope.lookupvar('contrail::address') %>
-cassandra_server_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
+cassandra_server_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9042" }.join(' ') %>
 http_server_port = 8090
 rest_api_port = 9081
 rest_api_ip = 0.0.0.0 
