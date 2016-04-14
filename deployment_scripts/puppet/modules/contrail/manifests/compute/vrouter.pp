@@ -13,6 +13,11 @@
 #    under the License.
 
 class contrail::compute::vrouter {
+
+  Exec {
+    path => '/sbin:/usr/sbin:/bin:/usr/bin',
+  }
+
   $dev_mac = getvar("::macaddress_${contrail::phys_dev}")
 
   if $contrail::compute_dpdk_enabled {
@@ -44,7 +49,7 @@ class contrail::compute::vrouter {
     remove  => [$delete_packages],
   } ->
   exec { 'remove-ovs-modules':
-    command => '/sbin/modprobe -r openvswitch'
+    command => 'modprobe -r openvswitch'
   } ->
   file {'/etc/contrail/agent_param':
     ensure  => present,
@@ -65,9 +70,11 @@ class contrail::compute::vrouter {
     require  => Class[Contrail::Package],
   } ->
   service {'supervisor-vrouter':
-    ensure    => running,
-    enable    => true,
-    subscribe => [Class[Contrail::Package],Exec['remove-ovs-modules'],
+    ensure     => running,
+    enable     => true,
+    hasrestart => false,
+    restart    => 'service supervisor-vrouter stop && modprobe -r vrouter && service supervisor-vrouter start',
+    subscribe  => [Class[Contrail::Package],Exec['remove-ovs-modules'],
                   File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
                   '/etc/contrail/contrail-vrouter-nodemgr.conf']
                   ],
