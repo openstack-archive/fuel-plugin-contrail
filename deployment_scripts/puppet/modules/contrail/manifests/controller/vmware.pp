@@ -47,17 +47,17 @@ class contrail::controller::vmware {
       pip_install => $pip_pkgs,
     }
 
-    exec {'retrive install packages':
+    exec {'retrive latest install packages':
       command => "/usr/bin/curl -fLO http://${::contrail::master_ip}:8080/plugins/contrail-3.0/latest-contrail-install-packages.deb",
-      creates => '/opt/contrail/contrail-install-packages.deb',
+      creates => '/opt/contrail/latest-contrail-install-packages.deb',
       cwd     => '/opt/contrail',
       before  => Exec['fab_prov_esxi'],
       require => Class['contrail::package'],
     }
 
-    exec {'retrive vmware plugin packages':
+    exec {'retrive latest vmware plugin packages':
       command => "/usr/bin/curl -fLO http://${::contrail::master_ip}:8080/plugins/contrail-3.0/latest-contrail-install-vcenter-plugin.deb",
-      creates => '/opt/contrail/contrail-install-vcenter-plugin.deb',
+      creates => '/opt/contrail/latest-contrail-install-vcenter-plugin.deb',
       cwd     => '/opt/contrail',
       before  => Exec['fab_prov_esxi'],
       require => Class['contrail::package'],
