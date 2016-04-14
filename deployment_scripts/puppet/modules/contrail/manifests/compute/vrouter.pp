@@ -20,6 +20,10 @@ class contrail::compute::vrouter {
   $phys_dev = $contrail::phys_dev
   $dpdk_dev_pci = $contrail::phys_dev_pci
 
+  Exec {
+    path => '/sbin:/usr/sbin:/bin:/usr/bin',
+  }
+
   if $contrail::compute_dpdk_enabled {
 
     if empty($dev_mac) {
@@ -57,17 +61,21 @@ class contrail::compute::vrouter {
     path    => '/etc/init/supervisor-vrouter.override',
     content => 'manual',
   } ->
-  class { 'contrail::package':
-    install => [$install_packages],
-    remove  => [$delete_packages],
+  package { $delete_packages:
+    ensure => purged,
+    tag    => ['delete'],
+  } ->
+  package { $install_packages:
+    ensure => present,
+    tag    => ['install'],
   } ->
   exec { 'remove-ovs-modules':
-    command => '/sbin/modprobe -r openvswitch'
+    command => 'modprobe -r openvswitch'
   } ->
   file {'/etc/contrail/agent_param':
     ensure  => present,
     content => template('contrail/agent_param.erb'),
-    require => Class[Contrail::Package],
+    require => Package[$install_packages],
   } ->
   file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
     ensure  => present,
@@ -76,7 +84,7 @@ class contrail::compute::vrouter {
   exec { 'remove_supervisor_override':
     command  => 'rm -rf /etc/init/supervisor-vrouter.override',
     provider => shell,
-    require  => Class[Contrail::Package],
+    require  => Package[$install_packages],
   }
 
   if $contrail::compute_dpkd_on_vf {
@@ -112,14 +120,20 @@ class contrail::compute::vrouter {
     } ->
 
     service {'supervisor-vrouter':
-      ensure    => running,
-      enable    => true,
-      subscribe => [Class[Contrail::Package],Exec['remove-ovs-modules'],
+      ensure     => running,
+      enable     => true,
+      hasrestart => false,
+      restart    => 'service supervisor-vrouter stop && \
+modprobe -r vrouter && \
+sync && \
+echo 3 > /proc/sys/vm/drop_caches && \
+echo 1 > /proc/sys/vm/compact_memory && \
+service supervisor-vrouter start',
+      subscribe  => [Package[$install_packages],Exec['remove-ovs-modules'],
                     File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
                     '/etc/contrail/contrail-vrouter-nodemgr.conf']
                     ],
     }
-  }
   # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
   exec {'no_network_reconfigure':
     command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
