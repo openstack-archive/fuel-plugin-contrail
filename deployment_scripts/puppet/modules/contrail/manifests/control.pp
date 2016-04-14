@@ -70,18 +70,18 @@ class contrail::control {
 # Control service
   service { 'contrail-named':
     ensure    => running,
-    require   => Package['contrail-dns'],
-    subscribe => [File['/etc/contrail/dns/contrail-named.conf'],
+    subscribe => [Package['contrail-dns'],
+                  File['/etc/contrail/dns/contrail-named.conf'],
                   File['/etc/contrail/dns/contrail-rndc.conf'],
                   ]
   }
   service { 'supervisor-control':
     ensure    => $contrail::service_ensure,
     enable    => true,
-    require   => [Package['contrail-openstack-control'],Package['contrail-control']],
-    subscribe => [File['/etc/contrail/contrail-control.conf'],
-                    File['/etc/contrail/contrail-dns.conf'],
-                    ],
+    subscribe =>  [Package['contrail-openstack-control'],Package['contrail-control'],
+                  File['/etc/contrail/contrail-control.conf'],
+                  File['/etc/contrail/contrail-dns.conf'],
+                  ],
   }
 
 }

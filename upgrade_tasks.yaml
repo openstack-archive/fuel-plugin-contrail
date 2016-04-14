@@ -1,0 +1,83 @@
+# Contrail upgrade tasks
+# DO NOT MODIFY THE FOLLOWING LINES
+
+- id: upgrade-contrail-pre
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-pre.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: upgrade-contrail-stop
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-contrail-config,contrail-config]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-stop.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: upgrade-contrail-db
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-contrail-db, contrail-db]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-db.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: upgrade-contrail-config
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-contrail-config,contrail-config]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: upgrade-contrail-control
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-contrail-control,contrail-control]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-control.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: upgrade-contrail-post
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-post.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: upgrade-contrail-controller
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-controller,controller]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-controller.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
