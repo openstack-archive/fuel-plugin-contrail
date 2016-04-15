@@ -15,7 +15,6 @@
 import os
 import os.path
 from proboscis import test
-import time
 from copy import deepcopy
 from proboscis import asserts
 from fuelweb_test import logger
@@ -370,10 +369,10 @@ class IntegrationTests(TestBasic):
             },
             )
 
-        cluster_nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
+        nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
 
         self.show_step(6)
-        for node in cluster_nodes:
+        for node in nodes:
             self.fuel_web.update_node_networks(
                 node['id'],
                 interfaces_dict=deepcopy(plugin.INTERFACES),
