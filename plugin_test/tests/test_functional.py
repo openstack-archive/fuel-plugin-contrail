@@ -589,4 +589,5 @@ class IntegrationTests(TestBasic):
         plugin.show_range(self, 9, 12)
         openstack.update_deploy_check(self, conf_db, delete=True,
                                       is_vsrx=vsrx_setup_result,
-                                      ostf_fail_tests=['Check that required services are running'])
+                                      ostf_fail_tests=['Check that required \
+                                                       services are running'])

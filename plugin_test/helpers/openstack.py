@@ -12,11 +12,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import time
 from devops.helpers.helpers import wait
 from fuelweb_test import logger
 from fuelweb_test.settings import DEPLOYMENT_MODE
-from fuelweb_test.helpers.checkers import check_repo_managment
 from . import settings
 
 
