@@ -50,7 +50,7 @@ class contrail::controller {
 # Neutron configuration
   neutron_config {
     'DEFAULT/core_plugin': value => 'neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2';
-    'DEFAULT/api_extensions_path': value => 'extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions';
+    'DEFAULT/api_extensions_path': value => 'extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions:/usr/lib/python2.7/dist-packages/neutron_lbaas/extensions/';
     'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin';
     'DEFAULT/allow_overlapping_ips': value => 'True';
     'service_providers/service_provider': value => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
@@ -61,15 +61,21 @@ class contrail::controller {
     'QUOTAS/quota_subnet': value => '-1';
     'QUOTAS/quota_port': value => '-1';
   } ->
+  file_line {'add_neutron_defaults':
+    line      => '. /etc/default/neutron-server',
+    path      => '/etc/init/neutron-server.conf',
+    ensure   => 'present',
+    after    => 'neutron_plugin_ini_path',
+  } ->
   file { '/etc/contrail/vnc_api_lib.ini':
     content => template('contrail/vnc_api_lib.ini.erb')
   } ->
-  file {'/etc/neutron/plugins/opencontrail/ContrailPlugin.ini':
-    content => template('contrail/ContrailPlugin.ini.erb'),
+  file {'/etc/neutron/plugins/opencontrail/contrailplugin.ini':
+    content => template('contrail/contrailplugin.ini.erb'),
   } ->
   file {'/etc/neutron/plugin.ini':
     ensure => link,
-    target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'
+    target => '/etc/neutron/plugins/opencontrail/contrailplugin.ini'
   }
 
 # Contrail-specific heat templates settings
@@ -128,8 +134,9 @@ class contrail::controller {
     require   => [Package['neutron-server'],
                     Package['neutron-plugin-contrail'],
                     ],
-    subscribe => [File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
+    subscribe => [File['/etc/neutron/plugins/opencontrail/contrailplugin.ini'],
                     File['/etc/neutron/plugin.ini'],
+                    File_line['add_neutron_defaults'],
                     ],
   }
 
