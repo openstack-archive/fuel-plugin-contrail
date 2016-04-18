@@ -106,7 +106,7 @@ class contrail {
   # vCenter settings
   $use_vcenter                                = hiera('use_vcenter', false)
 
-  if $use_vcenter and 'primary-controller' in hiera_array('roles') {
+  if $use_vcenter and ('primary-controller' in hiera_array('roles') or 'compute-vmware' in hiera_array('roles')) {
     $vcenter_hash                               = hiera('vcenter', {})
     $vcenter_server_ip                          = $vcenter_hash['computes'][0]['vc_host']
     $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']

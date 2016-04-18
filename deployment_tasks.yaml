@@ -451,6 +451,18 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Set proper apt pin for Contrail repository
+- id: contrail-repository-vmware
+  type: puppet
+  groups: [compute-vmware]
+  required_for: [tools]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+
 # Set apt pin for packeges that need to be override
 - id: contrail-override-repository
   type: puppet
@@ -509,6 +521,27 @@
   role: [compute]
   required_for: [post_deployment_end, contrail-compute-firewall]
   requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-nova.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Deploy contrail vCenter plugin
+- id: contrail-compute-vmware
+  type: puppet
+  role: [compute-vmware]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-compute-vmware-nova
+  type: puppet
+  role: [compute-vmware]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start,contrail-compute-vmware]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-nova.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
