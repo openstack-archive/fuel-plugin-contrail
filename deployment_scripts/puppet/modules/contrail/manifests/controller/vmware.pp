@@ -55,14 +55,6 @@ class contrail::controller::vmware {
       require => Class['contrail::package'],
     }
 
-    exec {'retrive latest vmware plugin packages':
-      command => "/usr/bin/curl -fLO http://${::contrail::master_ip}:8080/plugins/contrail-3.0/latest-contrail-install-vcenter-plugin.deb",
-      creates => '/opt/contrail/latest-contrail-install-vcenter-plugin.deb',
-      cwd     => '/opt/contrail',
-      before  => Exec['fab_prov_esxi'],
-      require => Class['contrail::package'],
-    }
-
     exec {'retrive vmdk':
       command => "/usr/bin/curl -fLO http://${::contrail::master_ip}:8080/plugins/contrail-3.0/ContrailVM-disk1.vmdk",
       creates => '/opt/contrail/ContrailVM-disk1.vmdk',
