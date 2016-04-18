@@ -35,6 +35,13 @@ class contrail::compute::nova {
       'DEFAULT/pci_passthrough_whitelist':       value => $contrail::passthrough_whitelist;
     }
   }
+  if $contrail::use_vcenter and $contrail::node_role == 'compute-vmware' {
+    nova_config {
+      'DEFAULT/compute_driver':                  value => 'nova.virt.vmwareapi.contrailVCDriver';
+      'vmware/vcenter_dvswitch':                 value => "$contrail::contrail_vcenter_dvswitch";
+    }
+
+  }
   Nova_config <||> ~>
   service { 'nova-compute':
     ensure => running,

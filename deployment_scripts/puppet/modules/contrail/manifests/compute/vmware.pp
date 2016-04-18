@@ -36,4 +36,22 @@ class contrail::compute::vmware {
   package { ['libcontrail-java-api','libcontrail-vijava','libcontrail-vrouter-java-api']: } ->
   package { 'contrail-vcenter-plugin': }
 
+# Config file
+  file { '/etc/contrail':
+    ensure  => directory,
+    mode    => '0750',
+  } ->
+  file {'/etc/contrail/contrail-vcenter-plugin.conf':
+    ensure  => present,
+    content => template('contrail/contrail-vcenter-plugin.conf.erb'),
+    require => [Package['contrail-vcenter-plugin'],File['/etc/contrail']],
+  }
+
+# Enable and start service
+  service { 'contrail-vcenter-plugin':
+    ensure    => running,
+    enable    => true,
+    subscribe => [Package['contrail-vcenter-plugin'],File['/etc/contrail/contrail-vcenter-plugin.conf']],
+  }
+
 }
