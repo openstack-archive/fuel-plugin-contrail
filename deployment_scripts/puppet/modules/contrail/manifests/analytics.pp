@@ -33,7 +33,7 @@ class contrail::analytics {
 
 # Packages
   package { 'redis-server': } ->
-  package { 'contrail-analytics': } ->
+  package { 'contrail-analytics': }
   package { 'contrail-openstack-analytics': }
 
 # Analytics config files
