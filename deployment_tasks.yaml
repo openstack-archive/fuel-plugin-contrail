@@ -266,10 +266,6 @@
   type: skipped
 - id: openstack-network-agents-l3
   type: skipped
-- id: primary-openstack-network-plugins-l2
-  type: skipped
-- id: openstack-network-plugins-l2
-  type: skipped
 - id: primary-openstack-network-agents-dhcp
   type: skipped
 - id: openstack-network-agents-dhcp
