@@ -14,8 +14,26 @@
 
 class contrail::compute::vmware {
 
+  # Config file
+  file { '/etc/contrail':
+    ensure => directory,
+    mode   => '0750',
+  }->
+  file { '/var/log/contrail':
+    ensure => directory,
+    mode   => '0750',
+  }->
   file {'/etc/contrail/ESXiToVRouterIp.map':
     content => template('contrail/ESXiToVRouterIp.map.erb')
+  }->
+  file {'/etc/contrail/contrail-vcenter-plugin.conf':
+    ensure  => present,
+    content => template('contrail/contrail-vcenter-plugin.conf.erb'),
+  }~>
+  # Enable and start service
+  service { 'contrail-vcenter-plugin':
+    ensure => running,
+    enable => true,
   }
 
 }
