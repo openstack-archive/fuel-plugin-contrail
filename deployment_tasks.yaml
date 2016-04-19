@@ -384,7 +384,7 @@
   parameters:
     puppet_manifest: puppet/manifests/controller-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 3600
 
 # Create networks for ostf-tests and provision route target
 - id: openstack-controller-provision
