@@ -36,5 +36,5 @@ view "_default_view_" {
     match-clients {any;};
     match-destinations {any;};
     match-recursive-only no;
-    forwarders { <%= external_dns['dns_list'].map{ |ip| "#{ip};" }.join(' ') %> };
+    forwarders { <%= external_dns['dns_list'].split(',').map{ |ip| "#{ip};" }.join(' ') %> };
 };
