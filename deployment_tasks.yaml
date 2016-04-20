@@ -406,7 +406,7 @@
   parameters:
     puppet_manifest: puppet/manifests/contrail-controller-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 3600
 
 ##############################################################
 #  Compute vmware tasks section

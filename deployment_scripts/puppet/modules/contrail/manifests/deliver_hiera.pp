@@ -1,3 +1,4 @@
+
 #    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,14 +13,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/controller-hiera-post.pp')
 
-include contrail
+define contrail::deliver_hiera (
+  $host = $title,
+  )
+{
+  exec {'copy_yaml_to_config_node':
+    command => "scp -i /var/lib/astute/vmware/vmware /root/config-override.yaml root@${host}:/etc/hiera/override/contrail.yaml"
+  }
 
-# Post-install
-# Create predefined_networks for OSTF-nets in controller-provision.pp
-file { "${hiera_dir}/${plugin_yaml}":
-  ensure  => file,
-  content => template('contrail/plugins.yaml.erb'),
-  require => File['/etc/hiera/override']
 }
