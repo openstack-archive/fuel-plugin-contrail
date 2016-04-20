@@ -37,4 +37,23 @@ case $operatingsystem
     default: {}
 }
 
+$hiera_dir = '/etc/hiera/override'
+$plugin_name = 'contrail'
+$plugin_yaml = "${plugin_name}.yaml"
 
+$contrail_plugin = hiera('contrail', undef)
+
+file_line {"${plugin_name}_hiera_override":
+  path  => '/etc/hiera.yaml',
+  line  => "  - override/${plugin_name}",
+  after => '  - override/module/%{calling_module}',
+}
+
+file {'/etc/hiera/override':
+  ensure  => directory,
+}
+
+file_line{'vmware pub authorized keys':
+  path   => '/root/.ssh/authorized_keys',
+  line   => file('/var/lib/astute/vmware/vmware.pub'),
+}
