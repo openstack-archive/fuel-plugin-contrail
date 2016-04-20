@@ -1,3 +1,4 @@
+
 #    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,7 +13,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-controller-vmware.pp')
 
-include contrail
-class { 'contrail::controller::vmware': }
+define contrail::deliver_hiera (
+  $host = $title,
+  )
+{
+  exec {"copy_yaml_to_config_node_${host}":
+    path    => ['/bin', '/usr/bin'],
+    command => "scp -oStrictHostKeyChecking=no -i /var/lib/astute/vmware/vmware /root/config-override.yaml root@${host}:/etc/hiera/override/contrail.yaml",
+  }
+
+}
