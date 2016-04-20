@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -26,14 +26,14 @@ file_line {"${plugin_name}_hiera_override":
   path  => '/etc/hiera.yaml',
   line  => "  - override/${plugin_name}",
   after => '  - override/module/%{calling_module}',
-} ->
+}
+
 file {'/etc/hiera/override':
   ensure  => directory,
-}
+} ->
 # Post-install
 # Create predefined_networks for OSTF-nets in controller-provision.pp
 file { "${hiera_dir}/${plugin_yaml}":
   ensure  => file,
   content => template('contrail/plugins.yaml.erb'),
-  require => File['/etc/hiera/override']
 }

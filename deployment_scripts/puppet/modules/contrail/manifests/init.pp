@@ -105,9 +105,9 @@ class contrail {
 
   # vCenter settings
   $use_vcenter                                = hiera('use_vcenter', false)
+  $vcenter_hash                               = hiera_hash('vcenter', false)
 
-  if $use_vcenter and 'primary-controller' in hiera_array('roles') {
-    $vcenter_hash                               = hiera('vcenter', {})
+  if $vcenter_hash {
     $vcenter_server_ip                          = $vcenter_hash['computes'][0]['vc_host']
     $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']
     $vcenter_server_pass                        = $vcenter_hash['computes'][0]['vc_password']
@@ -125,6 +125,7 @@ class contrail {
     $contrail_fab_build_ip                      = values(get_node_to_ipaddr_map_by_network_role($contrail_fab_build_node_hash, 'admin/pxe'))
     $contrail_fab_default                       = {'vmdk' => '/opt/contrail/ContrailVM-disk1.vmdk', 'vcenter_server' => 'vcenter1', 'mode' => 'vcenter'}
   }
+
 
 
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
@@ -156,4 +157,5 @@ class contrail {
   # Contrail Config nodes Private IP list
   $contrail_config_nodes_hash     = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-config', 'contrail-config'])
   $contrail_config_ips            = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
+  $contrail_config_ips_adm        = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'fw-admin')))
 }

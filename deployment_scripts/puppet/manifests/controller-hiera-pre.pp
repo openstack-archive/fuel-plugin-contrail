@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -26,16 +26,24 @@ file_line {"${plugin_name}_hiera_override":
   path  => '/etc/hiera.yaml',
   line  => "  - override/${plugin_name}",
   after => '  - override/module/%{calling_module}',
-} ->
-file {'/etc/hiera/override':
-  ensure  => directory,
 }
 
+file {'/etc/hiera/override':
+  ensure  => directory,
+} ->
 # Pre-deploy
 # Empty predefined_networks to skip OSTF nets creation
 # in openstack-network-controller.pp
 file { "${hiera_dir}/${plugin_yaml}":
   ensure  => file,
   content => 'quantum_settings: { neutron_agents: [], predefined_networks: [] }',
-  require => File['/etc/hiera/override']
+}
+
+if $contrail::use_vcenter {
+  file { '/root/config-override.yaml':
+    ensure  => file,
+    content => inline_template("<%= scope.lookupvar('contrail::vcenter_hash').to_yaml.gsub('---','vcenter:') %>"),
+  }
+
+  contrail::deliver_hiera {$contrail::contrail_config_ips_adm:}
 }

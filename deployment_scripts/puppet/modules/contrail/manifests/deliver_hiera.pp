@@ -12,7 +12,21 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-controller-vmware.pp')
 
-include contrail
-class { 'contrail::controller::vmware': }
+define contrail::deliver_hiera (
+  $host = $title,
+  )
+{
+  $opt='-oStrictHostKeyChecking=no -i /var/lib/astute/vmware/vmware'
+
+  exec {"create_override_dir_${host}":
+    path    => ['/bin', '/usr/bin'],
+    command => "ssh ${opt} root@${host} 'mkdir -p /etc/hiera/override/'",
+  } ->
+
+  exec {"copy_yaml_to_config_node_${host}":
+    path    => ['/bin', '/usr/bin'],
+    command => "scp ${opt} /root/config-override.yaml root@${host}:/etc/hiera/override/plugins.yaml",
+  }
+
+}
