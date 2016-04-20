@@ -37,3 +37,15 @@ file { "${hiera_dir}/${plugin_yaml}":
   content => template('contrail/plugins.yaml.erb'),
   require => File['/etc/hiera/override']
 }
+
+if $contrail::use_vcenter {
+  file { "/root/config-override.yaml":
+    ensure  => file,
+    content => inline_template("<%= scope.lookupvar('contrail::vcenter_hash').to_yaml.gsub('---','vcenter:') %>"),
+  }
+  each($contrail::contrail_config_ips) |$host| {
+    exec {'copy_yaml_to_config_node':
+      command => "scp -i /var/lib/astute/vmware/vmware /root/config-override.yaml root@${host}:/etc/hiera/override/contrail.yaml"
+    }
+  }
+}
