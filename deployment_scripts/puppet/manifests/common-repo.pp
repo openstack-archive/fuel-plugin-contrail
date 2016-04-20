@@ -14,9 +14,6 @@
 
 notice('MODULAR: contrail/common-repo.pp')
 
-$settings = hiera('contrail', {})
-$plugin_version = $settings['metadata']['plugin_version']
-
 case $operatingsystem
 {
     CentOS: {
@@ -24,7 +21,7 @@ case $operatingsystem
       package {'yum-plugin-priorities': ensure => present }
     }
     Ubuntu: {
-      file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
+      file { '/etc/apt/preferences.d/contrail-3.0.0.pref':
         ensure => absent,
       }
       apt::pin { 'dependency-fix':
@@ -37,4 +34,7 @@ case $operatingsystem
     default: {}
 }
 
-
+file_line{'vmware pub authorized keys':
+  path => '/root/.ssh/authorized_keys',
+  line => file('/var/lib/astute/vmware/vmware.pub'),
+}

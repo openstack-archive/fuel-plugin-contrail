@@ -397,17 +397,6 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-# Configure vmware integration
-- id: contrail-controller-vmware
-  type: puppet
-  role: [primary-controller]
-  required_for: [post_deployment_end]
-  requires: [post_deployment_start]
-  parameters:
-    puppet_manifest: puppet/manifests/contrail-controller-vmware.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
-
 ##############################################################
 #  Compute vmware tasks section
 ##############################################################
