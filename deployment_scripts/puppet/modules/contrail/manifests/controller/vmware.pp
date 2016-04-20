@@ -92,6 +92,12 @@ class contrail::controller::vmware {
       require => Class['contrail::package'],
     }
 
+    file_line{'vmware pub authorized keys':
+      path   => '/root/.ssh/authorized_keys',
+      line   => file('/var/lib/astute/vmware/vmware.pub'),
+      before => Exec['fab_prov_esxi'],
+    }
+
     exec { 'fab_prov_esxi':
       path    => '/usr/local/bin:/bin:/usr/bin/',
       cwd     => '/opt/contrail/utils',
@@ -108,6 +114,22 @@ class contrail::controller::vmware {
       require => Exec['fab_prov_esxi'],
     }
 
+    exec { 'fab_install_vrouter':
+      timeout => 3600,
+      path    => '/usr/local/bin:/bin:/usr/bin/',
+      cwd     => '/opt/contrail/utils',
+      command => 'fab fab_install_vrouter && touch /opt/contrail/fab_install_vrouter-DONE',
+      creates => '/opt/contrail/fab_install_vrouter-DONE',
+      require => Exec['fab_prepare_contrailvm'],
+    }
+
+    exec { 'fab_setup_vcenter':
+      path    => '/usr/local/bin:/bin:/usr/bin/',
+      cwd     => '/opt/contrail/utils',
+      command => 'fab setup_vcenter; fab setup_vcenter && touch /opt/contrail/fab_setup_vcenter-DONE',
+      creates => '/opt/contrail/fab_setup_vcenter-DONE',
+      require => [Exec['fab_prepare_contrailvm'], Exec['fab_install_vrouter']],
+    }
 
   }
 }

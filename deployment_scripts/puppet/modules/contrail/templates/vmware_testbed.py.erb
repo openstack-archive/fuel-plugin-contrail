@@ -1,16 +1,29 @@
 <%-
 fab_default=scope.lookupvar('contrail::contrail_fab_default')
+contrailvm=scope.lookupvar('contrail::contrail_vcenter_vm_ips')
+vcenter_compute=scope.lookupvar('contrail::contrail_compute_vmware_ips')[0]
+fab_build=scope.lookupvar('contrail::contrail_fab_build_ip')[0]
 -%>
 from fabric.api import env
 
 #Role definition of the hosts.
 env.roledefs = {
-    'compute' : <%= scope.lookupvar('contrail::contrail_vcenter_vm_ips') %>,
-    'vcenter_compute' : <%= scope.lookupvar('contrail::contrail_compute_vmware_ips') %>,
-    'build' : <%= scope.lookupvar('contrail::contrail_fab_build_ip') %>,
-    'all' : <%= scope.lookupvar('contrail::contrail_fab_build_ip') %>,
-    'cfgm' : <%= scope.lookupvar('contrail::contrail_fab_build_ip') %>,
+    'compute' : <%= contrailvm %>,
+    'vcenter_compute' : ["root@<%= vcenter_compute %>"],
+    'build' : ["root@<%= fab_build %>"],
+    'all' : ["root@<%= fab_build %>"],
+    'cfgm' : ["root@<%= fab_build %>"],
+    'control' : ["root@<%= fab_build %>"],
+    'openstack' : ["root@<%= fab_build %>"],
 }
+
+env.passwords = {
+<%- contrailvm.each do |ip| -%>
+    '<%= ip %>': 'c0ntrail123',
+<%- end -%>
+}
+
+env.command_timeout=3600
 
 #Openstack admin password
 env.openstack_admin_password = '<%= scope.lookupvar('contrail::admin_password') %>'
@@ -50,7 +63,7 @@ env.vcenter_servers = {
                   'password': '<%= scope.lookupvar('contrail::vcenter_server_pass') %>',
                   'auth': 'https',
                   'datacenter': '<%= scope.lookupvar('contrail::contrail_vcenter_datacenter') %>',
-                  'cluster': ['<%= scope.lookupvar('contrail::vcenter_server_cluster') %>'],
+                  'cluster': <%= scope.lookupvar('contrail::vcenter_server_cluster').split(',').map(&:strip) %>,
                   'vcenter_compute': '<%= scope.lookupvar('contrail::contrail_compute_vmware_ips')[0] %>',
                   'dv_switch': { 'dv_switch_name': '<%= scope.lookupvar('contrail::contrail_vcenter_dvswitch') %>',},
                   'dv_port_group': {
