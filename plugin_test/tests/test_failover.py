@@ -13,14 +13,12 @@
 #    under the License.
 
 import os
-from proboscis.asserts import assert_equal
 from proboscis import test
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
-from helpers import openstack
 
 
 @test(groups=["plugins"])

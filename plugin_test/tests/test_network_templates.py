@@ -14,10 +14,7 @@
 
 import os
 import yaml
-import time
-from ipaddr import IPNetwork
 from proboscis import test
-from proboscis.asserts import assert_true
 from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.tests.base_test_case import SetupEnvironment
@@ -37,8 +34,9 @@ class TestNetworkTemplates(TestNetworkTemplatesBase, TestBasic):
     add_package = \
         '/var/www/nailgun/plugins/contrail-3.0/' \
         'repositories/ubuntu/contrail-setup*'
-    node_name = lambda self, name_node: self.fuel_web. \
-        get_nailgun_node_by_name(name_node)['hostname']
+
+    def node_name(self, name_node):
+        return self.fuel_web.get_nailgun_node_by_name(name_node)['hostname']
 
     cluster_id = ''
 
