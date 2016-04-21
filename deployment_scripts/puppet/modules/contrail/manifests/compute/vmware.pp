@@ -36,4 +36,7 @@ class contrail::compute::vmware {
   package { ['libcontrail-java-api','libcontrail-vijava','libcontrail-vrouter-java-api']: } ->
   package { 'contrail-vcenter-plugin': }
 
+  file {'/etc/contrail/ESXiToVRouterIp.map':
+    content => template('contrail/ESXiToVRouterIp.map.erb')
+  }
 }
