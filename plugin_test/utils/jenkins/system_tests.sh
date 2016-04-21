@@ -434,11 +434,11 @@ RunTest() {
     # run python test set to create environments, deploy and test product
     if [ "${DRY_RUN}" = "yes" ]; then
         echo export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}${WORKSPACE}"
-        echo python plugin_test/run_tests.py -q --nologcapture --with-xunit "${OPTS}"
+        echo python plugin_test/run_tests.py -q --nologcapture --with-xunit ${OPTS}
     else
         export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}${WORKSPACE}"
         echo "${PYTHONPATH}"
-        python plugin_test/run_tests.py -q --nologcapture --with-xunit "${OPTS}"
+        python plugin_test/run_tests.py -q --nologcapture --with-xunit ${OPTS}
 
     fi
     ec=$?
