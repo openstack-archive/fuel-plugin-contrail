@@ -18,3 +18,27 @@ apt::pin { 'favor_contrail_packages':
   priority => 1400,
   label    => 'contrail',
 }
+
+# This need for successful execution core puppet manifest when we use contrail libvirt
+file { '/etc/default/libvirtd':
+  ensure => present,
+  content => '',
+}
+
+file { '/etc/init.d/libvirtd':
+  ensure  => present,
+  mode    => 0755,
+  content => '',
+}
+
+exec { 'patch_core_vmware_manifest1':
+  path    => '/usr/local/bin:/bin:/usr/bin/',
+  cwd     => '/etc/puppet/modules/vmware/manifests',
+  command => 'sed -i -e \'/\x27python-oslo.vmware\x27:/,+2d\' compute_vmware.pp',
+}
+
+exec { 'patch_core_vmware_manifest2':
+  path    => '/usr/local/bin:/bin:/usr/bin/',
+  cwd     => '/etc/puppet/modules/vmware/manifests',
+  command => 'sed -i \'/Package\[\x27python-oslo.vmware\x27\]/d\' compute_vmware.pp',
+}
