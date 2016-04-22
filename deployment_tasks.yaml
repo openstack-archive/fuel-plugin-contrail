@@ -417,8 +417,8 @@
 - id: contrail-compute-vmware-repo
   type: puppet
   groups: [compute-vmware]
-  required_for: [globals]
-  requires: [deploy_start]
+  required_for: [tools]
+  requires: [deploy_start, globals]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-vmware-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
