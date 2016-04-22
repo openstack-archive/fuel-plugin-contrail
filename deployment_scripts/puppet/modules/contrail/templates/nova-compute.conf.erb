@@ -1,0 +1,26 @@
+[DEFAULT]
+compute_driver=nova.virt.vmwareapi.contrailVCDriver
+log_file=nova-compute-vmware-vcenter-vmcluster1.log
+host=vcenter-vmcluster1
+​
+[vmware]
+​
+cache_prefix=$host
+​
+<%  compute_vmware_clusters.each do |cluster_name|    -%>
+cluster_name=<%= cluster_name %>
+<% end %>
+host_ip=<%= @host_ip %>
+host_username=<%= @host_username %>
+host_password=<%= @host_password %>
+​
+vcenter_dvswitch=<%= @contrail_dvSwitch %>
+​
+api_retry_count=5
+maximum_objects=100
+task_poll_interval=5.0
+datastore_regex=.*
+use_linked_clone=true
+​
+[libvirt]
+virt_type=vmwareapi
