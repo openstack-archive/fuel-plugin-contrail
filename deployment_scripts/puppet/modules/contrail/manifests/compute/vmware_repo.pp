@@ -44,4 +44,8 @@ exec { 'patch_core_vmware_manifest2':
   command => 'sed -i \'/Package\[\x27python-oslo.vmware\x27\]/d\' compute_vmware.pp',
 }
 
+file { '/etc/puppet/modules/vmware/templates/nova-compute.conf.erb':
+  source => 'puppet:///modules/contrail/nova-compute.conf.erb_fixed',
+}
+
 }
