@@ -14,7 +14,7 @@ attributes:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid AS number"
   contrail_gateways:
-    value: '10.109.3.250'
+    value: '10.109.4.250'
     label: 'GW IP'
     description: 'Comma separated IP addresses of BGP peers.'
     weight: 40
