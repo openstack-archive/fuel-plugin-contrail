@@ -123,4 +123,72 @@ attributes:
     restrictions:
       - action: hide
         condition: not (settings:contrail.contrail_global_sriov.value == true)
-
+  contrail_vcenter_datacenter:
+    value: "Datacenter"
+    label: "vCenter Datacenter"
+    description: "vCenter Datacenter for Contrail"
+    weight: 160
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter Datacenter"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvswitch:
+    value: "Contrail_dvSwitch"
+    label: "vCenter dvSwitch"
+    description: "vCenter dvSwitch for Contrail"
+    weight: 170
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter dvSwitch"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvportgroup:
+    value: "Contrail_DV_Port_Group"
+    label: "vCenter DV Port Group"
+    description: "vCenter DV Port Group for Contrail"
+    weight: 180
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter DV Port Group"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvportgroup_numberofports:
+    value: "3"
+    label: "vCenter DV Port Group number of ports"
+    description: "vCenter number of ports DV Port Group for Contrail"
+    weight: 190
+    type: "text"
+    regex:
+      source: '^[1-9]\d*$'
+      error: "Invalid vCenter DV Port Group number of ports"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrailvm_ntp:
+    value: "10.109.3.1"
+    label: "ntp server for ContrailVM"
+    description: "Set ntp server available for ContrailVM"
+    weight: 195
+    type: "text"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_esxi_for_fabric:
+    value: ""
+    label: "vCenter ESXi data for fabric"
+    description: "vCenter ESXi data for fabric in YAML format"
+    weight: 200
+    type: "textarea"
+    regex:
+      source: '.'
+      error: "Invalid vCenter ESXi data for fabric"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
