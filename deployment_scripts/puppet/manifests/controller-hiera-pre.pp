@@ -21,3 +21,12 @@ file { '/etc/hiera/plugins/contrail.yaml':
   ensure  => file,
   content => 'neutron_config: { predefined_networks: [] }',
 }
+
+if $contrail::use_vcenter {
+  file { '/root/config-override.yaml':
+    ensure  => file,
+    content => inline_template("<%= scope.lookupvar('contrail::vcenter_hash').to_yaml.gsub('---','vcenter:') %>"),
+  }
+
+  contrail::deliver_hiera {$contrail::contrail_config_ips_adm:}
+}
