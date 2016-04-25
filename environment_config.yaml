@@ -108,14 +108,14 @@ attributes:
     description: >
       Enable this option to unlock the SRIOV feature.
       NOTE: You still have to assign SRIOV-role to compute nodes to enable SRIOV on them.
-    weight: 210
+    weight: 155 
     type: "checkbox"
   sriov_physnet:
     value: 'physnet1'
     label: 'Provide name for physical net'
     description: >
       This physical network will be provided over SRIOV capable interfaces.
-    weight: 220
+    weight: 156
     type: 'text'
     regex:
       source: '^\w+$'
@@ -123,4 +123,105 @@ attributes:
     restrictions:
       - action: hide
         condition: not (settings:contrail.contrail_global_sriov.value == true)
+  contrail_vcenter_datacenter:
+    value: "Datacenter"
+    label: "vCenter Datacenter"
+    description: "vCenter Datacenter for Contrail"
+    weight: 160
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter Datacenter"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvswitch:
+    value: "Contrail_dvSwitch"
+    label: "vCenter dvSwitch"
+    description: "vCenter dvSwitch for Contrail"
+    weight: 170
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter dvSwitch"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvportgroup:
+    value: "Contrail_DV_Port_Group"
+    label: "vCenter DV Port Group"
+    description: "vCenter DV Port Group for Contrail"
+    weight: 180
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter DV Port Group"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvportgroup_numberofports:
+    value: "3"
+    label: "vCenter DV Port Group number of ports"
+    description: "vCenter number of ports DV Port Group for Contrail"
+    weight: 190
+    type: "text"
+    regex:
+      source: '^[1-9]\d*$'
+      error: "Invalid vCenter DV Port Group number of ports"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  provision_vmware:
+    value: true
+    label: "Provision VMware hosts"
+    description: >
+      Enable this option to allow the plugin to provision ContrailVMs to ESXi hosts
+      and create Contrail_dvSwitch.
+      Can be disabled, if VMs are already created or this must be done manually.
+    weight: 192
+    type: "checkbox"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_esxi_for_fabric:
+    value: "#Sample data, replace with your actual settings\n 
+            \"esxi1\": \n  \"username\": \"root\"\n  \"ip\": \"172.16.0.252\"\
+            \n  \"fabric_vswitch\": \"vSwitch1\"\n  \"uplink_nic\": \"vmnic1\"\n \
+            \ \"contrail_vm\": \n    \"mac\": \"00:50:56:03:BC:BC\"\n    \"host\"\
+            : \"root@10.109.3.231\"\n  \"cluster\": \"Cluster1\"\n  \"datastore\"\
+            : \"/vmfs/volumes/nfs\"\n  \"password\": \"swordfish\"\n"
+
+    label: "vCenter ESXi data for fabric"
+    description: "vCenter ESXi data for fabric in YAML format"
+    weight: 200
+    type: "textarea"
+    regex:
+      source: '.'
+      error: "Invalid vCenter ESXi data for fabric"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrailvm_ntp:
+    value: "10.109.3.1"
+    label: "NTP server for ContrailVM"
+    description: "NTP server address for ContrailVM, reachable from Private network"
+    weight: 205
+    type: "text"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_environment:
+    type: "select"
+    weight: 210
+    value: "prod"
+    label: "ContrailVM flavor"
+    description: "Choose the flavor for ContrailVM. Flavor with less RAM may be used for development/test environments."
+    values:
+      - data: "dev"
+        label: "development"
+      - data: "prod"
+        label: "production"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
 
