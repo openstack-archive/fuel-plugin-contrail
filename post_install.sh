@@ -1,3 +1,4 @@
+#!/bin/sh
 #    Copyright 2015 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,21 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/controller-hiera-pre.pp')
-
-# Pre-deploy
-# Empty predefined_networks to skip OSTF nets creation
-# in openstack-network-controller.pp
-file { '/etc/hiera/plugins/contrail.yaml':
-  ensure  => file,
-  content => 'neutron_config: { predefined_networks: [] }',
-}
-
-if $contrail::use_vcenter {
-  file { '/root/config-override.yaml':
-    ensure  => file,
-    content => inline_template("<%= scope.lookupvar('contrail::vcenter_hash').to_yaml.gsub('---','vcenter:') %>"),
-  }
-
-  contrail::deliver_hiera {$contrail::contrail_config_ips_adm:}
-}
+/usr/bin/dockerctl shell nailgun sed -i -e "/if common_attrs.get('use_vcenter', {}).get('value') is True and/,+5 d" /usr/lib/python2.7/site-packages/nailgun/api/v1/validators/cluster.py
+/usr/bin/dockerctl shell nailgun sed -i -e "s/vCenterNetworkBackends:\[\"network:neutron:core:nsx/vCenterNetworkBackends:[\"network:neutron:core:nsx\",\"network:neutron:contrail\"/" /usr/share/nailgun/static/build/bundle.js
+/usr/bin/dockerctl shell nailgun systemctl restart nailgun.service
