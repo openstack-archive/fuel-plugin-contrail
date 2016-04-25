@@ -84,6 +84,8 @@ class contrail {
   $admin_tenant   = $admin_settings['tenant']
 
   # Contrail settings
+  # defines the memory size of ContrailVM [fixme]
+  $env              = $settings['contrail_environment']
   $asnum            = $settings['contrail_asnum']
   $external         = $settings['contrail_external']
   $route_target     = $settings['contrail_route_target']
@@ -124,6 +126,31 @@ class contrail {
     $libvirt_name = 'libvirtd'
   }
 
+  # vCenter settings
+  $use_vcenter                                = hiera('use_vcenter', false)
+  $vcenter_hash                               = hiera_hash('vcenter', false)
+
+  if $vcenter_hash {
+    $vcenter_server_ip                          = $vcenter_hash['computes'][0]['vc_host']
+    $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']
+    $vcenter_server_pass                        = $vcenter_hash['computes'][0]['vc_password']
+    $vcenter_server_cluster                     = $vcenter_hash['computes'][0]['vc_cluster']
+    $vcenter_server_name                        = $vcenter_hash['computes'][0]['availability_zone_name']
+    $contrail_vcenter_datacenter                = $settings['contrail_vcenter_datacenter']
+    $contrail_vcenter_dvswitch                  = $settings['contrail_vcenter_dvswitch']
+    $contrail_vcenter_dvportgroup               = $settings['contrail_vcenter_dvportgroup']
+    $contrail_vcenter_dvportgroup_numberofports = $settings['contrail_vcenter_dvportgroup_numberofports']
+    $contrail_vcenter_esxi_for_fabric           = $settings['contrail_vcenter_esxi_for_fabric']
+    $provision_vmware                           = $settings['provision_vmware']
+    $contrailvm_ntp                             = $settings['contrailvm_ntp']
+    $contrail_vcenter_vm_ips                    = get_contrailvm_ips()
+    $contrail_compute_vmware_nodes_hash         = get_nodes_hash_by_roles(hiera('network_metadata'), ['compute-vmware'])
+    $contrail_compute_vmware_ips                = values(get_node_to_ipaddr_map_by_network_role($contrail_compute_vmware_nodes_hash, 'admin/pxe'))
+    $contrail_fab_build_node_hash               = get_nodes_hash_by_roles(hiera('network_metadata'), ['primary-controller'])
+    $contrail_fab_build_ip                      = values(get_node_to_ipaddr_map_by_network_role($contrail_fab_build_node_hash, 'admin/pxe'))
+    $contrail_fab_default                       = {'vmdk' => '/opt/contrail/ContrailVM-disk1.vmdk', 'vcenter_server' => 'vcenter1', 'mode' => 'vcenter'}}
+
+
   # Settings for RabbitMQ on contrail controllers
   $rabbit             = hiera_hash('rabbit')
   $rabbit_password    = $rabbit['password']
@@ -146,4 +173,5 @@ class contrail {
   # Contrail Config nodes Private IP list
   $contrail_config_nodes_hash     = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-config', 'contrail-config'])
   $contrail_config_ips            = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
+  $contrail_config_ips_adm        = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'fw-admin')))
 }
