@@ -14,7 +14,7 @@
 
 notice('MODULAR: contrail/common-repo.pp')
 
-$settings = hiera('contrail', {})
+$settings = hiera_hash('contrail', {})
 $plugin_version = $settings['metadata']['plugin_version']
 
 case $operatingsystem
@@ -37,4 +37,7 @@ case $operatingsystem
     default: {}
 }
 
-
+file_line{'vmware pub authorized keys':
+  path => '/root/.ssh/authorized_keys',
+  line => file('/var/lib/astute/vmware/vmware.pub'),
+}
