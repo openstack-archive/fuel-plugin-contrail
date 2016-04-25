@@ -87,10 +87,69 @@
     strategy:
       type: parallel
 
+##########################################################
 # Tasks
+##########################################################
+
+##############
+#1. Copy ssh keys to vmware
+##############
+
+- id: copy_keys
+  type: copy_files
+  version: 2.0.0
+  role: '*'
+  required_for: [pre_deployment_end]
+  requires: [generate_keys]
+  cross-depends:
+      - name: generate_keys
+        role: master
+  parameters:
+    files:
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/neutron/neutron.pub
+        dst: /var/lib/astute/neutron/neutron.pub
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/neutron/neutron
+        dst: /var/lib/astute/neutron/neutron
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/nova/nova.pub
+        dst: /var/lib/astute/nova/nova.pub
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/nova/nova
+        dst: /var/lib/astute/nova/nova
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/mysql/mysql.pub
+        dst: /var/lib/astute/mysql/mysql.pub
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/mysql/mysql
+        dst: /var/lib/astute/mysql/mysql
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/mongodb/mongodb.key
+        dst: /var/lib/astute/mongodb/mongodb.key
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/fernet-keys/0
+        dst: /var/lib/astute/keystone/0
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/fernet-keys/1
+        dst: /var/lib/astute/keystone/1
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware
+        dst: /var/lib/astute/vmware/vmware
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware.pub
+        dst: /var/lib/astute/vmware/vmware.pub
+    permissions: '0600'
+    dir_permissions: '0700'
+    cwd: /
+
 #############
-#1. Install Contrail utils, java
+#2. Generate keys
 #############
+
+- id: generate_keys
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [pre_deployment_start]
+  required_for: [copy_keys]
+  parameters:
+    cmd: sh /etc/puppet/modules/osnailyfacter/modular/astute/generate_keys.sh -p /var/lib/fuel/keys/ -i {CLUSTER_ID} -o 'mongodb' -s 'neutron nova mysql vmware' -f '0 1'
+    timeout: 180
+    cwd: /
+
+#############
+#3. Install Contrail utils, java
+##############
 
 - id: contrail-utils
   type: puppet
@@ -104,7 +163,7 @@
     timeout: 720
 
 #############
-#2. Install Cassandra and wait cluster to bootstrap
+#4. Install Cassandra and wait cluster to bootstrap
 #############
 
 - id: contrail-db-primary
@@ -118,7 +177,10 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
 
-# This task is a anchor for make dependency between fuel keystone tasks and contrail db setup
+##############
+#5. This task is a anchor for make dependency between fuel keystone tasks and contrail db setup
+#############
+
 - id: contrail-keystone
   type: skipped
   version: 2.0.0
@@ -129,7 +191,7 @@
     - name: contrail-db-primary
 
 ################
-#3. Deploy other Cassandra servers
+#6. Deploy other Cassandra servers
 ################
 
 - id: contrail-db-all
@@ -146,7 +208,7 @@
     timeout: 3600
 
 ###############
-#4. Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
+#7. Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
 #   this task is performed on one node initially to allow discovery service to start up
 ###############
 
@@ -166,7 +228,7 @@
     timeout: 1440
 
 ################
-#5. Provision Primary Control config
+#8. Provision Primary Control config
 ################
 
 - id: contrail-config-provision-primary
@@ -181,7 +243,7 @@
     timeout: 1440
 
 ################
-#6. Perform same actions on other contrail-config nodes
+#9. Perform same actions on other contrail-config nodes
 ################
 
 - id: contrail-config-all
@@ -201,7 +263,7 @@
       type: parallel
 
 ###############
-#7. Provision Contrail Config
+#10. Provision Contrail Config
 ###############
 
 - id: contrail-config-provision-all
@@ -218,7 +280,7 @@
       type: parallel
 
 ################
-#8. Install and configure Contrail Control Node
+#11. Install and configure Contrail Control Node
 ################
 
 - id: contrail-control-primary
@@ -237,7 +299,7 @@
     timeout: 1440
 
 ################
-#9. Provision Primary Contrail control
+#12. Provision Primary Contrail control
 ################
 
 - id: contrail-control-provision-primary
@@ -252,7 +314,7 @@
     timeout: 1440
 
 ##############
-#10. Install other Contrail Control Nodes
+#13. Install other Contrail Control Nodes
 ##############
 
 - id: contrail-control-all
@@ -272,7 +334,7 @@
       type: parallel
 
 ################
-#11. Provision Contrail control
+#14. Provision Contrail control
 ################
 
 - id: contrail-control-provision-all
@@ -289,7 +351,7 @@
       type: parallel
 
 ###############
-# Provision Control db
+#15. Provision Control db
 ###############
 
 - id: contrail-db-provision-all
@@ -450,6 +512,20 @@
     timeout: 120
 
 #################
+# Configure vmware integration
+#################
+
+- id: openstack-controller-vmware-primary
+  type: puppet
+  role: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [controller-hiera-post]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-vmware.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+
+#################
 # Create networks for ostf-tests and provision route target
 #################
 
@@ -477,6 +553,43 @@
     type: one-by-one
   parameters:
     puppet_manifest: puppet/manifests/controller-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+##############################################################
+#  Compute vmware tasks section
+##############################################################
+
+
+# Set proper apt pin for Contrail repository
+- id: contrail-compute-vmware-repo
+  type: puppet
+  groups: [compute-vmware]
+  required_for: [tools]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-compute-vmware-pkg
+  type: puppet
+  groups: [compute-vmware]
+  required_for: [top-role-compute-vmware]
+  requires: [deploy_start, globals, contrail-compute-vmware-repo]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware-pkg.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Deploy contrail vCenter plugin
+- id: contrail-compute-vmware
+  type: puppet
+  role: [compute-vmware]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
