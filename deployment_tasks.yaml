@@ -413,6 +413,16 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+- id: contrail-compute-vmware-pkg
+  type: puppet
+  groups: [compute-vmware]
+  required_for: [top-role-compute-vmware]
+  requires: [deploy_start, globals, contrail-compute-vmware-repo]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware-pkg.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Deploy contrail vCenter plugin
 - id: contrail-compute-vmware
   type: puppet
