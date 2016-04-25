@@ -151,3 +151,4 @@ Configuring Contrail Plugin
 
         WARNING! first usable addresses from Private network will be used as VIP for Contrail controllers.
         For example, if your Private network CIDR is 192.168.200.0/24, then Contrail VIP will be **192.168.200.1**.
+
