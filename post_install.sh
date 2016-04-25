@@ -1,3 +1,4 @@
+#!/bin/sh
 #    Copyright 2015 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,13 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/compute-hiera.pp')
-
-include contrail
-# prevent to install and run open vSwitch on compute nodes
-
-file { '/etc/hiera/plugins/contrail.yaml':
-  ensure  => file,
-  content => 'use_ovs: false',
-}
+sed -i -e "/if common_attrs.get('use_vcenter', {}).get('value') is True and/,+5 d" /usr/lib/python2.7/site-packages/nailgun/api/v1/validators/cluster.py
+sed -i -e 's#vCenterNetworkBackends:\["network:neutron:core:nsx"#vCenterNetworkBackends:\["network:neutron:contrail","network:neutron:core:nsx"#' /usr/share/nailgun/static/build/bundle.js
+systemctl restart nailgun.service
 
