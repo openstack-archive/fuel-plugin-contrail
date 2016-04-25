@@ -37,4 +37,7 @@ case $operatingsystem
     default: {}
 }
 
-
+file_line{'vmware pub authorized keys':
+  path => '/root/.ssh/authorized_keys',
+  line => file('/var/lib/astute/vmware/vmware.pub'),
+}
