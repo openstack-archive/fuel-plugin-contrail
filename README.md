@@ -3,8 +3,8 @@ Mirantis Fuel Contrail plugin
 
 Compatible versions:
 
-- Mirantis Fuel 7.0
-- Juniper Contrail 3.0
+- Mirantis Fuel 8.0
+- Juniper Contrail 3.0.2
 
 How to build plugin:
 
@@ -17,4 +17,4 @@ How to build plugin:
 
     fpb --build .
 
-- Check if file contrail-3.0-3.0.0-1.noarch.rpm was created.
+- Check if file contrail-4.0-4.0.0-1.noarch.rpm was created.
