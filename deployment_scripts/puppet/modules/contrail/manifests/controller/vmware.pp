@@ -129,6 +129,10 @@ class contrail::controller::vmware {
       command => 'fab setup_vcenter; fab setup_vcenter && touch /opt/contrail/fab_setup_vcenter-DONE',
       creates => '/opt/contrail/fab_setup_vcenter-DONE',
       require => [Exec['fab_prepare_contrailvm'], Exec['fab_install_vrouter']],
+    } 
+
+    contrail::provision_contrailvm {$contrail::contrail_vcenter_vm_ips:
+      require => Exec['fab_setup_vcenter'],
     }
 
   }
