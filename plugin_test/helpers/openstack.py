@@ -46,6 +46,16 @@ def assign_net_provider(obj, **options):
         name=obj.__class__.__name__,
         mode=DEPLOYMENT_MODE,
         settings=default_settings)
+
+    # Configure private network (disable vlan and etc.)
+    nets = obj.fuel_web.client.get_networks(obj.cluster_id)['networks']
+    for net in nets:
+        if net['name'] == 'private':
+            net['ip_ranges'][0][0] = net['ip_ranges'][0][0][:-1] + '2'
+            net['vlan_start'] = None
+            net['meta']['notation'] = 'ip_ranges'
+    obj.fuel_web.client.update_network(obj.cluster_id, networks=nets)
+
     return obj.cluster_id
 
 
