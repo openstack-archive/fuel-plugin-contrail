@@ -139,14 +139,17 @@ def activate_vsrx():
     command = 'sed -r "s/ENV_NAME/$ENV_NAME/g" {0} > logs/vSRX1.xml'.\
         format(VSRX_TEMPLATE_PATH)
     subprocess.call(command, shell=True)
+    command = 'sed -i -r "s/vSRX1.img/vSRX.400.img/g" logs/vSRX1.xml'
+    subprocess.call(command, shell=True)
     command = 'virsh create logs/vSRX1.xml'
     logger.info("#" * 10 + 'Create vSRX...')
     if subprocess.call(command, shell=True):
         logger.info("#" * 10 + 'VSRX could not be established, '
                     'OSTF will not be running' + "#" * 10)
         return False
-
-    command = 'sudo ip route add 10.100.1.0/24 via 10.109.1.250'
+    command = 'sudo ip route del 10.100.1.0/24'
+    subprocess.call(command, shell=True)
+    command = 'sudo ip route add 10.100.1.0/24 via 10.109.3.250'
     subprocess.call(command, shell=True)
     return True
 

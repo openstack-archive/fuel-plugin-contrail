@@ -28,7 +28,7 @@ from helpers import openstack
 class ContrailPlugin(TestBasic):
     """ContrailPlugin."""  # TODO documentation
 
-    pack_copy_path = '/var/www/nailgun/plugins/contrail-3.0'
+    pack_copy_path = '/var/www/nailgun/plugins/contrail-4.0'
     add_package = \
         '/var/www/nailgun/plugins/contrail-3.0/' \
         'repositories/ubuntu/contrail-setup*'
@@ -56,7 +56,7 @@ class ContrailPlugin(TestBasic):
         Duration 20 min
 
         """
-
+        plugin.show_range(self, 1, 6)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
@@ -66,23 +66,25 @@ class ContrailPlugin(TestBasic):
         """Deploy a cluster with Contrail Plugin
 
         Scenario:
-            1. Revert snapshot "ready_with_3_slaves"
-            2. Create cluster
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable Contrail plugin
             3. Add 1 node with contrail-config, contrail-control and
                contrail-db roles
             4. Add a node with controller role
-            4. Add a node with compute role
-            6. Enable Contrail plugin
-            5. Deploy cluster with plugin
+            5. Add a node with compute role
+            6. Deploy cluster with plugin
 
         Duration 90 min
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
 
+        plugin.show_range(self, 3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -93,7 +95,7 @@ class ContrailPlugin(TestBasic):
                 'slave-03': ['compute'],
             })
 
-        # deploy cluster
+        self.show_step(6)
         openstack.deploy_cluster(self)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -106,28 +108,29 @@ class ContrailPlugin(TestBasic):
         and install contrail plugin
 
         Scenario:
-            1. Revert snapshot "ready_with_9_slaves"
-            2. Create cluster
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable Contrail plugin
             3. Add 3 nodes with contrail-db role
             4. Add a node with contrail-config role
             5. Add a node with contrail-control role
             6. Add a node with with controller role
             7. Add a node with compute + cinder role
-            8. Enable Contrail plugin
-            9. Deploy cluster with plugin
-            10. Create net and subnet
-            11. Run OSTF tests
+            8. Deploy cluster with plugin
+            9. Run OSTF tests
 
         Duration 110 min
 
         """
+        self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        # enable plugin in contrail settings
+        self.show_step(2)
         plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
+        plugin.show_range(self, 3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -140,8 +143,9 @@ class ContrailPlugin(TestBasic):
                 'slave-07': ['compute', 'cinder'],
             })
 
-        # deploy cluster
+        self.show_step(8)
         openstack.deploy_cluster(self)
 
+        self.show_step(9)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
