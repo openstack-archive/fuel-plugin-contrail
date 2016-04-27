@@ -118,6 +118,16 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
 
+# This task is a anchor for make dependency between fuel keystone tasks and contrail db setup
+- id: contrail-keystone
+  type: skipped
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [primary-keystone, keystone, neutron-keystone, nova-keystone]
+  cross-depends-by:
+    - name: contrail-db-primary
+
 ################
 #3. Deploy other Cassandra servers
 ################
@@ -323,8 +333,10 @@
   type: puppet
   version: 2.0.0
   groups: [primary-controller, controller]
-  requires: [primary-database]
-  required_for: [primary-rabbitmq]
+  requires: [deploy_start, primary-cluster-haproxy, cluster-haproxy]
+  required_for: [deploy_end, openstack-haproxy]
+  cross-depended-by:
+    - name: contrail-config-primary
   parameters:
     puppet_manifest: puppet/manifests/controller-vip.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -386,7 +398,7 @@
   version: 2.0.0
   groups: [primary-controller, controller]
   required_for: [deploy_end]
-  requires: [controller_remaining_tasks]
+  requires: [controller_remaining_tasks, controller-hiera-post, primary-heat, heat]
   parameters:
     puppet_manifest: puppet/manifests/controller-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -458,6 +470,9 @@
       role: self
     - name: contrail-config-all
       policy: all
+    - name: openstack-controller-provision
+      role: primary-controller
+      policy: all
   strategy:
     type: one-by-one
   parameters:
@@ -476,8 +491,8 @@
   type: puppet
   version: 2.0.0
   groups: [compute]
-  required_for: [tools]
-  requires: [deploy_start, globals]
+  required_for: [tools, fuel_pkgs]
+  requires: [deploy_start, setup_repositories]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -539,6 +554,9 @@
     puppet_manifest: puppet/manifests/contrail-compute-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+  cross-depends:
+    - name: openstack-controller-provision
+      role: primary-controller
   strategy:
     type: one-by-one
 
@@ -559,6 +577,9 @@
   groups: [compute]
   required_for: [deploy_end]
   requires: [top-role-compute, enable_nova_compute_service, openstack-network-end, contrail-compute-network]
+  cross-depends:
+    - name: openstack-controller-provision
+      policy: all
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-nova.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
