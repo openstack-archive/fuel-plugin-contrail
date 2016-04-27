@@ -14,6 +14,10 @@
 
 class contrail::compute::vmware {
 
+  file { '/etc/contrail':
+    ensure => directory,
+    mode   => '0750',
+  }->
   file {'/etc/contrail/ESXiToVRouterIp.map':
     content => template('contrail/ESXiToVRouterIp.map.erb')
   }
