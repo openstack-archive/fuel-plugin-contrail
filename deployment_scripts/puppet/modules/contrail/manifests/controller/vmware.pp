@@ -123,5 +123,9 @@ class contrail::controller::vmware {
       require => [Exec['fab_prepare_contrailvm'], Exec['fab_install_vrouter']],
     }
 
+    contrail::provision_contrailvm {$contrail::contrail_vcenter_vm_ips:
+      require => Exec['fab_setup_vcenter'],
+    }
+
   }
 }
