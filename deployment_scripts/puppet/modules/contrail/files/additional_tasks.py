@@ -47,3 +47,10 @@ def provision_contrailvm(cmd):
     with settings(password='c0ntrail123', connection_attempts=10):
         sudo(cmd)
 
+
+@task
+def change_hostname(hostname):
+    """Change hostname on ContrailVM"""
+    with settings(password='c0ntrail123', connection_attempts=10):
+        cmd = 'echo %s > /etc/hostname' % hostname
+        sudo(cmd)

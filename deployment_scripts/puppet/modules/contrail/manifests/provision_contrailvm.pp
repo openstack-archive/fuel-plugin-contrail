@@ -46,6 +46,10 @@ define contrail::provision_contrailvm (
   $vmware_vmpg_vswitch = $esxi_data['fabric_vswitch']
   $vmware_vmpg_vswitch_mtu = '9000'
   $mode = 'vcenter'
+  $oktets = split($self_ip, '\.')
+  $last_oktet = $oktets[3]
+  $vm_hostname = "ContrailVM-${last_oktet}"
+
   
   $provisioning_cmd = "setup-vnc-compute --self_ip ${self_ip} \
   --cfgm_ip ${cfgm_ip} \
@@ -74,7 +78,7 @@ define contrail::provision_contrailvm (
   --vmware_vmpg_vswitch_mtu ${vmware_vmpg_vswitch_mtu} \
   --mode ${mode}"
   
-  $register_cmd = "python provision_vrouter.py --host_name ContrailVM \
+  $register_cmd = "python provision_vrouter.py --host_name ${vm_hostname} \
   --host_ip ${self_ip} \
   --api_server_ip ${contrail_internal_vip} \
   --oper add \
@@ -89,6 +93,13 @@ define contrail::provision_contrailvm (
     cwd     => '/opt/contrail/utils',
     command => "fab -H ${title} disable_add_vnc_config && touch /opt/contrail/disable_add_vnc_config-${self_ip}-DONE",
     creates => "/opt/contrail/disable_add_vnc_config-${self_ip}-DONE",
+  } ->
+
+  exec { "change_hostname-${self_ip}":
+    path    => '/usr/local/bin:/bin:/usr/bin/',
+    cwd     => '/opt/contrail/utils',
+    command => "fab -H ${title} change_hostname:'${vm_hostname}' && touch /opt/contrail/change_hostname-${self_ip}-DONE",
+    creates => "/opt/contrail/change_hostname-${self_ip}-DONE",
   } ->
   
   exec { "provision_contrailvm-${self_ip}":
