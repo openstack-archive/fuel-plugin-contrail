@@ -49,6 +49,7 @@ define contrail::provision_contrailvm (
   $oktets = split($self_ip, '\.')
   $last_oktet = $oktets[3]
   $vm_hostname = "ContrailVM-${last_oktet}"
+  $contrailvm_ntp = $contrail::contrailvm_ntp
 
   
   $provisioning_cmd = "setup-vnc-compute --self_ip ${self_ip} \
@@ -100,6 +101,13 @@ define contrail::provision_contrailvm (
     cwd     => '/opt/contrail/utils',
     command => "fab -H ${title} change_hostname:'${vm_hostname}' && touch /opt/contrail/change_hostname-${self_ip}-DONE",
     creates => "/opt/contrail/change_hostname-${self_ip}-DONE",
+  } ->
+
+  exec { "set_ntp-${self_ip}":
+    path    => '/usr/local/bin:/bin:/usr/bin/',
+    cwd     => '/opt/contrail/utils',
+    command => "fab -H ${title} set_ntp:'${contrailvm_ntp}' && touch /opt/contrail/set_ntp-${self_ip}-DONE",
+    creates => "/opt/contrail/set_ntp-${self_ip}-DONE",
   } ->
   
   exec { "provision_contrailvm-${self_ip}":

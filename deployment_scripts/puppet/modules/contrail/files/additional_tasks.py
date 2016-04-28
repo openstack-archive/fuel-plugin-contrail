@@ -54,3 +54,11 @@ def change_hostname(hostname):
     with settings(password='c0ntrail123', connection_attempts=10):
         cmd = 'echo %s > /etc/hostname' % hostname
         sudo(cmd)
+
+
+@task
+def set_ntp(ntp):
+    """Set proper ntp server on ContrailVM"""
+    with settings(password='c0ntrail123', connection_attempts=10):
+        sudo('sed -i "/^server/g" /etc/ntp.conf')
+        sudo('echo "server %s" >> /etc/ntp.conf' % ntp)

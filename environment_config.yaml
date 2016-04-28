@@ -161,6 +161,15 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
+  contrailvm_ntp:
+    value: "10.109.3.1"
+    label: "ntp server for ContrailVM"
+    description: "Set ntp server available for ContrailVM"
+    weight: 195
+    type: "text"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
   contrail_vcenter_esxi_for_fabric:
     value: ""
     label: "vCenter ESXi data for fabric"
