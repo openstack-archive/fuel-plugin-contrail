@@ -55,7 +55,7 @@ class IntegrationTests(TestBasic):
                segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with controller role
-            4. Add 2 nodes with "compute" and "Ceph-OSD" roles
+            4. Add 3 nodes with "compute" and "Ceph-OSD" roles
             5. Add a node with contrail-config role
             6. Add a node with contrail-control role
             7. Add a node with contrail-db role
@@ -87,9 +87,10 @@ class IntegrationTests(TestBasic):
                 'slave-03': ['controller'],
                 'slave-04': ['compute', 'ceph-osd'],
                 'slave-05': ['compute', 'ceph-osd'],
-                'slave-06': ['contrail-config'],
-                'slave-07': ['contrail-control'],
-                'slave-08': ['contrail-db'],
+                'slave-06': ['compute', 'ceph-osd'],
+                'slave-07': ['contrail-config'],
+                'slave-08': ['contrail-control'],
+                'slave-09': ['contrail-db'],
             })
 
         self.show_step(8)
