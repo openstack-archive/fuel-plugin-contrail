@@ -120,12 +120,15 @@ def activate_plugin(obj):
 def activate_vsrx():
     """Activate vSRX1 image"""
 
-    logger.info('Configure iptables and route...')
+    logger.info("#" * 10 + 'Configure iptables and route...'  + "#" * 10)
     command = 'sudo /sbin/iptables -F'
+    logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
     command = 'sudo /sbin/iptables -t nat -F'
+    logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
     command = 'sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE'
+    logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
 
     if not VSRX_TEMPLATE_PATH:
@@ -133,23 +136,31 @@ def activate_vsrx():
                     'OSTF will not be running' + "#" * 10)
         return False
 
-    logger.info("#" * 10 + 'Delete previous installation of vSRX...')
-    subprocess.call('virsh destroy vSRX1', shell=True)
-    subprocess.call('virsh undefine vSRX1', shell=True)
+    logger.info("#" * 10 + 'Delete previous installation of vSRX...' + "#" * 10)
+    command = 'virsh destroy vSRX1'
+    logger.info('The command is %s', command)
+    subprocess.call(command, shell=True)
+    command = 'virsh undefine vSRX1'
+    logger.info('The command is %s', command)
+    subprocess.call(command, shell=True)
     command = 'sed -r "s/ENV_NAME/$ENV_NAME/g" {0} > logs/vSRX1.xml'.\
         format(VSRX_TEMPLATE_PATH)
+    logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
     command = 'sed -i -r "s/vSRX1.img/vSRX.400.img/g" logs/vSRX1.xml'
+    logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
     command = 'virsh create logs/vSRX1.xml'
-    logger.info("#" * 10 + 'Create vSRX...')
+    logger.info("#" * 10 + 'Create vSRX...' + "#" * 10)
     if subprocess.call(command, shell=True):
         logger.info("#" * 10 + 'VSRX could not be established, '
                     'OSTF will not be running' + "#" * 10)
         return False
     command = 'sudo ip route del 10.100.1.0/24'
+    logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
     command = 'sudo ip route add 10.100.1.0/24 via 10.109.3.250'
+    logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
     return True
 
