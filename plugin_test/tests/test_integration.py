@@ -195,7 +195,7 @@ class IntegrationTests(TestBasic):
             {
                 'slave-01': ['controller'],
                 'slave-02': ['controller'],
-                'slave-03': ['controller', 'mongo'],
+                'slave-03': ['controller', 'mongo', 'ceph-osd'],
                 'slave-04': ['compute', 'ceph-osd', 'mongo'],
                 'slave-05': ['compute', 'ceph-osd', 'cinder'],
                 'slave-06': ['mongo'],
@@ -283,7 +283,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
-                'slave-01': ['controller'],
+                'slave-01': ['controller', 'ceph-osd'],
                 'slave-02': ['compute', 'ceph-osd'],
                 'slave-03': ['compute', 'ceph-osd'],
                 'slave-04': ['contrail-config',
@@ -606,7 +606,7 @@ class IntegrationTests(TestBasic):
                 'slave-01': ['controller', 'cinder', 'ceph-osd'],
                 'slave-02': ['controller', 'cinder'],
                 'slave-03': ['controller', 'ceph-osd'],
-                'slave-04': ['compute'],
+                'slave-04': ['compute', 'ceph-osd'],
                 'slave-05': ['compute'],
                 'slave-06': ['contrail-config',
                              'contrail-control',
