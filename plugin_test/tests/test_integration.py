@@ -15,7 +15,6 @@
 import os
 import os.path
 from proboscis import test
-import time
 from copy import deepcopy
 from proboscis import asserts
 from fuelweb_test import logger
@@ -270,7 +269,7 @@ class IntegrationTests(TestBasic):
             }
 
         interfaces_update = [{
-            'name': 'eth3',
+            'name': 'enp0s6',
             'interface_properties': {
                 'mtu': 9000,
                 'disable_offloading': False
