@@ -164,15 +164,16 @@ class IntegrationTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
-            3. Add 2 nodes with "controller" role
+            3. Add a node with "controller" role
             4. Add a node with "controller" + "MongoDB" multirole
-            5. Add a node with "compute" + "ceph-OSD" + "cinder" multiroles
-            6. Add node with "compute" + "ceph-OSD" + " MongoDB" multiroles
-            7. Add a node with "MongoDB" role
-            8. Add a node with "contrail-config", "contrail-control" and
+            5. Add a node with "controller"+ "ceph-OSD" multiroles
+            6. Add a node with "compute" + "ceph-OSD" + "cinder" multiroles
+            7. Add a node with "compute" + "ceph-OSD" multiroles
+            8. Add a node with "MongoDB" role
+            9. Add a node with "contrail-config", "contrail-control" and
                "contrail-db" roles
-            9. Deploy cluster with plugin
-            10. Run OSTF tests
+            10. Deploy cluster with plugin
+            11. Run OSTF tests
 
         Duration 120 min
 
@@ -194,9 +195,9 @@ class IntegrationTests(TestBasic):
             self.cluster_id,
             {
                 'slave-01': ['controller'],
-                'slave-02': ['controller'],
+                'slave-02': ['controller', 'ceph-osd'],
                 'slave-03': ['controller', 'mongo'],
-                'slave-04': ['compute', 'ceph-osd', 'mongo'],
+                'slave-04': ['compute', 'ceph-osd'],
                 'slave-05': ['compute', 'ceph-osd', 'cinder'],
                 'slave-06': ['mongo'],
                 'slave-07': ['contrail-config',
@@ -221,7 +222,7 @@ class IntegrationTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Add a node with controller role
+            3. Add a node with "controller" and "Ceph OSD" roles
             4. Add 2 nodes with "compute" and "Storage-Ceph OSD" roles
             5. Add a node with "contrail-config", "contrail-control" and
                "contrail-db" roles
@@ -283,7 +284,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
-                'slave-01': ['controller'],
+                'slave-01': ['controller', 'ceph-osd'],
                 'slave-02': ['compute', 'ceph-osd'],
                 'slave-03': ['compute', 'ceph-osd'],
                 'slave-04': ['contrail-config',
@@ -584,8 +585,9 @@ class IntegrationTests(TestBasic):
             5. Add 2 nodes with "compute" role
             6. Add 3 nodes with "contrail-config", "contrail-control" and
                "contrail-db" roles
-            7. Deploy cluster with plugin
-            8. Run OSTF tests
+            7. Add a node with "Ceph-OSD" role
+            8. Deploy cluster with plugin
+            9. Run OSTF tests
 
         """
         self.show_step(1)
@@ -616,7 +618,8 @@ class IntegrationTests(TestBasic):
                              'contrail-db'],
                 'slave-08': ['contrail-config',
                              'contrail-control',
-                             'contrail-db']
+                             'contrail-db'],
+                'slave-09': ['ceph-osd']
             })
 
         self.show_step(7)
