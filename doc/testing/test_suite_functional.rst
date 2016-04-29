@@ -424,3 +424,47 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Check that a Compute node can be deleted and added again with CephOSD
+---------------------------------------------------------------------
+
+
+ID
+##
+
+contrail_plugin_add_delete_compute_ceph
+
+
+Description
+###########
+
+Verify that Compute node can be deleted and added after deploying with CephOSD as a storage backend
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+    2. Enable and configure Contrail plugin
+    3. Add a node with "controller" + "mongo" roles and  3 nodes with "compute" + "ceph-osd" roles
+    4. Add node with "contrail-control", "contrail-config" and "contrail-db" roles
+    5. Deploy cluster and run OSTF tests
+    6. Check Controller and Contrail nodes status
+    7. Add node with "compute" role
+    8. Deploy changes and run OSTF tests
+    9. Delete node with "compute" role
+    10. Deploy changes
+    11. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.

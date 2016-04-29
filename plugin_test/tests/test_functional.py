@@ -542,20 +542,20 @@ class IntegrationTests(TestBasic):
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Add 1 node with "controller" + "mongo" roles and
-               2 nodes with "compute" + "ceph-osd" roles
+               3 nodes with "compute" + "ceph-osd" roles
             4. Add node with "contrail-control", "contrail-config" and
                "contrail-db" roles
-            5. Deploy cluster
+            5. Deploy cluster and run OSTF tests
             6. Check Controller and Contrail nodes status
             7. Add node with "compute" role
-            8. Deploy changes
+            8. Deploy changes and run OSTF tests
             9. Delete node with "compute" role
             10. Deploy changes
             11. Run OSTF tests
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=5,
+        plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={
                                            'images_ceph': True,
                                            'volumes_ceph': True,
@@ -573,12 +573,13 @@ class IntegrationTests(TestBasic):
             'slave-01': ['controller', 'mongo'],
             'slave-02': ['compute', 'ceph-osd'],
             'slave-03': ['compute', 'ceph-osd'],
-            'slave-04': ['contrail-control',
+            'slave-04': ['compute', 'ceph-osd'],
+            'slave-05': ['contrail-control',
                          'contrail-config',
                          'contrail-db'],
-            # Here slave-5
+            # Here slave-6
         }
-        conf_db = {'slave-05': ['compute']}
+        conf_db = {'slave-06': ['compute']}
 
         self.show_step(5)
         openstack.update_deploy_check(self, conf_no_db,
