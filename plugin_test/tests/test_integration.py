@@ -15,7 +15,6 @@
 import os
 import os.path
 from proboscis import test
-import time
 from copy import deepcopy
 from proboscis import asserts
 from fuelweb_test import logger
@@ -262,15 +261,15 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self)
 
         interfaces = {
-            'eth0': ['fuelweb_admin'],
-            'eth1': ['public'],
-            'eth2': ['management'],
-            'eth3': ['private'],
-            'eth4': ['storage'],
+            'enp0s3': ['fuelweb_admin'],
+            'enp0s4': ['public'],
+            'enp0s5': ['management'],
+            'enp0s6': ['private'],
+            'enp0s7': ['storage'],
             }
 
         interfaces_update = [{
-            'name': 'eth3',
+            'name': 'enp0s6',
             'interface_properties': {
                 'mtu': 9000,
                 'disable_offloading': False
