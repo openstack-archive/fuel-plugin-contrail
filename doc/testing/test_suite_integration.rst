@@ -113,12 +113,15 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin
-    3. Add 3 nodes with controller role
-    4. Add 2 nodes with "compute" and "Ceph-OSD" roles
-    5. Add a node with "MongoDB" role
-    6. Add a node with "contrail-config", "contrail-control" and "contrail-db" roles
-    7. Deploy cluster with plugin
-    8. Run OSTF tests
+    3. Add a node with "controller" role
+    4. Add a node with "controller" + "MongoDB" multirole
+    5. Add a node with "controller"+ "ceph-OSD" multiroles
+    6. Add a node with "compute" + "ceph-OSD" + "cinder" multiroles
+    7. Add a node with "compute" + "ceph-OSD" multiroles
+    8. Add a node with "MongoDB" role
+    9. Add a node with "contrail-config", "contrail-control" and "contrail-db" roles
+    10. Deploy cluster with plugin
+    11. Run OSTF tests
 
 
 Expected results
@@ -154,8 +157,8 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
-    3. Add a node with controller role
-    4. Add 2 nodes with "compute" and "Storage-cinder" roles
+    3. Add a node with "controller" and "Ceph OSD" roles
+    4. Add 2 nodes with "compute" and "Storage-Ceph OSD" roles
     5. Add a node with "contrail-config", "contrail-control" and "contrail-db" roles
     6. Add 2 nodes with "contrail-config", "contrail-control" roles
     7. Configure MTU on network interfaces (Jumbo-frames)
