@@ -1,26 +1,26 @@
-#    Copyright 2016 Mirantis, Inc.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
+"""Copyright 2016 Mirantis, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+"""
 
 import os
-from proboscis.asserts import assert_equal
+
 from proboscis import test
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
-from helpers import openstack
 
 
 @test(groups=["plugins"])
@@ -39,7 +39,7 @@ class FailoverTests(TestBasic):
           groups=["cannot_deploy_only_contrail_db"])
     @log_snapshot_after_test
     def cannot_deploy_only_contrail_db(self):
-        """Check can not deploy Contrail cluster with "contrail_db" only
+        """Check can not deploy Contrail cluster with "contrail_db" only.
 
         Scenario:
             1. Create an environment with
@@ -50,7 +50,6 @@ class FailoverTests(TestBasic):
             4. Add 1 nodes with "contrail-db" role
             5. Deploy cluster and verify that it will fail
         """
-
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
@@ -74,7 +73,7 @@ class FailoverTests(TestBasic):
           groups=["cannot_deploy_only_contrail_config"])
     @log_snapshot_after_test
     def cannot_deploy_only_contrail_config(self):
-        """Check can not deploy Contrail cluster with "contrail_config" only
+        """Check can not deploy Contrail cluster with "contrail_config" only.
 
         Scenario:
             1. Create an environment with
@@ -85,7 +84,6 @@ class FailoverTests(TestBasic):
             4. Add 1 nodes with "contrail-config" role
             5. Deploy cluster and verify that it will fail
         """
-
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
@@ -109,7 +107,7 @@ class FailoverTests(TestBasic):
           groups=["cannot_deploy_only_contrail_control"])
     @log_snapshot_after_test
     def cannot_deploy_only_contrail_control(self):
-        """Check can not deploy Contrail cluster with "contrail_control" only
+        """Check can not deploy Contrail cluster with "contrail_control" only.
 
         Scenario:
             1. Create an environment with
@@ -120,7 +118,6 @@ class FailoverTests(TestBasic):
             4. Add 1 nodes with "contrail-control" role
             5. Deploy cluster and verify that it will fail
         """
-
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
 
