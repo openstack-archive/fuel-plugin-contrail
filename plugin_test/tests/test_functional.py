@@ -1,16 +1,17 @@
-#    Copyright 2016 Mirantis, Inc.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
+"""Copyright 2016 Mirantis, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+"""
 
 import os
 from proboscis import test
@@ -41,8 +42,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_plugin_add_delete_controller_node"])
     @log_snapshot_after_test
     def contrail_plugin_add_delete_controller_node(self):
-        """Verify that Controller node can be deleted
-        and added after deploying
+        """Verify that Controller node can be deleted and added after deploying.
 
         Scenario:
             1. Create an environment with
@@ -118,7 +118,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_plugin_add_delete_compute_node"])
     @log_snapshot_after_test
     def contrail_plugin_add_delete_compute_node(self):
-        """Verify that Compute node can be deleted and added after deploying
+        """Verify that Compute node can be deleted and added after deploying.
 
         Scenario:
             1. Create an environment with
@@ -190,7 +190,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_ha_with_shutdown_contrail_node"])
     @log_snapshot_after_test
     def contrail_ha_with_shutdown_contrail_node(self):
-        """Verify HA with deleting Contrail roles
+        """Verify HA with deleting Contrail roles.
 
         Scenario:
             1. Create an environment with
@@ -242,7 +242,7 @@ class IntegrationTests(TestBasic):
         }
 
         def check_node_state(cluster_id, node_name, node_state):
-            """Checks node state by it's name"""
+            """Check node state by it's name."""
             for node in self.fuel_web.client.list_cluster_nodes(cluster_id):
                 if node_name in node['name']:
                     assert_equal(node['status'], node_state,
@@ -283,7 +283,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_add_control"])
     @log_snapshot_after_test
     def contrail_add_control(self):
-        """Verify that Contrail control role can be added after deploying
+        """Verify that Contrail control role can be added after deploying.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -332,7 +332,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_add_config"])
     @log_snapshot_after_test
     def contrail_add_config(self):
-        """Verify that Contrail config role can be added after deploying
+        """Verify that Contrail config role can be added after deploying.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -381,7 +381,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_delete_control"])
     @log_snapshot_after_test
     def contrail_delete_control(self):
-        """Verify that Contrail control role can be deleted after deploying
+        """Verify that Contrail control role can be deleted after deploying.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -432,7 +432,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_delete_config"])
     @log_snapshot_after_test
     def contrail_delete_config(self):
-        """Verify that Contrail config role can be deleted after deploying
+        """Verify that Contrail config role can be deleted after deploying.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -485,8 +485,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_add_db"])
     @log_snapshot_after_test
     def contrail_add_db(self):
-        """Verify that Contrail DB role can be added and deleted after
-        deploying
+        """Verify that Contrail DB role can be added and deleted after deploy.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -535,7 +534,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_plugin_add_delete_compute_ceph"])
     @log_snapshot_after_test
     def contrail_plugin_add_delete_compute_ceph(self):
-        """Verify that compute node can be added and deleted in env with Ceph
+        """Verify that compute node can be added and deleted in env with Ceph.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -588,6 +587,7 @@ class IntegrationTests(TestBasic):
         openstack.update_deploy_check(self, conf_db,
                                       is_vsrx=vsrx_setup_result)
         plugin.show_range(self, 9, 12)
-        openstack.update_deploy_check(self, conf_db, delete=True,
-                                      is_vsrx=vsrx_setup_result,
-                                      ostf_fail_tests=['Check that required services are running'])
+        openstack.update_deploy_check(
+            self, conf_db, delete=True,
+            is_vsrx=vsrx_setup_result,
+            ostf_fail_tests=['Check that required services are running'])

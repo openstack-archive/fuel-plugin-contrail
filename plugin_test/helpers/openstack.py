@@ -67,7 +67,7 @@ def deploy_cluster(obj, wait_for_status='operational'):
         obj.fuel_web.deploy_cluster_wait(
             obj.cluster_id, check_services=False,
             timeout=180 * 60)
-    except:
+    except Exception:
         nailgun_nodes = obj.env.fuel_web.client.list_cluster_nodes(
             obj.env.fuel_web.get_last_created_cluster())
         time.sleep(420)

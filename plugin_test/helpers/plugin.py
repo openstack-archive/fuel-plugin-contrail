@@ -1,16 +1,17 @@
-#    Copyright 2015 Mirantis, Inc.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
+"""Copyright 2016 Mirantis, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+"""
 
 import os
 import time
@@ -48,6 +49,7 @@ INTERFACES = {
 
 
 def upload_contrail_packages(obj):
+    """Upload contrail packeges on master node."""
     node_ssh = obj.env.d_env.get_admin_remote()
     if os.path.splitext(obj.pack_path)[1] == ".deb":
         pkg_name = os.path.basename(obj.pack_path)
@@ -59,6 +61,7 @@ def upload_contrail_packages(obj):
 
 
 def install_packages(obj, remote):
+    """Install contrail packeges on master node."""
     command = "cd " + obj.pack_copy_path + " && ./install.sh"
     logger.info('The command is %s', command)
     remote.execute_async(command)
@@ -67,8 +70,7 @@ def install_packages(obj, remote):
 
 
 def prepare_contrail_plugin(obj, slaves=None, options={}):
-    """Copy necessary packages to the master node and install them"""
-
+    """Copy necessary packages to the master node and install them."""
     obj.env.revert_snapshot("ready_with_%d_slaves" % slaves)
 
     # copy plugin to the master node
@@ -94,7 +96,7 @@ def prepare_contrail_plugin(obj, slaves=None, options={}):
 
 
 def activate_plugin(obj):
-    """Enable plugin in contrail settings"""
+    """Enable plugin in contrail settings."""
     plugin_name = 'contrail'
     msg = "Plugin couldn't be enabled. Check plugin version. Test aborted"
     assert_true(
@@ -118,9 +120,8 @@ def activate_plugin(obj):
 
 
 def activate_vsrx():
-    """Activate vSRX1 image"""
-
-    logger.info("#" * 10 + 'Configure iptables and route...'  + "#" * 10)
+    """Activate vSRX1 image."""
+    logger.info("#" * 10 + 'Configure iptables and route...' + "#" * 10)
     command = 'sudo /sbin/iptables -F'
     logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
@@ -136,7 +137,8 @@ def activate_vsrx():
                     'OSTF will not be running' + "#" * 10)
         return False
 
-    logger.info("#" * 10 + 'Delete previous installation of vSRX...' + "#" * 10)
+    logger.info(
+        "#" * 10 + 'Delete previous installation of vSRX...' + "#" * 10)
     command = 'virsh destroy vSRX1'
     logger.info('The command is %s', command)
     subprocess.call(command, shell=True)
@@ -166,8 +168,7 @@ def activate_vsrx():
 
 
 def net_group_preparation(obj):
-    """Prepare network group for network template """
-
+    """Prepare network group for network template."""
     node_ssh = obj.env.d_env.get_admin_remote()
 
     # preparing commands for gateway setting and  private interface updating
@@ -186,7 +187,8 @@ def net_group_preparation(obj):
         node_ssh.execute_async(i)
         time.sleep(40)
 
+
 def show_range(obj, start_value, end_value):
-    """Show several steps"""
+    """Show several steps."""
     for i in range(start_value, end_value):
         obj.show_step(i)
