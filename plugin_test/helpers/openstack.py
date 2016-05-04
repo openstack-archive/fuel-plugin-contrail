@@ -1,16 +1,17 @@
-#    Copyright 2015 Mirantis, Inc.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
+"""Copyright 2016 Mirantis, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+"""
 
 import time
 from devops.helpers.helpers import wait
@@ -21,8 +22,7 @@ from . import settings
 
 
 def assign_net_provider(obj, **options):
-    """Assign neutron with tunneling segmentation"""
-
+    """Assign neutron with tunneling segmentation."""
     default_settings = {
         "net_provider": 'neutron',
         "net_segment_type": 'tun',
@@ -60,8 +60,10 @@ def assign_net_provider(obj, **options):
 
 
 def deploy_cluster(obj, wait_for_status='operational'):
-    """
-    Deploy cluster with additional time for waiting on node's availability
+    """Deploy cluster with additional time for waiting on node's availability.
+
+    :param obj: Test case object
+    :param wait_for_status: status of deployment
     """
     try:
         obj.fuel_web.deploy_cluster_wait(
@@ -81,7 +83,8 @@ def deploy_cluster(obj, wait_for_status='operational'):
 
 
 def assign_vlan(obj, **interface_tags):
-    """ Configure vlan on interfaces
+    """Configure vlan on interfaces.
+
     :param obj: Test case object
     :param interface_tags: keyword params of interface role and it's vlan tags
     :return: None
@@ -93,7 +96,14 @@ def assign_vlan(obj, **interface_tags):
     obj.fuel_web.client.update_network(obj.cluster_id, networks=nets)
 
 
-def update_deploy_check(obj, nodes, delete=False, is_vsrx=True):
+def update_deploy_check(obj, nodes, delete=False, is_vsrx=True,
+                        ostf_timeout=0, ostf_suites=[], ostf_fail_tests=[]):
+    """Update, deploy and check cluster.
+
+    :param obj: Test case object
+    :param nodes:type dictionary, dictionary of nodes
+    :param delete: type boolean, True if node should be deleted
+    """
     # Cluster configuration
     obj.fuel_web.update_nodes(obj.cluster_id,
                               nodes_dict=nodes,
@@ -104,6 +114,14 @@ def update_deploy_check(obj, nodes, delete=False, is_vsrx=True):
 
     # Run OSTF tests
     if is_vsrx:
+        ostf_params = {}
+        if ostf_timeout:
+            ostf_params['timeout'] = ostf_timeout
+        if ostf_suites:
+            ostf_params['test_sets'] = ostf_suites
+        if ostf_fail_tests:
+            ostf_params['should_fail'] = len(ostf_fail_tests)
+            ostf_params['failed_test_name'] = ostf_fail_tests
         obj.fuel_web.run_ostf(cluster_id=obj.cluster_id)
 
 
@@ -111,20 +129,21 @@ def wait_for_cluster_status(obj, cluster_id,
                             status='operational',
                             timeout=settings.DEPLOY_CLUSTER_TIMEOUT):
     """Wait for cluster status until timeout is reached.
-        :param obj: Test case object, usually it is 'self'
-        :param cluster_id: cluster identifier
-        :param status: Cluster status, available values:
 
-          - new
-          - deployment
-          - stopped
-          - operational
-          - error
-          - remove
-          - update
-          - update_error
-        :param timeout: the time that we are waiting.
-        :return: time that we are actually waited.
+    :param obj: Test case object, usually it is 'self'
+    :param cluster_id: cluster identifier
+    :param status: Cluster status, available values:
+
+      - new
+      - deployment
+      - stopped
+      - operational
+      - error
+      - remove
+      - update
+      - update_error
+    :param timeout: the time that we are waiting.
+    :return: time that we are actually waited.
 
     """
     def check_func():
