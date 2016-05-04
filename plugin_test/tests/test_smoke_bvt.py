@@ -1,20 +1,21 @@
-#    Copyright 2015 Mirantis, Inc.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
+"""Copyright 2016 Mirantis, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+"""
 
 import os
 import os.path
-import time
+
 from proboscis import test
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
@@ -44,7 +45,7 @@ class ContrailPlugin(TestBasic):
           groups=["install_contrail"])
     @log_snapshot_after_test
     def install_contrail(self):
-        """Install Contrail Plugin and create cluster
+        """Install Contrail Plugin and create cluster.
 
         Scenario:
             1. Revert snapshot "ready_with_5_slaves"
@@ -63,7 +64,7 @@ class ContrailPlugin(TestBasic):
           groups=["contrail_smoke"])
     @log_snapshot_after_test
     def contrail_smoke(self):
-        """Deploy a cluster with Contrail Plugin
+        """Deploy a cluster with Contrail Plugin.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -102,7 +103,8 @@ class ContrailPlugin(TestBasic):
           groups=["contrail_bvt"])
     @log_snapshot_after_test
     def contrail_bvt(self):
-        """BVT test for contrail plugin
+        """BVT test for contrail plugin.
+
         Deploy cluster with 1 controller, 1 compute,
         3 contrail-config, contrail-control, contrail-db roles
         and install contrail plugin

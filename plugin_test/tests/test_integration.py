@@ -1,16 +1,17 @@
-#    Copyright 2015 Mirantis, Inc.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
+"""Copyright 2016 Mirantis, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+"""
 
 import os
 import os.path
@@ -47,7 +48,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_ha"])
     @log_snapshot_after_test
     def contrail_ha(self):
-        """Check Contrail deploy on HA environment
+        """Check Contrail deploy on HA environment.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -103,7 +104,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_ha_baseos"])
     @log_snapshot_after_test
     def contrail_ha_baseos(self):
-        """Check deploy HA-contrail on an environment with a base-os node
+        """Check deploy HA-contrail on an environment with a base-os node.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -157,7 +158,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_ceilometer"])
     @log_snapshot_after_test
     def contrail_ceilometer(self):
-        """Check deploy environment with Contrail and Ceilometer
+        """Check deploy environment with Contrail and Ceilometer.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -215,7 +216,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_jumbo"])
     @log_snapshot_after_test
     def contrail_jumbo(self):
-        """Check deploy contrail on an environment with jumbo-frames support
+        """Check deploy contrail on an environment with jumbo-frames support.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -266,7 +267,7 @@ class IntegrationTests(TestBasic):
             'enp0s5': ['management'],
             'enp0s6': ['private'],
             'enp0s7': ['storage'],
-            }
+        }
 
         interfaces_update = [{
             'name': 'enp0s6',
@@ -274,7 +275,7 @@ class IntegrationTests(TestBasic):
                 'mtu': 9000,
                 'disable_offloading': False
             },
-            }]
+        }]
 
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
@@ -293,7 +294,8 @@ class IntegrationTests(TestBasic):
                              'contrail-control'],
                 'slave-06': ['contrail-config',
                              'contrail-control'],
-                })
+            }
+        )
 
         self.show_step(7)
         slave_nodes = \
@@ -324,7 +326,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_bonding"])
     @log_snapshot_after_test
     def contrail_bonding(self):
-        """Check deploy contrail with aggregation of network interfaces
+        """Check deploy contrail with aggregation of network interfaces.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -369,9 +371,10 @@ class IntegrationTests(TestBasic):
                              'contrail-control',
                              'contrail-db'],
             },
-            )
+        )
 
-        cluster_nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
+        cluster_nodes = self.fuel_web.client.list_cluster_nodes(
+            self.cluster_id)
 
         self.show_step(6)
         for node in cluster_nodes:
@@ -395,7 +398,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
-            timeout=45*60,
+            timeout=45 * 60,
             should_fail=2,
             failed_test_name=[('Check network connectivity '
                                'from instance via floating IP'),
@@ -406,7 +409,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_vlan"])
     @log_snapshot_after_test
     def contrail_vlan(self):
-        """Check deploy contrail on an environment with vlan-tagging
+        """Check deploy contrail on an environment with vlan-tagging.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -463,7 +466,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_ceph_multirole"])
     @log_snapshot_after_test
     def contrail_ceph_multirole(self):
-        """Check deploy contrail with Controller + Ceph multirole
+        """Check deploy contrail with Controller + Ceph multirole.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -520,7 +523,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_cinder_multirole"])
     @log_snapshot_after_test
     def contrail_cinder_multirole(self):
-        """Check deploy contrail with Controller + Cinder multirole
+        """Check deploy contrail with Controller + Cinder multirole.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -571,7 +574,7 @@ class IntegrationTests(TestBasic):
           groups=["contrail_cinder_ceph_multirole"])
     @log_snapshot_after_test
     def contrail_cinder_ceph_multirole(self):
-        """Check deploy contrail with Controller + Cinder + Ceph multirole
+        """Check deploy contrail with Controller + Cinder + Ceph multirole.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
