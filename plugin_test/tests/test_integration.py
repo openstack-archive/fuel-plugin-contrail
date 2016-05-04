@@ -315,10 +315,10 @@ class IntegrationTests(TestBasic):
             node = self.fuel_web.get_nailgun_node_by_name(node_name)
             with self.env.d_env.get_ssh_to_remote(node['ip']) as remote:
                 asserts.assert_true(
-                    jumbo.check_node_iface_mtu(remote, "eth3", 9000),
+                    jumbo.check_node_iface_mtu(remote, "enp0s6", 9000),
                     "MTU on {0} is not 9000. Actual value: {1}"
                     .format(remote.host,
-                            jumbo.get_node_iface(remote, "eth3")))
+                            jumbo.get_node_iface(remote, "enp0s6")))
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_bonding"])
