@@ -90,9 +90,9 @@ adv_net_template:
             provider: ovs
       nic_mapping:
         default:
-          if1: eth0
-          if2: eth1
-          if3: eth3
+          if1: enp0s3       # admin
+          if2: enp0s4       # public
+          if3: enp0s5       # management
       templates_for_node_role:
         cinder:
         - common
