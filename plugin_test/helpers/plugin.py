@@ -41,9 +41,9 @@ BOND_CONFIG = [
 ]
 
 INTERFACES = {
-    'eth0': ['fuelweb_admin', 'storage'],
-    'eth1': ['public'],
-    'eth2': ['management'],
+    'enp0s3': ['fuelweb_admin', 'storage'],
+    'enp0s4': ['public'],
+    'enp0s5': ['management'],
     'lnx-bond0': ['private']
 }
 
