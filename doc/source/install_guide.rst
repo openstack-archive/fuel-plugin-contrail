@@ -37,6 +37,12 @@ Installing Contrail Plugin
         <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-4.0/
         ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-4.0/install.sh
 
+#.  In case if vmware integration expected, before running *install.sh* copy vcenter plugin package to contrail plugin folder
+    ::
+
+        scp contrail-install-vcenter-plugin_3.0.0.0-2723_all.deb \
+        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-3.0/
+
 .. raw:: latex
 
     \clearpage
@@ -49,7 +55,7 @@ Configuring Contrail Plugin
 
     .. image:: images/name_and_release.png
 
-#.  Please select KVM or QEMU hypervisor type for your environment
+#.  Please select KVM or QEMU hypervisor type for your environment also enable "vCenter" feature if vmware integration expected
 
     .. image:: images/compute.png
 
