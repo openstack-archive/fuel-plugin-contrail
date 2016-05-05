@@ -35,9 +35,15 @@ Installing Contrail Plugin
 #.  In case if you are using Juniper Contrail, copy Juniper contrail install package (obtained from Juniper by subscription, see Prerequisites above) to the Fuel Master node and run the installation script to unpack the vendor package and populate plugin repository
     ::
 
-        scp contrail-install-packages_3.0-2652-kilo_all.deb \
+        scp contrail-install-packages_3.0-2723-kilo_all.deb \
         <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-3.0/
         ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-3.0/install.sh
+
+#.  In case if vmware integration expected, before running *install.sh* copy vcenter plugin package to contrail plugin folder
+    ::
+
+        scp contrail-install-vcenter-plugin_3.0.0.0-2723_all.deb \
+        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-3.0/
 
 .. raw:: latex
 
@@ -51,7 +57,7 @@ Configuring Contrail Plugin
     .. image:: images/name_and_release.png
        :width: 80%
 
-#.  Please select KVM or QEMU hypervisor type for your environment
+#.  Please select KVM or QEMU hypervisor type for your environment also enable "vCenter" feature if vmware integration expected
 
     .. image:: images/compute.png
        :width: 80%
