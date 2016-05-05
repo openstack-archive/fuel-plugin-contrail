@@ -18,4 +18,5 @@ Guide to the Contrail plugin version 3.0 for Fuel 7.0
     verification
     contrail_ui_intro
     tuning
+    vmware
     appendix
