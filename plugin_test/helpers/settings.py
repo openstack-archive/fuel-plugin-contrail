@@ -18,3 +18,10 @@ import os
 VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH', False)
 
 DEPLOY_CLUSTER_TIMEOUT = 60*25  # 25 minutes
+
+BAREMETAL_IMPI = {
+    'user': os.environ.get('BM_IPMI_USER'),
+    'password': os.environ.get('BM_IPMI_PASSWORD'),
+    'host': os.environ.get('BM_IPMI_HOST'),
+    'remote_ip': os.environ.get('BM_IP'),
+}
