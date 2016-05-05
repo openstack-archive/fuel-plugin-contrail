@@ -21,4 +21,6 @@ Guide to the Contrail plugin version 5.0-5.0.0-1 for Fuel 9.0
     verification
     restoring_failed_contrail_node
     contrail_ui_intro
+    tuning
+    vmware
     appendix
