@@ -23,13 +23,13 @@ export REBOOT_TIMEOUT=${REBOOT_TIMEOUT:-5000}
 export ALWAYS_CREATE_DIAGNOSTIC_SNAPSHOT=${ALWAYS_CREATE_DIAGNOSTIC_SNAPSHOT:-true}
 
 # Export specified settings
-if [ -z $NODE_VOLUME_SIZE ]; then export NODE_VOLUME_SIZE=350; fi
-if [ -z $OPENSTACK_RELEASE ]; then export OPENSTACK_RELEASE=Ubuntu; fi
-if [ -z $ENV_NAME ]; then export ENV_NAME="contrail"; fi
-if [ -z $ADMIN_NODE_MEMORY ]; then export ADMIN_NODE_MEMORY=4096; fi
-if [ -z $ADMIN_NODE_CPU ]; then export ADMIN_NODE_CPU=4; fi
-if [ -z $SLAVE_NODE_MEMORY ]; then export SLAVE_NODE_MEMORY=4096; fi
-if [ -z $SLAVE_NODE_CPU ]; then export SLAVE_NODE_CPU=4; fi
+if [ -z "$NODE_VOLUME_SIZE" ]; then export NODE_VOLUME_SIZE=350; fi
+if [ -z "$OPENSTACK_RELEASE" ]; then export OPENSTACK_RELEASE=Ubuntu; fi
+if [ -z "$ENV_NAME" ]; then export ENV_NAME="contrail"; fi
+if [ -z "$ADMIN_NODE_MEMORY" ]; then export ADMIN_NODE_MEMORY=4096; fi
+if [ -z "$ADMIN_NODE_CPU" ]; then export ADMIN_NODE_CPU=4; fi
+if [ -z "$SLAVE_NODE_MEMORY" ]; then export SLAVE_NODE_MEMORY=4096; fi
+if [ -z "$SLAVE_NODE_CPU" ]; then export SLAVE_NODE_CPU=4; fi
 
 # Init and update submodule
 git submodule init && git submodule update
@@ -281,7 +281,7 @@ MakeISO() {
   if [ "${DRY_RUN}" = "yes" ]; then
     ISO="${WORKSPACE}/build/iso/fuel.iso"
   else
-    ISO="`ls ${WORKSPACE}/build/iso/*.iso | head -n 1`"
+    ISO="$(find "${WORKSPACE}/build/iso/"*".iso" | head -n 1)"
     # check that ISO file exists
     if [ ! -f "${ISO}" ]; then
       echo "Error! ISO file not found!"
@@ -369,10 +369,10 @@ RunTest() {
             exit $NOISOFOUND_ERR
         else
             if [ "${DRY_RUN}" = "yes" ]; then
-                echo wget -c ${ISO_URL} -O ${ISO_PATH}
+                echo wget -c "${ISO_URL}" -O "${ISO_PATH}"
             else
                 echo "No ${ISO_PATH} found. Trying to download file."
-                wget -c ${ISO_URL} -O ${ISO_PATH}
+                wget -c "${ISO_URL}" -O "${ISO_PATH}"
                 rc=$?
                 if [ $rc -ne 0 ]; then
                     echo "Failed to fetch ISO from ${ISO_URL}"
@@ -404,7 +404,7 @@ RunTest() {
     fi
 
     if [ ! -f "$LOGS_DIR" ]; then
-      mkdir -p $LOGS_DIR
+      mkdir -p "$LOGS_DIR"
     fi
 
     export ENV_NAME
@@ -416,7 +416,7 @@ RunTest() {
       if [ "${DRY_RUN}" = "yes" ]; then
         echo dos.py erase "${ENV_NAME}"
       else
-        if [ $(dos.py list | grep "^${ENV_NAME}\$") ]; then
+        if dos.py list | grep "^${ENV_NAME}\$"; then
           dos.py erase "${ENV_NAME}"
         fi
       fi
@@ -440,7 +440,7 @@ RunTest() {
         echo python plugin_test/run_tests.py -q --nologcapture --with-xunit ${OPTS}
     else
         export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}${WORKSPACE}"
-        echo ${PYTHONPATH}
+        echo "${PYTHONPATH}"
         python plugin_test/run_tests.py -q --nologcapture --with-xunit ${OPTS}
 
     fi
@@ -481,7 +481,7 @@ RouteTasks() {
 # MAIN
 
 # first we want to get variable from command line options
-GetoptsVariables ${@}
+GetoptsVariables "${@}"
 
 # then we define global variables and there defaults when needed
 GlobalVariables
