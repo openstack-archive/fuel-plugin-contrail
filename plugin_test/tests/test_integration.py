@@ -349,7 +349,7 @@ class IntegrationTests(TestBasic):
         self.show_step(2)
         plugin.activate_plugin(self)
 
-        # configure vlan on storage and management interfaces
+        # configure vlan on storage and private interfaces
         openstack.assign_vlan(self, private=101, storage=102)
 
         plugin.show_range(self, 3, 6)

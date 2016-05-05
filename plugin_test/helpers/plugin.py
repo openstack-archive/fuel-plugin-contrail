@@ -31,8 +31,8 @@ BOND_CONFIG = [
         'mode': 'balance-rr',
         'name': 'lnx-bond0',
         'slaves': [
-            {'name': 'eth3'},
-            {'name': 'eth4'},
+            {'name': 'enp0s6'},
+            {'name': 'enp0s7'},
         ],
         'state': None,
         'type': 'bond',
@@ -41,9 +41,9 @@ BOND_CONFIG = [
 ]
 
 INTERFACES = {
-    'eth0': ['fuelweb_admin', 'storage'],
-    'eth1': ['public'],
-    'eth2': ['management'],
+    'enp0s3': ['fuelweb_admin', 'storage'],
+    'enp0s4': ['public'],
+    'enp0s5': ['management'],
     'lnx-bond0': ['private']
 }
 
