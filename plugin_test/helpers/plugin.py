@@ -170,22 +170,26 @@ def activate_vsrx():
 def net_group_preparation(obj):
     """Prepare network group for network template."""
     node_ssh = obj.env.d_env.get_admin_remote()
-
+    net_name = 'private'
+    command = 'fuel network-group --env {0} | grep {1}'.format(
+        obj.cluster_id, net_name)
+    # get private net params
+    output = node_ssh.execute(command)['stdout'].pop()
+    ids, name, vlan_start, cidr, gateway, group_id = [
+        x.strip() for x in output.split('|')]
+    gateway = cidr.split('0/').pop(0) + '1'
     # preparing commands for gateway setting and  private interface updating
+    logger.info('{0} {1} {2}'.format(ids, net_name, cidr))
     commands = [
-        'fuel network-group --delete --network 5',
-        'fuel network-group --create --name fuel network-group'
-        '--create --name private --cidr 10.109.3.0/24 '
-        '--gateway 10.109.3.1 --nodegroup 1',
-        'fuel network-group --set --network 6 --meta "'
-        '{"name": "private", "notation": "cidr", "render_type": null,'
-        '"map_priority": 2, "configurable": true, "use_gateway": true,'
-        ' "render_addr_mask": "internal", "vlan_start": null, '
-        '"cidr": "10.109.3.0/24"}"']
+        'fuel network-group --set --network %s --gateway %s' % (ids, gateway),
+        """fuel network-group --set --network %s --meta \'
+           {"name": %s, "notation": "cidr",
+           "render_type": null, "map_priority": 2, "configurable": true,
+            "render_addr_mask": "internal", "vlan_start": null,
+            "use_gateway": true, "cidr": %s}\'""" % (ids, net_name, cidr)]
 
     for i in commands:
         node_ssh.execute_async(i)
-        time.sleep(40)
 
 
 def show_range(obj, start_value, end_value):
