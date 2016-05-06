@@ -6,3 +6,4 @@ address <%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrai
 gateway <%= scope.lookupvar('contrail::gateway') %>
 <% end -%>
 network_name contrail
+post-up ip route add default via <%= scope.function_hiera(['management_vrouter_vip']) %>

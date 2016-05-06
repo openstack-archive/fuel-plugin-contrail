@@ -465,7 +465,20 @@
   type: shell
   role: [compute]
   required_for: [post_deployment_end]
-  requires: [configure_default_route]
+  requires: [contrail-compute-aggregate]
   parameters:
     cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
     timeout: 720
+
+- id: configure_default_route
+  type: puppet
+  version: 2.0.0
+  role: [primary-mongo, mongo, compute-vmware, ceph-osd, cinder, cinder-vmware]
+  requires: [post_deployment_start]
+  required_for: [post_deployment_end]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/configure_default_route.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
+

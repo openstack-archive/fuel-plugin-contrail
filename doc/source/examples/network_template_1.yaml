@@ -79,15 +79,6 @@ adv_net_template:
             name: <% if3 %>
           - action: add-br
             name: br-aux
-          - action: add-br
-            name: br-prv
-            provider: ovs
-          - action: add-patch
-            bridges:
-            - br-prv
-            - br-mesh
-            mtu: 65000
-            provider: ovs
       nic_mapping:
         default:
           if1: enp0s3       # admin
