@@ -68,7 +68,7 @@
   role: [primary-contrail-db, contrail-db,
     primary-contrail-config,contrail-config,
     primary-contrail-control,contrail-control]
-  tasks: [configure_default_route, dns-client, ntp-client]
+  tasks: [default_route, dns-client, ntp-client]
   required_for: [post_deployment_end]
   requires: [post_deployment_start]
   parameters:
@@ -460,12 +460,24 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
+# Configures default route 
+- id: default_route
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end, compute-reboot]
+  requires: [post_deployment_start, contrail-compute-aggregate]
+  parameters:
+    puppet_manifest: puppet/manifests/default-route.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+
+
 # Reboot compute nodes, if it need.
 - id: compute-reboot
   type: shell
   role: [compute]
   required_for: [post_deployment_end]
-  requires: [configure_default_route]
+  requires: [default_route]
   parameters:
     cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
     timeout: 720
