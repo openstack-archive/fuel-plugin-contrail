@@ -68,17 +68,14 @@ class TestNetworkTemplates(TestNetworkTemplatesBase, TestBasic):
                *   Login with ssh to Fuel master node.
                *   List existing network-groups
             fuel network-group --env 1
-            3. Remove and create again network-group *private* to set a gateway
-               fuel network-group --delete --network 5
-               fuel network-group --create --name /
-               private --cidr 10.109.3.0/24 --gateway 10.109.3.1 --nodegroup 1
+            3. Set gateway for private network.
             4. Set the ``render_addr_mask`` parameter to `internal`
-               for this network by typing:
-               fuel network-group --set --network 6 --meta
+               for private network by typing:
+               fuel network-group --set --network <net_id> --meta
                '{"name": "private", "notation": "cidr", "render_type": null,
                "map_priority": 2, "configurable": true, "use_gateway": true,
                "render_addr_mask": "internal", "vlan_start": null,
-               "cidr": "10.109.3.0/24"}'
+               "cidr": <cidr>}'
             5. Save sample :download:
                `network template<examples/network_template_1.yaml>`
             6. Upload the network template by typing:
