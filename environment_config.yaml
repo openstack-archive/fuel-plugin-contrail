@@ -61,32 +61,6 @@ attributes:
     description: "Enable this option to unlock the DPDK feature.\nNOTE: You still have to assign DPDK-role to compute nodes to enable DPDK on them."
     weight: 70
     type: "checkbox"
-  hugepages_size:
-    type: 'select'
-    weight: 120
-    value: '2'
-    label: 'Hugepage size'
-    description: 'Choose the size of hugepages that will be used for dpdk feature. Check if 1GB pages are supported on target compute node. # grep pdpe1gb /proc/cpuinfo | uniq'
-    values:
-      - data: '2'
-        label: '2M'
-      - data: '1024'
-        label: "1G"
-    restrictions:
-      - action: hide
-        condition: not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)
-  hugepages_amount:
-    value: '60'
-    label: 'Hugepages amount (%)'
-    description: 'The amount of memory allocated on each compute-node for hugepages in percent'
-    weight: 130
-    type: 'text'
-    regex:
-      source: '^[1-9][0-9]?$|^100$'
-      error: "Invalid amount of percent"
-    restrictions:
-      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
-        action: "hide"
   vrouter_core_mask:
     value: "0x3"
     label: "CPU pinning"
@@ -94,7 +68,7 @@ attributes:
     weight: 131
     type: "text"
     regex:
-      source: '^0[xX][0-9a-fA-F]+$'
+      source: '0[xX][0-9a-fA-F]+'
       error: "Invalid hexadecimal value"
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
