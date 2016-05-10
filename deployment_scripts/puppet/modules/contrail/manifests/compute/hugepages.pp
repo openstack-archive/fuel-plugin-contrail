@@ -13,78 +13,39 @@
 #    under the License.
 
 class contrail::compute::hugepages {
+  # This class is kept here to ensure hugetlbfs mount existence,
+  # even if user has missed nova hugepages configuration in UI/API.
+  $node_hash       = hiera_hash('node', {})
+  $nova_huge_pages = pick($node_hash['nova_hugepages_enabled'], false)
 
-  if $contrail::compute_dpdk_enabled {
-    # NOTE: To use hugepages we have to upgrade qemu packages to version 2.4
-    # The kernel configuration for hugepages
-    Kernel_parameter {
-      provider => 'grub2',
+  if $contrail::compute_dpdk_enabled and !$nova_huge_pages and ($::osfamily == 'Debian') {
+    $qemu_hugepages_value    = 'set KVM_HUGEPAGES 1'
+    $libvirt_hugetlbfs_mount = 'set hugetlbfs_mount /run/hugepages/kvm'
+    augeas { 'qemu_hugepages':
+      context => '/files/etc/default/qemu-kvm',
+      changes => $qemu_hugepages_value,
+      notify  => Service[$contrail::libvirt_name],
     }
-    if $contrail::hugepages_size == 2 {
-      $max_map_count=$contrail::hugepages_number * 2
-      sysctl::value { 'vm.max_map_count':
-        value => "${max_map_count} ",
-      } ->
-      sysctl::value { 'vm.nr_hugepages':
-        value => "${contrail::hugepages_number} ",
-      }
-      kernel_parameter { 'hugepagesz':
-        ensure => absent,
-      }
-      kernel_parameter { 'hugepages':
-        ensure => absent,
-      }
+    augeas { 'libvirt_hugetlbfs_mount':
+      context => '/files/etc/libvirt/qemu.conf',
+      changes => $libvirt_hugetlbfs_mount,
+      notify  => Service[$contrail::libvirt_name],
     }
-    elsif $contrail::hugepages_size == 1024 {
-      kernel_parameter { 'hugepagesz':
-        ensure => present,
-        value  => "${contrail::hugepages_size}M",
-      } ->
-      kernel_parameter { 'hugepages':
-        ensure => present,
-        value  => $contrail::hugepages_size,
-      }
-
-      #This need for vrouter start when 1Gb hugepages not enabled yet
-      exec { 'temporary_add_hugepages':
-        path    => ['/sbin', '/usr/bin'],
-        command => 'sysctl -w vm.nr_hugepages=256',
-        onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
-      }
-      exec { 'reboot_require':
-        path    => ['/bin', '/usr/bin'],
-        command => 'touch /tmp/contrail-reboot-require',
-        onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
-      }
-    }
-
-    file { '/hugepages':
-      ensure => 'directory',
-      group  => 'kvm',
-    } ->
-
-    mount { '/hugepages':
-      ensure  => 'mounted',
-      fstype  => 'hugetlbfs',
-      device  => 'hugetlbfs',
-      options => 'mode=775,gid=kvm',
-      atboot  => true,
-    } ->
-
-    file_line { 'hugepages_mountpoint':
-      path  => '/etc/libvirt/qemu.conf',
-      match => '#hugetlbfs_mount',
-      line  => 'hugetlbfs_mount = "/hugepages"',
-    } ~>
-
     service { 'qemu-kvm':
       ensure => running,
       enable => true,
-    } ~>
-
+    }
     service { $contrail::libvirt_name:
       ensure => running,
       enable => true,
     }
+
+    kernel_parameter { 'transparent_hugepage':
+      ensure => present,
+      value  => 'never',
+    }
+
+    Augeas['qemu_hugepages'] ~> Service<| title == 'qemu-kvm'|>
+    Service<| title == 'qemu-kvm'|> -> Service<| title == $contrail::libvirt_name |>
   }
 }
