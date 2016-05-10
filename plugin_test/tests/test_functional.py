@@ -205,9 +205,8 @@ class IntegrationTests(TestBasic):
             7. Check Controller and Contrail nodes status
             8. Shutdown node with 'contrail-db', "contarail-config" and
                "contrail-control" roles
-            9. Deploy changes
-            10. Run OSTF tests
-            11. Check Controller and Contrail nodes status
+            9. Run OSTF tests
+            10. Check Controller and Contrail nodes status
 
         """
         self.show_step(1)
@@ -268,12 +267,15 @@ class IntegrationTests(TestBasic):
                     self.fuel_web.get_devops_nodes_by_nailgun_nodes([node]))
                 break
 
-        self.show_step(10)
+        self.show_step(9)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'])
+                                   test_sets=['smoke', 'sanity', 'ha'],
+                                   should_fail=1,
+                                   failed_test_name=['Check state of haproxy backends on controllers']
+                                   )
 
-        self.show_step(11)
+        self.show_step(10)
         node_roles = {'controller', 'contrail-config'}
         for node_name, roles in conf_no_contrail.items():
             if node_roles & set(roles):
