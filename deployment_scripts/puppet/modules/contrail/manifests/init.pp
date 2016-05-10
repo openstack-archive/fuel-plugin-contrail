@@ -53,7 +53,7 @@ class contrail {
   $phys_dev          = get_private_ifname($interface, $network_scheme)
   $phys_dev_pci      = get_dev_pci_addr($phys_dev, $network_scheme)
   $phys_dev_mtu      = get_physdev_mtu(regsubst($phys_dev, '\..*' , ''))
-  $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+  $vrouter_core_mask = pick($dpdk_hash['ovs_core_mask'], '0x3')
   $vr_flow_entries   = pick($settings['vr_flow_entries'], '524288')
   $vr_mpls_labels    = pick($settings['vr_mpls_labels'], '5120')
 
@@ -108,10 +108,6 @@ class contrail {
   $external         = $settings['contrail_external']
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
-  # Hugepages configuration for DPDK vrouter
-  $hugepages_size   = pick($settings['hugepages_size'],2)
-  $hugepages_amount = pick($settings['hugepages_amount'],10)
-  $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
