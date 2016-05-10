@@ -29,7 +29,6 @@ class contrail {
   $node_name        = hiera('user_node_name')
   $nodes            = hiera('nodes')
   $region           = hiera('region', 'RegionOne')
-  $dpdk_hash        = hiera_hash('dpdk', {})
   $cluster          = hiera('cluster')
   $cluster_id       = $cluster['id']
 
@@ -108,10 +107,6 @@ class contrail {
   $external         = $settings['contrail_external']
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
-  # Hugepages configuration for DPDK vrouter
-  $hugepages_size   = pick($settings['hugepages_size'],2)
-  $hugepages_amount = pick($settings['hugepages_amount'],10)
-  $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
