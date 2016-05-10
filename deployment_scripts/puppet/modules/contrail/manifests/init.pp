@@ -28,6 +28,7 @@ class contrail {
   $master_ip        = hiera('master_ip')
   $node_name        = hiera('user_node_name')
   $nodes            = hiera('nodes')
+  $dpdk_hash        = hiera_hash('dpdk', {})
 
   # Network configuration
   prepare_network_config($network_scheme)
@@ -39,7 +40,7 @@ class contrail {
   $netmask_short     = netmask_to_cidr($netmask)
   $phys_dev          = get_private_ifname($interface)
   $phys_dev_pci      = get_dev_pci_addr($phys_dev)
-  $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+  $vrouter_core_mask = pick($dpdk_hash['ovs_core_mask'], '0x3')
 
   # VIPs
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
@@ -87,10 +88,6 @@ class contrail {
   $external         = $settings['contrail_external']
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
-  # Hugepages configuration for DPDK vrouter
-  $hugepages_size   = pick($settings['hugepages_size'],2)
-  $hugepages_amount = pick($settings['hugepages_amount'],10)
-  $hugepages_number = floor($::memorysize_mb * $hugepages_amount / '100' / $hugepages_size)
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
