@@ -173,7 +173,7 @@ attributes:
   contrail_vcenter_esxi_for_fabric:
     value: ""
     label: "vCenter ESXi data for fabric"
-    description: "vCenter ESXi data for fabric"
+    description: "vCenter ESXi data for fabric in YAML format"
     weight: 200
     type: "textarea"
     regex:

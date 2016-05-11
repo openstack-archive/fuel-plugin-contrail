@@ -11,7 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-require 'json'
+require 'yaml'
 
 module Puppet::Parser::Functions
 newfunction(:create_esxi_map, :type => :rvalue, :doc => <<-EOS
@@ -23,7 +23,7 @@ newfunction(:create_esxi_map, :type => :rvalue, :doc => <<-EOS
     compute_vmware_clusters = vcenter_hash['computes'][0]['vc_cluster'].split(',')
 
     contrail_hash = function_hiera(['contrail'])
-    esxi_hash = JSON.parse contrail_hash['contrail_vcenter_esxi_for_fabric']
+    esxi_hash = YAML.load contrail_hash['contrail_vcenter_esxi_for_fabric']
     map_elements = Array.new
 
     esxi_hash.each do |esxi_name, esxi_values|
@@ -35,3 +35,4 @@ newfunction(:create_esxi_map, :type => :rvalue, :doc => <<-EOS
     return map_elements.sort
   end
 end
+

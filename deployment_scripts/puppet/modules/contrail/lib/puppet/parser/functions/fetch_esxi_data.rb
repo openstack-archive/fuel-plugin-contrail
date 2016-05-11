@@ -11,7 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-require 'json'
+require 'yaml'
 
 module Puppet::Parser::Functions
 newfunction(:fetch_esxi_data, :type => :rvalue, :doc => <<-EOS
@@ -20,7 +20,7 @@ newfunction(:fetch_esxi_data, :type => :rvalue, :doc => <<-EOS
   ) do |args|
     hiera = function_hiera(["contrail"])
     host = args[0]
-    user_fab = JSON.parse hiera["contrail_vcenter_esxi_for_fabric"]
+    user_fab = YAML.load hiera["contrail_vcenter_esxi_for_fabric"]
     user_fab.each { |k, v|
       if v["contrail_vm"]["host"] == host then
         return v
@@ -28,3 +28,4 @@ newfunction(:fetch_esxi_data, :type => :rvalue, :doc => <<-EOS
     }
     end
 end
+
