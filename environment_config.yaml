@@ -113,6 +113,27 @@ attributes:
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
         action: "hide"
+  contrail_global_sriov:
+    value: false
+    label: "Enable SRIOV feature for this environment."
+    description: >
+      Enable this option to unlock the SRIOV feature.
+      NOTE: You still have to assign SRIOV-role to compute nodes to enable SRIOV on them.
+    weight: 155
+    type: "checkbox"
+  sriov_physnet:
+    value: 'physnet1'
+    label: 'Provide name for physical net'
+    description: >
+      This physical network will be provided over SRIOV capable interfaces.
+    weight: 156
+    type: 'text'
+    regex:
+      source: '^\w+$'
+      error: "Name has to be alphanumeric"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.contrail_global_sriov.value == true)
   contrail_vcenter_datacenter:
     value: "Datacenter"
     label: "vCenter Datacenter"
@@ -161,12 +182,15 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
-  contrailvm_ntp:
-    value: "10.109.3.1"
-    label: "ntp server for ContrailVM"
-    description: "Set ntp server available for ContrailVM"
-    weight: 195
-    type: "text"
+  provision_vmware:
+    value: true
+    label: "Provision VMware hosts"
+    description: >
+      Enable this option to allow the plugin to provision ContrailVMs to ESXi hosts
+      and create Contrail_dvSwitch.
+      Can be disabled, if VMs are already created or this must be done manually.
+    weight: 192
+    type: "checkbox"
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
@@ -182,24 +206,12 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
-  contrail_global_sriov:
-    value: false
-    label: "Enable SRIOV feature for this environment."
-    description: >
-      Enable this option to unlock the SRIOV feature.
-      NOTE: You still have to assign SRIOV-role to compute nodes to enable SRIOV on them.
-    weight: 210
-    type: "checkbox"
-  sriov_physnet:
-    value: 'physnet1'
-    label: 'Provide name for physical net'
-    description: >
-      This physical network will be provided over SRIOV capable interfaces.
-    weight: 220
-    type: 'text'
-    regex:
-      source: '^\w+$'
-      error: "Name has to be alphanumeric"
+  contrailvm_ntp:
+    value: "10.109.3.1"
+    label: "NTP server for ContrailVM"
+    description: "NTP server address for ContrailVM, reachable from Private network"
+    weight: 205
+    type: "text"
     restrictions:
-      - action: hide
-        condition: not (settings:contrail.contrail_global_sriov.value == true)
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
