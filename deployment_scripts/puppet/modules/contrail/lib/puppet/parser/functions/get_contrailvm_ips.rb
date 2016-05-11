@@ -11,7 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-require 'json'
+require 'yaml'
 
 module Puppet::Parser::Functions
 newfunction(:get_contrailvm_ips, :type => :rvalue, :doc => <<-EOS
@@ -20,7 +20,7 @@ newfunction(:get_contrailvm_ips, :type => :rvalue, :doc => <<-EOS
   ) do |args|
      vm_ips = []
      hiera = function_hiera(["contrail"])
-     user_fab = JSON.parse hiera["contrail_vcenter_esxi_for_fabric"]
+     user_fab = YAML.load hiera["contrail_vcenter_esxi_for_fabric"]
      user_fab.each do |_, v|
        if v.key?("contrail_vm")
          vm_ips << v["contrail_vm"]["host"]
@@ -29,3 +29,4 @@ newfunction(:get_contrailvm_ips, :type => :rvalue, :doc => <<-EOS
     return vm_ips
     end
 end
+

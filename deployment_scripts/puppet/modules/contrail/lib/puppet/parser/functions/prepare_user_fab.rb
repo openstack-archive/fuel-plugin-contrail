@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+require 'yaml'
 require 'json'
 
 module Puppet::Parser::Functions
@@ -20,7 +21,7 @@ newfunction(:prepare_user_fab, :type => :rvalue, :doc => <<-EOS
   ) do |args|
     hiera = function_hiera(["contrail"])
     default_fab = args[0]
-    user_fab = JSON.parse hiera["contrail_vcenter_esxi_for_fabric"]
+    user_fab = YAML.load hiera["contrail_vcenter_esxi_for_fabric"]
     full_fab = user_fab
     full_fab.each { |k, v|
       full_fab[k]["vcenter_server"] = default_fab["vcenter_server"]
@@ -31,3 +32,4 @@ newfunction(:prepare_user_fab, :type => :rvalue, :doc => <<-EOS
     return pretty_fab
     end
 end
+
