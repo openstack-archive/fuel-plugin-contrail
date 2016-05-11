@@ -90,42 +90,43 @@ class contrail::controller::vmware {
       before => Exec['fab_prov_esxi'],
     }
 
-    exec { 'fab_prov_esxi':
-      path    => '/usr/local/bin:/bin:/usr/bin/',
-      cwd     => '/opt/contrail/utils',
-      command => 'fab prov_esxi && touch /opt/contrail/fab_prov_esxi-DONE',
-      creates => '/opt/contrail/fab_prov_esxi-DONE',
-    }
+    if contrail::provision_vmware {
+      exec { 'fab_prov_esxi':
+        path    => '/usr/local/bin:/bin:/usr/bin/',
+        cwd     => '/opt/contrail/utils',
+        command => 'fab prov_esxi && touch /opt/contrail/fab_prov_esxi-DONE',
+        creates => '/opt/contrail/fab_prov_esxi-DONE',
+      }
 
-    exec { 'fab_prepare_contrailvm':
-      timeout => 3600,
-      path    => '/usr/local/bin:/bin:/usr/bin/',
-      cwd     => '/opt/contrail/utils',
-      command => 'fab prepare_contrailvm:/opt/contrail/latest-contrail-install-packages.deb && touch /opt/contrail/fab_prepare_contrailvm-DONE',
-      creates => '/opt/contrail/fab_prepare_contrailvm-DONE',
-      require => Exec['fab_prov_esxi'],
-    }
+      exec { 'fab_prepare_contrailvm':
+        timeout => 3600,
+        path    => '/usr/local/bin:/bin:/usr/bin/',
+        cwd     => '/opt/contrail/utils',
+        command => 'fab prepare_contrailvm:/opt/contrail/latest-contrail-install-packages.deb && touch /opt/contrail/fab_prepare_contrailvm-DONE',
+        creates => '/opt/contrail/fab_prepare_contrailvm-DONE',
+        require => Exec['fab_prov_esxi'],
+      }
 
-    exec { 'fab_install_vrouter':
-      timeout => 3600,
-      path    => '/usr/local/bin:/bin:/usr/bin/',
-      cwd     => '/opt/contrail/utils',
-      command => 'fab fab_install_vrouter && touch /opt/contrail/fab_install_vrouter-DONE',
-      creates => '/opt/contrail/fab_install_vrouter-DONE',
-      require => Exec['fab_prepare_contrailvm'],
-    }
+      exec { 'fab_install_vrouter':
+        timeout => 3600,
+        path    => '/usr/local/bin:/bin:/usr/bin/',
+        cwd     => '/opt/contrail/utils',
+        command => 'fab fab_install_vrouter && touch /opt/contrail/fab_install_vrouter-DONE',
+        creates => '/opt/contrail/fab_install_vrouter-DONE',
+        require => Exec['fab_prepare_contrailvm'],
+      }
 
-    exec { 'fab_setup_vcenter':
-      path    => '/usr/local/bin:/bin:/usr/bin/',
-      cwd     => '/opt/contrail/utils',
-      command => 'fab setup_vcenter; fab setup_vcenter && touch /opt/contrail/fab_setup_vcenter-DONE',
-      creates => '/opt/contrail/fab_setup_vcenter-DONE',
-      require => [Exec['fab_prepare_contrailvm'], Exec['fab_install_vrouter']],
-    }
+      exec { 'fab_setup_vcenter':
+        path    => '/usr/local/bin:/bin:/usr/bin/',
+        cwd     => '/opt/contrail/utils',
+        command => 'fab setup_vcenter; fab setup_vcenter && touch /opt/contrail/fab_setup_vcenter-DONE',
+        creates => '/opt/contrail/fab_setup_vcenter-DONE',
+        require => [Exec['fab_prepare_contrailvm'], Exec['fab_install_vrouter']],
+      }
 
-    contrail::provision_contrailvm {$contrail::contrail_vcenter_vm_ips:
-      require => Exec['fab_setup_vcenter'],
+      contrail::provision_contrailvm {$contrail::contrail_vcenter_vm_ips:
+        require => Exec['fab_setup_vcenter'],
+      }
     }
-
   }
 }
