@@ -118,6 +118,7 @@ class contrail {
     $contrail_vcenter_dvportgroup               = $settings['contrail_vcenter_dvportgroup']
     $contrail_vcenter_dvportgroup_numberofports = $settings['contrail_vcenter_dvportgroup_numberofports']
     $contrail_vcenter_esxi_for_fabric           = $settings['contrail_vcenter_esxi_for_fabric']
+    $provision_vmware                           = $settings['provision_vmware']
     $contrailvm_ntp                             = $settings['contrailvm_ntp']
     $contrail_vcenter_vm_ips                    = get_contrailvm_ips()
     $contrail_compute_vmware_nodes_hash         = get_nodes_hash_by_roles(hiera('network_metadata'), ['compute-vmware'])
