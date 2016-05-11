@@ -2,6 +2,7 @@
 auth_host=<%= scope.lookupvar('contrail::keystone_address') %>
 auth_protocol=<%= scope.lookupvar('contrail::keystone_protocol') %>
 auth_port=35357
+auth_url=<%= scope.lookupvar('contrail::auth_url') %>
 admin_user=<%= scope.lookupvar('contrail::neutron_user') %>
 admin_password=<%= scope.lookupvar('contrail::service_token') %>
 admin_token=<%= scope.lookupvar('contrail::admin_token') %>
