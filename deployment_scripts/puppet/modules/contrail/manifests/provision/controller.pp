@@ -16,17 +16,19 @@ class contrail::provision::controller {
 
 contrail::create_network{'net04':
   netdata          => $contrail::nets['net04'],
+  tenant_name      => $contrail::admin_tenant,
 } ->
 
 contrail::create_network{'net04_ext':
   netdata => $contrail::nets['net04_ext'],
   notify  => Exec['prov_route_target'],
+  tenant_name      => $contrail::admin_tenant,
 } ->
 
 openstack::network::create_router{'router04':
   internal_network => 'net04',
   external_network => 'net04_ext',
-  tenant_name      => $contrail::admin_tenant
+  tenant_name      => $contrail::admin_tenant,
 }
 
 exec { 'prov_route_target':
