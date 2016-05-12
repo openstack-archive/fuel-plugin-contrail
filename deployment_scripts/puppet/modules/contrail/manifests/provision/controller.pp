@@ -15,12 +15,14 @@
 class contrail::provision::controller {
 
 contrail::create_network{$contrail::private_net:
-  netdata  => $contrail::nets[$contrail::private_net],
+  netdata     => $contrail::nets[$contrail::private_net],
+  tenant_name => $contrail::admin_tenant,
 } ->
 
 contrail::create_network{$contrail::floating_net:
-  netdata => $contrail::nets[$contrail::floating_net],
-  notify  => Exec['prov_route_target'],
+  netdata     => $contrail::nets[$contrail::floating_net],
+  notify      => Exec['prov_route_target'],
+  tenant_name => $contrail::admin_tenant,
 } ->
 
 neutron_router { $contrail::default_router:
