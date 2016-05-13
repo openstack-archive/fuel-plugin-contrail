@@ -61,6 +61,17 @@
   parameters:
     strategy:
       type: parallel
+
+- id: contrail-tsn
+  type: group
+  role: [contrail-tsn]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts, deploy_start]
+  required_for: [deploy_end]
+  requires: [deploy_start, primary-contrail-control]
+  parameters:
+    strategy:
+      type: parallel
+
 #
 # Group for post-deployment tasks
 - id: contrail-post-deploy
@@ -334,6 +345,54 @@
     puppet_manifest: puppet/manifests/controller-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
+##############################################################
+#  TSN tasks section
+##############################################################
+
+# Set proper apt pin for Contrail repository
+- id: contrail-repository
+  type: puppet
+  groups: [contrail-tsn]
+  required_for: [tools]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-tsn-vrouter
+  type: puppet
+  role: [contrail-tsn]
+  requires: [post_deployment_start]
+  required_for: [reconfigure-contrail-tsn-vrouter]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: reconfigure-contrail-tsn-vrouter
+  type: puppet
+  role: [contrail-tsn]
+  requires: [contrail-tsn-vrouter]
+  required_for: [provision-tsn-vrouter]
+  parameters:
+    puppet_manifest: puppet/manifests/reconfigure-contrail-tsn-vrouter.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+
+- id: provision-tsn-vrouter
+  type: puppet
+  role: [contrail-tsn]
+  required_for: [post_deployment_end]
+  requires: [reconfigure-contrail-tsn-vrouter]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-tsn-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+
 
 ##############################################################
 #  Compute tasks section
