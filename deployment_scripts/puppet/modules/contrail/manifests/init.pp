@@ -110,6 +110,14 @@ class contrail {
   $dpdk_vf_number        = 0
   $sriov_hash            = get_sriov_devices($compute_dpkd_on_vf, $phys_dev)
 
+  # ToR agent settings
+  $enable_tor_agents  = $settings['enable_tor_agents']
+  $tor_agents_ssl  = $settings['tor_agents_ssl']
+  if $enable_tor_agents == true {
+    $tor_agents_configurations = parseyaml($settings['tor_agents_configurations'])
+  }
+
+
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
 
