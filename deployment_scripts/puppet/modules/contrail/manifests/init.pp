@@ -101,6 +101,13 @@ class contrail {
   $passthrough_whitelist = inline_template(
     '<%= "[" + scope.lookupvar("::contrail::sriov_hash").map{ |dev, _| "{\"devname\":\"#{dev}\", \"physical_network\":\"#{sriov_physnet}\"}" }.join(", ") + "]" %>')
 
+  # ToR agent settings
+  $enable_tor_agents  = $settings['enable_tor_agents']
+  if $enable_tor_agents == true {
+    $tor_agents_configuration = parseyaml($settings['tor_agents_configuration'])
+  }
+
+
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
 
