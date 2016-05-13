@@ -31,7 +31,7 @@ project = u'Contrail plugin for Fuel'
 copyright = u'2015, Mirantis Inc.'
 
 version = '3.0'
-release = '3.0-3.0.0-1'
+release = '3.0-3.0.1-1'
 
 pygments_style = 'sphinx'
 

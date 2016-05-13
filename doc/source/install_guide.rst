@@ -15,13 +15,13 @@ Installing Contrail Plugin
 #.  Copy the rpm downloaded at previous step to the Fuel Master node and install the plugin
     ::
 
-        scp contrail-3.0-3.0.0-1.noarch.rpm  <Fuel Master node ip>:/tmp/
+        scp contrail-3.0-3.0.1-1.noarch.rpm  <Fuel Master node ip>:/tmp/
 
 #.  Log into the Fuel Master node and install the plugin
     ::
 
         ssh <the Fuel Master node ip>
-        fuel plugins --install contrail-3.0-3.0.0-1.noarch.rpm
+        fuel plugins --install contrail-3.0-3.0.1-1.noarch.rpm
 
     You should get the following output::
 
