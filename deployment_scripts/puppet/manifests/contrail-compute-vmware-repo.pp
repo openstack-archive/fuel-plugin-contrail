@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-compute-repo.pp')
+notice('MODULAR: contrail/contrail-compute-vmware-repo.pp')
 
 include contrail
 class { 'contrail::compute::vmware_repo': }
