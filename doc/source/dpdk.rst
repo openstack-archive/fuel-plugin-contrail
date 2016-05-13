@@ -203,3 +203,29 @@ In this chapter described DPDK related options that you can change from Fuel UI:
 - *"CPU pinning"* - this hexadecimal value describes how many and which exact processors will be used by dpdk-vrouter. CPU pinning is implemented using `taskset util <http://www.linuxcommand.org/man_pages/taskset1.html>`_
 - *"Patch Nova"* - current release (7.0) of MOS nova doesn't have support for DPDK-based vRouter. In future, necessary patches will be included in MOS maintenance updates.
 - *"Install Qemu and Libvirt from Contrail"* - DPDK-based vRouter needs huge pages memory-backing for guests. MOS 7.0 ships with qemu and libvirt that don't support it. This is needed only for DPDK feature and will be implemented only on nodes where we have "DPDK" role.
+
+How to change huge pages settings after deployment
+--------------------------------------------------
+
+After deploy is finished, plugin settigs are locked in Fuel UI. Therefore, huge pages size/ammount cannot be changed
+by plug-in, and should be changed manually on each compute node. Here are the nessesary steps:
+
+**2MB-sized huge pages** are set with sysctl and can be added on fly with this command::
+
+    # sysctl -w vm.nr_hugepages=<number of pages>
+
+Here number of huge pages can be calculated from ammount that you want to be set, for example 20GB = 20 * 1024 / 2 = 10240 pieces.
+Then edit the /etc/sysctl.conf file to make these changes persistent over reboots.
+
+**1GB-sized huge pages** are set through the kernel parameter and require a reboot to take effect.
+Kernel versions supplied with Ubuntu 14.04 don't support on fly allocation for 1GB-sized huge pages.
+First, edit the /etc/default/grub file and set needed amount of huge pages.
+Here is the example for GRUB_CMDLINE_LINUX in /etc/default/grub::
+
+    GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX hugepagesz=1024M hugepages=20
+
+Then update the bootloader and reboot for these parameters to take effect::
+
+    # update-grub
+    # reboot
+
