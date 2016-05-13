@@ -141,3 +141,30 @@ attributes:
     restrictions:
       - action: hide
         condition: not (settings:contrail.contrail_global_sriov.value == true)
+  enable_tor_agents:
+    value: false
+    label: "Enable ToR agents"
+    description: "Enable this option to unlock the Tor Agent configuration feature."
+    weight: 230
+    type: "checkbox"
+  tor_agents_ssl:
+    value: false
+    label: "Enable ToR agents ssl mode"
+    description: "Enable this option to generate ssl certificates and configure them for tor agents."
+    weight: 240
+    type: "checkbox"
+    restrictions:
+      - condition: "settings:contrail.enable_tor_agents.value == false"
+        action: "hide"
+  tor_agent_configurations:
+    value: ""
+    label: "Configuration for TOR agents"
+    description: "Provide here configuration data for ToR agents in YAML format"
+    weight: 250
+    type: "textarea"
+    regex:
+      source: '.'
+      error: "Provide information for ToR agents"
+    restrictions:
+      - condition: "settings:contrail.enable_tor_agents.value == false"
+        action: "hide"
