@@ -19,6 +19,13 @@ apt::pin { 'favor_contrail_packages':
   label    => 'contrail',
 }
 
+apt::pin { 'fixup_fox_libnl':
+  explanation => 'Fix for libnl from contrail repo',
+  packages    => 'libnl-route-3-200',
+  priority    => '1500',
+  version     => '3.2.21-1ubuntu1',
+}
+
 # Temporary dirty hack. Fix execution of core manifests compute.pp and compute-vmware.pp.
 # When contrail packages was installed, instead of libvirtd we will have libvirt-bin files [FIXME]
 file { '/etc/default/libvirtd':
