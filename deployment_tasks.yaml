@@ -316,9 +316,9 @@
 # Create overrides for Hiera on Controllers: contrail-specific predefined_nets
 - id: controller-hiera-post
   type: puppet
-  role: [primary-controller,controller]
-  required_for: [post_deployment_end]
-  requires: [post_deployment_start]
+  groups: [primary-controller,controller]
+  required_for: [horizon]
+  requires: [openstack-network-end]
   parameters:
     puppet_manifest: puppet/manifests/controller-hiera-post.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -329,7 +329,7 @@
   type: puppet
   role: [primary-controller]
   required_for: [post_deployment_end]
-  requires: [controller-hiera-post]
+  requires: [post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/controller-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
