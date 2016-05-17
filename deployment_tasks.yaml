@@ -458,7 +458,7 @@
   version: 2.0.0
   role: [primary-controller]
   required_for: [deploy_end]
-  requires: [controller-hiera-post]
+  requires: [controller-hiera-post, openstack-controller-contrail]
   cross-depends:
     - name: /(primary-)?openstack-controller$/
       role: self
@@ -520,6 +520,30 @@
   version: 2.0.0
   #
 
+- id: configure_default_route
+  type: puppet
+  version: 2.0.0
+  role: [primary-mongo, mongo, compute-vmware, ceph-osd, cinder, cinder-vmware]
+  requires: [post_deployment_start]
+  required_for: [post_deployment_end]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/configure_default_route.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
+
+- id: compute-configure_default_route
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  requires: [openstack-network-end, enable_nova_compute_service]
+  required_for: [deploy_end]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/configure_default_route.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
+
 # Set apt pin for packeges that need to be override
 - id: contrail-override-repository
   type: puppet
@@ -565,7 +589,8 @@
   version: 2.0.0
   groups: [compute]
   required_for: [deploy_end]
-  requires: [top-role-compute, enable_nova_compute_service, openstack-network-end, contrail-compute-provision]
+  requires: [top-role-compute, enable_nova_compute_service, openstack-network-end,
+             contrail-compute-provision, compute-configure_default_route]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-network.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -601,7 +626,8 @@
   version: 2.0.0
   groups: [compute]
   required_for: [deploy_end]
-  requires: [top-role-compute, enable_nova_compute_service, openstack-network-end, contrail-compute-firewall]
+  requires: [top-role-compute, enable_nova_compute_service, openstack-network-end,
+             contrail-compute-firewall, compute-configure_default_route]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -618,15 +644,3 @@
     puppet_manifest: puppet/manifests/contrail-compute-aggregate.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
-
-# Reboot compute nodes, if it need.
-- id: compute-reboot
-  type: shell
-  version: 2.0.0
-  groups: [compute]
-  required_for: [deploy_end]
-  requires: [top-role-compute, enable_nova_compute_service, openstack-network-end, contrail-compute-aggregate, contrail-compute-vrouter]
-  parameters:
-    cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
-    timeout: 720
-
