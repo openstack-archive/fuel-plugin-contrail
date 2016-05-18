@@ -35,6 +35,8 @@ sudo /sbin/iptables -F
 sudo /sbin/iptables -t nat -F
 sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
+# Init and update submodule
+git submodule update --init --recursive --remote
 
 ShowHelp() {
 cat << EOF
