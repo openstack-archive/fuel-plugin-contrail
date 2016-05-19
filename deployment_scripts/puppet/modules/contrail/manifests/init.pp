@@ -98,8 +98,6 @@ class contrail {
   $compute_sriov_enabled = $global_sriov_enabled and 'sriov' in hiera_array('roles')
   $sriov_physnet         = $settings['sriov_physnet']
   $sriov_hash            = get_sriov_devices()
-  $passthrough_whitelist = inline_template(
-    '<%= "[" + scope.lookupvar("::contrail::sriov_hash").map{ |dev, _| "{\"devname\":\"#{dev}\", \"physical_network\":\"#{sriov_physnet}\"}" }.join(", ") + "]" %>')
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
