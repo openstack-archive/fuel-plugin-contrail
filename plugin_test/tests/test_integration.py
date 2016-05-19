@@ -210,7 +210,8 @@ class IntegrationTests(TestBasic):
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
-                test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],)
+                test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],
+                timeout=60*60)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_jumbo"])
