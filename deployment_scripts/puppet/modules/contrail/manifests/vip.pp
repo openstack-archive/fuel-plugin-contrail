@@ -47,7 +47,7 @@ class contrail::vip {
     balancermember_port    => 9100,
     server_names           => $contrail::contrail_config_ips,
     ipaddresses            => $contrail::contrail_config_ips,
-    public                 => true,
+    public                 => $contrail::contrail_api_public,
     internal               => true,
     public_ssl             => $contrail::public_ssl,
     haproxy_config_options => { 'option'  => 'nolinger',
