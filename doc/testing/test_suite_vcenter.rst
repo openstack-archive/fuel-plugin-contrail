@@ -3,19 +3,6 @@ VMWare tests
 ============
 
 
-Pre-condition
-------------------------
-   * Installed `Fuel 7.0
-     <https://docs.mirantis.com/openstack/fuel/fuel-7.0/quickstart-guide.html#introduction>`_
-   * Installed contrail plugin :doc:`/install_guide`
-   * Environment must be created with "vCenter" support for compute virtualization and
-     Contrail for networking
-   * vSphere environments must be already preconfigured
-   * ESXi hosts must have connectivity with Fuel Private network
-   * A DHCP server capable of address reservation must be present in Private network
-     to assign IP addresses to ContrailVMs
-
-
 BVT Contrail VMWare test
 ------------------------
 
@@ -55,8 +42,7 @@ Steps
     4. Configure interfaces on nodes.
     5. Configure network settings.
     6. Configure Openstack settings:
-       * Set VMWare vCenter/ESXi datastore for images (Glance)VMWare
-         vCenter/ESXi datastore for images (Glance).
+       * Set VMWare vCenter/ESXi datastore for images (Glance)VMWare vCenter/ESXi datastore for images (Glance).
     7. Configure VMware vCenter Settings:
        Add and assign 2 vCenter clusters to compute-vmware.
     8. Configure Contrail plugin settings.
@@ -89,7 +75,7 @@ Check deploy Contrail and VMWare with Ceph
 Complexity
 ##########
 
-smoke
+core
 
 
 Steps
@@ -147,7 +133,7 @@ Check redeployment Contrail and VMWare env after removing a controller node
 Complexity
 ##########
 
-smoke
+core
 
 
 Steps
@@ -185,7 +171,7 @@ Expected results
 Cluster should be deployed and all OSTF test cases should be passed.
 
 
-Check conection between instances in different availibility zones.
+Check conection between instances in different availibility zones
 -----------------------------------------------------------------
 
 
@@ -204,7 +190,7 @@ Check connectivity between VMs in different availability zones.
 Complexity
 ##########
 
-smoke
+core
 
 
 Steps
@@ -292,15 +278,15 @@ Steps
     9. Run OSTF tests.
     10. Create net_1: net01__subnet, 192.168.1.0/24, and attach it to the router01.
     11. Create security groups:
-        SG1
-        SG2
+        * SG1
+        * SG2
     12. Delete all defaults egress rules of SG1 and SG2.
     13. Add icmp rule to SG1:
-       Ingress rule with ip protocol 'icmp ', port range any, SG group 'SG1'
-       Egress rule with ip protocol 'icmp ', port range any, SG group 'SG1'
+        * Ingress rule with ip protocol 'icmp ', port range any, SG group 'SG1'
+        * Egress rule with ip protocol 'icmp ', port range any, SG group 'SG1'
     14. Add icmp rule to SG2:
-       Ingress rule with ip protocol 'icmp ', port range any, SG group 'SG2'
-       Egress rule with ip protocol 'icmp ', port range any, SG group 'SG2'
+        * Ingress rule with ip protocol 'icmp ', port range any, SG group 'SG2'
+        * Egress rule with ip protocol 'icmp ', port range any, SG group 'SG2'
     15. Launch few instance of vcenter az with SG1 in net1(on each ESXI).
     16. Launch few instance of vcenter az with SG2 in net1(on each ESXI).
     17. Verify that icmp ping is enabled between VMs from SG1.
@@ -308,15 +294,14 @@ Steps
     19. Verify that icmp ping is not enabled between instances from SG1 and VMs from SG2.
 
 
-Expected result
-###############
+Expected results
+################
 
-Network traffic is allowed/prohibited to instances according security groups
-rules.
+Network traffic is allowed/prohibited to instances according security groups rules.
 
 
-Check creation instance of vcenter az in the one batch.
---------------------------------------------------------
+Check creation instance of vcenter az in the one batch
+------------------------------------------------------
 
 
 ID
@@ -364,13 +349,14 @@ Steps
     12. Delete all instances from horizon simultaneously.
 
 
-Expected result
-###############
+Expected results
+################
 
 All instances should be created and deleted without any error.
 
-Create volumes and attach them to appropriate instances.
-----------------------------------------------------------------------------------------
+
+Create volumes and attach them to appropriate instances
+-------------------------------------------------------
 
 
 ID
@@ -418,10 +404,11 @@ Steps
     12. Attach each volume to its instance.
 
 
-Expected result
-###############
+Expected results
+################
 
 Each volume should be attached to its instance.
+
 
 Check connectivity via external Contrail network with floating IP
 -----------------------------------------------------------------
