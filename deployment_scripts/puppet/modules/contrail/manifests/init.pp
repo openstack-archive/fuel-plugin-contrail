@@ -112,6 +112,7 @@ class contrail {
 
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
+  $dpdk_on_vf           = $settings['dpdk_on_vf']
   $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
   # Package override
