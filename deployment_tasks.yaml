@@ -441,7 +441,7 @@
 - id: controller-hiera-post
   type: puppet
   version: 2.0.0
-  role: [primary-controller,controller]
+  groups: [primary-controller,controller]
   required_for: [deploy_end]
   requires: [openstack-network-end]
   parameters:
@@ -456,7 +456,7 @@
 - id: openstack-controller-provision
   type: puppet
   version: 2.0.0
-  role: [primary-controller]
+  groups: [primary-controller]
   required_for: [deploy_end]
   requires: [controller-hiera-post]
   cross-depends:
