@@ -1,4 +1,4 @@
-#    Copyright 2016 Mirantis, Inc.
+#    Copyright 2015 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,6 +12,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/common-repo.pp')
+class contrail::compute::hiera {
 
-class { 'contrail::common_repo': }
+  # prevent to install and run open vSwitch on compute nodes
+  file { '/etc/hiera/plugins/contrail.yaml':
+    ensure  => file,
+    content => 'use_ovs: false',
+  }
+}
