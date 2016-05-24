@@ -23,8 +23,8 @@ class contrail::compute::nova {
     value   => $cgroup_acl_string,
   } ~>
   service { $contrail::libvirt_name :
-    ensure   => 'running',
-    enable   => true
+    ensure => 'running',
+    enable => true
   }
 
   nova_config {
