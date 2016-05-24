@@ -14,18 +14,4 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
-apt::pin { 'contrail-main':
-  explanation => 'Set priority for common contrail packages',
-  priority    => 200,
-  label       => 'contrail',
-}
-
-# Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
-exec {'no_network_reconfigure':
-  command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
-  onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
-}
-exec {'no_openstack_network_reconfigure':
-  command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
-  onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
-}
+class { 'contrail::compute::compute_repo':}

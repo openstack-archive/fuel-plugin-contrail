@@ -51,15 +51,15 @@ class contrail::controller::aggregate {
 
 # Create flavor for huge pages
     exec { 'create-m1.small.hpgs-flavor' :
-      command   => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 20 2"',
-      unless    => 'bash -c "nova flavor-list | grep -q m1.small.hpgs"',
+      command => 'bash -c "nova flavor-create --is-public true m1.small.hpgs auto 512 20 2"',
+      unless  => 'bash -c "nova flavor-list | grep -q m1.small.hpgs"',
     } ->
     exec { 'create-m1.small.hpgs-mempage' :
       command   => 'bash -c "nova flavor-key m1.small.hpgs set hw:mem_page_size=large"',
     } ->
     exec { 'create-m1.small.hpgs-aggregate' :
-      command   => 'bash -c "nova flavor-key m1.small.hpgs set aggregate_instance_extra_specs:hpgs=true"',
-      require   => Exec['aggr-set-metadata'],
+      command => 'bash -c "nova flavor-key m1.small.hpgs set aggregate_instance_extra_specs:hpgs=true"',
+      require => Exec['aggr-set-metadata'],
     }
   }
 }
