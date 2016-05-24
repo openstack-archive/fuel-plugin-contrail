@@ -16,14 +16,14 @@ class contrail::controller::scheduler {
 
   if $contrail::global_dpdk_enabled {
     ini_subsetting {'add_aggregateinstanceextraspecsfilter':
-      ensure             => present,
-      section            => 'DEFAULT',
-      key_val_separator  => '=',
-      path               => '/etc/nova/nova.conf',
-      setting            => 'scheduler_default_filters',
-      subsetting         => 'AggregateInstanceExtraSpecsFilter',
+      ensure               => present,
+      section              => 'DEFAULT',
+      key_val_separator    => '=',
+      path                 => '/etc/nova/nova.conf',
+      setting              => 'scheduler_default_filters',
+      subsetting           => 'AggregateInstanceExtraSpecsFilter',
       subsetting_separator => ',',
-      notify             => Service['nova-scheduler'],
+      notify               => Service['nova-scheduler'],
     }
   }
 
