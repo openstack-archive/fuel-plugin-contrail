@@ -1,4 +1,4 @@
-#    Copyright 2016 Mirantis, Inc.
+#    Copyright 2015 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,6 +12,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/common-repo.pp')
+class contrail::controller_hiera_pre {
 
-class { 'contrail::common_repo': }
+  # Pre-deploy
+  # Empty predefined_networks to skip OSTF nets creation
+  # in openstack-network-controller.pp
+  file { '/etc/hiera/plugins/contrail.yaml':
+    ensure  => file,
+    content => 'neutron_config: { predefined_networks: [] }',
+  }
+}

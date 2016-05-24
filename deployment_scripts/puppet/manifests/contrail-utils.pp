@@ -16,37 +16,4 @@ notice('MODULAR: contrail/contrail-utils.pp')
 
 include contrail
 
-sysctl::value {
-  'net.ipv4.conf.all.rp_filter':  value => '2';
-  'net.ipv4.conf.default.rp_filter':  value => '2';
-}
-
-case $operatingsystem {
-  Ubuntu: {
-    file { '/etc/apt/preferences.d/contrail-pin-100':
-      ensure => file,
-      source => 'puppet:///modules/contrail/contrail-pin-100',
-    } ->
-    exec { 'reinstall-tzdata':
-      path    => '/bin:/sbin:/usr/bin:/usr/sbin',
-      command => '/usr/bin/apt-get install -y --force-yes tzdata',
-      before  => Class['contrail::package'],
-    }
-    $pkgs = ['python-crypto','python-netaddr','python-paramiko',
-      'ifenslave-2.6','patch','openjdk-7-jre-headless',
-      'python-contrail','contrail-setup','contrail-utils','contrail-nodemgr','supervisor']
-  }
-
-  CentOS: {
-    $pkgs     = ['python-netaddr','python-paramiko','patch',
-      'java-1.7.0-openjdk','contrail-fabric-utils','contrail-setup']
-    $pip_pkgs = ['Fabric-1.7.5']
-  }
-
-  default: {}
-}
-
-class { 'contrail::package':
-  install     => $pkgs,
-  pip_install => $pip_pkgs,
-}
+class { 'contrail::contrail_utils': }

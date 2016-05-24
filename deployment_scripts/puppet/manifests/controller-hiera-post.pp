@@ -16,9 +16,4 @@ notice('MODULAR: contrail/controller-hiera-post.pp')
 
 include contrail
 
-# Post-install
-# Create predefined_networks for OSTF-nets in controller-provision.pp
-file { '/etc/hiera/plugins/contrail.yaml':
-  ensure  => file,
-  content => template('contrail/plugins.yaml.erb'),
-}
+class { 'contrail::controller_hiera_post':}

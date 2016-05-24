@@ -14,9 +14,4 @@
 
 notice('MODULAR: contrail/compute-hiera.pp')
 
-# prevent to install and run open vSwitch on compute nodes
-
-file { '/etc/hiera/plugins/contrail.yaml':
-  ensure  => file,
-  content => 'use_ovs: false',
-}
+class { 'contrail::compute_hiera': }
