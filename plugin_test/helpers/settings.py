@@ -21,9 +21,16 @@ VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH', False)
 OSFT_RUN_TIMEOUT = 45 * 60  # 45 minutes
 DEPLOY_CLUSTER_TIMEOUT = 25 * 60  # 25 minutes
 
-BAREMETAL_IMPI = {
-    'user': os.environ.get('BM_IPMI_USER'),
-    'password': os.environ.get('BM_IPMI_PASSWORD'),
-    'host': os.environ.get('BM_IPMI_HOST'),
-    'remote_ip': os.environ.get('BM_IP'),
+BAREMETAL = {
+    # Target Baremetal host
+    'ipmi_user': os.environ.get('BM_IPMI_USER'),
+    'ipmi_password': os.environ.get('BM_IPMI_PASSWORD'),
+    'ipmi_host': os.environ.get('BM_IPMI_ADDR'),
+
+    # Host where tests are running
+    'target_macs': os.environ.get('BM_TARGET_MACS'),
+    # Target ethernet interfaces in Fuel
+    # format: "pxe_interface;slave_interface"
+    'target_interfaces': os.environ.get('BM_TARGET_INTERFACES'),
+    'host_bridge_interfaces': os.environ.get('BM_HOST_BRIDGE_INTERFACES'),
 }

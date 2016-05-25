@@ -213,3 +213,12 @@ def change_contrail_api_port(obj, port):
         clatts['editable']['contrail']['metadata']['versions'][0][
             'contrail_api_public_port']['value'] == port,
         "Contrail api port is not equal {0}".format(port))
+
+
+def activate_dpdk(obj):
+    """Activate DPDK functionality"""
+    clatts = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
+    clatts['editable']['contrail']['metadata']['versions'][0]['contrail_global_dpdk']['value'] = True
+    clatts['editable']['contrail']['metadata']['versions'][0]['hugepages_amount']['value'] = 50
+    obj.fuel_web.client.update_cluster_attributes(obj.cluster_id, clatts)
+
