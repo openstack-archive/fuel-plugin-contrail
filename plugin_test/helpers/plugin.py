@@ -197,3 +197,11 @@ def show_range(obj, start_value, end_value):
     """Show several steps."""
     for i in range(start_value, end_value):
         obj.show_step(i)
+
+
+def activate_dpdk(obj):
+    """Activate DPDK functionality"""
+    clatts = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
+    clatts['editable']['contrail']['contrail_global_dpdk']['value'] = True
+    clatts['editable']['contrail']['hugepages_amount']['value'] = 50
+    obj.fuel_web.client.update_cluster_attributes(obj.cluster_id, clatts)
