@@ -125,7 +125,7 @@
   groups: [primary-controller, controller]
   required_for: [deploy_end]
   requires: [primary-keystone, keystone, neutron-keystone, nova-keystone]
-  cross-depends-by:
+  cross-depended-by:
     - name: contrail-db-primary
 
 ################
@@ -441,7 +441,7 @@
 - id: controller-hiera-post
   type: puppet
   version: 2.0.0
-  role: [primary-controller,controller]
+  groups: [primary-controller,controller]
   required_for: [deploy_end]
   requires: [openstack-network-end]
   parameters:
@@ -456,7 +456,7 @@
 - id: openstack-controller-provision
   type: puppet
   version: 2.0.0
-  role: [primary-controller]
+  groups: [primary-controller]
   required_for: [deploy_end]
   requires: [controller-hiera-post]
   cross-depends:
@@ -470,8 +470,9 @@
       role: self
     - name: contrail-config-all
       policy: all
-    - name: openstack-controller-provision
-      role: primary-controller
+    - name: contrail-config-primary
+      policy: all
+    - name: openstack-controller-contrail
       policy: all
   strategy:
     type: one-by-one
@@ -618,15 +619,3 @@
     puppet_manifest: puppet/manifests/contrail-compute-aggregate.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
-
-# Reboot compute nodes, if it need.
-- id: compute-reboot
-  type: shell
-  version: 2.0.0
-  groups: [compute]
-  required_for: [deploy_end]
-  requires: [top-role-compute, enable_nova_compute_service, openstack-network-end, contrail-compute-aggregate, contrail-compute-vrouter]
-  parameters:
-    cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
-    timeout: 720
-
