@@ -195,7 +195,7 @@ attributes:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
   contrail_vcenter_esxi_for_fabric:
-    value: ""
+    value: "---"
     label: "vCenter ESXi data for fabric"
     description: "vCenter ESXi data for fabric in YAML format"
     weight: 200
@@ -206,6 +206,8 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
+      - condition: "not (settings:contrail.provision_vmware.value == true)"
+        action: "hide"
   contrailvm_ntp:
     value: "10.109.3.1"
     label: "NTP server for ContrailVM"
@@ -214,4 +216,6 @@ attributes:
     type: "text"
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+      - condition: "not (settings:contrail.provision_vmware.value == true)"
         action: "hide"
