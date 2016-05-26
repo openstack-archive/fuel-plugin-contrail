@@ -136,7 +136,7 @@ class contrail {
   $contrail_private_vip = $network_metadata['vips']['contrail_priv']['ipaddr']
   $contrail_mgmt_vip    = $contrail_private_vip
 
-  $contrail_api_public  = $settings['contrail_api_public']
+  $contrail_api_public_port  = $settings['contrail_api_public_port']
 
   # Settings for RabbitMQ on contrail controllers
   $rabbit             = hiera('rabbit')
