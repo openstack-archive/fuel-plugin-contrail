@@ -40,8 +40,9 @@ class contrail::compute::nova {
     }
   }
   if $contrail::compute_sriov_enabled {
+    $pci_wl = generate_passthrough_whitelist($contrail::sriov_physnet)
     nova_config {
-      'DEFAULT/pci_passthrough_whitelist':       value => $contrail::passthrough_whitelist;
+      'DEFAULT/pci_passthrough_whitelist':       value => $pci_wl;
     }
   }
   Nova_config <||> ~>
