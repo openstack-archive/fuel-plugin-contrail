@@ -108,6 +108,15 @@ attributes:
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
         action: "hide"
+  dpdk_on_vf:
+    value: false
+    label: "DPDK on VF"
+    description: "Configure DPDK vrouter use VF network adapter"
+    weight: 160
+    type: "checkbox"
+    restrictions:
+      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+        action: "hide"
   contrail_global_sriov:
     value: false
     label: "Enable SRIOV feature for this environment."
@@ -129,4 +138,3 @@ attributes:
     restrictions:
       - action: hide
         condition: not (settings:contrail.contrail_global_sriov.value == true)
-
