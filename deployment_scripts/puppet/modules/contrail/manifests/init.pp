@@ -121,7 +121,7 @@ class contrail {
   $patch_nova               = pick($settings['patch_nova'], false)
   $install_contrail_qemu_lv = pick($settings['install_contrail_qemu_lv'], false )
 
-  if $install_contrail_qemu_lv and $global_dpdk_enabled {
+  if $install_contrail_qemu_lv and $global_dpdk_enabled and $compute_dpdk_enabled {
     $libvirt_name = 'libvirt-bin'
   } else {
     $libvirt_name = 'libvirtd'
