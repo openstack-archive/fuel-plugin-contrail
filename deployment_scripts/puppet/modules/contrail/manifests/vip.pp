@@ -28,7 +28,7 @@ class contrail::vip {
   }
 
   openstack::ha::haproxy_service { 'contrail-analytics-api':
-    order                  => '201',
+    order                  => '200',
     listen_port            => 8081,
     balancermember_port    => 9081,
     server_names           => $contrail::contrail_config_ips,
@@ -45,13 +45,27 @@ class contrail::vip {
   }
 
   openstack::ha::haproxy_service { 'contrail-configuration-api':
-    order                  => '202',
+    order                  => '201',
     listen_port            => 8082,
     balancermember_port    => 9100,
     server_names           => $contrail::contrail_config_ips,
     ipaddresses            => $contrail::contrail_config_ips,
-    public                 => $contrail::contrail_api_public,
+    public                 => false,
     internal               => true,
+    haproxy_config_options => { 'option'  => 'nolinger',
+                                'balance' => 'roundrobin',
+                                'timeout' => ['server 3m', 'client 3m'] },
+    balancermember_options => 'check inter 2000 rise 2 fall 3',
+  }
+
+  openstack::ha::haproxy_service { 'contrail-configuration-api-public':
+    order                  => '202',
+    listen_port            => $contrail::contrail_api_public_port,
+    balancermember_port    => 9100,
+    server_names           => $contrail::contrail_config_ips,
+    ipaddresses            => $contrail::contrail_config_ips,
+    public                 => true,
+    internal               => false,
     public_ssl             => $contrail::public_ssl,
     public_ssl_path        => $contrail::public_ssl_path,
     haproxy_config_options => { 'option'  => 'nolinger',

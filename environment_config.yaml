@@ -40,12 +40,15 @@ attributes:
     regex:
       source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid target"
-  contrail_api_public:
-    value: true
-    label: "Contrail API on Public VIP"
-    description: "Toggles Contrail API endpoint for Public VIP. Enabling this option is incompatible with Murano, as it uses the same port, 8082"
+  contrail_api_public_port:
+    value: "8082"
+    label: "Listen port for Contrail API on Public VIP"
+    description: "The listen port for Contrail API endpoint for Public VIP. Default value 8082 may not be used if Murano is installed, as it uses the same port"
     weight: 62
-    type: "checkbox"
+    type: "text"
+    regex:
+      source: '^(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|5\d{4}|[0-9]\d{0,3})$'
+      error: "Invalid port"
   contrail_global_dpdk:
     value: false
     label: "Enable DPDK feature for this environment."
