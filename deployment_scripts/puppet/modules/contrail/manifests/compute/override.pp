@@ -17,15 +17,16 @@ class contrail::compute::override {
   $common_pkg  = ['iproute2', 'haproxy', 'libatm1', 'libxen-4.4']
   $libvirt_pkg = ['libvirt-bin', 'libvirt0']
   $qemu_pkg    = ['qemu','qemu-*']
-
+  $nova_pkg    = ['nova-compute', 'nova-common', 'python-nova', 'python-urllib3']
+  
   $keep_config_files = '-o Dpkg::Options::="--force-confold"'
   $force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
   $patch_path  = '/usr/lib/python2.7/dist-packages'
-
+  
   Exec {
     path => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
   }
-
+  
   apt::pin { 'contrail-override-common':
     explanation => 'Set priority for packages that need to override from contrail repository',
     priority    => 1200,
@@ -49,31 +50,23 @@ class contrail::compute::override {
     apt::source { 'dpdk-depends-repo':
       location    => 'file:/opt/contrail/contrail_install_repo_dpdk',
       repos       => './',
-      release     => '',
-      include_src => false,
-    }
-
+      release     => ' ',
+    }  
     # Patch nova packages if it set on Fuel UI
     if $contrail::patch_nova {
-      apt::pin { 'contrail-pin-nova':
-        explanation => 'Prevent patched python-nova from upgrades',
+      apt::pin { 'contrail-override-nova':
+        explanation => 'Set priority for packages that need to override from contrail repository',
         priority    => 1200,
-        label       => '1:2015.1.1-1~u14.04+mos19665',
-        packages    => 'python-nova',
+        label       => 'contrail',
+        packages    => $nova_pkg,
       } ->
-      file { "${patch_path}/nova-dpdk-vrouter.patch":
-        ensure  => present,
-        mode    => '0644',
-        source  => 'puppet:///modules/contrail/nova-dpdk-vrouter.patch',
-      }->
-      exec { 'patch-python-nova':
-        command => 'patch -p1 < nova-dpdk-vrouter.patch && touch python-nova-patch-DONE',
-        cwd     => $patch_path,
-        creates => "${patch_path}/python-nova-patch-DONE",
+      #TODO rewrite using package
+      exec { 'override-nova':
+        command => "apt-get install --yes --force-yes ${keep_config_files} ${force_overwrite} nova-compute",
+        unless  => 'dpkg -l | grep nova-compute | grep contrail',
       }
     }
 
-    # Override libvirt and qemu packages if it set on Fuel UI
     if $contrail::install_contrail_qemu_lv {
       # For qemu you don't need additional pinning, only dpdk repository
       apt::pin { 'contrail-pin-qemu':
@@ -84,7 +77,7 @@ class contrail::compute::override {
       } ->
       exec {'override-qemu':
         command => "apt-get install --yes ${keep_config_files} ${force_overwrite} \
-                    qemu-kvm qemu-system-x86 qemu-system-common",
+        qemu-kvm qemu-system-x86 qemu-system-common",
         unless  => 'dpkg -l | grep qemu-system-common | grep contrail',
         require => Apt::Source['dpdk-depends-repo'],
       } ~>
@@ -98,10 +91,18 @@ class contrail::compute::override {
         priority    => 1200,
         label       => 'dpdk-depends-packages',
       } ->
+      # Install options are supported starting from puppet 3.5.1
+      #    package { $libvirt_pkg:
+      #      ensure          => '2:1.2.12-0ubuntu7+contrail2',
+      #      install_options => [$keep_config_files, $force_overwrite],
+      #    } ->
       exec { 'override-libvirt':
-        command => "apt-get install --yes ${keep_config_files} ${force_overwrite} libvirt-bin libvirt0",
+        command => "apt-get remove --yes --force-yes ${keep_config_files} ${force_overwrite} libvirt-daemon-system",
         unless  => 'dpkg -l | grep libvirt0 | grep contrail',
         require => Apt::Source['dpdk-depends-repo'],
+      } ->
+      exec { 'install-nova':
+        command => "apt-get install --yes --force-yes ${keep_config_files} ${force_overwrite} nova-compute",
       } ->
       # With a new libvirt packages this init script must be stopped
       service { 'libvirtd':
@@ -129,5 +130,5 @@ class contrail::compute::override {
       }
     }
   }
-
 }
+
