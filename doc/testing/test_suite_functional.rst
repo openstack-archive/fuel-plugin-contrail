@@ -417,7 +417,7 @@ Steps
     4. Login as user to Openstack Horizon UI
     5. Change login and password for user
     6. Login to Openstack Horizon UI with new credentials
-    7. Login to Contrail Ui with sane credentials
+    7. Login to Contrail Ui with same credentials
 
 
 Expected results
