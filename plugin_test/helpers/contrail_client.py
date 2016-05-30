@@ -22,13 +22,14 @@ from fuelweb_test.settings import KEYSTONE_CREDS
 class ContrailClient(object):
     """Contrail utilite wrapper."""
 
-    def __init__(self, controller_node_ip, **kwargs):
+    def __init__(self, controller_node_ip, contrail_port=8082,
+                 credentials=KEYSTONE_CREDS, **kwargs):
         """Create ContrailClient object."""
-        url = "http://{0}:8082".format(controller_node_ip)
+        url = "http://{0}:{1}".format(controller_node_ip, contrail_port)
         logger.info('Initiate Nailgun client with url %s', url)
         self.keystone_url = "http://{0}:5000/v2.0".format(controller_node_ip)
         self._client = HTTPClient(url=url, keystone_url=self.keystone_url,
-                                  credentials=KEYSTONE_CREDS,
+                                  credentials=credentials,
                                   **kwargs)
         super(ContrailClient, self).__init__()
 
