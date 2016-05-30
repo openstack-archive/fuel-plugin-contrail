@@ -17,7 +17,7 @@ class contrail::compute::aggregate {
   if $contrail::compute_dpdk_enabled {
 
     $nodes_hash          = hiera('nodes')
-    $dpdk_compute_nodes  = nodes_with_roles(['dpdk'], 'fqdn')
+    $dpdk_compute_nodes  = nodes_with_roles($contrail::nodes, ['dpdk'], 'fqdn')
     $dpdk_hosts          = join($dpdk_compute_nodes, ',')
     $nova_hash           = hiera_hash('nova', {})
     $keystone_tenant     = pick($nova_hash['tenant'], 'services')
@@ -42,9 +42,8 @@ class contrail::compute::aggregate {
     }
 
     exec { 'aggr_add_host':
-      command => "bash -c \"nova aggregate-add-host hpgs-aggr ${::fqdn}\" && touch /opt/contrail/aggr_add_host-DONE",
-      creates => '/opt/contrail/aggr_add_host-DONE',
+      command => "bash -c \"nova aggregate-add-host hpgs-aggr ${::fqdn}\"",
+      unless  => "bash -c \"nova aggregate-details hpgs-aggr | grep ${::fqdn}\"",
     }
   }
 }
-
