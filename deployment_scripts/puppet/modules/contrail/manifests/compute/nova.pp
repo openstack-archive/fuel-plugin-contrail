@@ -36,7 +36,13 @@ class contrail::compute::nova {
   }
   if $contrail::compute_dpdk_enabled {
     nova_config {
+      'libvirt/virt_type':                       value => 'kvm';
       'CONTRAIL/use_userspace_vhost':            value => true;
+    }
+
+    file { '/etc/nova/nova-compute.conf':
+      ensure => present,
+      content => '',
     }
   }
   if $contrail::compute_sriov_enabled {
