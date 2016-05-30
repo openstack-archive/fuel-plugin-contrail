@@ -197,3 +197,20 @@ def show_range(obj, start_value, end_value):
     """Show several steps."""
     for i in range(start_value, end_value):
         obj.show_step(i)
+
+
+def switch_contrail_api_public(obj, value=False):
+    """Disable contrail api public.
+
+    :param value: True - contrail_api_public is enabled,
+                  False - contrail_api_public is disabled.
+    """
+    clatts = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
+    clatts['editable']['contrail']['metadata']['versions'][0][
+        'contrail_api_public']['value'] = value
+    obj.fuel_web.client.update_cluster_attributes(obj.cluster_id, clatts)
+    clatts = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
+    assert_true(
+        clatts['editable']['contrail']['metadata']['versions'][0][
+            'contrail_api_public']['value'] == value,
+        "Contrail api public not in state {0}".format(value))
