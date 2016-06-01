@@ -20,6 +20,7 @@ VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH', False)
 
 OSFT_RUN_TIMEOUT = 45 * 60  # 45 minutes
 DEPLOY_CLUSTER_TIMEOUT = 25 * 60  # 25 minutes
+CONTRAIL_PLUGIN_VERSION = os.environ.get('CONTRAIL_PLUGIN_VERSION', '4.0.0')
 
 BAREMETAL_IMPI = {
     'user': os.environ.get('BM_IPMI_USER'),

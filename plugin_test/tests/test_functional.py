@@ -633,10 +633,8 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         plugin.activate_vsrx()
 
-        plugin.activate_plugin(self)
+        plugin.activate_plugin(self, contrail_api_public_port=port)
         cluster_id = self.fuel_web.get_last_created_cluster()
-
-        plugin.change_contrail_api_port(self, port)
 
         self.fuel_web.update_nodes(
             self.cluster_id,
