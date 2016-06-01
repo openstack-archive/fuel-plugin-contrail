@@ -33,6 +33,16 @@ class contrail::controller {
   package { 'neutron-plugin-contrail': } ->
   package { 'contrail-heat': }
 
+
+#Fix for certifi CA blocking self signed certificates
+  if $public_ssl_hash {
+    file{'/usr/lib/python2.7/dist-packages/certifi/cacert.pem':
+      ensure  => 'link',
+      target  => '/etc/ssl/certs/ca-certificates.crt',
+      require => Package['python-contrail']
+    }
+  }
+
 # Nova configuration
   nova_config {
     'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
