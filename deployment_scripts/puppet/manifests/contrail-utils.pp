@@ -35,6 +35,15 @@ case $operatingsystem {
     $pkgs = ['python-crypto','python-netaddr','python-paramiko',
       'ifenslave-2.6','patch','openjdk-7-jre-headless',
       'python-contrail','contrail-setup','contrail-utils','contrail-nodemgr','supervisor']
+
+    #Fix for certifi CA blocking self signed certificates
+    if $public_ssl_hash {
+      file{'/usr/lib/python2.7/dist-packages/certifi/cacert.pem':
+        ensure  => 'link',
+        target  => '/etc/ssl/certs/ca-certificates.crt'
+        require => Package['python-contrail']
+      }
+    }
   }
 
   CentOS: {
