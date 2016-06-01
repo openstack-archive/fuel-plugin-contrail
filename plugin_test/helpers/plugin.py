@@ -24,6 +24,7 @@ from proboscis.asserts import assert_true
 from settings import VSRX_TEMPLATE_PATH
 import openstack
 
+CONTRAIL_PLUGIN_VERSION = '4.0.0'
 
 BOND_CONFIG = [
     {
@@ -95,7 +96,7 @@ def prepare_contrail_plugin(obj, slaves=None, options={}):
     openstack.assign_net_provider(obj, **options)
 
 
-def activate_plugin(obj):
+def activate_plugin(obj, **kwargs):
     """Enable plugin in contrail settings."""
     plugin_name = 'contrail'
     msg = "Plugin couldn't be enabled. Check plugin version. Test aborted"
@@ -104,19 +105,14 @@ def activate_plugin(obj):
         msg)
     logger.debug('we have contrail element')
 
-    # FIXME: uncomment next block when opencontrail v3.0 is available
-    """
-    if obj.CONTRAIL_DISTRIBUTION == 'juniper':
-        option = {'metadata/enabled': True,
-                  'contrail_distribution/value': 'juniper', }
-    else:
-        option = {'metadata/enabled': True, }
-    """
+    options = {}
+    if kwargs:
+        for option in kwargs:
+            options.update(
+                {'{0}/value'.format(option): kwargs[option]})
 
-    # FIXME: remove next line when opencontrail v3.0 is available
-    option = {'metadata/enabled': True, }
-
-    obj.fuel_web.update_plugin_data(obj.cluster_id, plugin_name, option)
+    obj.fuel_web.update_plugin_settings(
+        obj.cluster_id, plugin_name, CONTRAIL_PLUGIN_VERSION, options)
 
 
 def activate_vsrx():
@@ -197,19 +193,3 @@ def show_range(obj, start_value, end_value):
     """Show several steps."""
     for i in range(start_value, end_value):
         obj.show_step(i)
-
-
-def change_contrail_api_port(obj, port):
-    """Change port of Contrail API.
-
-    :param value: type string, port number.
-    """
-    clatts = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
-    clatts['editable']['contrail']['metadata']['versions'][0][
-        'contrail_api_public_port']['value'] = port
-    obj.fuel_web.client.update_cluster_attributes(obj.cluster_id, clatts)
-    clatts = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
-    assert_true(
-        clatts['editable']['contrail']['metadata']['versions'][0][
-            'contrail_api_public_port']['value'] == port,
-        "Contrail api port is not equal {0}".format(port))
