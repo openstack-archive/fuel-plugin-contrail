@@ -14,13 +14,23 @@ under the License.
 """
 
 import os
+import string
+import time
+
+from random import choice
 from proboscis import test
 from proboscis.asserts import assert_equal
 from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
+from fuelweb_test.helpers import os_actions
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+from fuelweb_test.settings import SERVTEST_PASSWORD
+from fuelweb_test.settings import SERVTEST_TENANT
+from fuelweb_test.settings import SERVTEST_USERNAME
+
+from helpers.contrail_client import ContrailClient
 from helpers import plugin
 from helpers import openstack
 from helpers import settings
@@ -269,11 +279,12 @@ class IntegrationTests(TestBasic):
 
         self.show_step(9)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'],
-                                   should_fail=1,
-                                   failed_test_name=['Check state of haproxy backends on controllers']
-                                   )
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=1,
+                failed_test_name=[
+                    'Check state of haproxy backends on controllers'])
 
         self.show_step(10)
         node_roles = {'controller', 'contrail-config'}
@@ -593,3 +604,106 @@ class IntegrationTests(TestBasic):
             self, conf_db, delete=True,
             is_vsrx=vsrx_setup_result,
             ostf_fail_tests=['Check that required services are running'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+          groups=["contrail_login_password"])
+    @log_snapshot_after_test
+    def contrail_login_password(self):
+        """Create a new network via Contrail.
+
+        Scenario:
+            1. Deploy cluster with Contrail.
+            2. Login as admin to Openstack Horizon UI.
+            3. Create new user.
+            4. Login as user to Openstack Horizon UI.
+            5. Change login and password for user.
+            6. Login to Openstack Horizon UI with new credentials.
+            7. Login to Contrail Ui with same credentials.
+
+        Duration: 15 min
+
+        """
+        # constants
+        max_password_lengh = 64
+        port = 18082
+
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=3)
+
+        # activate vSRX image
+        plugin.activate_vsrx()
+
+        plugin.activate_plugin(self)
+        cluster_id = self.fuel_web.get_last_created_cluster()
+
+        plugin.change_contrail_api_port(self, port)
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+                'slave-02': ['controller'],
+                'slave-03': ['compute'],
+            })
+
+        openstack.deploy_cluster(self)
+        self.fuel_web.run_ostf(
+            cluster_id=self.cluster_id, test_sets=['smoke'])
+
+        self.show_step(2)
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+        contrail_client = ContrailClient(os_ip, contrail_port=port)
+        projects = contrail_client.get_projects()
+
+        tenant = os_conn.get_tenant(SERVTEST_TENANT)
+
+        self.show_step(3)
+        chars = string.letters + string.digits + string.punctuation
+        new_password = ''.join(
+            [choice(chars) for i in range(max_password_lengh)])
+        new_username = ''.join(
+            [choice(chars) for i in range(max_password_lengh)])
+        logger.info(
+            'New username: {0}, new password: {1}'.format(
+                new_username, new_password))
+        new_user = os_conn.create_user(new_username, new_password, tenant)
+        role = [role for role in os_conn.keystone.roles.list()
+                if role.name == 'admin'].pop()
+        os_conn.keystone.roles.add_user_role(new_user.id, role.id, tenant.id)
+
+        self.show_step(4)
+        os_actions.OpenStackActions(
+            os_ip, new_username,
+            new_password,
+            SERVTEST_TENANT)
+
+        self.show_step(5)
+        new_password = ''.join(
+            [choice(chars) for i in range(max_password_lengh)])
+        new_user.manager.update_password(new_user, new_password)
+        logger.info(
+            'New username: {0}, new password: {1}'.format(
+                new_username, new_password))
+        time.sleep(30)  # need to update password for new user
+
+        self.show_step(6)
+        os_actions.OpenStackActions(
+            os_ip, new_username,
+            new_password,
+            SERVTEST_TENANT)
+        contrail = ContrailClient(
+            os_ip, contrail_port=port,
+            credentials={
+                'username': new_username,
+                'tenant_name': SERVTEST_TENANT,
+                'password': new_password})
+
+        assert_equal(
+            projects, contrail.get_projects(),
+            "Can not give info by Contrail API.")

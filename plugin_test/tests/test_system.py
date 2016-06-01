@@ -15,20 +15,23 @@ under the License.
 
 import os
 
-from proboscis import test
 from devops.helpers.helpers import tcp_ping
 from devops.helpers.helpers import wait
+
 from fuelweb_test import logger
 from fuelweb_test.helpers import os_actions
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
-from helpers.contrail_client import ContrailClient
 from fuelweb_test.settings import SERVTEST_PASSWORD
 from fuelweb_test.settings import SERVTEST_TENANT
 from fuelweb_test.settings import SERVTEST_USERNAME
+
+from proboscis import test
 from proboscis.asserts import assert_true
+
+from helpers.contrail_client import ContrailClient
 from helpers import plugin
 from helpers import openstack
 
@@ -73,6 +76,27 @@ class SystemTests(TestBasic):
                             remote, ip_from, command,
                             creds)['exit_code'] == ping_result,
                         'Ping responce is not received.')
+
+    def get_role(self, os_conn, role_name):
+        """Get role by name."""
+        role_list = os_conn.keystone.roles.list()
+        for role in role_list:
+            if role.name == role_name:
+                return role
+        return None
+
+    def add_role_to_user(self, os_conn, user_name, role_name, tenant_name):
+        """Assign role to user.
+
+        :param os_conn: type object
+        :param user_name: type string,
+        :param role_name: type string
+        :param tenant_name: type string
+        """
+        tenant_id = os_conn.get_tenant(tenant_name).id
+        user_id = os_conn.get_user(user_name).id
+        role_id = self.get_role(os_conn, role_name).id
+        os_conn.keystone.roles.add_user_role(user_id, role_id, tenant_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["systest_setup"])
@@ -120,6 +144,8 @@ class SystemTests(TestBasic):
         self.show_step(7)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id, test_sets=['smoke'])
+
+        self.env.make_snapshot("systest_setup", is_make=True)
 
     @test(depends_on=[systest_setup],
           groups=["create_new_network_via_contrail"])
@@ -268,3 +294,139 @@ class SystemTests(TestBasic):
             net_contrail = contrail_client.get_net_by_id(
                 net['id'])['virtual-network']['uuid']
             assert_true(net['id'] == net_contrail)
+
+    @test(depends_on=[systest_setup],
+          groups=["contrail_vm_connection_in_different_tenants"])
+    @log_snapshot_after_test
+    def contrail_vm_connection_in_different_tenants(self):
+        """Create a new network via Contrail.
+
+        Scenario:
+            1. Setup systest_setup.
+            2. Create 1 new tenant(project).
+            3. Create networks in the each tenants.
+            4. Launch 2 new instance in different tenants(projects).
+            5. Check ping connectivity between instances.
+            6. Verify on Contrail controller WebUI that networks are there and
+               VMs are attached to different networks.
+
+        Duration: 15 min
+
+        """
+        # constants
+        net_admin = 'net_1'
+        net_test = 'net_2'
+        cidr = '192.168.115.0'
+        self.env.revert_snapshot('systest_setup')
+        self.show_step(1)
+        cluster_id = self.fuel_web.get_last_created_cluster()
+
+        self.show_step(2)
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        contrail_client = ContrailClient(os_ip)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+
+        test_tenant = 'test'
+        os_conn.create_user_and_tenant(test_tenant, test_tenant, test_tenant)
+        self.add_role_to_user(os_conn, 'test', 'admin', 'test')
+
+        test = os_actions.OpenStackActions(
+            os_ip, test_tenant, test_tenant, test_tenant)
+        test_contrail = ContrailClient(
+            os_ip,
+            credentials={
+                'username': test_tenant,
+                'tenant_name': test_tenant,
+                'password': test_tenant})
+        tenant = test.get_tenant(test_tenant)
+        for user in os_conn.keystone.users.list():
+            if user.name != test_tenant:
+                tenant.add_user(user, self.get_role(test, 'admin'))
+
+        self.show_step(3)
+        logger.info(
+            'Create network {0} in the {1}'.format(net_admin, tenant.name))
+        network_test = test.create_network(
+            network_name=net_test,
+            tenant_id=tenant.id)['network']
+
+        subnet_test = test.create_subnet(
+            subnet_name=net_test,
+            network_id=network_test['id'],
+            cidr=cidr + '/24')
+
+        router = test.create_router('router_1', tenant=tenant)
+        test.add_router_interface(
+            router_id=router["id"],
+            subnet_id=subnet_test["id"])
+
+        network = contrail_client.create_network([
+            "default-domain", SERVTEST_TENANT, net_admin],
+            [{"attr": {
+                "ipam_subnets": [{
+                    "subnet": {
+                        "ip_prefix": '10.1.1.0',
+                        "ip_prefix_len": 24}}]},
+                    "to": ["default-domain",
+                           "default-project",
+                           "default-network-ipam"]}])['virtual-network']
+        default_router = contrail_client.get_router_by_name(SERVTEST_TENANT)
+        contrail_client.add_router_interface(network, default_router)
+
+        self.show_step(4)
+        srv_1 = os_conn.create_server_for_migration(
+            neutron=True, label=net_admin)
+        fip_1 = os_conn.assign_floating_ip(srv_1).ip
+        wait(
+            lambda: tcp_ping(fip_1, 22), timeout=60, interval=5,
+            timeout_msg="Node {0} is not accessible by SSH.".format(fip_1))
+        ip_1 = os_conn.get_nova_instance_ip(srv_1, net_name=net_admin)
+        srv_2 = test.create_server_for_migration(
+            neutron=True, label=net_test)
+        srv_3 = test.create_server_for_migration(
+            neutron=True, label=net_test)
+        ips = []
+        for srv in [srv_2, srv_3]:
+            ip = (test.get_nova_instance_ip(srv, net_name=net_test))
+            if ip_1 != ip_1:
+                ips.append(ip)
+
+        self.show_step(5)
+        ip_pair = {}
+        ip_pair[fip_1] = ips
+
+        controller = self.fuel_web.get_nailgun_primary_node(
+            self.env.d_env.nodes().slaves[1])
+        self.ping_instance_from_instance(
+            os_conn, controller.name, ip_pair, ping_result=1)
+
+        self.show_step(6)
+        logger.info('{}'.format(network))
+        net_info = contrail_client.get_net_by_id(
+            network['uuid'])['virtual-network']
+        logger.info(''.format(net_info))
+        net_interface_ids = []
+        for interface in net_info['virtual_machine_interface_back_refs']:
+            net_interface_ids.append(interface['uuid'])
+        interf_id = contrail_client.get_instance_by_id(
+            srv_1.id)['virtual-machine'][
+                'virtual_machine_interface_back_refs'][0]['uuid']
+        assert_true(
+            interf_id in net_interface_ids,
+            '{0} is not attached to network {1}'.format(
+                srv_1.name, net_admin))
+        net_info = test_contrail.get_net_by_id(
+            network_test['id'])['virtual-network']
+        net_interface_ids = []
+        for interface in net_info['virtual_machine_interface_back_refs']:
+            net_interface_ids.append(interface['uuid'])
+        interf_id = test_contrail.get_instance_by_id(
+            srv_2.id)['virtual-machine'][
+                'virtual_machine_interface_back_refs'][0]['uuid']
+        assert_true(
+            interf_id in net_interface_ids,
+            '{0} is not attached to network {1}'.format(
+                srv_2.name, net_test))

@@ -197,3 +197,19 @@ def show_range(obj, start_value, end_value):
     """Show several steps."""
     for i in range(start_value, end_value):
         obj.show_step(i)
+
+
+def change_contrail_api_port(obj, port):
+    """Change port of Contrail API.
+
+    :param value: type string, port number.
+    """
+    clatts = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
+    clatts['editable']['contrail']['metadata']['versions'][0][
+        'contrail_api_public_port']['value'] = port
+    obj.fuel_web.client.update_cluster_attributes(obj.cluster_id, clatts)
+    clatts = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
+    assert_true(
+        clatts['editable']['contrail']['metadata']['versions'][0][
+            'contrail_api_public_port']['value'] == port,
+        "Contrail api port is not equal {0}".format(port))
