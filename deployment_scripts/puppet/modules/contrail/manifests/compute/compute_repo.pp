@@ -23,10 +23,10 @@ class contrail::compute::compute_repo {
   # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
   exec {'no_network_reconfigure':
     command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
-    onlyif  => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
+    creates => '/opt/contrail/provision-vrouter-DONE'
   }
   exec {'no_openstack_network_reconfigure':
     command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/openstack-network/openstack-network-compute.pp',
-    onlyif  => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE'
+    creates => '/opt/contrail/provision-vrouter-DONE'
   }
 }

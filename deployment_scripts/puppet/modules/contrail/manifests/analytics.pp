@@ -20,8 +20,8 @@ class contrail::analytics {
   File {
     ensure  => present,
     mode    => '0644',
-    owner   => root,
-    group   => root,
+    owner   => 'contrail',
+    group   => 'contrail',
     require => Package['contrail-openstack-analytics'],
   }
 
@@ -39,6 +39,8 @@ class contrail::analytics {
 # Analytics config files
   file { '/etc/redis/redis.conf':
     source  => 'puppet:///modules/contrail/redis.conf',
+    owner   => 'root',
+    group   => 'root',
     require => Package['redis-server'],
   }
 

@@ -34,17 +34,23 @@ class contrail::compute::vrouter {
     $install_packages = ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1']
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
   }
-  file { 'create_supervisor_vrouter_override':
-    ensure  => present,
-    path    => '/etc/init/supervisor-vrouter.override',
-    content => 'manual',
-  } ->
+
+  if !is_pkg_installed('contrail-openstack-vrouter') {
+    file { 'create_supervisor_vrouter_override':
+      ensure  => present,
+      path    => '/etc/init/supervisor-vrouter.override',
+      content => 'manual',
+      before  => Class['contrail::package'],
+    }
+  }
+
   class { 'contrail::package':
     install => [$install_packages],
     remove  => [$delete_packages],
   } ->
   exec { 'remove-ovs-modules':
-    command => '/sbin/modprobe -r openvswitch'
+    command => '/sbin/modprobe -r openvswitch',
+    onlyif  => '/sbin/lsmod | grep -q openvswitch',
   } ->
   file {'/etc/contrail/agent_param':
     ensure  => present,
@@ -60,9 +66,9 @@ class contrail::compute::vrouter {
     content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
   }
   exec { 'remove_supervisor_override':
-    command  => 'rm -rf /etc/init/supervisor-vrouter.override',
-    provider => shell,
-    require  => Class[Contrail::Package],
+    command => '/bin/rm /etc/init/supervisor-vrouter.override',
+    onlyif  => '/usr/bin/test -f /etc/init/supervisor-vrouter.override',
+    require => Class['Contrail::Package'],
   } ->
   service {'supervisor-vrouter':
     ensure    => running,

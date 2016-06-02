@@ -17,6 +17,6 @@ class contrail::compute::hiera {
   # prevent to install and run open vSwitch on compute nodes
   file { '/etc/hiera/plugins/contrail.yaml':
     ensure  => file,
-    content => 'use_ovs: false',
+    content => "---\nuse_ovs: false\n",
   }
 }
