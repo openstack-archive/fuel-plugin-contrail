@@ -103,6 +103,10 @@ def update_deploy_check(obj, nodes, delete=False, is_vsrx=True,
     :param obj: Test case object
     :param nodes:type dictionary, dictionary of nodes
     :param delete: type boolean, True if node should be deleted
+    :param is_vsrx: type booleam, doesn't run tests if vsrx is not set
+    :param ostf_timeout: timeout for tests
+    :param ostf_suites: test suites to run
+    :param ostf_fail_tests: tests which should fails
     """
     # Cluster configuration
     obj.fuel_web.update_nodes(obj.cluster_id,
