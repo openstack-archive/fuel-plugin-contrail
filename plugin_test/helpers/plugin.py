@@ -193,3 +193,12 @@ def show_range(obj, start_value, end_value):
     """Show several steps."""
     for i in range(start_value, end_value):
         obj.show_step(i)
+
+
+def activate_dpdk(obj):
+    """Activate DPDK functionality."""
+    opts = {
+        'contrail_global_dpdk': True,
+        'hugepages_amount': '50',
+    }
+    activate_plugin(obj, **opts)
