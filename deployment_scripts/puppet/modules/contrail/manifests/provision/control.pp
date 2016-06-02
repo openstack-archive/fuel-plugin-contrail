@@ -37,7 +37,20 @@ class contrail::provision::control {
 then exit 1; fi",
     tries     => 10,
     try_sleep => 10,
-  } ->
+  }
+
+  if $contrail::node_role == 'primary-contrail-control' {
+    exec { 'prov_control_asn':
+      command => "python /opt/contrail/utils/provision_control.py \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--router_asn ${contrail::asnum} \
+--admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
+&& touch /opt/contrail/prov_control_asn-DONE",
+      creates => '/opt/contrail/prov_control_asn-DONE',
+      require => Exec['wait_for_api'],
+      before  => Exec['prov_control_bgp'],
+    }
+  }
 
   exec { 'prov_control_bgp':
     command => "python /opt/contrail/utils/provision_control.py \
@@ -46,6 +59,7 @@ then exit 1; fi",
 --admin_user neutron --admin_tenant_name services --admin_password ${contrail::service_token} \
 && touch /opt/contrail/prov_control_bgp-DONE",
     creates => '/opt/contrail/prov_control_bgp-DONE',
+    require  => Exec['wait_for_api'],
   }
 
   if $contrail::node_role == 'primary-contrail-control' {
