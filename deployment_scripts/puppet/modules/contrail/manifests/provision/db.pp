@@ -19,19 +19,22 @@ class contrail::provision::db {
     path     => '/usr/bin:/bin:/sbin',
   }
 
-# VNC config for provision scripts
-  file { '/etc/contrail/vnc_api_lib.ini':
-    content => template('contrail/vnc_api_lib.ini.erb')
+  # VNC config for provision scripts
+  if !defined(File['/etc/contrail/vnc_api_lib.ini']) {
+    file { '/etc/contrail/vnc_api_lib.ini':
+      content => template('contrail/vnc_api_lib.ini.erb')
+    }
   }
 
-  notify {'Waiting for contrail API':} ->
-
-  exec {'wait_for_api':
-    command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
-then exit 1; fi",
-    tries     => 10,
-    try_sleep => 10,
-  } ->
+  if !defined(Exec['wait_for_api']) {
+    exec {'wait_for_api':
+      command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
+      then exit 1; fi",
+      tries     => 10,
+      try_sleep => 10,
+      notify    => Exec['prov_database_node'],
+    }
+  }
 
   exec { 'prov_database_node':
     command => "python /opt/contrail/utils/provision_database_node.py \
@@ -41,6 +44,4 @@ then exit 1; fi",
 && touch /opt/contrail/prov_database_node-DONE",
     creates => '/opt/contrail/prov_database_node-DONE',
   }
-
 }
-

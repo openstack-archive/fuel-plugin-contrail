@@ -31,8 +31,10 @@ class contrail::database {
   package { 'contrail-openstack-database': }
 
 # VNC API
-  file { '/etc/contrail/vnc_api_lib.ini':
-    content => template('contrail/vnc_api_lib.ini.erb')
+  if !defined(File['/etc/contrail/vnc_api_lib.ini']) {
+    file { '/etc/contrail/vnc_api_lib.ini':
+      content => template('contrail/vnc_api_lib.ini.erb'),
+    }
   }
 
 # Zookeeper
