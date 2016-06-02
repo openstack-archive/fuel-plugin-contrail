@@ -21,24 +21,25 @@ class contrail::utils {
 
   case $::operatingsystem {
     Ubuntu: {
-      file { '/etc/apt/preferences.d/contrail-pin-100':
-        ensure => file,
-        source => 'puppet:///modules/contrail/contrail-pin-100',
-      } ->
-      exec { 'reinstall-tzdata':
-        command => '/usr/bin/apt-get install -y --force-yes tzdata',
-        before  => Class['contrail::package'],
+      apt::pin { 'contrail-pin-100':
+        order    => '100',
+        packages => '*',
+        priority => '1200',
+        label    => 'contrail',
       }
       $pkgs = [
-        'python-crypto', 'python-netaddr', 'python-paramiko', 'ifenslave-2.6',
-        'patch', 'openjdk-7-jre-headless', 'python-contrail', 'contrail-setup',
-        'contrail-utils', 'contrail-nodemgr', 'supervisor'
+        'contrail-nodemgr', 'contrail-setup', 'contrail-utils', 'ifenslave-2.6',
+        'openjdk-7-jre-headless', 'patch', 'python-contrail', 'python-crypto',
+        'python-netaddr', 'python-paramiko', 'supervisor', 'tzdata'
       ]
+      Package<| (title == 'tzdata') |> {
+        require => Apt::Pin['contrail-pin-100'],
+      } -> Package<| (title != 'tzdata') |>
     }
     CentOS: {
       $pkgs     = [
-        'python-netaddr', 'python-paramiko', 'patch', 'java-1.7.0-openjdk',
-        'contrail-fabric-utils', 'contrail-setup'
+        'contrail-fabric-utils', 'contrail-setup', 'java-1.7.0-openjdk',
+        'patch', 'python-netaddr', 'python-paramiko'
       ]
       $pip_pkgs = ['Fabric-1.7.5']
     }

@@ -13,9 +13,9 @@
 #    under the License.
 
 class contrail::compute::network {
-  $address = $contrail::address
-  $ifname = $contrail::phys_dev
-  $netmask = $contrail::netmask_short
+  $address    = $contrail::address
+  $ifname     = $contrail::phys_dev
+  $netmask    = $contrail::netmask_short
   $default_gw = undef
 
   $br_file = $::operatingsystem ? {
@@ -25,19 +25,22 @@ class contrail::compute::network {
 
   Exec {
     provider => 'shell',
-    path => '/usr/bin:/bin:/sbin',
+    path     => '/usr/bin:/bin:/sbin',
   }
 
   file { $br_file: ensure => absent } ->
+
   # Remove interface from the bridge
   exec {"remove_${ifname}_mesh":
     command => "brctl delif br-mesh ${ifname}",
-    returns => [0,1] # Idempotent
+    onlyif  => "brctl show br-mesh | grep -q ${ifname}",
   } ->
+
   exec {'flush_addr_br_mesh':
     command => 'ip addr flush dev br-mesh',
-    returns => [0,1] # Idempotent
+    onlyif  => 'ip addr show dev br-mesh | grep -q inet',
   }
+
   case $::operatingsystem {
     'Ubuntu': {
       file {'/etc/network/interfaces.d/ifcfg-vhost0':
@@ -57,4 +60,3 @@ class contrail::compute::network {
     default: {}
   }
 }
-
