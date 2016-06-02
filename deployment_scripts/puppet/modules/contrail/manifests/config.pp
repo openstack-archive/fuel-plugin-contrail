@@ -37,7 +37,11 @@ class contrail::config {
   }
 
 # Packages
-  package { 'openjdk-7-jre-headless': }->
+  if !defined(Package['openjdk-7-jre-headless']) {
+    package { 'openjdk-7-jre-headless':
+      notify => Package['ifmap-server'],
+    }
+  }
   package { 'ifmap-server': }->
   package { 'contrail-config': }
   package { 'contrail-openstack-config': }->
@@ -77,8 +81,10 @@ class contrail::config {
     content => template('contrail/basicauthusers.properties.erb'),
   }
 
-  file { '/etc/contrail/vnc_api_lib.ini':
-    content => template('contrail/vnc_api_lib.ini.erb')
+  if !defined(File['/etc/contrail/vnc_api_lib.ini']) {
+    file { '/etc/contrail/vnc_api_lib.ini':
+      content => template('contrail/vnc_api_lib.ini.erb')
+    }
   }
 
   file { '/etc/contrail/contrail-api.conf':
