@@ -19,14 +19,15 @@ class contrail::provision::config {
     path     => '/usr/bin:/bin:/sbin',
   }
 
-  notify {'Waiting for contrail API':} ->
-
-  exec {'wait_for_api':
-    command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
+  if !defined(Exec['wait_for_api']) {
+    exec {'wait_for_api':
+      command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
 then exit 1; fi",
-    tries     => 10,
-    try_sleep => 10,
-  } ->
+      tries     => 10,
+      try_sleep => 10,
+      notify    => Exec['prov_config_node'],
+    }
+  }
 
   exec { 'prov_config_node':
     command => "python /opt/contrail/utils/provision_config_node.py \

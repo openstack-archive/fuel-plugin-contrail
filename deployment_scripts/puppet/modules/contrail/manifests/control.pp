@@ -40,8 +40,10 @@ class contrail::control {
   package { 'contrail-openstack-control': }
 
 # Contrail control config files
-  file { '/etc/contrail/vnc_api_lib.ini':
-    content => template('contrail/vnc_api_lib.ini.erb')
+  if !defined(File['/etc/contrail/vnc_api_lib.ini']) {
+    file { '/etc/contrail/vnc_api_lib.ini':
+      content => template('contrail/vnc_api_lib.ini.erb')
+    }
   }
 
   file { '/etc/contrail/contrail-control.conf':

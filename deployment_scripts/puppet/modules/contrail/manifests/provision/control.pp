@@ -30,13 +30,13 @@ class contrail::provision::control {
     }
   }
 
-  notify {'Waiting for contrail API':} ->
-
-  exec {'wait_for_api':
-    command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
+  if !defined(Exec['wait_for_api']) {
+    exec {'wait_for_api':
+      command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
 then exit 1; fi",
-    tries     => 10,
-    try_sleep => 10,
+      tries     => 10,
+      try_sleep => 10,
+    }
   }
 
   if $contrail::node_role == 'primary-contrail-control' {
@@ -59,7 +59,7 @@ then exit 1; fi",
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_control_bgp-DONE",
     creates => '/opt/contrail/prov_control_bgp-DONE',
-    require  => Exec['wait_for_api'],
+    require => Exec['wait_for_api'],
   }
 
   if roles_include('primary-contrail-control') {
@@ -67,5 +67,4 @@ then exit 1; fi",
       require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
     }
   }
-
 }
