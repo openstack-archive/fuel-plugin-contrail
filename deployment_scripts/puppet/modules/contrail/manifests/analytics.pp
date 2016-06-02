@@ -70,6 +70,15 @@ class contrail::analytics {
     content => template('contrail/contrail-topology.conf.erb'),
   }
 
+  ini_setting { 'analytics-fdlimit':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_analytics.conf',
+    section => 'supervisord',
+    setting => 'minfds',
+    value   => '65535',
+    require => Package['contrail-analytics'],
+  }
+
 # Services
   service { 'redis-server':
     ensure    => running,
@@ -82,7 +91,8 @@ class contrail::analytics {
     ensure    => $contrail::service_ensure,
     enable    => true,
     require   => [Package['contrail-openstack-analytics'],
-                    Service['redis-server']],
+                    Service['redis-server'],
+                    Ini_setting['analytics-fdlimit']],
     subscribe => [File['/etc/contrail/contrail-analytics-api.conf'],
                     File['/etc/contrail/contrail-collector.conf'],
                     File['/etc/contrail/contrail-query-engine.conf'],
