@@ -22,9 +22,20 @@ OSFT_RUN_TIMEOUT = 45 * 60  # 45 minutes
 DEPLOY_CLUSTER_TIMEOUT = 25 * 60  # 25 minutes
 CONTRAIL_PLUGIN_VERSION = os.environ.get('CONTRAIL_PLUGIN_VERSION', '4.0.0')
 
-BAREMETAL_IMPI = {
-    'user': os.environ.get('BM_IPMI_USER'),
-    'password': os.environ.get('BM_IPMI_PASSWORD'),
-    'host': os.environ.get('BM_IPMI_HOST'),
-    'remote_ip': os.environ.get('BM_IP'),
+BAREMETAL = {
+    # Target Baremetal host
+    'ipmi_user': os.environ.get('BM_IPMI_USER'),
+    'ipmi_password': os.environ.get('BM_IPMI_PASSWORD'),
+    'ipmi_host': os.environ.get('BM_IPMI_ADDR'),
+
+    # Host where tests are running
+    # format: "mac1;mac2"
+    'target_macs': os.environ.get('BM_TARGET_MACS'),
+    # Target ethernet interfaces in Fuel
+    # format: "pxe_interface;slave_interface"
+    # i.e.: "eth1;eth2"
+    'target_interfaces': os.environ.get('BM_TARGET_INTERFACES'),
+    # format: "interface:subnet;interface:subnet"
+    # i.e.: "eth1:127.0.0.1/24;eth2:192.168.0.1/24"
+    'host_bridge_interfaces': os.environ.get('BM_HOST_BRIDGE_INTERFACES'),
 }

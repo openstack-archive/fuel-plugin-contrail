@@ -193,3 +193,19 @@ def show_range(obj, start_value, end_value):
     """Show several steps."""
     for i in range(start_value, end_value):
         obj.show_step(i)
+
+
+def activate_dpdk(obj):
+    """Activate DPDK functionality."""
+    clatr = obj.fuel_web.client.get_cluster_attributes(obj.cluster_id)
+    netatr = clatr['editable']['contrail']['metadata']['versions'][0]
+
+    # Enable DPDK and setup hugepages
+    params = {
+        'contrail_global_dpdk': {'value': True},
+        'hugepages_amount': {'value': 50}
+    }
+    for param, data in params.items():
+        netatr[param].update(data)
+
+    obj.fuel_web.client.update_cluster_attributes(obj.cluster_id, clatr)

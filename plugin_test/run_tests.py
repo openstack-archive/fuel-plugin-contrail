@@ -47,6 +47,7 @@ def import_tests():
     from tests import test_network_templates
     from tests import test_failover
     from tests import test_system
+    from tests import test_dpdk
 
 
 def run_tests():
