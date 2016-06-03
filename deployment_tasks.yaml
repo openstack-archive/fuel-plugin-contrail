@@ -482,3 +482,22 @@
     timeout: 3600
     cwd: /
 
+- id: sahara
+  type: skipped
+
+- id: sahara-contrail
+  type: puppet
+  version: 2.0.0
+  role: [primary-controller, controller]
+  condition: "settings:additional_components.sahara.value == true"
+  required_for: [post_deployment_end]
+  requires: [openstack-controller-provision]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/sahara/sahara.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+  test_pre:
+    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/sahara/sahara_pre.rb
+  test_post:
+    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/sahara/sahara_post.rb
+
