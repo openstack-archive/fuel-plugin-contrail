@@ -25,6 +25,18 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
       $dpdk_dev_mac = $dev_mac
     }
 
+    $raw_phys_dev = regsubst($::contrail::phys_dev, '\..*' , '')
+    # in case of bonds, MAC address should be set permanently, because slave interfaces
+    # may start in random order during the boot process
+    if ( 'bond' in $raw_phys_dev) {
+      file_line { 'permanent_mac':
+        ensure => present,
+        line => "hwaddress ${dev_mac}",
+        path => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
+        after => "iface ${raw_phys_dev} inet manual",
+      }
+    }
+
     $install_packages = ['contrail-openstack-vrouter','contrail-vrouter-dpdk-init','iproute2','haproxy','libatm1']
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
     file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
