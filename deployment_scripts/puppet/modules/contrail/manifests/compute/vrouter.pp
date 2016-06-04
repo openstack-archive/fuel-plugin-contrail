@@ -13,7 +13,10 @@
 #    under the License.
 
 class contrail::compute::vrouter {
-  $dev_mac = getvar("::macaddress_${contrail::phys_dev}")
+
+# facter uses underscore instead of dot as a separator for interface name with vlan
+$phys_dev_facter = regsubst("$phys_dev", '\.' , '_')
+$dev_mac         = getvar("::macaddress_${phys_dev_facter}")
 
   if $contrail::compute_dpdk_enabled {
     if empty($dev_mac) {
