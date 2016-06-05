@@ -44,7 +44,7 @@ then exit 1; fi",
       command => "python /opt/contrail/utils/provision_control.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
 --router_asn ${contrail::asnum} \
---admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
+--admin_user neutron --admin_tenant_name services --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_control_asn-DONE",
       creates => '/opt/contrail/prov_control_asn-DONE',
       require => Exec['wait_for_api'],
