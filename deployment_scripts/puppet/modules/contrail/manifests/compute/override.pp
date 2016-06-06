@@ -14,19 +14,20 @@
 
 class contrail::compute::override {
 
+
   $common_pkg  = ['iproute2', 'haproxy', 'libatm1', 'libxen-4.4']
   $libvirt_pkg = ['libvirt-bin', 'libvirt0']
   $qemu_pkg    = ['qemu','qemu-*']
   $nova_pkg    = ['nova-compute', 'nova-common', 'python-nova', 'python-urllib3']
-  
+
   $keep_config_files = '-o Dpkg::Options::="--force-confold"'
   $force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
   $patch_path  = '/usr/lib/python2.7/dist-packages'
-  
+
   Exec {
     path => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
   }
-  
+
   apt::pin { 'contrail-override-common':
     explanation => 'Set priority for packages that need to override from contrail repository',
     priority    => 1200,
@@ -131,4 +132,3 @@ class contrail::compute::override {
     }
   }
 }
-

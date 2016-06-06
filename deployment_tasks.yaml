@@ -470,6 +470,17 @@
     cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
     timeout: 720
 
+# Enable vrouter on virtual function
+- id: contrail-compute-dpdk-on-vf
+  type: puppet
+  role: [compute]
+  required_for: [post_deployment_end]
+  requires: [compute-reboot, post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-dpdk-on-vf.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 - id: configure_default_route
   type: puppet
   version: 2.0.0
