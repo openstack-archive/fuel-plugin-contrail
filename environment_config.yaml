@@ -47,7 +47,7 @@ attributes:
     weight: 62
     type: "text"
     regex:
-      source: '^(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|5\d{4}|[0-9]\d{0,3})$'
+      source: '^(102[4-9]|10[3-9]\d|1[1-9]\d{2}|[2-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$'
       error: "Invalid port"
   contrail_global_dpdk:
     value: false
