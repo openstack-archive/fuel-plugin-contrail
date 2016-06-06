@@ -99,7 +99,16 @@ class contrail {
   $global_sriov_enabled  = $settings['contrail_global_sriov']
   $compute_sriov_enabled = $global_sriov_enabled and 'sriov' in hiera_array('roles')
   $sriov_physnet         = $settings['sriov_physnet']
-  $sriov_hash            = get_sriov_devices()
+
+  # DPDK settings
+  $global_dpdk_enabled  = $settings['contrail_global_dpdk']
+  $dpdk_on_vf           = $settings['dpdk_on_vf']
+  $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
+
+  # DPDK on VF settings
+  $compute_dpkd_on_vf    = $compute_dpdk_enabled and $compute_sriov_enabled and $settings['dpdk_on_vf']
+  $dpdk_vf_number        = 0
+  $sriov_hash            = get_sriov_devices($compute_dpkd_on_vf, $phys_dev)
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
@@ -109,11 +118,6 @@ class contrail {
     true    => 'stopped',
     default => 'running',
   }
-
-  # DPDK settings
-  $global_dpdk_enabled  = $settings['contrail_global_dpdk']
-  $dpdk_on_vf           = $settings['dpdk_on_vf']
-  $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
   # Package override
   $patch_nova               = pick($settings['patch_nova'], false)

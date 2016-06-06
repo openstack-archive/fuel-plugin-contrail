@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,9 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-
-require 'yaml'
-
 module Puppet::Parser::Functions
   newfunction(:get_sriov_devices, :type => :rvalue, :doc => <<-EOS
     Returns sriov capable devices
@@ -23,6 +20,7 @@ module Puppet::Parser::Functions
     EOS
   ) do |args|
 
+    dpdk_on_vf = args[0]
     bridge_interfaces = Array.new()
     bond_interfaces = Array.new()
 
@@ -47,6 +45,23 @@ module Puppet::Parser::Functions
         sriov_hash[network_interface] = Hash.new
         sriov_hash[network_interface]["totalvfs"] = IO.read(network_interface_path + "/device/sriov_totalvfs").to_i
         sriov_hash[network_interface]["numvfs"] = IO.read(network_interface_path + "/device/sriov_numvfs").to_i
+      end
+    end
+
+    if dpdk_on_vf
+      hiera_data_key = "priv_int_sriov_data"
+      private_interface = args[1]
+      private_interface_path = "/sys/class/net/" + private_interface
+      if (File.exists?(private_interface_path + "/device/sriov_totalvfs"))
+        sriov_hash[private_interface] = Hash.new
+        sriov_hash[private_interface]["totalvfs"] = IO.read(private_interface_path + "/device/sriov_totalvfs").to_i
+        sriov_hash[private_interface]["numvfs"] = IO.read(private_interface_path + "/device/sriov_numvfs").to_i
+        function_add_data_to_yaml(["/etc/hiera/plugins/contrail.yaml", hiera_data_key, sriov_hash[private_interface]])
+      elsif not function_hiera_hash([hiera_data_key, {}]).empty?
+        sriov_hiera = function_hiera_hash([hiera_data_key, {}])
+        sriov_hash[private_interface] = Hash.new
+        sriov_hash[private_interface]["totalvfs"] = sriov_hiera["totalvfs"]
+        sriov_hash[private_interface]["numvfs"] = sriov_hiera["numvfs"]
       end
     end
 
