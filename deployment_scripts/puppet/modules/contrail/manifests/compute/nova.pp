@@ -23,8 +23,8 @@ class contrail::compute::nova {
     value   => $cgroup_acl_string,
   } ~>
   service { $contrail::libvirt_name :
-    ensure   => 'running',
-    enable   => true
+    ensure => 'running',
+    enable => true
   }
 
   nova_config {
@@ -34,19 +34,26 @@ class contrail::compute::nova {
     'DEFAULT/security_group_api':                value => 'neutron';
     'DEFAULT/heal_instance_info_cache_interval': value => '0';
   }
+
   if $contrail::compute_dpdk_enabled {
     nova_config {
-      'libvirt/virt_type':                       value => 'kvm';
-      'CONTRAIL/use_userspace_vhost':            value => true;
+      'libvirt/virt_type': value => 'kvm';
+      'CONTRAIL/use_userspace_vhost': value => true;
     }
 
     file { '/etc/nova/nova-compute.conf':
-      ensure => present,
+      ensure  => present,
       content => '',
     }
   }
   if $contrail::compute_sriov_enabled {
-    $pci_wl = generate_passthrough_whitelist($contrail::sriov_physnet)
+    $pci_wl = generate_passthrough_whitelist(
+      $contrail::sriov_physnet,
+      $contrail::compute_dpkd_on_vf,
+      $contrail::phys_dev,
+      $contrail::dpdk_vf_number
+      )
+
     nova_config {
       'DEFAULT/pci_passthrough_whitelist':       value => $pci_wl;
     }

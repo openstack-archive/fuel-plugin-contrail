@@ -58,4 +58,3 @@ class contrail::compute::network {
     default: {}
   }
 }
-

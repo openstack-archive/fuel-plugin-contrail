@@ -14,11 +14,14 @@
 
 class contrail::compute::vrouter {
 
-# facter uses underscore instead of dot as a separator for interface name with vlan
-$phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-$dev_mac         = getvar("::macaddress_${phys_dev_facter}")
-
+  # facter uses underscore instead of dot as a separator for interface name with vlan
+  $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
+  $dev_mac  = getvar("::macaddress_${phys_dev_facter}")
+  $phys_dev = $contrail::phys_dev
+  $dpdk_dev_pci = $contrail::phys_dev_pci
+  
   if $contrail::compute_dpdk_enabled {
+
     if empty($dev_mac) {
       $dpdk_dev_mac = get_mac_from_vrouter()
     } else {
@@ -66,10 +69,6 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
     content => template('contrail/agent_param.erb'),
     require => Class[Contrail::Package],
   } ->
-  file {'/etc/contrail/contrail-vrouter-agent.conf':
-    ensure  => present,
-    content => template('contrail/contrail-vrouter-agent.conf.erb'),
-  } ->
   file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
     ensure  => present,
     content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
@@ -78,13 +77,47 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
     command  => 'rm -rf /etc/init/supervisor-vrouter.override',
     provider => shell,
     require  => Class[Contrail::Package],
-  } ->
-  service {'supervisor-vrouter':
-    ensure    => running,
-    enable    => true,
-    subscribe => [Class[Contrail::Package],Exec['remove-ovs-modules'],
-                  File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
-                  '/etc/contrail/contrail-vrouter-nodemgr.conf']
-                  ],
+  }
+
+  if $contrail::compute_dpkd_on_vf {
+    $sriov_in_kernel = sriov_in_kernel()
+    $cmd_arr = ['puppet apply -v -d --logdest /var/log/puppet.log',
+      '--modulepath=/etc/puppet/modules/:/etc/fuel/plugins/contrail-4.0/puppet/modules/',
+      '/etc/fuel/plugins/contrail-4.0/puppet/manifests/contrail-compute-dpdk-on-vf.pp',
+      '&& sed -i "/contrail-compute-dpdk-on-vf/d" /etc/rc.local']
+
+    if $sriov_in_kernel {
+      class { 'contrail::compute::dpdk_on_vf':
+        require => [Class[Contrail::Package],Exec['remove-ovs-modules'],
+                    File['/etc/contrail/agent_param',
+                    '/etc/contrail/contrail-vrouter-nodemgr.conf']],
+      }
+    } else {
+      file_line {'apply_dpdk_on_vf_after_reboot':
+        line => join($cmd_arr, ' '),
+        path => '/etc/rc.local',
+      }
+
+      service {'supervisor-vrouter':
+        ensure  => stopped,
+        enable  => false,
+        require => Class[Contrail::Package],
+      }
+    }
+
+  } else {
+    file {'/etc/contrail/contrail-vrouter-agent.conf':
+      ensure  => present,
+      content => template('contrail/contrail-vrouter-agent.conf.erb'),
+    } ->
+
+    service {'supervisor-vrouter':
+      ensure    => running,
+      enable    => true,
+      subscribe => [Class[Contrail::Package],Exec['remove-ovs-modules'],
+                    File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
+                    '/etc/contrail/contrail-vrouter-nodemgr.conf']
+                    ],
+    }
   }
 }

@@ -21,14 +21,34 @@ module Puppet::Parser::Functions
   ) do |args|
 
     physnet = args[0]
+    dpdk_on_vf = args[1]
     sriov_hash = function_get_sriov_devices([])
 
     list = sriov_hash.map { |dev, _|
-      #pci_address = `ethtool -i #{dev} | awk '/bus-info/ {print $2}'`.strip
       pci_address = function_get_dev_pci_addr([dev])
       Hash["address" => pci_address, "physical_network" => physnet]
-    }.to_json
+    }
 
-    return list
+    if dpdk_on_vf
+      hiera_data_key = "priv_int_vfn_wl"
+      priv_int = args[2]
+      dpdk_vf_number = args[3]
+      if (File.exists?("/sys/class/net/#{priv_int}"))
+        vfn = Dir.glob "/sys/class/net/#{priv_int}/device/virtfn*"
+        vfn_wl = vfn.map { |f|
+           if not f.end_with? "virtfn#{dpdk_vf_number}"
+             pci_address = File.readlink(f).split("/")[1]
+             Hash["address" => pci_address, "physical_network" => physnet]
+           end
+        }
+        list += vfn_wl
+        function_add_data_to_yaml(["/etc/hiera/plugins/contrail.yaml", hiera_data_key, vfn_wl])
+      elsif not function_hiera_array([hiera_data_key, []]).empty?
+        vfn_wl = function_hiera_array([hiera_data_key, []])
+        list += vfn_wl
+      end
+    end
+
+    return list.to_json
   end
 end
