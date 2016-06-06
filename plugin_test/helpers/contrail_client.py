@@ -17,6 +17,9 @@ from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import json_parse
 from fuelweb_test.helpers.http import HTTPClient
 from fuelweb_test.settings import KEYSTONE_CREDS
+from fuelweb_test.settings import PATH_TO_CERT
+from fuelweb_test.settings import VERIFY_SSL
+from fuelweb_test.settings import DISABLE_SSL
 
 
 class ContrailClient(object):
@@ -25,9 +28,17 @@ class ContrailClient(object):
     def __init__(self, controller_node_ip, contrail_port=8082,
                  credentials=KEYSTONE_CREDS, **kwargs):
         """Create ContrailClient object."""
-        url = "http://{0}:{1}".format(controller_node_ip, contrail_port)
-        logger.info('Initiate Nailgun client with url %s', url)
-        self.keystone_url = "http://{0}:5000/v2.0".format(controller_node_ip)
+        if DISABLE_SSL:
+            url = "http://{0}:{1}".format(controller_node_ip, contrail_port)
+            self.keystone_url = "http://{0}:5000/v2.0".format(
+                controller_node_ip)
+        else:
+            url = "https://{0}:{1}".format(controller_node_ip, contrail_port)
+            self.keystone_url = 'https://{0}:5000/v2.0/'.format(
+                controller_node_ip)
+            insecure = not VERIFY_SSL
+            credentials.update({'ca_cert': PATH_TO_CERT, 'insecure': insecure})
+        logger.info('Initiate Contrail client with url %s', url)
         self._client = HTTPClient(url=url, keystone_url=self.keystone_url,
                                   credentials=credentials,
                                   **kwargs)
