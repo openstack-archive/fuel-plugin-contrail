@@ -14,27 +14,16 @@
 
 class contrail::compute::vrouter {
 
-# facter uses underscore instead of dot as a separator for interface name with vlan
-$phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-$dev_mac         = getvar("::macaddress_${phys_dev_facter}")
-
+  $dev_mac = getvar("::macaddress_${contrail::phys_dev}")
+  $phys_dev = $contrail::phys_dev
+  $dpdk_dev_pci = $contrail::phys_dev_pci
+  
   if $contrail::compute_dpdk_enabled {
+
     if empty($dev_mac) {
       $dpdk_dev_mac = get_mac_from_vrouter()
     } else {
       $dpdk_dev_mac = $dev_mac
-    }
-
-    $raw_phys_dev = regsubst($::contrail::phys_dev, '\..*' , '')
-    # in case of bonds, MAC address should be set permanently, because slave interfaces
-    # may start in random order during the boot process
-    if ( 'bond' in $raw_phys_dev) {
-      file_line { 'permanent_mac':
-        ensure => present,
-        line => "hwaddress ${dev_mac}",
-        path => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
-        after => "iface ${raw_phys_dev} inet manual",
-      }
     }
 
     $install_packages = ['contrail-openstack-vrouter','contrail-vrouter-dpdk-init','iproute2','haproxy','libatm1']
@@ -78,13 +67,22 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
     command  => 'rm -rf /etc/init/supervisor-vrouter.override',
     provider => shell,
     require  => Class[Contrail::Package],
-  } ->
-  service {'supervisor-vrouter':
-    ensure    => running,
-    enable    => true,
-    subscribe => [Class[Contrail::Package],Exec['remove-ovs-modules'],
-                  File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
-                  '/etc/contrail/contrail-vrouter-nodemgr.conf']
-                  ],
+  }
+
+  if $contrail::compute_dpkd_on_vf {
+    service {'supervisor-vrouter':
+      ensure    => stopped,
+      enable    => false,
+      require   => Class[Contrail::Package],
+    }
+  } else {
+    service {'supervisor-vrouter':
+      ensure    => running,
+      enable    => true,
+      subscribe => [Class[Contrail::Package],Exec['remove-ovs-modules'],
+                    File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
+                    '/etc/contrail/contrail-vrouter-nodemgr.conf']
+                    ],
+    }
   }
 }
