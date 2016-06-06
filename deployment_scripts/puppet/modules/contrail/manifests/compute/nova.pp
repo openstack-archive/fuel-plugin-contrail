@@ -23,8 +23,8 @@ class contrail::compute::nova {
     value   => $cgroup_acl_string,
   } ~>
   service { $contrail::libvirt_name :
-    ensure   => 'running',
-    enable   => true
+    ensure => 'running',
+    enable => true
   }
 
   nova_config {
@@ -41,7 +41,7 @@ class contrail::compute::nova {
     }
 
     file { '/etc/nova/nova-compute.conf':
-      ensure => present,
+      ensure  => present,
       content => '',
     }
   }
@@ -56,4 +56,17 @@ class contrail::compute::nova {
     ensure => running,
     enable => true,
   }
+
+  if ($::contrail::ceilometer_enabled) {
+    file_line { 'decrease interval':
+        ensure => present,
+        path   => '/etc/ceilometer/pipeline.yaml',
+        line   => '      interval: 60',
+        match  => '      interval:',
+    } ~>
+    service {'ceilometer-polling':
+      ensure    => running,
+    }
+  }
+
 }
