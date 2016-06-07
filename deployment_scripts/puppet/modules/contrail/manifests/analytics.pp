@@ -54,8 +54,8 @@ class contrail::analytics {
     'DEFAULTS/log_category':               value => ' ';
     'DEFAULTS/log_file':                   value => '/var/log/contrail/contrail-analytics-api.log';
     'DEFAULTS/analytics_data_ttl':         value => '48';
-    'DEFAULTS/analytics_config_audit_ttl': value => '1';
-    'DEFAULTS/analytics_statistics_ttl':   value => '1';
+    'DEFAULTS/analytics_config_audit_ttl': value => '-1';
+    'DEFAULTS/analytics_statistics_ttl':   value => '-1';
     'DEFAULTS/analytics_flow_ttl':         value => '-1';
     'DISCOVERY/disc_server_ip':            value => $contrail::contrail_private_vip;
     'DISCOVERY/disc_server_port':          value => '5998';
@@ -74,6 +74,8 @@ class contrail::analytics {
     'DEFAULT/log_level':                  value => 'SYS_NOTICE';
     'DEFAULT/log_local':                  value => '1';
     'DEFAULT/syslog_port':                value => '-1';
+    'DEFAULT/http_server_port':           value => '8089';
+    'DEFAULT/kafka_broker_list':          value => $contrail::kafka_broker_list;
     'COLLECTOR/port':                     value => '8086';
     'DISCOVERY/server':                   value => $contrail::contrail_private_vip;
     'REDIS/port':                         value => '6379';
@@ -106,13 +108,13 @@ class contrail::analytics {
     'DISCOVERY/disc_server_port': value => '5998';
   }
 
-  alarm_gen_config {
+  contrail_alarm_gen_config {
     'DEFAULTS/host_ip':           value => $contrail::address;
     'DEFAULTS/log_local':         value => '1';
     'DEFAULTS/log_level':         value => 'SYS_NOTICE';
     'DEFAULTS/log_file':          value => '/var/log/contrail/contrail-alarm-gen.log';
     'DEFAULTS/kafka_broker_list': value => $contrail::kafka_broker_list;
-    'DEFAULTS/zk_list':           value => $contrail::zk_list;
+    'DEFAULTS/zk_list':           value => $contrail::zk_server_ip;
     'DISCOVERY/disc_server_ip':   value => $contrail::contrail_private_vip;
     'DISCOVERY/disc_server_port': value => '5998';
     'REDIS/redis_server_port':    value => '6379';
@@ -182,5 +184,5 @@ class contrail::analytics {
   Contrail_query_engine_config <||> ~>      Service['supervisor-analytics']
   Contrail_analytics_api_config <||> ~>     Service['supervisor-analytics']
   Contrail_collector_config <||> ~>         Service['supervisor-analytics']
-  Alarm_gen_config <||> ~>                  Service['supervisor-analytics']
+  Contrail_alarm_gen_config <||> ~>         Service['supervisor-analytics']
 }

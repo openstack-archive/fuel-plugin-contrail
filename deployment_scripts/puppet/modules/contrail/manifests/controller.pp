@@ -81,7 +81,15 @@ class contrail::controller {
     ensure => link,
     target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'
   }
-
+  service { 'neutron-server':
+    ensure    => running,
+    enable    => true,
+    require   => [
+      Package['neutron-server'],
+      Package['neutron-plugin-contrail'],
+      ],
+    subscribe => File['/etc/neutron/plugin.ini'],
+  }
 # Contrail-specific heat templates settings
   heat_config {
     'DEFAULT/plugin_dirs':            value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat/resources,/usr/lib/python2.7/dist-packages/vnc_api/gen/heat/resources';
@@ -131,15 +139,4 @@ class contrail::controller {
       }
     }
   }
-
-  service { 'neutron-server':
-    ensure    => running,
-    enable    => true,
-    require   => [
-      Package['neutron-server'],
-      Package['neutron-plugin-contrail'],
-      ],
-    subscribe => File['/etc/neutron/plugin.ini'],
-  }
-  Contrailplugin_ini_config <||> ~> Service['Neutron-server']
 }
