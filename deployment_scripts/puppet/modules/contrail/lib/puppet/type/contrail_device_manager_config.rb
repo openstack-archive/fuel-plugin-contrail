@@ -1,4 +1,4 @@
-Puppet::Type.newtype(:contrail_database_nodemgr_config) do
+Puppet::Type.newtype(:contrail_device_manager_config) do
 
   ensurable
 
