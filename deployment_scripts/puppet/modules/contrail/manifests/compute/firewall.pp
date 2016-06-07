@@ -14,30 +14,25 @@
 
 class contrail::compute::firewall {
 
-  $ipv4_file = $::operatingsystem ? {
-      'Ubuntu' => '/etc/iptables/rules.v4',
-      'CentOS' => '/etc/sysconfig/iptables',
+  firewallchain {
+    [
+      'INPUT:nat:IPv4',
+      'OUTPUT:nat:IPv4',
+      'POSTROUTING:nat:IPv4',
+      'PREROUTING:nat:IPv4'
+    ]:
+      purge => true,
   }
 
-  exec {'flush_nat':
-    command => '/sbin/iptables -t nat -F'
-  } ->
-
-  firewall {'0000 metadata service':
+  firewall { '0000 metadata service':
     source  => '169.254.0.0/16',
     iniface => 'vhost0',
     action  => 'accept'
-  } ->
+  }
 
-  firewall {'0001 juniper contrail rules':
+  firewall { '0001 juniper contrail rules':
     proto  => 'tcp',
     dport  => ['2049','8085','9090','8102','33617','39704','44177','55970','60663'],
     action => 'accept'
-  } ->
-
-  exec { 'persist-firewall':
-    command => "/sbin/iptables-save > ${ipv4_file}",
-    user    => 'root',
   }
-
 }
