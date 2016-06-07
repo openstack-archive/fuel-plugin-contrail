@@ -14,9 +14,9 @@
 
 class contrail::compute::vrouter {
 
-# facter uses underscore instead of dot as a separator for interface name with vlan
-$phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-$dev_mac         = getvar("::macaddress_${phys_dev_facter}")
+  # facter uses underscore instead of dot as a separator for interface name with vlan
+  $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
+  $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
 
   if $contrail::compute_dpdk_enabled {
     if empty($dev_mac) {
@@ -71,11 +71,51 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
     ensure  => present,
     content => template('contrail/agent_param.erb'),
     require => Class[Contrail::Package],
-  } ->
-  file {'/etc/contrail/contrail-vrouter-agent.conf':
-    ensure  => present,
-    content => template('contrail/contrail-vrouter-agent.conf.erb'),
-  } ->
+  }
+  if $contrail::compute_dpdk_enabled == true {
+    contrail_vrouter_agent {
+      'DEFAULT/platform'                          : value => 'dpdk';
+      'DEFAULT/physical_interface_address'        : value => $contrail::phys_dev_pci;
+      'DEFAULT/physical_interface_mac'            : value => $dpdk_dev_mac;
+      'DEFAULT/log_file'                          : value => '/var/log/contrail/contrail-vrouter-agent.log';
+      'DEFAULT/log_level'                         : value => 'SYS_NOTICE';
+      'DEFAULT/log_local'                         : value => '1';
+      'DEFAULT/log_flow'                          : value => '1';
+      'DEFAULT/use_syslog'                        : value => '1';
+      'DEFAULT/syslog_facility'                   : value => 'LOG_LOCAL0';
+      'DEFUALT/headless_mode'                     : value => 'true';
+      'DISCOVERY/server'                          : value => $contrail::contrail_private_vip;
+      'DISCOVERY/max_control_nodes'               : value => '2';
+      'HYPERVISOR/type'                           : value => 'kvm';
+      'METADATA/metadata_proxy_secret'            : value => $contrail::metadata_secret;
+      'NETWORKS/control_network_ip'               : value => $contrail::address;
+      'VIRTUAL-HOST-INTERFACE/name'               : value => 'vhost0';
+      'VIRTUAL-HOST-INTERFACE/ip'                 : value => "${contrail::address}/${contrail::netmask_short}";
+      'VIRTUAL-HOST-INTERFACE/physical_interface' : value => $contrail::phys_dev;
+      'VIRTUAL-HOST-INTERFACE/gateway'            : value => pick($contrail::gateway, false);
+      'SERVICE-INSTANCE/netns_command'            : value => '/usr/bin/opencontrail-vrouter-netns';
+    }
+  } else {
+    contrail_vrouter_agent {
+      'DEFAULT/log_file'                          : value => '/var/log/contrail/contrail-vrouter-agent.log';
+      'DEFAULT/log_level'                         : value => 'SYS_NOTICE';
+      'DEFAULT/log_local'                         : value => '1';
+      'DEFAULT/log_flow'                          : value => '1';
+      'DEFAULT/use_syslog'                        : value => '1';
+      'DEFAULT/syslog_facility'                   : value => 'LOG_LOCAL0';
+      'DEFAULT/headless_mode'                     : value => 'true';
+      'DISCOVERY/server'                          : value => $contrail::contrail_private_vip;
+      'DISCOVERY/max_control_nodes'               : value => '2';
+      'HYPERVISOR/type'                           : value => 'kvm';
+      'METADATA/metadata_proxy_secret'            : value => $contrail::metadata_secret;
+      'NETWORKS/control_network_ip'               : value => $contrail::address;
+      'VIRTUAL-HOST-INTERFACE/name'               : value => 'vhost0';
+      'VIRTUAL-HOST-INTERFACE/ip'                 : value => "${contrail::address}/${contrail::netmask_short}";
+      'VIRTUAL-HOST-INTERFACE/physical_interface' : value => $contrail::phys_dev;
+      'VIRTUAL-HOST-INTERFACE/gateway'            : value => pick($contrail::gateway, false);
+      'SERVICE-INSTANCE/netns_command'            : value => '/usr/bin/opencontrail-vrouter-netns';
+    }
+  }
   file {'/etc/contrail/contrail-vrouter-nodemgr.conf':
     ensure  => present,
     content => template('contrail/contrail-vrouter-nodemgr.conf.erb'),
@@ -89,7 +129,7 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
     ensure    => running,
     enable    => true,
     subscribe => [Class[Contrail::Package],Exec['remove-ovs-modules'],
-                  File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
+                  File['/etc/contrail/agent_param',
                   '/etc/contrail/contrail-vrouter-nodemgr.conf']
                   ],
   }
