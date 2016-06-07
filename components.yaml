@@ -5,9 +5,4 @@
     - "cluster:net_provider": "neutron"
     - "cluster:net_segment_type": "tun"
   compatible:
-    - name: 'hypervisor:kvm'
-    - name: 'hypervisor:qemu'
-  incompatible:
-    - name: 'hypervisor:vmware'
-      description: 'Contrail plugin is not compatible with VMware for now'
-
+    - name: 'hypervisor:*'
