@@ -13,5 +13,4 @@
 #    under the License.
 
 notice('MODULAR: contrail/common-repo.pp')
-
-class { 'contrail::common_repo': }
+include contrail::common_repo

@@ -11,8 +11,23 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+require 'yaml'
 
-notice('MODULAR: contrail/controller-scheduler.pp')
+module Puppet::Parser::Functions
+newfunction(:get_contrailvm_ips, :type => :rvalue, :doc => <<-EOS
+    Return list of ContrailVM ips
+    EOS
+  ) do |args|
+     vm_ips = []
+     hiera = function_hiera_hash(["contrail", {}])
+     fail 'There is no section "contrail_vcenter_esxi_for_fabric" in the "contrail" data!' unless hiera["contrail_vcenter_esxi_for_fabric"]
+     user_fab = YAML.load hiera["contrail_vcenter_esxi_for_fabric"]
+     user_fab.each do |_, v|
+       if v.key?("contrail_vm")
+         vm_ips << v["contrail_vm"]["host"]
+       end
+     end
+    return vm_ips
+    end
+end
 
-include contrail
-include contrail::controller::scheduler

@@ -19,7 +19,8 @@ class contrail::common_repo {
 
   case $::operatingsystem {
     CentOS: {
-      yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
+      #NOTE: Contrail requires newer python-thrift and nodejs from it repo
+      yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'}
       package {'yum-plugin-priorities': ensure => present }
     }
     Ubuntu: {
@@ -34,5 +35,14 @@ class contrail::common_repo {
       }
     }
     default: {}
+  }
+
+  install_ssh_keys {'vmware_root_ssh_key':
+    ensure           => present,
+    user             => 'root',
+    private_key_name => 'id_rsa_vmware',
+    public_key_name  => 'id_rsa_vmware.pub',
+    private_key_path => '/var/lib/astute/vmware/vmware',
+    public_key_path  => '/var/lib/astute/vmware/vmware.pub',
   }
 }
