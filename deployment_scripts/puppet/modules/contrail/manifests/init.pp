@@ -150,6 +150,36 @@ class contrail {
     $libvirt_name = 'libvirtd'
   }
 
+  # vCenter settings
+  $use_vcenter                                = hiera('use_vcenter', false)
+  $vcenter_hash                               = hiera_hash('vcenter', {})
+
+  if $use_vcenter {
+    $mode                                       = 'vcenter'
+    $orchestrator                               = 'openstack'
+    $hypervisor                                 = 'libvirt'
+    $vmdk_vm_image                              = pick($settings['vmdk_vm_image'], "http://${::contrail::master_ip}:8080/plugins/contrail-3.0/ContrailVM-disk1.vmdk")
+    $vcenter_server_ip                          = $vcenter_hash['computes'][0]['vc_host']
+    $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']
+    $vcenter_server_pass                        = $vcenter_hash['computes'][0]['vc_password']
+    $vcenter_server_name                        = $vcenter_hash['computes'][0]['availability_zone_name']
+    $contrail_vcenter_datacenter                = $settings['contrail_vcenter_datacenter']
+    $contrail_vcenter_dvswitch                  = $settings['contrail_vcenter_dvswitch']
+    $contrail_vcenter_dvportgroup               = $settings['contrail_vcenter_dvportgroup']
+    $contrail_vcenter_dvportgroup_numberofports = $settings['contrail_vcenter_dvportgroup_numberofports']
+    $contrail_vcenter_esxi_for_fabric           = $settings['contrail_vcenter_esxi_for_fabric']
+    $provision_vmware                           = $settings['provision_vmware']
+    $contrailvm_ntp                             = $settings['contrailvm_ntp']
+    $provision_vmware_type                      = $settings['provision_vmware_type']
+    $contrail_vcenter_vm_ips                    = get_contrailvm_ips()
+    $contrail_compute_vmware_nodes_hash         = get_nodes_hash_by_roles($network_metadata, ['compute-vmware'])
+    $contrail_compute_vmware_ips                = values(get_node_to_ipaddr_map_by_network_role($contrail_compute_vmware_nodes_hash, 'neutron/mesh'))
+    $primary_controller_role                    = hiera('primary_controller_role', ['primary-controller'])
+    $contrail_fab_build_node_hash               = get_nodes_hash_by_roles($network_metadata, $primary_controller_role)
+    $contrail_fab_build_ip                      = values(get_node_to_ipaddr_map_by_network_role($contrail_fab_build_node_hash, 'neutron/mesh'))
+    $contrail_fab_default                       = {'vmdk' => '/opt/contrail/ContrailVM-disk1.vmdk', 'vcenter_server' => 'vcenter1', 'mode' => $mode }
+  }
+
   # Settings for RabbitMQ on contrail controllers
   $rabbit             = hiera_hash('rabbit')
   $rabbit_password    = $rabbit['password']
