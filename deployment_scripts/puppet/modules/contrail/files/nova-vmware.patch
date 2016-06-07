@@ -1,0 +1,437 @@
+diff --git a/nova/virt/vmwareapi/__init__.py b/nova/virt/vmwareapi/__init__.py
+index d9e0443..62516c1 100644
+--- a/nova/virt/vmwareapi/__init__.py
++++ b/nova/virt/vmwareapi/__init__.py
+@@ -17,5 +17,7 @@
+ """
+ # NOTE(sdague) for nicer compute_driver specification
+ from nova.virt.vmwareapi import driver
++from nova.virt.vmwareapi import contrailVC
+
+ VMwareVCDriver = driver.VMwareVCDriver
++contrailVCDriver = contrailVC.ContrailVCDriver
+diff --git a/nova/virt/vmwareapi/contrailVC.py b/nova/virt/vmwareapi/contrailVC.py
+new file mode 100644
+index 0000000..dc56feb
+--- /dev/null
++++ b/nova/virt/vmwareapi/contrailVC.py
+@@ -0,0 +1,318 @@
++# vim: tabstop=4 shiftwidth=4 softtabstop=4
++
++# Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
++# Copyright (c) 2012 VMware, Inc.
++# Copyright (c) 2011 Citrix Systems, Inc.
++# Copyright 2011 OpenStack Foundation
++#
++#    Licensed under the Apache License, Version 2.0 (the "License"); you may
++#    not use this file except in compliance with the License. You may obtain
++#    a copy of the License at
++#
++#         http://www.apache.org/licenses/LICENSE-2.0
++#
++#    Unless required by applicable law or agreed to in writing, software
++#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
++#    License for the specific language governing permissions and limitations
++#    under the License.
++
++"""
++Contrail wrapper around VCenter
++"""
++
++import re
++import time
++import socket
++import sys
++import uuid
++
++from oslo.config import cfg
++from oslo_vmware import vim_util as oslo_vmware_vim_util
++from oslo.vmware import exceptions as vexc
++from oslo_log import log as logging
++from oslo_utils import uuidutils
++from nova import exception
++from nova.openstack.common import loopingcall
++from nova.virt import driver
++from nova.virt.vmwareapi import error_util
++from nova.virt.vmwareapi import host
++from nova.virt.vmwareapi import vim_util
++from nova.virt.vmwareapi import vm_util
++from nova.virt.vmwareapi import vmops
++from nova.virt.vmwareapi import volumeops
++from nova.virt.vmwareapi import network_util
++
++from nova.virt.vmwareapi.driver import VMwareVCDriver
++from bitstring import BitArray
++#from thrift.transport import TTransport, TSocket
++#from thrift.transport.TTransport import TTransportException
++#from thrift.protocol import TBinaryProtocol, TProtocol
++#from nova_contrail_vif.gen_py.instance_service import InstanceService
++#from nova_contrail_vif.gen_py.instance_service import ttypes
++
++LOG = logging.getLogger(__name__)
++
++vmwareapi_contrail_opts = [
++    cfg.StrOpt('vcenter_dvswitch',
++               help='Vswitch name to use to instantiate VMs incase of Contaril VCenter solution'),
++    ]
++CONF = cfg.CONF
++CONF.register_opts(vmwareapi_contrail_opts, 'vmware')
++
++INVALID_VLAN_ID = 4096
++MAX_VLAN_ID = 4095
++
++class VCPVlans(object):
++    """The private-vlan object"""
++
++    def __init__(self, vc_session):
++        self._vlan_id_bits = BitArray(MAX_VLAN_ID + 1)
++        self._init_pvlans(vc_session)
++    #end __init__()
++
++    def _init_pvlans(self, session):
++        self._vlan_id_bits.set(1)
++
++        dvs_mor = vm_util.get_dvs_ref_from_name(session,
++                                                CONF.vmware.vcenter_dvswitch);
++        config_ret = session._call_method(vim_util,
++                                             "get_dynamic_property",
++                                             dvs_mor,
++                                             "VmwareDistributedVirtualSwitch",
++                                             "config")
++        if not config_ret:
++            return
++
++        for pvlan_map_entry in config_ret.pvlanConfig:
++            if pvlan_map_entry.pvlanType == "isolated":
++                self._vlan_id_bits[pvlan_map_entry.secondaryVlanId] = 0
++
++        port_grps_mor_ret = session._call_method(vim_util,
++                                             "get_dynamic_property",
++                                             dvs_mor,
++                                             "VmwareDistributedVirtualSwitch",
++                                             "portgroup")
++        if not port_grps_mor_ret:
++            return
++
++        port_grps_mor = port_grps_mor_ret.ManagedObjectReference
++
++        for port_grp_mor in port_grps_mor:
++            cfg_ret = session._call_method(vim_util,
++                                                 "get_dynamic_property",
++                                                 port_grp_mor,
++                                                 "DistributedVirtualPortgroup",
++                                                 "config")
++            if not cfg_ret:
++                continue;
++
++            if not cfg_ret.defaultPortConfig:
++                continue;
++
++            if not cfg_ret.defaultPortConfig.vlan:
++                continue;
++
++            if hasattr(cfg_ret.defaultPortConfig.vlan, "pvlanId"):
++                self._vlan_id_bits[cfg_ret.defaultPortConfig.vlan.pvlanId] = 1
++
++    #end _init_vlans()
++
++    def alloc_pvlan(self):
++        vid = self._vlan_id_bits.find('0b0')
++        if vid:
++            self._vlan_id_bits[vid[0]] = 1
++            return vid[0]
++        return INVALID_VLAN_ID
++    #end alloc_vlan()
++
++    def free_pvlan(self, vlan_id):
++        if vlan_id < 0 or vlan_id > MAX_VLAN_ID:
++            return
++        self._vlan_id_bits[vlan_id] = 0
++    #end free_vlan()
++
++#end VCPVlans
++
++
++class ContrailVCDriver(VMwareVCDriver):
++    """Sub class of VC"""
++
++    def __init__(self, virtapi, read_only=False, scheme="https"):
++        super(ContrailVCDriver, self).__init__(virtapi)
++        if CONF.vmware.vcenter_dvswitch is None:
++            raise Exception(_("Must specify vcenter_dvswitch, to use "
++                              "compute_driver=vmwareapi.contrailVCDriver"))
++        self.Vlan = VCPVlans(self._session)
++
++    def spawn(self, context, instance, image_meta, injected_files,
++              admin_password, network_info=None, block_device_info=None):
++        session = self._session
++        _vmops = self._get_vmops_for_compute_node(instance.node)
++        if network_info:
++            for vif in network_info:
++                network_uuid = vif['network']['id']
++                network_ref=None
++                try:
++                    network_ref = network_util.get_network_with_the_name(session,
++                                                   network_uuid, _vmops._cluster)
++                except vexc.VMwareDriverException:
++                    LOG.debug("Network %s not found on cluster!", network_uuid)
++
++                if not network_ref:
++                    vif['network']['bridge'] = vif['network']['id']
++                    pvlan_id = self.Vlan.alloc_pvlan()
++                    if pvlan_id == INVALID_VLAN_ID:
++                        raise exception.NovaException("Vlan id space is full")
++
++                    try:
++                        network_util.create_dvport_group(session,
++                                                    network_uuid,
++                                                    CONF.vmware.vcenter_dvswitch,
++                                                    pvlan_id, _vmops._cluster)
++                    except vexc.DuplicateName:
++                        self.Vlan.free_pvlan(pvlan_id)
++                else:
++                    vif['network']['bridge'] = vif['network']['id']
++                    #LOG.debug(_("Network %s found on host!") % network_uuid)
++
++                args = {'should_create_vlan':False, 'vlan':'0'}
++                vif['network']._set_meta(args)
++
++        super(ContrailVCDriver, self).spawn(context, instance, image_meta,
++                                             injected_files, admin_password,
++                                             network_info, block_device_info)
++
++    def destroy(self, context, instance, network_info, block_device_info=None,
++                destroy_disks=True, migrate_data=None):
++        session = self._session
++        _vmops = self._get_vmops_for_compute_node(instance.node)
++
++        super(ContrailVCDriver, self).destroy(context, instance, network_info,
++                                              block_device_info, destroy_disks,
++                                              migrate_data)
++
++        if not network_info:
++            return
++
++        for vif in network_info:
++            network_uuid = vif['network']['id']
++            network_ref=None
++            try:
++                network_ref = network_util.get_network_with_the_name(session,
++                                                     network_uuid, _vmops._cluster);
++            except vexc.VMwareDriverException:
++                LOG.debug("Network %s not found on cluster!", network_uuid)
++
++            if not network_ref:
++                continue;
++
++            dvpg_mor = oslo_vmware_vim_util.get_moref(network_ref['dvpg'], network_ref['type']);
++
++            vms_ret = session._call_method(vim_util,
++                                                 "get_dynamic_property",
++                                                 dvpg_mor,
++                                                 "DistributedVirtualPortgroup",
++                                                 "vm")
++            if not (vms_ret) or not (vms_ret.ManagedObjectReference):
++                cfg_ret = session._call_method(vim_util,
++                                              "get_dynamic_property",
++                                              dvpg_mor,
++                                              "DistributedVirtualPortgroup",
++                                              "config")
++                if (cfg_ret) and (cfg_ret.defaultPortConfig) and (cfg_ret.defaultPortConfig.vlan) :
++                    if hasattr(cfg_ret.defaultPortConfig.vlan, "pvlanId"):
++                        pvlan_id = cfg_ret.defaultPortConfig.vlan.pvlanId
++
++                # No VM exists on the dvPortGroup. Delete the network.
++                # Only if delete network is successful, free pvlan.
++                # This is to avoid it getting reused when old
++                # network is hanging around due to failed n/w delete operation
++                try:
++                    network_util.delete_dvport_group(session, dvpg_mor)
++                    if pvlan_id:
++                        self.Vlan.free_pvlan(pvlan_id)
++                except Exception as excep:
++                    LOG.warn(("In contrailVC:dvportgroup:delete, "
++                               "got this exception while destroying "
++                               "the dvportGroup: %s") % str(excep))
++
++    def plug_vifs(self, instance, network_info):
++        """Plug VIFs into networks."""
++        # vif plug is done by vcenter plugin. Not done here.
++        return
++
++    def attach_interface(self, instance, image_meta, vif):
++        """Attach an interface to the instance."""
++        session = self._session
++        _vmops = self._get_vmops_for_compute_node(instance.node)
++        network_uuid = vif['network']['id']
++        network_mor=None
++        try:
++            network_mor = network_util.get_network_with_the_name(session,
++                                                   network_uuid, _vmops._cluster);
++        except vexc.VMwareDriverException:
++            LOG.debug("Network %s not found on cluster!", network_uuid)
++
++        if not network_mor:
++            vif['network']['bridge'] = vif['network']['id']
++            pvlan_id = self.Vlan.alloc_pvlan()
++            #LOG.debug(_("Allocated pvlan for network %s") % network_uuid)
++            if pvlan_id == INVALID_VLAN_ID:
++                raise exception.NovaException("Vlan id space is full")
++
++            #LOG.debug(_("creating %s port-group on cluster!") % network_uuid)
++            network_util.create_dvport_group(session,
++                                            network_uuid,
++                                            CONF.vmware.vcenter_dvswitch,
++                                            pvlan_id, _vmops._cluster)
++        else:
++            vif['network']['bridge'] = vif['network']['id']
++            #LOG.debug(_("Network %s found on host!") % network_uuid)
++
++        args = {'should_create_vlan':False, 'vlan':'0'}
++        vif['network']._set_meta(args)
++
++        super(ContrailVCDriver, self).attach_interface(instance, image_meta, vif)
++
++    def detach_interface(self, instance, vif):
++        """Detach an interface from the instance."""
++        super(ContrailVCDriver, self).detach_interface(instance, vif)
++
++        session = self._session
++        _vmops = self._get_vmops_for_compute_node(instance.node)
++        network_uuid = vif['network']['id']
++        dvpg_mor=None
++        try:
++            dvpg_mor = network_util.get_network_with_the_name(session,
++                                                   network_uuid, _vmops._cluster);
++        except vexc.VMwareDriverException:
++            LOG.debug("Network %s not found on cluster!", network_uuid)
++
++        if not dvpg_mor:
++            return;
++
++        vms_ret = session._call_method(vim_util,
++                                       "get_dynamic_property",
++                                       dvpg_mor,
++                                       "DistributedVirtualPortgroup",
++                                       "vm")
++        if not (vms_ret) or (vms_ret.ManagedObjectReference):
++            cfg_ret = session._call_method(vim_util,
++                                          "get_dynamic_property",
++                                          dvpg_mor,
++                                          "DistributedVirtualPortgroup",
++                                          "config")
++            if not cfg_ret:
++                return;
++
++            if not cfg_ret.defaultPortConfig:
++                return;
++
++            if not cfg_ret.defaultPortConfig.vlan:
++                return;
++
++            if hasattr(cfg_ret.defaultPortConfig.vlan, "pvlanId"):
++                self.Vlan.free_pvlan(cfg_ret.defaultPortConfig.vlan.pvlanId)
++
++            self.remove_dvport_group(dvpg_mor)
+diff --git a/nova/virt/vmwareapi/network_util.py b/nova/virt/vmwareapi/network_util.py
+index a1a44e9..46b1f11 100644
+--- a/nova/virt/vmwareapi/network_util.py
++++ b/nova/virt/vmwareapi/network_util.py
+@@ -196,3 +196,43 @@ def create_port_group(session, pg_name, vswitch_name, vlan_id=0, cluster=None):
+         LOG.debug("Port Group %s already exists.", pg_name)
+     LOG.debug("Created Port Group with name %s on "
+               "the ESX host", pg_name)
++
++
++def create_dvport_group(session, pg_name, vswitch_name, vlan_id=0, cluster=None):
++    """Creates a port group on the host system with the vlan tags
++    supplied. VLAN id 0 means no vlan id association.
++    """
++    client_factory = session.vim.client.factory
++    dvs_mor = vm_util.get_dvs_ref_from_name(session, vswitch_name);
++
++    add_prt_grp_spec = vm_util.get_add_dvswitch_port_group_spec(
++                    client_factory,
++                    vswitch_name,
++                    pg_name,
++                    vlan_id)
++    try:
++        pg_create_task = session._call_method( session.vim,
++                                    "CreateDVPortgroup_Task", dvs_mor,
++                                    spec=add_prt_grp_spec)
++        session._wait_for_task(pg_create_task)
++
++    except vexc.DuplicateName:
++        # There can be a race condition when two instances try
++        # adding port groups at the same time. One succeeds, then
++        # the other one will get an exception. Since we are
++        # concerned with the port group being created, which is done
++        # by the other call, we can ignore the exception.
++        LOG.debug(_("Port Group %s already exists."), pg_name)
++        raise
++
++    LOG.debug(_("Created Port Group with name %s on "
++                "the ESX host") % pg_name)
++
++
++def delete_dvport_group(session, dvpg_mor):
++    if not dvpg_mor:
++        return;
++
++    destroy_task = session._call_method(session.vim, "Destroy_Task",
++                                              dvpg_mor)
++    session._wait_for_task(destroy_task)
+diff --git a/nova/virt/vmwareapi/vm_util.py b/nova/virt/vmwareapi/vm_util.py
+index 8c48fd4..fa69beb 100644
+--- a/nova/virt/vmwareapi/vm_util.py
++++ b/nova/virt/vmwareapi/vm_util.py
+@@ -171,6 +171,7 @@ def get_vm_create_spec(client_factory, instance, data_store_name,
+     config_spec.guestId = os_type
+     # The name is the unique identifier for the VM.
+     config_spec.instanceUuid = instance.uuid
++    config_spec.annotation = instance.display_name
+     # set the Hardware version
+     config_spec.version = extra_specs.hw_version
+
+@@ -1473,6 +1474,40 @@ def power_off_instance(session, instance, vm_ref=None):
+         LOG.debug("VM already powered off", instance=instance)
+
+
++def get_add_dvswitch_port_group_spec(client_factory, dvswitch_name,
++                                      port_group_name, vlan_id):
++    """Builds the distributed virtual switch port group add spec."""
++    config_spec = client_factory.create('ns0:DVPortgroupConfigSpec')
++    config_spec.name = port_group_name
++    config_spec.description = port_group_name
++    config_spec.numPorts = '128'
++    config_spec.autoExpand = 'True'
++    config_spec.type = 'earlyBinding'
++
++    vlan_spec = client_factory.create('ns0:VmwareDistributedVirtualSwitchPvlanSpec')
++    vlan_spec.pvlanId = int(vlan_id)
++    vlan_spec.inherited = 'False'
++
++    port_config_spec = client_factory.create('ns0:VMwareDVSPortSetting')
++    port_config_spec.vlan = vlan_spec
++    config_spec.defaultPortConfig = port_config_spec
++
++    return config_spec
++
++def get_dvs_ref_from_name(session, dvs_name):
++    """Get reference to the Distributd Virtual Switch with the name specified."""
++    dvs = session._call_method(vim_util, "get_objects",
++                "VmwareDistributedVirtualSwitch", ["summary.name"])
++    return _get_object_from_results(session, dvs, dvs_name,
++                                    _get_object_for_value)
++
++def get_dvportgroup_ref_from_name(session, dvpg_name):
++    """Get reference to the Distributd Virtual Switch with the name specified."""
++    pgs = session._call_method(vim_util, "get_objects",
++                "DistributedVirtualPortgroup", ["name"])
++    return _get_object_from_results(session, pgs, dvpg_name,
++                                    _get_object_for_value)
++
+ def find_rescue_device(hardware_devices, instance):
+     """Returns the rescue device.
+
