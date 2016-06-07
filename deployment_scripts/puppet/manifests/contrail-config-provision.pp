@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/contrail-config-provision.pp')
 
 include contrail
-class { 'contrail::provision::config': }
+include contrail::provision::config

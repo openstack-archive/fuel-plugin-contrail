@@ -15,5 +15,4 @@
 notice('MODULAR: contrail/contrail-utils.pp')
 
 include contrail
-
-class { 'contrail::utils': }
+include contrail::utils

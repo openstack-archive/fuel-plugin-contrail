@@ -15,5 +15,4 @@
 notice('MODULAR: contrail/contrail-controller-aggregate.pp')
 
 include contrail
-
-class { 'contrail::controller::aggregate': }
+include contrail::controller::aggregate

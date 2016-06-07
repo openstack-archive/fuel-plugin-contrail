@@ -1,3 +1,4 @@
+#!/bin/sh
 #    Copyright 2015 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,7 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-control.pp')
-
-include contrail
-include contrail::control
+# NOTE(ak858f): These lines should be enabled if patch is not applied.
+# Patch: https://gerrit.mtn5.cci.att.com/#/c/8326/
+#sed -i -e "/if common_attrs.get('use_vcenter', {}).get('value') is True and/,+5 d" /usr/lib/python2.7/site-packages/nailgun/api/v1/validators/cluster.py
+#sed -i -e 's#vCenterNetworkBackends:\["network:neutron:core:nsx"#vCenterNetworkBackends:\["network:neutron:contrail","network:neutron:core:nsx"#' /usr/share/nailgun/static/build/bundle.js
+#systemctl restart nailgun.service
