@@ -468,3 +468,51 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Check configured no default contrail parameters via Contrail WEB.
+---------------------------------------------------------------------
+
+
+ID
+##
+
+contrail_no_default
+
+
+Description
+###########
+
+Verify that all configured contrail parameters present in the Contrail WEB.
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Install contrail plugin.
+    2. Create cluster.
+    3. Set following no defaults contrail parameters:
+       * contrail_api_port
+       * contrail_route_target
+       * contrail_gateways
+       * contrail_external
+       * contrail_asnum
+    4. Add nodes:
+        1 contrail-config+contrail-control+contrail-db
+        1 controller
+        1 compute
+    5. Deploy cluster.
+    6. Verify that all configured contrail parameters present in
+       the Contrail WEB.
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
