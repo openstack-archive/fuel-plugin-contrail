@@ -135,3 +135,17 @@ class ContrailClient(object):
         """
         return self.client.get(
             '/virtual-network/{0}'.format(net_id))
+
+    @json_parse
+    def get_bgp_routers(self):
+        """Get bgp routers."""
+        return self.client.get('/bgp-routers')
+
+    @json_parse
+    def get_bgp_by_id(self, bgp_id):
+        """Get bgp router by id.
+
+        :param bgp_id: type string, bgp router id.
+        :return dictionary
+        """
+        return self.client.get('/bgp-router/{0}'.format(bgp_id))
