@@ -81,17 +81,25 @@ class contrail::controller {
     ensure => link,
     target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'
   }
-
+  service { 'neutron-server':
+    ensure    => running,
+    enable    => true,
+    require   => [
+      Package['neutron-server'],
+      Package['neutron-plugin-contrail'],
+      ],
+    subscribe => File['/etc/neutron/plugin.ini'],
+  }
 # Contrail-specific heat templates settings
   heat_config {
-    'DEFAULT/plugin_dirs':            value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat,/usr/lib/python2.7/dist-packages/vnc_api/gen/heat/resources';
-    'clients_contrail/contrail-user': value => 'neutron';
-    'clients_contrail/user':          value => $contrail::neutron_user;
-    'clients_contrail/password':      value => $contrail::service_token;
-    'clients_contrail/tenant':        value => $contrail::service_tenant;
-    'clients_contrail/api_server':    value => $contrail::contrail_mgmt_vip;
-    'clients_contrail/auth_host_ip':  value => $contrail::mos_mgmt_vip;
-    'clients_contrail/api_base_url':  value => '/';
+    'DEFAULT/plugin_dirs': value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat,/usr/lib/python2.7/dist-packages/vnc_api/gen/heat/resources';
+    'clients_contrail/contrail-user': value=> 'neutron';
+    'clients_contrail/user': value=> $contrail::neutron_user;
+    'clients_contrail/password': value=> $contrail::service_token;
+    'clients_contrail/tenant': value=> $contrail::service_tenant;
+    'clients_contrail/api_server': value=> $contrail::contrail_mgmt_vip;
+    'clients_contrail/auth_host_ip': value=> $contrail::mos_mgmt_vip;
+    'clients_contrail/api_base_url': value=> '/';
   } ~>
   service {'heat-engine':
     ensure     => running,
@@ -131,15 +139,4 @@ class contrail::controller {
       }
     }
   }
-
-  service { 'neutron-server':
-    ensure    => running,
-    enable    => true,
-    require   => [
-      Package['neutron-server'],
-      Package['neutron-plugin-contrail'],
-      ],
-    subscribe => File['/etc/neutron/plugin.ini'],
-  }
-  Contrailplugin_ini_config <||> ~> Service['Neutron-server']
 }
