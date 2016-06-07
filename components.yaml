@@ -1,13 +1,6 @@
-- name: 'network:neutron:contrail'
+- name: 'network:neutron:core:nsx'
   label: 'Contrail'
   description: 'Contrail SDN networking'
   bind: !!pairs
     - "cluster:net_provider": "neutron"
     - "cluster:net_segment_type": "tun"
-  compatible:
-    - name: 'hypervisor:kvm'
-    - name: 'hypervisor:qemu'
-  incompatible:
-    - name: 'hypervisor:vmware'
-      description: 'Contrail plugin is not compatible with VMware for now'
-
