@@ -275,3 +275,53 @@ Expected results
 ################
 
 Stack should be created.
+
+
+Check that ceilometer collects contrail metrics.
+------------------------------------------------
+
+
+ID
+##
+
+contrail_ceilometer_metrics
+
+
+Description
+###########
+
+Check that ceilometer collects contrail metrics.
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Install contrail plugin.
+    2. Create an environment with "Neutron with tunneling
+       segmentation" as a network configuration.
+    3. Enable and configure Contrail plugin.
+    4. Add a node with "controller" + "MongoDB" multirole.
+    5. Add a node with "compute".
+    6. Add a node with "contrail-config", "contrail-control" and
+       "contrail-db" roles.
+    7. Deploy cluster with plugin.
+    8. Run OSTF tests.
+    9. Create 2 instances in the default network.
+    10. Send icpm packets from one instance to another.
+    11. Check contrail ceilometer metrics:
+        *ip.floating.receive.bytes
+        *ip.floating.receive.packets
+        *ip.floating.transmit.bytes
+        *ip.floating.transmit.packets
+
+
+Expected results
+################
+
+All contrail ceilometer metrics should be collected by ceilometer.

@@ -30,6 +30,8 @@ from fuelweb_test.settings import SERVTEST_PASSWORD
 from fuelweb_test.settings import SERVTEST_TENANT
 from fuelweb_test.settings import SERVTEST_USERNAME
 
+from proboscis.asserts import assert_true
+
 from helpers.contrail_client import ContrailClient
 from helpers import plugin
 from helpers import openstack
@@ -705,3 +707,120 @@ class IntegrationTests(TestBasic):
         assert_equal(
             projects, contrail.get_projects(),
             "Can not give info by Contrail API.")
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+          groups=["contrail_no_default"])
+    @log_snapshot_after_test
+    def contrail_no_default(self):
+        """Check configured no default contrail parameters via Contrail WEB.
+
+        Scenario:
+            1. Install contrail plugin.
+            2. Create cluster.
+            3. Set following no defaults contrail parameters:
+               *contrail_api_port
+               *contrail_route_target
+               *contrail_gateways
+               *contrail_external
+               *contrail_asnum
+            4. Add nodes:
+                1 contrail-config+contrail-control+contrail-db
+                1 controller
+                1 compute
+            5. Deploy cluster.
+            6. Verify that all configured contrail parameters present in
+               the Contrail WEB.
+
+        Duration: 2.5 hours
+
+        """
+        # constants
+        contrail_api_port = 18082
+        contrail_route_target = 4294967295
+        contrail_gateways = '10.109.3.250'
+        contrail_external = '10.10.1.0/24'
+        contrail_asnum = 65534
+        external_net = 'admin_floating_net'
+
+        self.show_step(1)
+        self.show_step(2)
+        plugin.prepare_contrail_plugin(self, slaves=3)
+
+        # activate vSRX image
+        plugin.activate_vsrx()
+
+        self.show_step(3)
+        plugin.activate_plugin(
+            self, contrail_api_public_port=contrail_api_port,
+            contrail_route_target=contrail_route_target,
+            contrail_gateways=contrail_gateways,
+            contrail_external=contrail_external,
+            contrail_asnum=contrail_asnum)
+
+        cluster_id = self.fuel_web.get_last_created_cluster()
+
+        self.show_step(4)
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+                'slave-02': ['controller'],
+                'slave-03': ['compute'],
+            })
+
+        self.show_step(5)
+        openstack.deploy_cluster(self)
+
+        self.show_step(6)
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+        contrail_client = ContrailClient(
+            os_ip, contrail_port=contrail_api_port)
+
+        logger.info(
+            'Check contrail_asnum, contrail_route_target via Contrail.')
+        external_net_id = os_conn.get_network(external_net)['id']
+        ext_net = contrail_client.get_net_by_id(
+            external_net_id)["virtual-network"]
+        fuel_router_target = '{0}:{1}'.format(
+            contrail_asnum, contrail_route_target)
+        contrail_router_target = ext_net['route_target_list']['route_target']
+        message = 'Parameters {0} from Fuel is not equel {1} from Contrail Web'
+        assert_true(
+            fuel_router_target in contrail_router_target[0],
+            message.format(fuel_router_target, contrail_router_target[0]))
+
+        logger.info('Check contrail_external via Contrail.')
+        external_ip = ext_net[
+            'network_ipam_refs'][0]['attr']['ipam_subnets'][0]['subnet']
+        assert_true(
+            contrail_external.split('/')[0] == external_ip['ip_prefix'],
+            message.format(
+                contrail_external.split('/')[0],
+                external_ip['ip_prefix']
+                )
+        )
+        assert_true(
+            contrail_external.split('/')[1] == str(
+                external_ip['ip_prefix_len']),
+            message.format(
+                contrail_external.split('/')[1],
+                external_ip['ip_prefix_len'])
+            )
+
+        logger.info('Check contrail_gateways via Contrail.')
+        bgp_ids = contrail_client.get_bgp_routers()['bgp-routers']
+
+        bgp_ips = [
+            contrail_client.get_bgp_by_id(bgp_id['uuid'])[
+            'bgp-router']['bgp_router_parameters']['address']
+            for bgp_id in bgp_ids]
+
+        assert_true(
+            contrail_gateways in bgp_ips,
+            message.format(contrail_gateways, bgp_ips))
