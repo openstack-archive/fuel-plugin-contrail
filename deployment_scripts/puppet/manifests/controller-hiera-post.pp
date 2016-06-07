@@ -15,5 +15,4 @@
 notice('MODULAR: contrail/controller-hiera-post.pp')
 
 include contrail
-
-class { 'contrail::controller::hiera_post':}
+include contrail::controller::hiera_post

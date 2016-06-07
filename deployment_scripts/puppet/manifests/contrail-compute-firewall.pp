@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/contrail-compute-firewall.pp')
 
 include contrail
-class { 'contrail::compute::firewall': }
+include contrail::compute::firewall

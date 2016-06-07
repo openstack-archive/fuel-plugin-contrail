@@ -1,6 +1,7 @@
 .tox
 .build
 *.pyc
+*.pyo
 repositories/centos/*
 repositories/ubuntu/*
 deployment_scripts/puppet/modules/inifile
