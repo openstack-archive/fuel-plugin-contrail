@@ -38,7 +38,7 @@ attributes:
     weight: 60
     type: "text"
     regex:
-      source: '^(429496729[0-6]|42949672[0-8]\d|4294967[01]\d{2}|429496[0-6]\d{3}|42949[0-5]\d{4}|4294[0-8]\d{5}|429[0-3]\d{6}|42[0-8]\d{7}|4[01]\d{8}|[1-3]\d{9}|[1-9]\d{8}|[1-9]\d{7}|[1-9]\d{6}|[1-9]\d{5}|[1-9]\d{4}|[1-9]\d{3}|[1-9]\d{2}|[1-9]\d|\d)$'
+      source: '^(?:(6553[0-5])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9]\d{1,3})|([1-9]))$'
       error: "Invalid target"
   contrail_global_dpdk:
     value: false
@@ -70,10 +70,127 @@ attributes:
   install_contrail_qemu_lv:
     value: true
     label: "Install Qemu and Libvirt from Contrail"
-    description: "Install Qemu and Libvirt packages from contrail repository"
+    description: "Install Qemu and Libvirt packages from contrail repository. This option should be enabled for environment with VCenter"
     weight: 150
     type: "checkbox"
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+        action: "hide"
+  contrail_vcenter_datacenter:
+    value: "Datacenter"
+    label: "vCenter Datacenter"
+    description: "vCenter Datacenter for Contrail"
+    weight: 160
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter Datacenter"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvswitch:
+    value: "Contrail_dvSwitch"
+    label: "vCenter dvSwitch"
+    description: "vCenter dvSwitch for Contrail"
+    weight: 170
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter dvSwitch"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvportgroup:
+    value: "Contrail_DV_Port_Group"
+    label: "vCenter DV Port Group"
+    description: "vCenter DV Port Group for Contrail"
+    weight: 180
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vCenter DV Port Group"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  contrail_vcenter_dvportgroup_numberofports:
+    value: "3"
+    label: "vCenter DV Port Group number of ports"
+    description: "vCenter number of ports DV Port Group for Contrail"
+    weight: 190
+    type: "text"
+    regex:
+      source: '^[1-9]\d*$'
+      error: "Invalid vCenter DV Port Group number of ports"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  provision_vmware:
+    value: true
+    label: "Provision VMware hosts"
+    description: >
+      Enable this option to allow the plugin to provision ContrailVMs to ESXi hosts
+      and create Contrail_dvSwitch.
+      Can be disabled, if VMs are already created or this must be done manually.
+    weight: 192
+    type: "checkbox"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  vmdk_vm_image:
+    value: ""
+    label: "ContrailVM image for ESXi"
+    description: "URL to download ContrailVM image. Keep empty if you have it on FUEL-master in contrail-plugin folder at /var/www/nailgun/plugins/contrail-3.0/ContrailVM-disk1.vmdk"
+    weight: 194
+    type: "text"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+      - condition: "not (settings:contrail.provision_vmware.value == true)"
+        action: "hide"
+  contrail_vcenter_esxi_for_fabric:
+    value: "#Sample data, replace with your actual settings\n
+            \"esxi1\": \n  \"username\": \"root\"\n  \"ip\": \"172.16.0.252\"\
+            \n  \"fabric_vswitch\": \"vSwitch1\"\n  \"uplink_nic\": \"vmnic1\"\n \
+            \ \"contrail_vm\": \n    \"mac\": \"00:50:56:03:BC:BC\"\n    \"host\"\
+            : \"root@10.109.3.231\"\n  \"cluster\": \"Cluster1\"\n  \"datastore\"\
+            : \"/vmfs/volumes/nfs\"\n  \"password\": \"swordfish\"\n"
+    label: "vCenter ESXi data for fabric"
+    description: "vCenter ESXi data for fabric in YAML format"
+    weight: 200
+    type: "textarea"
+    regex:
+      source: '.'
+      error: "Invalid vCenter ESXi data for fabric"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+      - condition: "not (settings:contrail.provision_vmware.value == true)"
+        action: "hide"
+  contrailvm_ntp:
+    value: "10.109.3.1"
+    label: "NTP server for ContrailVM"
+    description: "NTP server address for ContrailVM, reachable from Private network"
+    weight: 205
+    type: "text"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+      - condition: "not (settings:contrail.provision_vmware.value == true)"
+        action: "hide"
+  contrail_environment:
+    type: "select"
+    weight: 210
+    value: "prod"
+    label: "ContrailVM flavor"
+    description: "Choose the flavor for ContrailVM. Flavor with less RAM may be used for development/test environments."
+    values:
+      - data: "dev"
+        label: "development"
+      - data: "prod"
+        label: "production"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+      - condition: "not (settings:contrail.provision_vmware.value == true)"
         action: "hide"
 
