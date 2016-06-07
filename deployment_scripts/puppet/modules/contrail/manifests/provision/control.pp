@@ -23,7 +23,7 @@ class contrail::provision::control {
     exec { "prov_external_bgp_${name}":
       command => "python /opt/contrail/utils/provision_mx.py  \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
---oper add --router_name ${name} --router_ip ${name} \
+--oper add --router_name ${name} --router_ip ${name} --router_asn ${contrail::asnum} \
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_external_bgp_${name}-DONE",
       creates => "/opt/contrail/prov_external_bgp_${name}-DONE",
