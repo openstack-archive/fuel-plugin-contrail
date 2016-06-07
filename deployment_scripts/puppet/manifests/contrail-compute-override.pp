@@ -15,5 +15,4 @@
 notice('MODULAR: contrail/contrail-compute-override.pp')
 
 include contrail
-
-class { 'contrail::compute::compute_override': }
+include contrail::compute::compute_override

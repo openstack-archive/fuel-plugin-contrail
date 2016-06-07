@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/controller-vip.pp')
 
 include contrail
-class { 'contrail::vip': }
+include contrail::vip
