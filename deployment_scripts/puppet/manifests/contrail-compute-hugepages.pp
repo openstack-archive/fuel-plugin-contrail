@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/contrail-compute-hugepages.pp')
 
 include contrail
-class { 'contrail::compute::hugepages': }
+include contrail::compute::hugepages

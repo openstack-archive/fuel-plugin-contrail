@@ -1,0 +1,82 @@
+# Note(AKirilochkin):
+# This file provides configuration for fabric subsystem. This is default way how Juniper deploys
+# the contrail things. We have used this as a default solution to get default configuration.
+# The better way is to use FUEL-based deployment to have all nodes managed by FUEL.
+<%-
+fab_default=scope.lookupvar('contrail::contrail_fab_default')
+contrailvm=scope.lookupvar('contrail::contrail_vcenter_vm_ips')
+vcenter_compute=scope.lookupvar('contrail::contrail_compute_vmware_ips')[0]
+fab_build=scope.lookupvar('contrail::contrail_fab_build_ip')[0]
+-%>
+from fabric.api import env
+
+#Role definition of the hosts.
+env.roledefs = {
+    'compute' : <%= contrailvm %>,
+    'vcenter_compute' : ["root@<%= vcenter_compute %>"],
+    'build' : ["root@<%= fab_build %>"],
+    'all' : ["root@<%= fab_build %>"],
+    'cfgm' : ["root@<%= fab_build %>"],
+    'control' : ["root@<%= fab_build %>"],
+    'openstack' : ["root@<%= fab_build %>"],
+}
+
+env.passwords = {
+<%- contrailvm.each do |ip| -%>
+    '<%= ip %>': 'c0ntrail123',
+<%- end -%>
+}
+
+env.command_timeout=3600
+
+#Openstack admin password
+env.openstack_admin_password = '<%= scope.lookupvar('contrail::admin_password') %>'
+
+#Default ssh key for fabric usage
+env.key_filename = '/var/lib/astute/vmware/vmware'
+
+env.keystone = {
+    'admin_token' : '<%= scope.lookupvar('contrail::admin_token') %>',
+    'service_tenant' : 'services',
+    'manage_neutron' : 'no',
+}
+
+env.ha = {
+    'internal_vip' : '<%= scope.lookupvar('contrail::mos_mgmt_vip') %>',
+    'external_vip' : '<%= scope.lookupvar('contrail::mos_public_vip') %>',
+    'contrail_internal_vip' : '<%= scope.lookupvar('contrail::contrail_private_vip') %>',
+    'contrail_external_vip' : '<%= scope.lookupvar('contrail::mos_public_vip') %>',
+}
+
+env.openstack = {
+    'service_token' : '<%= scope.lookupvar('contrail::admin_token') %>',
+}
+
+#service token need to define to do  restore of backup data
+service_token = '<%= scope.lookupvar('contrail::admin_token') %>'
+
+#To disable installing contrail interface rename package
+env.interface_rename = False
+
+#vcenter provisioning
+env.vcenter_servers = {
+    'vcenter1': {
+        'server':'<%= scope.lookupvar('contrail::vcenter_server_ip') %>',
+        'port': '443',
+        'username': '<%= scope.lookupvar('contrail::vcenter_server_user') %>',
+        'password': '<%= scope.lookupvar('contrail::vcenter_server_pass') %>',
+        'auth': 'https',
+        'datacenter': '<%= scope.lookupvar('contrail::contrail_vcenter_datacenter') %>',
+        'cluster': <%= scope.lookupvar('vcenter_server_cluster').split(',').map(&:strip) %>,
+        'vcenter_compute': '<%= scope.lookupvar('contrail::contrail_compute_vmware_ips')[0] %>',
+        'dv_switch': { 'dv_switch_name': '<%= scope.lookupvar('contrail::contrail_vcenter_dvswitch') %>',},
+        'dv_port_group': {
+            'dv_portgroup_name': '<%= scope.lookupvar('contrail::contrail_vcenter_dvportgroup') %>',
+            'number_of_ports': '<%= scope.lookupvar('contrail::contrail_vcenter_dvportgroup_numberofports') %>',
+        },
+    },
+}
+
+# The compute vm provisioning on ESXI host
+esxi_hosts = <%= scope.function_prepare_user_fab([fab_default]) %>
+
