@@ -9,6 +9,7 @@ contrail-db:
     - compute
     - ceph-osd
     - cinder
+    - contrail-vmware
 
 contrail-config:
   name: Contrail - Config
@@ -23,6 +24,7 @@ contrail-config:
     - compute
     - ceph-osd
     - cinder
+    - contrail-vmware
 
 contrail-control:
   name: Contrail - Control
@@ -36,6 +38,7 @@ contrail-control:
     - compute
     - ceph-osd
     - cinder
+    - contrail-vmware
 
 dpdk:
   name: DPDK compute
@@ -51,3 +54,28 @@ dpdk:
     - contrail-control
     - ceph-osd
     - cinder
+    - contrail-vmware
+  restrictions:
+    - condition: "settings:contrail_global_dpdk.value == false"
+      action: hide
+
+contrail-vmware:
+  name: Contrail - VMware
+  description: >
+    Contrail VMware vRouter role. Provides bridge between ESXi-host and Contrail.
+  has_primary: false
+  public_ip_required: false
+  weight: 100
+  conflicts:
+    - controller
+    - contrail-db
+    - contrail-config
+    - contrail-control
+    - ceph-osd
+    - cinder
+    - dpdk
+    - compute
+  restrictions:
+    - condition: "settings:common.use_vcenter.value == false"
+      action: hide
+

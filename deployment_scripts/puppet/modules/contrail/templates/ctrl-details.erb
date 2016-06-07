@@ -1,0 +1,24 @@
+SERVICE_TOKEN=<%= scope.lookupvar('contrail::service_token') %>
+AUTH_PROTOCOL=<%= scope.lookupvar('contrail::keystone_protocol') %>
+QUANTUM_PROTOCOL=<%= scope.lookupvar('contrail::neutron_protocol') %>
+ADMIN_TOKEN=<%= scope.lookupvar('contrail::admin_token') %>
+CONTROLLER=<% scope.lookupvar('contrail::mos_mgmt_vip') %>
+AMQP_SERVER=<%= scope.lookupvar('contrail::contrail_private_vip') %>
+HYPERVISOR=<%= scope.lookupvar('contrail::hypervisor') %>
+NOVA_PASSWORD=<%= scope.lookupvar('contrail::admin_token') %>
+NEUTRON_PASSWORD=<%= scope.lookupvar('contrail::admin_token') %>
+SERVICE_TENANT_NAME=<%= scope.lookupvar('service_tenant_name') %>
+QUANTUM=<%= scope.lookupvar('contrail::contrail_private_vip') %>
+QUANTUM_PORT=None
+COMPUTE=<%= scope.lookupvar('self_ip') %>
+SELF_MGMT_IP=<%= scope.lookupvar('::ipaddress_br_mgmt') %>
+CONTROLLER_MGMT=<%= scope.lookupvar('::ipaddress_br_mgmt') %>
+<%- if scope.lookupvar('contrail::node_role') == 'contrail-vmware' then -%>
+VMWARE_IP=<%= scope.lookupvar('vmware') %>
+VMWARE_USERNAME=<%= scope.lookupvar('vmware_username') %>
+VMWARE_PASSWD=<%= scope.lookupvar('vmware_passwd') %>
+VMWARE_VMPG_VSWITCH=<%= scope.lookupvar('vmware_vmpg_vswitch') %>
+INTERNAL_VIP=<%= scope.lookupvar('contrail::mos_mgmt_vip') %>
+CONTRAIL_INTERNAL_VIP=<%= scope.lookupvar('contrail::contrail_private_vip') %>
+EXTERNAL_VIP=<%= scope.lookupvar('contrail::mos_public_vip') %>
+<%- end -%>

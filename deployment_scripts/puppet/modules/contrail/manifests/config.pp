@@ -43,7 +43,7 @@ class contrail::config {
     }
   }
   package { 'ifmap-server': } ->
-  package { 'contrail-config': } ->
+  package { 'contrail-config': }
   package { 'contrail-openstack-config': } ->
 
 # Java support files
@@ -92,15 +92,13 @@ class contrail::config {
     'DEFAULTS/ifmap_server_port':         value => '8443';
     'DEFAULTS/ifmap_username':            value => 'api-server';
     'DEFAULTS/ifmap_password':            value => 'api-server';
-    'DEFAULTS/cassandra_server_list':     value => $contrail::cassandra_server_list;
+    'DEFAULTS/cassandra_server_list':     value => $contrail::cassandra_server_list_9160;
     'DEFAULTS/listen_ip_addr':            value => '0.0.0.0';
-    'DEFAULTS/listen_port':               value => '9100';
     'DEFAULTS/multi_tenancy':             value => true;
     'DEFAULTS/listen_port':               value => '9100';
     'DEFAULTS/log_file':                  value => '/var/log/contrail/contrail-api.log';
     'DEFAULTS/log_local':                 value => '1';
     'DEFAULTS/log_level':                 value => 'SYS_NOTICE';
-    'DEFAULTS/listen_port':               value => '9100';
     'DEFAULTS/disc_server_ip':            value => $contrail::contrail_private_vip;
     'DEFAULTS/disc_server_port':          value => '5998';
     'DEFAULTS/zk_server_ip':              value => $contrail::zk_server_ip;
@@ -133,14 +131,14 @@ class contrail::config {
   }
 
   contrail_discovery_config {
-    'DEFAULTS/zk_server_ip':          value => $contrail::zk_server_ip;
+    'DEFAULTS/zk_server_ip':          value => $contrail::contrail_mgmt_vip;
     'DEFAULTS/zk_server_port':        value => '2181';
     'DEFAULTS/listen_ip_addr':        value => '0.0.0.0';
     'DEFAULTS/listen_port':           value => '9110';
     'DEFAULTS/log_local':             value => '1';
     'DEFAULTS/log_file':              value => '/var/log/contrail/discovery.log';
     'DEFAULTS/log_level':             value => 'SYS_NOTICE';
-    'DEFAULTS/cassandra_server_list': value => $contrail::cassandra_server_list;
+    'DEFAULTS/cassandra_server_list': value => $contrail::cassandra_server_list_9160;
     'DEFAULTS/ttl_min':               value => '300';
     'DEFAULTS/ttl_max':               value => '1800';
     'DEFAULTS/hc_interval':           value => '5';
@@ -169,12 +167,12 @@ class contrail::config {
     'DEFAULTS/api_server_port':       value => '8082';
     'DEFAULTS/zk_server_ip':          value => $contrail::zk_server_ip;
     'DEFAULTS/log_file':              value => '/var/log/contrail/contrail-schema.log';
-    'DEFAULTS/cassandra_server_list': value => $contrail::cassandra_server_list;
-    'DEFAULTS/disc_server_ip':        value => $contrail::contrail::contrail_private_vip;
+    'DEFAULTS/cassandra_server_list': value => $contrail::cassandra_server_list_9160;
+    'DEFAULTS/disc_server_ip':        value => $contrail::contrail_private_vip;
     'DEFAULTS/disc_server_port':      value => '5998';
     'DEFAULTS/log_local':             value => '1';
     'DEFAULTS/log_level':             value => 'SYS_NOTICE';
-    'DEFAULTS/rabbit_server':         value => $contrail::contrail::contrail_private_vip;
+    'DEFAULTS/rabbit_server':         value => $contrail::contrail_private_vip;
     'DEFAULTS/rabbit_port':           value => '5673';
     'DEFAULTS/rabbit_user':           value => 'nova';
     'DEFAULTS/rabbit_password':       value => $contrail::rabbit_password;
@@ -193,13 +191,13 @@ class contrail::config {
     'DEFAULTS/api_server_port':        value => '8082';
     'DEFAULTS/zk_server_ip':           value => $contrail::zk_server_ip;
     'DEFAULTS/log_file':               value => '/var/log/contrail/contrail-svc-monitor.log';
-    'DEFAULTS/cassandra_server_list':  value => $contrail::cassandra_server_list;
+    'DEFAULTS/cassandra_server_list':  value => $contrail::cassandra_server_list_9160;
     'DEFAULTS/region':                 value => $contrail::region;
-    'DEFAULTS/disc_server_ip':         value => $contrail::contrail::contrail_private_vip;
+    'DEFAULTS/disc_server_ip':         value => $contrail::contrail_private_vip;
     'DEFAULTS/disc_server_port':       value => '5998';
     'DEFAULTS/log_local':              value => '1';
     'DEFAULTS/log_level':              value => 'SYS_NOTICE';
-    'DEFAULTS/rabbit_server':          value => $contrail::contrail::contrail_private_vip;
+    'DEFAULTS/rabbit_server':          value => $contrail::contrail_private_vip;
     'DEFAULTS/rabbit_port':            value => '5673';
     'DEFAULTS/rabbit_user':            value => 'nova';
     'DEFAULTS/rabbit_password':        value => $contrail::rabbit_password;
@@ -216,7 +214,7 @@ class contrail::config {
     'DEFAULTS/api_server_port':       value => '8082';
     'DEFAULTS/zk_server_ip':          value => $contrail::zk_server_ip;
     'DEFAULTS/log_file':              value => '/var/log/contrail/contrail-device-manager.log';
-    'DEFAULTS/cassandra_server_list': value => $contrail::cassandra_server_list;
+    'DEFAULTS/cassandra_server_list': value => $contrail::cassandra_server_list_9160;
     'DEFAULTS/disc_server_ip':        value => $contrail::contrail_private_vip;
     'DEFAULTS/disc_server_port':      value => '5998';
     'DEFAULTS/log_local':             value => '1';
@@ -260,12 +258,12 @@ class contrail::config {
       File['/etc/ifmap-server/basicauthusers.properties']
       ],
   }
+  Service['supervisor-config'] ->        Contrail_api_ini_config <||>
   Contrail_svc_monitor_config <||> ~>    Service['supervisor-config']
   Contrail_schema_config <||> ~>         Service['supervisor-config']
   Contrail_discovery_config <||> ~>      Service['supervisor-config']
   Contrail_config_nodemgr_config <||> ~> Service['supervisor-config']
   Contrail_api_config <||> ~>            Service['supervisor-config']
-  Contrail_api_ini_config <||> ~>        Service['supervisor-config']
   Contrail_device_manager_config <||> ~> Service['supervisor-config']
   Contrail_keystone_auth_config <||> ~>  Service['supervisor-config']
 }
