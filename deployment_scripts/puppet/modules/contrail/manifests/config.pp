@@ -94,7 +94,6 @@ class contrail::config {
     'DEFAULTS/ifmap_password':            value => 'api-server';
     'DEFAULTS/cassandra_server_list':     value => $contrail::cassandra_server_list_9160;
     'DEFAULTS/listen_ip_addr':            value => '0.0.0.0';
-    'DEFAULTS/listen_port':               value => '9100';
     'DEFAULTS/multi_tenancy':             value => true;
     'DEFAULTS/log_file':                  value => '/var/log/contrail/contrail-api.log';
     'DEFAULTS/log_local':                 value => '1';
