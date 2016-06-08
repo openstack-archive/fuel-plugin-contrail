@@ -467,7 +467,7 @@
   required_for: [post_deployment_end]
   requires: [contrail-compute-aggregate]
   parameters:
-    cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
+    cmd: if [ -f /tmp/contrail-reboot-require ]; then /usr/sbin/shutdown -r +1 & exit 0; fi
     timeout: 720
 
 - id: configure_default_route
