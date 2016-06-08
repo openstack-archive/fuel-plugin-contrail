@@ -33,9 +33,11 @@ Steps
     3. Install plugin with fuel-cli.
     4. Connect to Fuel web UI.
     5. Click on the "Create Environment" button.
-    6. Configure Environment with the "Neutron with tunneling segmentation" network configuration.
-    7. Click on "Settings"
-    8. Verify that Contrail Plugin Configure Checkboxes are present and active.
+    6. Configure Environment with the "Neutron with tunneling
+       segmentation" network configuration.
+    7. Activate plugin and all checkboxes.
+    8. Verify that Contrail Plugin Configure Checkboxes are present
+       and active. Check default vaules.
 
 
 Expected results

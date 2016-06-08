@@ -243,10 +243,13 @@ core
 Steps
 #####
 
-    1. Try to remove plugin and ensure that alert presents in cli: “400 Client Error: Bad Request (Can not delete plugin which is enabled for some environment.)”
-    2. Remove environment
-    3. Remove plugin
-    4. Check that it was removed successfully
+    1. Install plugin and create cluster with activated plugin.
+    2. Try to remove plugin and ensure that alert presents in cli:
+       '400 Client Error: Bad Request (Can not delete plugin which
+       is enabled for some environment.)'
+    3. Remove environment.
+    4. Remove plugin.
+    5. Check that it was removed successfully.
 
 
 Expected results
