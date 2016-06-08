@@ -39,7 +39,7 @@ then exit 1; fi",
     }
   }
 
-  if $contrail::node_role == 'primary-contrail-control' {
+  if roles_include(['primary-contrail-control']) {
     exec { 'prov_control_asn':
       command => "python /opt/contrail/utils/provision_control.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \

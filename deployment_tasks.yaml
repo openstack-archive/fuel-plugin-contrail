@@ -271,6 +271,7 @@
     strategy:
       type: parallel
 
+
 ################
 #11. Provision Contrail control
 ################
@@ -281,6 +282,8 @@
   groups: [contrail-control]
   required_for: [deploy_end]
   requires: [contrail-control-all]
+  cross-depends:
+    - name: contrail-control-provision-primary
   parameters:
     puppet_manifest: puppet/manifests/contrail-control-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
