@@ -17,12 +17,17 @@ import os
 import os.path
 
 from proboscis import test
+from proboscis.asserts import assert_equal
+from proboscis.asserts import assert_true
+
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+
 from helpers import plugin
 from helpers import openstack
+from helpers.settings import CONTRAIL_PLUGIN_VERSION
 
 
 @test(groups=["plugins"])
@@ -48,17 +53,124 @@ class ContrailPlugin(TestBasic):
         """Install Contrail Plugin and create cluster.
 
         Scenario:
-            1. Revert snapshot "ready_with_5_slaves"
-            2. Upload contrail plugin to the master node
-            3. Install plugin and additional packages
-            4. Enable Neutron with tunneling segmentation
-            5. Create cluster
+            1. Upload a plugin to Fuel Master node using scp.
+            2. Connect to Fuel Master node via ssh.
+            3. Install plugin with fuel-cli.
+            4. Connect to Fuel web UI.
+            5. Click on the "Create Environment" button.
+            6. Configure Environment with the "Neutron with tunneling
+               segmentation" network configuration.
+            7. Activate plugin and all checkboxes.
+            8. Verify that Contrail Plugin Configure Checkboxes are present
+               and active. Check default vaules.
 
         Duration 20 min
 
         """
-        plugin.show_range(self, 1, 6)
+        # defaults
+        plugin_name = 'contrail'
+        contrail_api_port = '8082'
+        contrail_route_target = '10000'
+        contrail_external = '10.100.1.0/24'
+        contrail_asnum = '64512'
+        hugepages_amount = '10'
+        hugepages_size = '2'
+        vrouter_core_mask = '0x3'
+        sriov_physnet = 'physnet1'
+
+        plugin.show_range(self, 1, 7)
         plugin.prepare_contrail_plugin(self, slaves=3)
+
+        cluster_id = self.fuel_web.get_last_created_cluster()
+        cmd = 'fuel plugins list'
+
+        output = list(self.env.d_env.get_admin_remote().execute(
+            cmd)['stdout']).pop().split(' ')
+
+        # check name
+        assert_true(
+            plugin_name in output,
+            "Plugin  {} is not installed.".format(plugin_name)
+        )
+        # check version
+        assert_true(
+            CONTRAIL_PLUGIN_VERSION in output,
+            "Plugin  {} is not installed.".format(CONTRAIL_PLUGIN_VERSION)
+        )
+
+        self.show_step(7)
+        plugin.activate_plugin(
+            self, contrail_global_dpdk=True, contrail_global_sriov=True,
+            dpdk_on_vf=True)
+
+        self.show_step(8)
+        attr = self.fuel_web.client.get_cluster_attributes(
+            cluster_id)['editable'][plugin_name]['metadata']
+
+        state = attr['enabled']
+        assert_equal(state, True, "Plugin is not enabled.")
+
+        attr = attr['versions'][0]
+        vers = attr['metadata']['plugin_version']
+        assert_equal(
+            CONTRAIL_PLUGIN_VERSION, vers,
+            "Invali version.".format(vers))
+
+        assert_equal(
+            contrail_api_port, attr['contrail_api_public_port']['value'],
+            "Invalid  contrail api port {0}.".format(
+                attr['contrail_api_public_port']['value']))
+
+        assert_equal(
+            True, attr['contrail_global_sriov']['value'],
+            "Contrail global sriov is disabled.")
+
+        assert_equal(
+            True, attr['dpdk_on_vf']['value'],
+            "Dpdk on vf is disabled.")
+
+        assert_equal(
+            contrail_route_target, attr['contrail_route_target']['value'],
+            "Invalid default contrail route target {0}.".format(
+                attr['contrail_route_target']['value']))
+
+        assert_equal(
+            hugepages_size, attr['hugepages_size']['value'],
+            "Invalid default hugepages size {0}.".format(
+                attr['hugepages_size']['value']))
+
+        assert_equal(
+            True, attr['contrail_global_dpdk']['value'],
+            "Contrail global dpdk is disabled.")
+
+        assert_equal(
+            True, attr['patch_nova']['value'],
+            "Patch_nova is not enabled by default.")
+
+        assert_equal(
+            sriov_physnet, attr['sriov_physnet']['value'],
+            "Invalid default sriov physnet {0}.".format(
+                attr['sriov_physnet']['value']))
+
+        assert_equal(
+            vrouter_core_mask, attr['vrouter_core_mask']['value'],
+            "Invalid default sriov physnet {0}.".format(
+                attr['vrouter_core_mask']['value']))
+
+        assert_equal(
+            contrail_asnum, attr['contrail_asnum']['value'],
+            "Invalid default sriov physnet {0}.".format(
+                attr['contrail_asnum']['value']))
+
+        assert_equal(
+            hugepages_amount, attr['hugepages_amount']['value'],
+            "Invalid default hugepages amount {0}.".format(
+                attr['hugepages_amount']['value']))
+
+        assert_equal(
+            contrail_external, attr['contrail_external']['value'],
+            "Invalid default 'contrail external' {0}.".format(
+                attr['contrail_external']['value']))
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["contrail_smoke"])
