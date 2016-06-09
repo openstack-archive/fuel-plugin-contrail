@@ -20,13 +20,14 @@ from devops.helpers.helpers import wait
 
 from fuelweb_test import logger
 from fuelweb_test.helpers import os_actions
-from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.settings import SERVTEST_PASSWORD
 from fuelweb_test.settings import SERVTEST_TENANT
 from fuelweb_test.settings import SERVTEST_USERNAME
+
 
 from proboscis import test
 from proboscis.asserts import assert_true
@@ -34,6 +35,7 @@ from proboscis.asserts import assert_true
 from helpers.contrail_client import ContrailClient
 from helpers import plugin
 from helpers import openstack
+from helpers.settings import OSTF_RUN_TIMEOUT
 
 
 @test(groups=["plugins"])
@@ -430,3 +432,121 @@ class SystemTests(TestBasic):
             interf_id in net_interface_ids,
             '{0} is not attached to network {1}'.format(
                 srv_2.name, net_test))
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_ceilometer_metrics"])
+    @log_snapshot_after_test
+    def contrail_ceilometer_metrics(self):
+        """Check that ceilometer collects contrail metrics.
+
+        Scenario:
+            1. Install contrail plugin.
+            2. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration.
+            3. Enable and configure Contrail plugin.
+            4. Add a node with "controller" + "MongoDB" multirole.
+            6. Add a node with "compute".
+            7. Add a node with "contrail-config", "contrail-control" and
+               "contrail-db" roles.
+            8. Deploy cluster with plugin.
+            9. Run OSTF tests.
+            10. Create 2 instances in the default network.
+            11. Send icpm packets from one instance to another.
+            12. Check contrail ceilometer metrics:
+                *ip.floating.receive.bytes
+                *ip.floating.receive.packets
+                *ip.floating.transmit.bytes
+                *ip.floating.transmit.packets
+
+
+        Duration 120 min
+
+        """
+        # constants
+        ceilometer_metrics = [
+            'ip.floating.receive.bytes',
+            'ip.floating.receive.packets',
+            'ip.floating.transmit.bytes',
+            'ip.floating.transmit.packets']
+        command = """source openrc; ceilometer sample-list -m {0}
+         -q 'resource_id={1}'"""
+        metric_type = 'cumulative'
+        time_to_update_metrics = 60 * 10
+        message = "Ceilometer doesn't collect metric {0}."
+
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(
+            self,
+            slaves=3,
+            options={'ceilometer': True})
+
+        self.show_step(2)
+        plugin.activate_plugin(self)
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        plugin.show_range(self, 4, 8)
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller', 'mongo'],
+                'slave-02': ['compute'],
+                'slave-03': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db'],
+            })
+        self.show_step(8)
+        openstack.deploy_cluster(self)
+        self.show_step(9)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'tests_platform'],
+                timeout=OSTF_RUN_TIMEOUT)
+
+        self.show_step(10)
+        cluster_id = self.fuel_web.get_last_created_cluster()
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+
+        srv_1 = os_conn.create_server_for_migration(
+            neutron=True, label='admin_internal_net')
+        fip_1 = os_conn.assign_floating_ip(srv_1)
+
+        srv_2 = os_conn.create_server_for_migration(
+            neutron=True, label='admin_internal_net')
+        fip_2 = os_conn.assign_floating_ip(srv_2)
+
+        for fip in [fip_1.ip, fip_2.ip]:
+            wait(
+                lambda: tcp_ping(fip, 22), timeout=60, interval=5,
+                timeout_msg="Node {0} is not accessible by SSH.".format(fip))
+
+        self.show_step(11)
+        controller = self.fuel_web.get_nailgun_primary_node(
+            self.env.d_env.nodes().slaves[0])
+        self.ping_instance_from_instance(
+            os_conn, controller.name, {fip_1.ip: [fip_2.ip]})
+
+        self.show_step(12)
+        with self.fuel_web.get_ssh_for_node("slave-01") as ssh:
+            for metric in ceilometer_metrics:
+                for resource_id in [fip_1.id, fip_2.id]:
+                    wait(
+                        lambda:
+                        len(list(ssh.execute(
+                            command.format(
+                                metric, resource_id))['stdout'])) > 4,
+                        timeout=time_to_update_metrics,
+                        timeout_msg=message.format(metric))
+                    m = list(ssh.execute(
+                        command.format(metric, resource_id))['stdout'])
+                    # Check type of metrics
+                    collect_metric_type = m[3].split(' ')[5]
+                    assert_true(
+                        collect_metric_type == metric_type,
+                        "Type of metric {0} not equel to {1}.".format(
+                            collect_metric_type, metric_type))
