@@ -471,7 +471,7 @@ All steps must be completed successfully, without any errors.
 
 
 Check configured no default contrail parameters via Contrail WEB.
----------------------------------------------------------------------
+-----------------------------------------------------------------
 
 
 ID
@@ -504,9 +504,9 @@ Steps
        * contrail_external
        * contrail_asnum
     4. Add nodes:
-        1 contrail-config+contrail-control+contrail-db
-        1 controller
-        1 compute
+       1 contrail-config+contrail-control+contrail-db
+       1 controller
+       1 compute
     5. Deploy cluster.
     6. Verify that all configured contrail parameters present in
        the Contrail WEB.

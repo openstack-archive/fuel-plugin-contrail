@@ -315,10 +315,10 @@ Steps
     9. Create 2 instances in the default network.
     10. Send icpm packets from one instance to another.
     11. Check contrail ceilometer metrics:
-        *ip.floating.receive.bytes
-        *ip.floating.receive.packets
-        *ip.floating.transmit.bytes
-        *ip.floating.transmit.packets
+        "\*ip.floating.receive.bytes",
+        "\*ip.floating.receive.packets",
+        "\*ip.floating.transmit.bytes",
+        "\*ip.floating.transmit.packets".
 
 
 Expected results
