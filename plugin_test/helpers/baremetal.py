@@ -121,7 +121,7 @@ class BMDriver(object):
             ret = BridgeTool.add_interface(bridge, br_interface[0])
             logger.debug('Add iface result: {0}'.format(ret))
 
-    def wait4node_status(self, obj, node_mac, status='discover',
+    def wait4node_status(self, obj, node_mac, status=['discover'],
                          timeout=settings.DEPLOY_CLUSTER_TIMEOUT):
         """Wait until slave host is ready."""
         logger.info('Wait for node "{0}" status "{1}"'.format(node_mac,
@@ -136,7 +136,7 @@ class BMDriver(object):
                          ' status:{status},'
                          ' name:{name},'
                          ' cluster:{cluster}.'.format(**node))
-            if node['status'] == status:
+            if node['status'] in status:
                 if not node['online']:
                     logger.info('Node found but "offline". ' +
                                 node_info)
@@ -165,7 +165,7 @@ class BMDriver(object):
         openstack.assign_vlan(obj, storage=102, management=101)
 
         node_mac = self.conf['target_macs']
-        self.wait4node_status(obj, node_mac, status='discover')
+        self.wait4node_status(obj, node_mac, status=['discover', 'ready'])
 
         node = self.get_bm_node(obj, node_mac)
         logger.info('Setup node "{0}" roles: "{1}"'.format(node['name'],
