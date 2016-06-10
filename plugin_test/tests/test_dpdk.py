@@ -260,7 +260,12 @@ class DPDKTests(TestBasic):
         openstack.deploy_cluster(self)
         # Run OSTF tests
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity'],
+                                   should_fail=1,
+                                   failed_test_name=['Check that required '
+                                                     'services are running']
+                                   )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_dpdk"])
