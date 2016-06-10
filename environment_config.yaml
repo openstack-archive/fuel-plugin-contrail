@@ -46,6 +46,18 @@ attributes:
     description: "Enable this option to unlock the DPDK feature.\nNOTE: You still have to assign DPDK-role to compute nodes to enable DPDK on them."
     weight: 70
     type: "checkbox"
+  vrouter_core_mask:
+    value: "0x3"
+    label: "CPU pinning"
+    description: "Hexadecimal mask that determines how many and what exactly processors will be used for dpdk vrouter"
+    weight: 131
+    type: "text"
+    regex:
+      source: '0[xX][0-9a-fA-F]+'
+      error: "Invalid hexadecimal value"
+    restrictions:
+      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+        action: "hide"
   patch_nova:
     value: true
     label: "Patch Nova"
