@@ -21,27 +21,62 @@ class contrail::compute::nova {
     path    => '/etc/libvirt/qemu.conf',
     setting => 'cgroup_device_acl',
     value   => $cgroup_acl_string,
-  } ~>
-  service { $contrail::libvirt_name :
-    ensure => 'running',
-    enable => true
+    notify  => Service['libvirt'],
   }
 
-  nova_config {
-    'DEFAULT/network_api_class':                 value => 'nova.network.neutronv2.api.API';
-    'DEFAULT/neutron_url_timeout':               value => '300';
-    'DEFAULT/firewall_driver':                   value => 'nova.virt.firewall.NoopFirewallDriver';
-    'DEFAULT/security_group_api':                value => 'neutron';
-    'DEFAULT/heal_instance_info_cache_interval': value => '0';
-  }
-  if $contrail::compute_dpdk_enabled {
-    nova_config {
-      'CONTRAIL/use_userspace_vhost':            value => true;
+  # [LCM] Workaroud to fix duplicate declaration with Service['libvirt']
+  # from class 'nova::compute::libvirt' during catalog compilation.
+  if !defined('nova::compute::libvirt') {
+    service { 'libvirt':
+      ensure => 'running',
+      enable => true,
+      name   => $contrail::libvirt_name,
     }
   }
-  Nova_config <||> ~>
-  service { 'nova-compute':
-    ensure => running,
-    enable => true,
+
+  # [LCM] Workaroud to fix duplicate declaration with nova_config recources
+  # from class 'nova::network::neutron' during catalog compilation.
+  if !defined('nova::network::neutron') {
+    nova_config {
+      'DEFAULT/network_api_class':   value => 'nova.network.neutronv2.api.API';
+      'DEFAULT/neutron_url_timeout': value => '300';
+      'DEFAULT/firewall_driver':     value => 'nova.virt.firewall.NoopFirewallDriver';
+      'DEFAULT/security_group_api':  value => 'neutron';
+    }
   }
+  else {
+    Nova_config <| (title == 'DEFAULT/neutron_url_timeout') |> {
+      value => '300',
+    }
+  }
+
+  # [LCM] Workaroud to fix duplicate declaration with nova_config recource
+  # from class 'nova::compute' during catalog compilation.
+  if !defined('nova::compute') {
+    nova_config { 'DEFAULT/heal_instance_info_cache_interval':
+      value => '0',
+    }
+  }
+  else {
+    Nova_config <| (title == 'DEFAULT/heal_instance_info_cache_interval') |> {
+      value => '0',
+    }
+  }
+
+  if $contrail::compute_dpdk_enabled {
+    nova_config {
+      'CONTRAIL/use_userspace_vhost': value => true;
+    }
+  }
+
+  # [LCM] Workaroud to fix duplicate declaration with Service['nova-compute']
+  # from class 'nova::generic_service' during catalog compilation.
+  if !defined('nova::generic_service') {
+    service { 'nova-compute':
+      ensure => running,
+      enable => true,
+    }
+  }
+
+  Nova_config <||> ~> Service['nova-compute']
 }
