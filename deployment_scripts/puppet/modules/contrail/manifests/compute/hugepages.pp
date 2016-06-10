@@ -15,8 +15,10 @@
 class contrail::compute::hugepages {
   # This class is kept here to ensure hugetlbfs mount existence,
   # even if user has missed nova hugepages configuration in UI/API.
+  $node_hash       = hiera_hash('node', {})
+  $nova_huge_pages = pick($node_hash['nova_hugepages_enabled'], false)
 
-  if $contrail::compute_dpdk_enabled and $::osfamily == 'Debian' {
+  if $contrail::compute_dpdk_enabled and !$nova_huge_pages and ($::osfamily == 'Debian') {
     $qemu_hugepages_value    = 'set KVM_HUGEPAGES 1'
     $libvirt_hugetlbfs_mount = 'set hugetlbfs_mount /run/hugepages/kvm'
     augeas { 'qemu_hugepages':
