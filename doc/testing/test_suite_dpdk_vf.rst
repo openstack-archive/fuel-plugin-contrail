@@ -31,16 +31,17 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 3 controller + mongo
-        * 1 compute + ceph
-        * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+       * 3 controller + mongo
+       * 1 compute + ceph
+       * 1 contrail-config+contrail-control+contrail-db
+       * 1 compute+sriov+dpdk
     4. Deploy cluster.
     5. Run OSTF tests.
+
 
 Expected results
 ################
@@ -76,13 +77,13 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute+sriov+dpdk
-        * 1 contrail-config+contrail-control+contrail-db
+       * 1 controller
+       * 1 compute+sriov+dpdk
+       * 1 contrail-config+contrail-control+contrail-db
     4. Deploy cluster.
     5. Run OSTF tests.
     6. Check Controller and Contrail nodes status.
@@ -125,14 +126,14 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute
-        * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+       * 1 controller
+       * 1 compute
+       * 1 contrail-config+contrail-control+contrail-db
+       * 1 compute+sriov+dpdk
     4. Run OSTF tests.
     5. Delete node with compute role.
     6. Deploy changes.
@@ -173,13 +174,13 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute+sriov+dpdk
-        * 1 contrail-config+contrail-control+contrail-db
+       * 1 controller
+       * 1 compute+sriov+dpdk
+       * 1 contrail-config+contrail-control+contrail-db
     4. Run OSTF tests.
     5. Add a node with compute+dpdk+sriov roles.
     6. Deploy changes.
@@ -220,13 +221,13 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 2 compute+sriov+dpdk
-        * 1 contrail-config+contrail-control+contrail-db
+       * 1 controller
+       * 2 compute+sriov+dpdk
+       * 1 contrail-config+contrail-control+contrail-db
     4. Run OSTF tests.
     5. Delete node with compute+dpdk roles.
     6. Deploy changes.
@@ -267,13 +268,13 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute+sriov+dpdk
-        * 1 contrail-config+contrail-control+contrail-db
+       * 1 controller
+       * 1 compute+sriov+dpdk
+       * 1 contrail-config+contrail-control+contrail-db
     4. Run OSTF tests.
     5. Add node with controller role.
     6. Deploy changes.
@@ -314,13 +315,13 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration.
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 3 controller
-        * 1 compute+sriov+dpdk
-        * 1 contrail-config+contrail-control+contrail-db
+       * 3 controller
+       * 1 compute+sriov+dpdk
+       * 1 contrail-config+contrail-control+contrail-db
     4. Run OSTF tests.
     5. Delete node with controller role.
     6. Deploy changes.
@@ -361,14 +362,14 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration.
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute
-        * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+       * 1 controller
+       * 1 compute
+       * 1 contrail-config+contrail-control+contrail-db
+       * 1 compute+sriov+dpdk
     4. Deploy cluster.
     5. Run OSTF.
     6. Add "contrail-config", "contrail-control", "contrail-db" roles.
@@ -410,14 +411,14 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute + ceph
-        * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+       * 1 controller
+       * 1 compute + ceph
+       * 1 contrail-config+contrail-control+contrail-db
+       * 1 compute+sriov+dpdk
     4. Deploy cluster.
     5. Run OSTF tests
     6. Create private networks net01 with subnet.
@@ -429,6 +430,7 @@ Steps
     10. Launch few instances in the net01.
         with image TestVM and flavor m1.small.hpgs in hpgs az.
     11. Check connection between instances (ping, ssh).
+
 
 Expected results
 ################
@@ -464,14 +466,14 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute + ceph
-        * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+       * 1 controller
+       * 1 compute + ceph
+       * 1 contrail-config+contrail-control+contrail-db
+       * 1 compute+sriov+dpdk
     4. Deploy cluster.
     5. Run OSTF tests
     6. Launch few instances with image TestVM and flavor m1.micro in nova az.
@@ -482,6 +484,7 @@ Steps
     10. Launch few instances with image TestVM and flavor m1.small.hpgs
         in hpgs az.
     11. Check connection between instances (ping, ssh).
+
 
 Expected results
 ################
@@ -517,14 +520,14 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute + ceph
-        * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+       * 1 controller
+       * 1 compute + ceph
+       * 1 contrail-config+contrail-control+contrail-db
+       * 1 compute+sriov+dpdk
     4. Deploy cluster.
     5. Run OSTF tests
     6. Create private networks net01 with subnet.
@@ -538,8 +541,8 @@ Steps
     12. Send ping from instances to 8.8.8.8 or other outside ip.
 
 
-Expected result
-###############
+Expected results
+################
 
 Pings should  get a response
 
@@ -571,14 +574,14 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation"
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute + ceph
-        * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+       * 1 controller
+       * 1 compute + ceph
+       * 1 contrail-config+contrail-control+contrail-db
+       * 1 compute+sriov+dpdk
     4. Deploy cluster.
     5. Run OSTF tests
     6. Create private networks net01 with subnet.
@@ -592,11 +595,10 @@ Steps
     12. Send ping from instances to 8.8.8.8 or other outside ip.
 
 
-Expected result
-###############
+Expected results
+################
 
 Instances have access to an internet.
-
 
 
 Create volume and boot instance from it
@@ -627,15 +629,15 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute + ceph
-        * 1 cinder
-        * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+       * 1 controller
+       * 1 compute + ceph
+       * 1 cinder
+       * 1 contrail-config+contrail-control+contrail-db
+       * 1 compute+sriov+dpdk
     4. Deploy cluster.
     5. Run OSTF tests.
     6. Create private networks net01 with subnet.
@@ -649,8 +651,9 @@ Steps
     12. Check that instances have "Active" status.
     13. Check connectivity to instances by floating ip(ping).
 
-Expected result
-###############
+
+Expected results
+################
 
 Instances should have "Active" status. Pings should get a response.
 
@@ -683,14 +686,14 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin:
-        * enable dpdk
-        * enable sriov
-        * enable DPDK on VF
+       * enable dpdk
+       * enable sriov
+       * enable DPDK on VF
     3. Add following nodes:
-        * 1 controller
-        * 1 compute + ceph
-        * 1 contrail-config+contrail-control+contrail-db
-        * 2 compute+sriov+dpdk
+       * 1 controller
+       * 1 compute + ceph
+       * 1 contrail-config+contrail-control+contrail-db
+       * 2 compute+sriov+dpdk
     4. Deploy cluster.
     5. Run OSTF tests.
     6. Create private networks net01 with subnet.
@@ -707,7 +710,8 @@ Steps
     15. Check instance host.
     16. Check connectivity to migrated instance by floating ip(ping).
 
-Expected result
-###############
+
+Expected results
+################
 
 Instances should be migrated. Pings should get a response.
