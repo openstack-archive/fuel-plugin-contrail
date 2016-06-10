@@ -343,11 +343,12 @@ class DPDKTests(TestBasic):
             3. Deploy cluster with following node configuration:
                 node-01: 'controller', 'ceph-osd';
                 node-02: 'contrail-control', 'contrail-config', 'contrail-db';
-                node-03: 'contrail-db', 'ceph-osd';
-                node-05: 'compute', 'dpdk';
-                node-06: 'compute', 'ceph-osd';
+                node-03: 'contrail-db';
+                node-04: 'compute', 'ceph-osd';
+                node-05: 'ceph-osd';
+                node-06: 'compute', 'dpdk';
             4. Run OSTF tests
-            5. Delete node-05 with "dpdk" and "compute" roles
+            5. Delete node-06 with "dpdk" and "compute" roles
             6. Deploy changes
             7. Run OSTF tests
 
@@ -374,8 +375,9 @@ class DPDKTests(TestBasic):
             'slave-02': ['contrail-control',
                          'contrail-config',
                          'contrail-db'],
-            'slave-03': ['contrail-db', 'ceph-osd'],
-            'slave-04': ['compute', 'ceph-osd']
+            'slave-03': ['contrail-db'],
+            'slave-04': ['compute', 'ceph-osd'],
+            'slave-05': ['ceph-osd'],
         }
 
         self.fuel_web.update_nodes(
