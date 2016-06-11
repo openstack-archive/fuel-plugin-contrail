@@ -20,3 +20,12 @@ file { '/etc/hiera/plugins/contrail.yaml':
   ensure  => file,
   content => 'use_ovs: false',
 }
+
+if roles_include('dpdk') {
+  file_line {'contrail-vrouter-override_ns':
+    path  => '/etc/hiera.yaml',
+    line  => '    - plugins/contrail-vrouter-override_ns',
+    after => '  !ruby/sym hierarchy:',
+  }
+}
+
