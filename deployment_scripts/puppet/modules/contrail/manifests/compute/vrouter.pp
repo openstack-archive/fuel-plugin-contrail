@@ -26,8 +26,9 @@ class contrail::compute::vrouter {
 
   if $contrail::compute_dpdk_enabled {
 
-    if empty($dev_mac) {
-      $dpdk_dev_mac = get_mac_from_vrouter()
+    $dpdk_mac = $::mac_from_vrouter
+    if $dpdk_mac {
+      $dpdk_dev_mac = $dpdk_mac
     } else {
       $dpdk_dev_mac = $dev_mac
     }
@@ -38,9 +39,9 @@ class contrail::compute::vrouter {
     if ( 'bond' in $raw_phys_dev) {
       file_line { 'permanent_mac':
         ensure => present,
-        line   => "hwaddress ${dev_mac}",
-        path   => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
-        after  => "iface ${raw_phys_dev} inet manual",
+        line => "hwaddress ${dpdk_dev_mac}",
+        path => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
+        after => "iface ${raw_phys_dev} inet manual",
       }
     }
 
@@ -48,7 +49,7 @@ class contrail::compute::vrouter {
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
 
     contrail_vrouter_dpdk_ini_config {
-      'program:contrail-vrouter-dpdk/command':                 value => "taskset ${contrail::vrouter_core_mask} /usr/bin/contrail-vrouter-dpdk --no-daemon";
+      'program:contrail-vrouter-dpdk/command':                 value => "taskset ${contrail::vrouter_core_mask} /usr/bin/contrail-vrouter-dpdk --no-daemon ${::supervisor_params}";
       'program:contrail-vrouter-dpdk/priority':                value => '410';
       'program:contrail-vrouter-dpdk/loglevel':                value => 'debug';
       'program:contrail-vrouter-dpdk/autostart':               value => true;

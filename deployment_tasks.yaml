@@ -515,6 +515,32 @@
   type: skipped
   version: 2.0.0
 
+# Redefined task to skip it on DPDK computes
+- id: openstack-network-common-config
+  type: puppet
+  version: 2.1.0
+  groups: [primary-controller,controller,compute]
+  required_for: [openstack-network-end]
+  requires: [openstack-network-start]
+  condition:
+    yaql_exp: >
+      (changedAny($.get('openstack_network'), $.get('verbose'), $.debug,
+      $.quantum_settings, $.neutron_advanced_configuration, $.rabbit,
+      $.ceilometer, $.network_scheme, $.get('use_syslog'),
+      $.get('use_stderr'), $.get('syslog_log_facility_neutron'),
+      $.network_metadata.nodes.values().where(
+        $.node_roles.any($.matches('controller'))).network_roles.select(
+          $.get('mgmt/messaging')),
+      $.get('amqp_hosts'), $.get('kombu_compression')) and not 'dpdk' in $.roles)
+  parameters:
+    puppet_manifest: /etc/puppet/modules/openstack_tasks/examples/openstack-network/common-config.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 1800
+
+##################
+# Configuration for Nova, Neutron, Heat, Ceilometer on OpenStack Controllers
+##################
+
 - id: openstack-controller-contrail
   type: puppet
   version: 2.0.0
@@ -708,6 +734,20 @@
   type: skipped
   version: 2.0.0
   #
+
+# Overrides bridges settings to make netconfig idempotent with DPDK
+- id: contrail-compute-netconfig-override
+  groups: [compute]
+  type: puppet
+  version: 2.1.0
+  condition:
+    yaql_exp: ('dpdk' in $.roles)
+  required_for: [deploy_end, contrail-override-repository]
+  requires: [deploy_start, netconfig]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-netconfig-override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
 
 # Set apt pin for packeges that need to be override
 - id: contrail-override-repository
