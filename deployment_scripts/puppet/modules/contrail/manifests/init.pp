@@ -34,7 +34,9 @@ class contrail {
   # Network configuration
   prepare_network_config($network_scheme)
   $interface         = get_network_role_property('neutron/mesh', 'interface')
-  $routes            = pick($network_scheme['endpoints'][$interface]['routes'], false)
+
+  $iface = pick($network_scheme['endpoints'][$interface], {})
+  $routes = pick($iface['routes'], false)
 
   if  $routes {
     $gateway = $routes[0]['via']
@@ -42,9 +44,9 @@ class contrail {
     $gateway = false
   }
 
-  $address           = get_network_role_property('neutron/mesh', 'ipaddr')
-  $cidr              = get_network_role_property('neutron/mesh', 'cidr')
-  $netmask           = get_network_role_property('neutron/mesh', 'netmask')
+  $address           = pick(get_network_role_property('neutron/mesh', 'ipaddr'), get_network_role_property('contrail/vhost0', 'ipaddr'))
+  $cidr              = pick(get_network_role_property('neutron/mesh', 'cidr'), get_network_role_property('contrail/vhost0', 'cidr'))
+  $netmask           = pick(get_network_role_property('neutron/mesh', 'netmask'), get_network_role_property('contrail/vhost0', 'netmask'))
   $netmask_short     = netmask_to_cidr($netmask)
   $phys_dev          = get_private_ifname($interface, $network_scheme)
   $phys_dev_pci      = get_dev_pci_addr($phys_dev, $network_scheme)
