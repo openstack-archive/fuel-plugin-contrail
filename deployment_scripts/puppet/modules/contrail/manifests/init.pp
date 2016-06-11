@@ -40,7 +40,6 @@ class contrail {
     $gateway = false
   }
 
-
   $address           = get_network_role_property('neutron/mesh', 'ipaddr')
   $cidr              = get_network_role_property('neutron/mesh', 'cidr')
   $netmask           = get_network_role_property('neutron/mesh', 'netmask')
