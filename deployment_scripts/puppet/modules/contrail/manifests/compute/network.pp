@@ -13,11 +13,10 @@
 #    under the License.
 
 class contrail::compute::network {
-  $node_role = 'compute'
-  $address = $contrail::address
-  $ifname = $contrail::phys_dev
-  $netmask = $contrail::netmask_short
-  $default_gw = undef
+  $address        = $contrail::address
+  $ifname         = $contrail::phys_dev
+  $netmask        = $contrail::netmask_short
+  $default_gw     = undef
 
   $br_file = $::operatingsystem ? {
     'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
