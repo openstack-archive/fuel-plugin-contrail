@@ -524,6 +524,18 @@
   version: 2.0.0
   #
 
+# Overrides bridges settings to make netconfig idempotent with DPDK
+- id: contrail-compute-netconfig-override
+  groups: [compute]
+  type: puppet
+  version: 2.0.0
+  reexecute_on: ['deploy_changes']
+  required_for: [deploy_end, contrail-override-repository]
+  requires: [deploy_start, netconfig]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-netconfig-override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+
 # Set apt pin for packeges that need to be override
 - id: contrail-override-repository
   type: puppet

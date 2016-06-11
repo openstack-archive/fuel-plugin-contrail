@@ -1,6 +1,5 @@
 auto vhost0
 iface vhost0 inet static
-pre-up /opt/contrail/bin/if-vhost0
 address <%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
 network_name contrail
 <% if scope.lookupvar('contrail::gateway') -%>
