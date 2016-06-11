@@ -12,8 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-require 'yaml'
-
 module Puppet::Parser::Functions
 newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
     Returns interface selected as "Private network" in web UI
