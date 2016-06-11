@@ -13,10 +13,13 @@
 #    under the License.
 
 class contrail::compute::network {
-  $address    = $contrail::address
-  $ifname     = $contrail::phys_dev
-  $netmask    = $contrail::netmask_short
-  $default_gw = undef
+  $address        = $contrail::address
+  $ifname         = $contrail::phys_dev
+  $netmask        = $contrail::netmask_short
+  $network_scheme = $contrail::network_scheme
+
+  $override_ns = vrouter_override_network_scheme($network_scheme, $ifname)
+  $default_gw  = undef
 
   $br_file = $::operatingsystem ? {
     'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
@@ -39,6 +42,17 @@ class contrail::compute::network {
   exec {'flush_addr_br_mesh':
     command => 'ip addr flush dev br-mesh',
     onlyif  => 'ip addr show dev br-mesh | grep -q inet',
+  }
+
+  # Override network_scheme to skip interfaces used by the vrouter
+  file { '/etc/hiera/plugins/contrail-vrouter-override_ns.yaml':
+    ensure  => file,
+    content => inline_template('<%= YAML.dump @override_ns %>')
+  }
+  file_line {'contrail-vrouter-override_ns':
+    path  => '/etc/hiera.yaml',
+    line  => '    - plugins/contrail-vrouter-override_ns',
+    after => '  !ruby/sym hierarchy:',
   }
 
   case $::operatingsystem {
