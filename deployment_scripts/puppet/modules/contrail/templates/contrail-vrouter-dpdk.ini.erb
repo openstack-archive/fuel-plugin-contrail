@@ -1,5 +1,5 @@
 [program:contrail-vrouter-dpdk]
-command=taskset <%= scope.lookupvar('contrail::vrouter_core_mask') %> /usr/bin/contrail-vrouter-dpdk --no-daemon
+command=taskset <%= scope.lookupvar('contrail::vrouter_core_mask') %> /usr/bin/contrail-vrouter-dpdk --no-daemon <%= scope.lookupvar('::supervisor_params') %>
 priority=410
 loglevel=debug
 autostart=true

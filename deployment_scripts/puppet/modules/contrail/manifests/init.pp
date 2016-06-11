@@ -32,7 +32,9 @@ class contrail {
   # Network configuration
   prepare_network_config($network_scheme)
   $interface         = get_network_role_property('neutron/mesh', 'interface')
-  $routes            = pick($network_scheme['endpoints'][$interface]['routes'], false)
+
+  $iface = pick($network_scheme['endpoints'][$interface], {})
+  $routes = pick($iface['routes'], false)
 
   if  $routes {
     $gateway = $routes[0]['via']
@@ -40,12 +42,17 @@ class contrail {
     $gateway = false
   }
 
+  if roles_include(['dpdk']) {
+    $network_role = 'contrail/vhost0'
+  } else {
+    $network_role = 'neutron/mesh'
+  }
 
-  $address           = get_network_role_property('neutron/mesh', 'ipaddr')
-  $cidr              = get_network_role_property('neutron/mesh', 'cidr')
-  $netmask           = get_network_role_property('neutron/mesh', 'netmask')
+  $address           = get_network_role_property($network_role, 'ipaddr')
+  $cidr              = get_network_role_property($network_role, 'cidr')
+  $netmask           = get_network_role_property($network_role, 'netmask')
   $netmask_short     = netmask_to_cidr($netmask)
-  $phys_dev          = get_private_ifname($interface)
+  $phys_dev          = get_private_ifname($network_scheme['roles']['neutron/mesh'])
   $phys_dev_pci      = get_dev_pci_addr($phys_dev)
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
   $headless_mode     = pick($settings['headless_mode'], true)
