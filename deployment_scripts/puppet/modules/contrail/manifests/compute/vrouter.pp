@@ -19,8 +19,9 @@ $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
 $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
 
   if $contrail::compute_dpdk_enabled {
-    if empty($dev_mac) {
-      $dpdk_dev_mac = get_mac_from_vrouter()
+    $dpdk_mac = $::mac_from_vrouter
+    if $dpdk_mac {
+      $dpdk_dev_mac = $dpdk_mac
     } else {
       $dpdk_dev_mac = $dev_mac
     }
@@ -31,7 +32,7 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
     if ( 'bond' in $raw_phys_dev) {
       file_line { 'permanent_mac':
         ensure => present,
-        line => "hwaddress ${dev_mac}",
+        line => "hwaddress ${dpdk_dev_mac}",
         path => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
         after => "iface ${raw_phys_dev} inet manual",
       }

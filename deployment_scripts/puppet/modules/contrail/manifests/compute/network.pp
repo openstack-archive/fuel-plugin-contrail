@@ -13,10 +13,10 @@
 #    under the License.
 
 class contrail::compute::network {
-  $address    = $contrail::address
-  $ifname     = $contrail::phys_dev
-  $netmask    = $contrail::netmask_short
-  $default_gw = undef
+  $address        = $contrail::address
+  $ifname         = $contrail::phys_dev
+  $netmask        = $contrail::netmask_short
+  $default_gw     = undef
 
   $br_file = $::operatingsystem ? {
     'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
@@ -43,9 +43,10 @@ class contrail::compute::network {
 
   case $::operatingsystem {
     'Ubuntu': {
-      file {'/etc/network/interfaces.d/ifcfg-vhost0':
-        ensure  => present,
-        content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
+      file {'/etc/network/if-pre-up.d/contrail-vrouter':
+        ensure => present,
+        source => 'puppet:///modules/contrail/pre-up-contrail-vrouter',
+        mode   => 0755,
       }
     }
     'CentOS': {
