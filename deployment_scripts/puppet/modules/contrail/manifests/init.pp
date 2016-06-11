@@ -32,7 +32,6 @@ class contrail {
   # Network configuration
   prepare_network_config($network_scheme)
   $interface         = get_network_role_property('neutron/mesh', 'interface')
-  $gateway           = $network_scheme['endpoints'][$interface]['gateway']
   $address           = get_network_role_property('neutron/mesh', 'ipaddr')
   $cidr              = get_network_role_property('neutron/mesh', 'cidr')
   $netmask           = get_network_role_property('neutron/mesh', 'netmask')
@@ -40,6 +39,12 @@ class contrail {
   $phys_dev          = get_private_ifname($interface)
   $phys_dev_pci      = get_dev_pci_addr($phys_dev)
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+
+  if $network_scheme['endpoints'][$interface]['vendor_specific'] {
+    $gateway = $network_scheme['endpoints'][$interface]['vendor_specific']['provider_gateway']
+  } else {
+    $gateway = false
+  }
 
   # VIPs
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']

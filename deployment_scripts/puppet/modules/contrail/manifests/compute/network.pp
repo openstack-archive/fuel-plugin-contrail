@@ -13,10 +13,14 @@
 #    under the License.
 
 class contrail::compute::network {
-  $address    = $contrail::address
-  $ifname     = $contrail::phys_dev
-  $netmask    = $contrail::netmask_short
-  $default_gw = undef
+  $address        = $contrail::address
+  $ifname         = $contrail::phys_dev
+  $netmask        = $contrail::netmask_short
+  $network_scheme = $contrail::network_scheme
+  $dpdk_enabled   = $contrail::compute_dpdk_enabled
+
+  $override_ns = vrouter_override_network_scheme($contrail::network_scheme, $ifname, $dpdk_enabled)
+  $default_gw  = undef
 
   $br_file = $::operatingsystem ? {
     'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
@@ -41,11 +45,23 @@ class contrail::compute::network {
     onlyif  => 'ip addr show dev br-mesh | grep -q inet',
   }
 
+  # Override network_scheme to skip interfaces used by the vrouter
+  file { '/etc/hiera/plugins/contrail-vrouter-override_ns.yaml':
+    ensure  => file,
+    content => inline_template('<%= YAML.dump @override_ns %>')
+  }
+  file_line {'contrail-vrouter-override_ns':
+    path  => '/etc/hiera.yaml',
+    line  => '    - plugins/contrail-vrouter-override_ns',
+    after => '  !ruby/sym hierarchy:',
+  }
+
   case $::operatingsystem {
     'Ubuntu': {
-      file {'/etc/network/interfaces.d/ifcfg-vhost0':
-        ensure  => present,
-        content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
+      file {'/etc/network/if-pre-up.d/contrail-vrouter':
+        ensure => present,
+        source => 'puppet:///modules/contrail/pre-up-contrail-vrouter',
+        mode   => 0755,
       }
     }
     'CentOS': {
