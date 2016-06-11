@@ -81,4 +81,17 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
                   '/etc/contrail/contrail-vrouter-nodemgr.conf']
                   ],
   }
+  # Override network_scheme to skip interfaces used by the vrouter
+  $override_ns = vrouter_override_network_scheme($contrail::network_scheme, $contrail::phys_dev, $contrail::compute_dpdk_enabled)
+  file { '/etc/hiera/plugins/contrail-vrouter-override_ns.yaml':
+    ensure  => file,
+    content => inline_template('<%= YAML.dump @override_ns %>'),
+    require => Service['supervisor-vrouter'],
+    replace => false,
+  } ->
+  file_line {'contrail-vrouter-override_ns':
+    path  => '/etc/hiera.yaml',
+    line  => '    - plugins/contrail-vrouter-override_ns',
+    after => '  !ruby/sym hierarchy:',
+  }
 }
