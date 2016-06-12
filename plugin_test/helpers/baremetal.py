@@ -162,8 +162,6 @@ class BMDriver(object):
                         pending_addition=True, pending_deletion=False,
                         update_nodegroups=False, update_interfaces=True):
         """Setup roles for nailgun node."""
-        openstack.assign_vlan(obj, storage=102, management=101)
-
         node_mac = self.conf['target_macs']
         self.wait4node_status(obj, node_mac, status=['discover', 'ready'])
 
@@ -267,6 +265,9 @@ class BMDriver(object):
         nailgun_nodes = obj.fuel_web.client.list_cluster_nodes(cluster_id)
         baremetal_macs = self.conf['target_macs']
         for node in nailgun_nodes:
+            if not node['status']== 'discover':
+                # Skip not discovered nodes
+                continue
             if node['mac'] in baremetal_macs:
                 # Skip Barematal node
                 continue

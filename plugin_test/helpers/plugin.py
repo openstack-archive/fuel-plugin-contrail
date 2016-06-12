@@ -197,8 +197,10 @@ def show_range(obj, start_value, end_value):
 
 def activate_dpdk(obj):
     """Activate DPDK functionality."""
+    openstack.assign_vlan(obj, storage=102, management=101)
+
     opts = {
         'contrail_global_dpdk': True,
-        'hugepages_amount': '50',
+        'hugepages_amount': '60',
     }
     activate_plugin(obj, **opts)
