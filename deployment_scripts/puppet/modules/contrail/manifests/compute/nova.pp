@@ -14,34 +14,91 @@
 
 class contrail::compute::nova {
 
-  $cgroup_acl_string='["/dev/null", "/dev/full", "/dev/zero","/dev/random", "/dev/urandom","/dev/ptmx","/dev/kvm", "/dev/kqemu","/dev/rtc","/dev/hpet", "/dev/vfio/vfio","/dev/net/tun"]'
-
+  $cgroup_acl_string='["/dev/null", "/dev/full", "/dev/zero", "/dev/random", "/dev/urandom", "/dev/ptmx", "/dev/kvm", "/dev/kqemu", "/dev/rtc"'
   ini_setting { 'set_cgroup_acl_string':
     ensure  => present,
     path    => '/etc/libvirt/qemu.conf',
     setting => 'cgroup_device_acl',
     value   => $cgroup_acl_string,
-  } ~>
-  service { $contrail::libvirt_name :
-    ensure => 'running',
-    enable => true
+    notify  => Service['libvirt'],
+  }
+
+  # [LCM] Workaroud to fix duplicate declaration with Service['libvirt']
+  # from class 'nova::compute::libvirt' during catalog compilation.
+  if !defined(Service['libvirt']) {
+    service { 'libvirt':
+      ensure => 'running',
+      enable => true,
+      name   => $contrail::libvirt_name,
+    }
+  }
+
+  # [LCM] Workaroud to fix duplicate declaration with nova_config recources
+  # from class 'nova::network::neutron' during catalog compilation.
+  if !defined(Nova_config['DEFAULT/network_api_class']) {
+    nova_config {'DEFAULT/network_api_class':
+      value => 'nova.network.neutronv2.api.API'
+    }
+  }
+  else {
+    Nova_config <| (title == 'DEFAULT/network_api_class') |> {
+      value => 'nova.network.neutronv2.api.API',
+    }
+  }
+
+  if !defined(Nova_config['DEFAULT/firewall_driver']) {
+    nova_config {'DEFAULT/firewall_driver':
+      value => 'nova.virt.firewall.NoopFirewallDriver'
+    }
+  }
+  else {
+    Nova_config <| (title == 'DEFAULT/firewall_driver') |> {
+      value => 'nova.virt.firewall.NoopFirewallDriver',
+    }
+  }
+
+  if !defined(Nova_config['DEFAULT/security_group_api']) {
+    nova_config {'DEFAULT/security_group_api':
+      value => 'neutron'
+    }
+  }
+  else {
+    Nova_config <| (title == 'DEFAULT/security_group_api') |> {
+      value => 'neutron',
+    }
   }
 
   nova_config {
-    'DEFAULT/network_api_class':                 value => 'nova.network.neutronv2.api.API';
-    'DEFAULT/neutron_url_timeout':               value => '300';
-    'DEFAULT/firewall_driver':                   value => 'nova.virt.firewall.NoopFirewallDriver';
-    'DEFAULT/security_group_api':                value => 'neutron';
-    'DEFAULT/heal_instance_info_cache_interval': value => '0';
+    'DEFAULT/neutron_url_timeout': value => '300';
   }
-  if $contrail::compute_dpdk_enabled {
-    nova_config {
-      'CONTRAIL/use_userspace_vhost':            value => true;
+
+  # [LCM] Workaroud to fix duplicate declaration with nova_config recource
+  # from class 'nova::compute' during catalog compilation.
+  if !defined(Nova_config['DEFAULT/heal_instance_info_cache_interval']) {
+    nova_config { 'DEFAULT/heal_instance_info_cache_interval':
+      value => '0',
     }
   }
-  Nova_config <||> ~>
-  service { 'nova-compute':
-    ensure => running,
-    enable => true,
+  else {
+    Nova_config <| (title == 'DEFAULT/heal_instance_info_cache_interval') |> {
+      value => '0',
+    }
   }
+
+  if $contrail::compute_dpdk_enabled {
+    nova_config {
+      'CONTRAIL/use_userspace_vhost': value => true;
+    }
+  }
+
+  # [LCM] Workaroud to fix duplicate declaration with Service['nova-compute']
+  # from class 'nova::generic_service' during catalog compilation.
+  if !defined(Class['::nova::compute']) {
+    service { 'nova-compute':
+      ensure => running,
+      enable => true,
+    }
+  }
+
+  Nova_config <||> ~> Service['nova-compute']
 }
