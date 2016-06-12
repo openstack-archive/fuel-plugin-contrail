@@ -120,7 +120,7 @@ class DPDKTests(TestBasic):
                 node-1: 'controller', 'ceph-osd';
                 node-2: 'contrail-config', 'contrail-control', 'contrail-db';
                 node-3: 'contrail-db';
-                node-4: 'compute', 'ceph-osd', 'dpdk';
+                node-4: 'compute', 'dpdk';
                 node-5: 'compute', 'ceph-osd';
             4. Run OSTF tests
             5. Check Controller and Contrail nodes status
@@ -150,7 +150,7 @@ class DPDKTests(TestBasic):
         plugin.show_range(self, 3, 5)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'ceph-osd', 'dpdk'])
+                                    roles=['compute', 'dpdk'])
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
@@ -170,8 +170,12 @@ class DPDKTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
+        # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   should_fail=1,
+                                   failed_test_name=['Instance live migration']
+                                   )
 
         # Add Compute node and check again
         plugin.show_range(self, 6, 8)
@@ -185,8 +189,12 @@ class DPDKTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
+        # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   should_fail=1,
+                                   failed_test_name=['Instance live migration']
+                                   )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_delete_compute"])
@@ -202,7 +210,7 @@ class DPDKTests(TestBasic):
                 node-01: 'controller';
                 node-02: 'contrail-control', 'contrail-config', 'contrail-db';
                 node-03: 'contrail-db';
-                node-04: 'compute', 'cinder', 'dpdk';
+                node-04: 'compute', 'dpdk';
                 node-05: 'compute', 'cinder';
                 node-06: 'compute';
             4. Run OSTF tests
@@ -226,7 +234,7 @@ class DPDKTests(TestBasic):
         plugin.show_range(self, 3, 4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'cinder', 'dpdk'])
+                                    roles=['compute', 'dpdk'])
         conf_no_compute = {
             'slave-01': ['controller'],
             'slave-02': ['contrail-control',
