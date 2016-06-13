@@ -24,7 +24,7 @@ control_network_ip=<%= scope.lookupvar('contrail::address') %>
 name=vhost0
 ip=<%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
 physical_interface=<%= @phys_dev %>
-<% if scope.lookupvar('contrail::gateway') != :undef -%>
+<% if scope.lookupvar('contrail::gateway') -%>
 gateway=<%= scope.lookupvar('contrail::gateway') %>
 <% end -%>
 [GATEWAY-0]
