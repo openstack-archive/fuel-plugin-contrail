@@ -49,6 +49,7 @@ def import_tests():
     from tests import test_system
     from tests import test_dpdk
     from tests import test_sriov
+    from tests import test_dpdk_vf
 
 
 def run_tests():
