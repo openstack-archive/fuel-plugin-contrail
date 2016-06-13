@@ -62,8 +62,11 @@ To enable DPDK you should proceed with following steps:
 
    .. image:: images/enable_contrail_plugin.png
 
+.. raw:: latex
 
-#. Enable DPDK on Fuel UI
+    \pagebreak
+
+2. Enable DPDK on Fuel UI
 
    .. image:: images/enable_contrail_dpdk.png
 
@@ -72,8 +75,11 @@ To enable DPDK you should proceed with following steps:
    1GB sized require a reboot. Also, it is necessary to leave some amount of memory
    for the operating system itself.
 
+.. raw:: latex
 
-#. Add DPDK role on computes where you want to have DPDK-based vRouter.
+    \pagebreak
+
+4. Add DPDK role on computes where you want to have DPDK-based vRouter.
    **Computes that are not marked with DPDK role will use kernel-based vRouter.**
 
     .. image:: images/add_dpdk_role.png
@@ -84,7 +90,8 @@ To enable DPDK you should proceed with following steps:
       Computes with DPDK-based vRouter require flavor with HugePages enabled.
       **Instances with usual flavours can't be launched on DPDK-enabled hosts.**
 
-   If DPDK is enabled in plugin settings Fuel will create one flavor that will have hugepages support, named "m1.small.hpgs". One can create custom flavor with following steps on controller node::
+   If DPDK is enabled in plugin settings Fuel will create one flavor that will have hugepages support, named "m1.small.hpgs".
+   One can create custom flavor with following steps on controller node::
 
     # . openrc
     # nova flavor-create m2.small.hpgs auto 2000 20 2
@@ -114,12 +121,14 @@ After deploy finishes, you can verify your installation. First, proceed with bas
     root@node-37:~# /opt/contrail/bin/dpdk_nic_bind.py -s
     Network devices using DPDK-compatible driver
     ============================================
-    0000:06:00.0 '82599ES 10-Gigabit SFI/SFP+ Network Connection' drv=igb_uio unused=
+    0000:06:00.0 '82599ES 10-Gigabit SFI/SFP+ Network Connection' drv=igb_uio
+    unused=
     Network devices using kernel driver
     ===================================
     0000:02:00.0 'I350 Gigabit Network Connection' if=eth0 drv=igb unused=igb_uio
     0000:02:00.1 'I350 Gigabit Network Connection' if=eth1 drv=igb unused=igb_uio
-    0000:06:00.1 '82599ES 10-Gigabit SFI/SFP+ Network Connection' if=eth3 drv=ixgbe   unused=igb_uio
+    0000:06:00.1 '82599ES 10-Gigabit SFI/SFP+ Network Connection' if=eth3 drv=ixgbe   
+    unused=igb_uio
     Other network devices
     =====================
     <none>
@@ -149,7 +158,8 @@ After deploy finishes, you can verify your installation. First, proceed with bas
            Mt=Transmit Mirror, Tc=Transmit Checksum Offload, L3=Layer 3, L2=Layer 2
            D=DHCP, Vp=Vhost Physical, Pr=Promiscuous, Vnt=Native Vlan Tagged
            Mnp=No MAC Proxy, Dpdk=DPDK PMD Interface, Rfl=Receive Filtering Offload
-           Mon=Interface is Monitored, Uuf=Unknown Unicast Flood, Vof=VLAN insert/strip offload
+           Mon=Interface is Monitored, Uuf=Unknown Unicast Flood
+           Vof=VLAN insert/strip offload
     vif0/0      PCI: 0:0:0.0 (Speed 10000, Duplex 1)
                 Type:Physical HWaddr:00:1b:21:87:21:98 IPaddr:0
                 Vrf:0 Flags:L3L2Vp MTU:1514 Ref:14

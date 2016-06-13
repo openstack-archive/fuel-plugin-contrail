@@ -13,9 +13,10 @@ Guide to the Contrail plugin version 4.0 for Fuel 8.0
     sys_reqs
     install_guide
     dpdk
+    dpdk_on_vf
     enable_sriov
+    contrail_tsn
     using_network_templates
     verification
     contrail_ui_intro
-    dpdk_on_vf
     appendix

@@ -53,8 +53,11 @@ Configuring Contrail Plugin
 
     .. image:: images/compute.png
 
+.. raw:: latex
 
-#.  Please select Contrail SDN networking setup.
+    \pagebreak
+
+3.  Please select Contrail SDN networking setup.
 
     .. image:: images/networking_setup.png
 
@@ -70,7 +73,11 @@ Configuring Contrail Plugin
 
     *   Gateway nodes IP addresses (provided as a comma-separated list) - peer addresses for BGP interaction with border routers.
 
-#.  Add nodes and assign them the following roles:
+.. raw:: latex
+
+    \pagebreak
+
+6.  Add nodes and assign them the following roles:
 
     *   At least 1 Controller
 
@@ -96,21 +103,31 @@ Configuring Contrail Plugin
 
 #.  Configure the network settings. See details at `Mirantis OpenStack User Guide (page 16) <https://docs.mirantis.com/openstack/fuel/fuel-8.0/pdf/Fuel-8.0-UserGuide.pdf>`_.
 
-    *   Open Nodes tab:
-        Select all the nodes, push **Configure interfaces** button
+    Open "Nodes" tab, select all the nodes and press **Configure interfaces** button
 
-        .. image:: images/conf-interfaces.png
-
-
-    *   Set *Private* network to the separate network interface.
-        **DO NOT USE THIS PHYSICAL INTERFACE FOR ANY OTHER NETWORK.**
-        This interface will be used by contrail vRouter.
-        It is recommended to set the bigger MTU for Private interfaces (e.g. 9000) if the switching hardware supports
-        Jumbo Frames.
-        This will enhance contrail network performance by avoiding packet fragmentation within Private network.
+    .. image:: images/conf-interfaces.png
 
 
-#.  Example network configuration
+    Set *Private* network to the separate network interface.
+    **DO NOT USE THIS PHYSICAL INTERFACE FOR ANY OTHER NETWORK.**
+    This interface will be used by contrail vRouter.
+    It is recommended to set the bigger MTU for Private interfaces (e.g. 9000) if the switching hardware supports
+    Jumbo Frames.
+    This will enhance contrail network performance by avoiding packet fragmentation within Private network.
+
+    .. image:: images/public-net.png
+
+    .. warning::
+
+        **First usable addresses from the Private network will be used as VIP for Contrail controllers.**
+        For example, if your Private network CIDR is 192.168.200.0/24, then Contrail VIP will be **192.168.200.1**.
+        If you want to use other IP as VIP, you need to specify a range for this network.
+
+.. raw:: latex
+
+    \pagebreak
+
+9.  Example network configuration
 
     Hardware servers with two network interfaces are used as openstack nodes.
     The interfaces configuration is following:
@@ -132,12 +149,5 @@ Configuring Contrail Plugin
     After installation is finished, `Contrail Web UI <http://www.juniper.net/techpubs/en_US/contrail2.0/topics/task/configuration
     /monitor-dashboard-vnc.html>`_ can be accessed by the same IP address as Horizon, but using HTTPS protocol and port 8143.
     For example, if you configured public network as described on screenshot below, then Contrail Web UI can be accessed by
-    **https://<Private-VIP>:8143**
+    **https://<Public-VIP>:8143**
 
-    .. image:: images/public-net.png
-
-    .. warning::
-
-        **First usable addresses from the Private network will be used as VIP for Contrail controllers.**
-        For example, if your Private network CIDR is 192.168.200.0/24, then Contrail VIP will be **192.168.200.1**.
-        If you want to use other IP as VIP, you need to specify a range for this network.

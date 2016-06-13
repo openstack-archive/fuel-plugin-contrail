@@ -36,11 +36,19 @@ How to enable SR-IOV in fuel
 
     .. image:: images/enable_sriov_settings.png
 
-#. Assign SR-IOV role to compute hosts.
+.. raw:: latex
+
+    \pagebreak
+
+2. Assign SR-IOV role to compute hosts.
 
     .. image:: images/enable_sriov_role_node.png
 
-#. **SR-IOV will be enabled on all SR-IOV capable interfaces, not assigned
+.. raw:: latex
+
+    \pagebreak
+
+3. **SR-IOV will be enabled on all SR-IOV capable interfaces, not assigned
    to Fuel bridges(networks in Fuel UI).**
    List of interfaces can be modified manually after deployment.
 
@@ -53,7 +61,8 @@ How to create VM with sriov device
 
 #. Create VN with configured physical network and vlan id::
 
-    neutron net-create --provider:physical_network=<physical network from contrail settings tab> \
+    neutron net-create \
+    --provider:physical_network=<physical network from contrail settings tab> \
     --provider: segmentation_id=<Vlan_id> <Network_Name>
 
 #. Create a subnet::
@@ -62,9 +71,12 @@ How to create VM with sriov device
 
 #. Create a Port::
 
-    neutron port-create --fixed-ip subnet_id=<subnet uuid>,ip_address=<IP address from above subnet> \
+    neutron port-create \
+    --fixed-ip subnet_id=<subnet uuid>,ip_address=<IP address from above subnet> \
     --name <name of port> <vn uuid> --binding:vnic_type direct
 
 #. Boot VM with the port::
 
-    nova boot --flavor m1.large --image <image name> --nic port-id=<uuid of above port> <vm name>
+    nova boot \
+    --flavor m1.large --image <image name> \
+    --nic port-id=<uuid of above port> <vm name>

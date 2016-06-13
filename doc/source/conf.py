@@ -16,7 +16,7 @@ mypreamble=ur'''
   \setlength\leftmargin{10pt}%
   }%
   \item\MakeFramed {\FrameRestore}%
-  \tiny  % <---------------- To be changed!
+  \small  % <---------------- To be changed!
   \OriginalVerbatim[#1]%
 }
 '''

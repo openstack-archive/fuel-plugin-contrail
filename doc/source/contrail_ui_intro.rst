@@ -12,8 +12,7 @@ For detailed information on Contrail operations, please refer to official `Junip
 Logging in
 ----------
 
-Log into Contrail UI using the `OpenStack admin credentials.
-<https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#access-permissions-for-horizon>`_
+Log into Contrail UI using the OpenStack admin credentials.
 
 .. image:: images/contrail-login.png
 

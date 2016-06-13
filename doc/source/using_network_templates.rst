@@ -16,34 +16,41 @@ The provided template utilizes 3 networks: Admin (PXE), Public and Private.
 
     .. image:: images/conf-interfaces2.png
 
-#.  Next, we need to set gateway for the private network.
+.. raw:: latex
+
+    \pagebreak
+
+3.  Next, we need to set gateway for the private network.
     Here is how to do it with Fuel CLI:
 
     *   Login with ssh to Fuel master node.
     *   List existing network-groups
         ::
 
-            fuel network-group --env 1
+          fuel network-group --env 1
 
     *   Remove and create again network-group *private* to set a gateway
         ::
 
-            fuel network-group --delete --network 5
-            fuel network-group --create --name private \
-              --cidr 10.109.3.0/24 --gateway 10.109.3.1 --nodegroup 1
+          fuel network-group --delete --network 5
+          fuel network-group --create --name private \
+          --cidr 10.109.3.0/24 --gateway 10.109.3.1 --nodegroup 1
 
 #.  Set the ``render_addr_mask`` parameter to `internal` for this network by typing:
     ::
 
-        fuel network-group --set --network 6 --meta '{"name": "private", "notation": "cidr",\
-         "render_type": null, "map_priority": 2, "configurable": true, "use_gateway": true,\
-         "render_addr_mask": "internal", "vlan_start": null, "cidr": "10.109.3.0/24"}'
+      fuel network-group --set --network 6 \
+      --meta '{"name": "private", "notation": "cidr",\
+        "render_type": null, "map_priority": 2, \
+        "configurable": true, "use_gateway": true,\
+        "render_addr_mask": "internal", "vlan_start": null, \
+        "cidr": "10.109.3.0/24"}'
 
 
 #.  Save sample :download:`network template<examples/network_template_1.yaml>`
 #.  Upload the network template by typing:
     ::
 
-        fuel --env 1 network-template --upload --dir /root/
+      fuel --env 1 network-template --upload --dir /root/
 
 #.  Start deploy, pressing "Deploy changes" button.
