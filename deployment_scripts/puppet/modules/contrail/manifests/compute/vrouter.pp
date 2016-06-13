@@ -120,4 +120,9 @@ class contrail::compute::vrouter {
                     ],
     }
   }
+
+  # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
+  exec {'no_network_reconfigure':
+    command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
+  }
 }
