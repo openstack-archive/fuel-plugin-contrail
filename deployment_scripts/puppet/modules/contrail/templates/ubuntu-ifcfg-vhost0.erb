@@ -2,7 +2,9 @@ auto vhost0
 iface vhost0 inet static
 pre-up /opt/contrail/bin/if-vhost0
 address <%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
-<% if scope.lookupvar('contrail::gateway') != :undef -%>
-gateway <%= scope.lookupvar('contrail::gateway') %>
-<% end -%>
 network_name contrail
+<% if scope.lookupvar('contrail::gateway') -%>
+<% scope.lookupvar('contrail::routes').each do |route| -%>
+post-up ip route add <%= route['net'] %> via <%= route['via'] %> dev vhost0
+<% end -%>
+<% end -%>
