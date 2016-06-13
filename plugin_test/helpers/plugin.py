@@ -204,3 +204,16 @@ def activate_dpdk(obj):
         'hugepages_amount': '60',
     }
     activate_plugin(obj, **opts)
+
+
+def activate_dpdk_vf(obj):
+    """Activate DPDK on VF functionality."""
+    openstack.assign_vlan(obj, storage=102, management=101)
+
+    opts = {
+        'contrail_global_dpdk': True,
+        'contrail_global_sriov': True,
+        'dpdk_on_vf': True,
+        'hugepages_amount': '60',
+    }
+    activate_plugin(obj, **opts)
