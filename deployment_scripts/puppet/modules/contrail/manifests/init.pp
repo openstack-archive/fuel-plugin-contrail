@@ -32,6 +32,29 @@ class contrail {
 
   $public_ssl_hash  = hiera('public_ssl')
   $public_ssl       = $public_ssl_hash['services']
+  # Network configuration
+  prepare_network_config($network_scheme)
+  $interface         = get_network_role_property('neutron/mesh', 'interface')
+  $routes            = pick($network_scheme['endpoints'][$interface]['routes'], false)
+
+  if  $routes {
+    $gateway = $routes[0]['via']
+  } else {
+    $gateway = false
+  }
+
+
+  $address           = get_network_role_property('neutron/mesh', 'ipaddr')
+  $cidr              = get_network_role_property('neutron/mesh', 'cidr')
+  $netmask           = get_network_role_property('neutron/mesh', 'netmask')
+  $netmask_short     = netmask_to_cidr($netmask)
+  $phys_dev          = get_private_ifname($interface)
+  $phys_dev_pci      = get_dev_pci_addr($phys_dev)
+  $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+
+  # VIPs
+  $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
+  $mos_public_vip = $network_metadata['vips']['public']['ipaddr']
 
   $neutron_settings = hiera_hash('quantum_settings', {})
   $metadata_secret  = $neutron_settings['metadata']['metadata_proxy_shared_secret']
