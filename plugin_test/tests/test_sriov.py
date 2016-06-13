@@ -104,3 +104,89 @@ class SRIOVTests(TestBasic):
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'],
                                    failed_test_name=['Instance live migration'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_sriov_add_compute"])
+    @log_snapshot_after_test
+    def contrail_sriov_add_compute(self):
+        """Verify that Contrail compute role can be added after deploying.
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Deploy cluster with following node configuration:
+                node-1: 'controller', 'ceph-osd';
+                node-2: 'contrail-config', 'contrail-control', 'contrail-db';
+                node-3: 'contrail-db';
+                node-4: 'compute', 'sriov';
+                node-5: 'compute', 'ceph-osd';
+            4. Run OSTF tests
+            5. Add one node with following configuration:
+                node-6: "compute", "ceph-osd";
+            6. Deploy changes
+            7. Run OSTF tests
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=9,
+                                       options={'images_ceph': True,
+                                                'volumes_ceph': True,
+                                                'ephemeral_ceph': True,
+                                                'objects_ceph': True,
+                                                'volumes_lvm': False})
+        self.bm_drv.host_prepare()
+
+        self.show_step(2)
+        # enable plugin and enable SR-IOV in contrail settings
+        plugin.activate_sriov(self)
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        self.show_step(3)
+        self.bm_drv.setup_fuel_node(self,
+                                    cluster_id=self.cluster_id,
+                                    roles=['compute', 'sriov'])
+        conf_nodes = {
+            'slave-01': ['controller', 'ceph-osd'],
+            'slave-02': ['contrail-config',
+                         'contrail-control',
+                         'contrail-db'],
+            'slave-03': ['contrail-db'],
+            'slave-04': ['compute', 'ceph-osd'],
+            'slave-05': ['compute', 'ceph-osd'],
+        }
+        conf_compute = {'slave-06': ['compute', 'ceph-osd']}
+
+        # Cluster configuration
+        self.fuel_web.update_nodes(self.cluster_id,
+                                   nodes_dict=conf_nodes,
+                                   update_interfaces=False)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Deploy cluster
+        openstack.deploy_cluster(self)
+        # Run OSTF tests
+        self.show_step(4)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   should_fail=1,
+                                   failed_test_name=['Instance live migration']
+                                   )
+
+        # Add Compute node and check again
+        self.show_step(5)
+        # Cluster configuration
+        self.fuel_web.update_nodes(self.cluster_id,
+                                   nodes_dict=conf_compute,
+                                   update_interfaces=False)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Deploy cluster
+        self.show_step(6)
+        openstack.deploy_cluster(self)
+        # Run OSTF tests
+        self.show_step(7)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   should_fail=1,
+                                   failed_test_name=['Instance live migration']
+                                   )
