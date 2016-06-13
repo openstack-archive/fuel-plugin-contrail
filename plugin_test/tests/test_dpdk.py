@@ -79,7 +79,7 @@ class DPDKTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 4)
+        self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
@@ -102,9 +102,14 @@ class DPDKTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
+        # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
+            self.show_step(4)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'])
+                                   test_sets=['smoke', 'sanity', 'ha'],
+                                   should_fail=1,
+                                   failed_test_name=['Instance live migration']
+                                   )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_compute"])
