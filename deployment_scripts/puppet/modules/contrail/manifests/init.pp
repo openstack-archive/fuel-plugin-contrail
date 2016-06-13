@@ -33,7 +33,7 @@ class contrail {
   # Network configuration
   prepare_network_config($network_scheme)
   $interface         = get_network_role_property('neutron/mesh', 'interface')
-  $gateway           = $network_scheme['endpoints'][$interface]['gateway']
+  $gateway           = $network_scheme['endpoints'][$interface]['routes'][0]['via']
   $address           = get_network_role_property('neutron/mesh', 'ipaddr')
   $cidr              = get_network_role_property('neutron/mesh', 'cidr')
   $netmask           = get_network_role_property('neutron/mesh', 'netmask')
