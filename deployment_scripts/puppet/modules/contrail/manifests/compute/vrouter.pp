@@ -19,8 +19,16 @@ class contrail::compute::vrouter {
   $dev_mac  = getvar("::macaddress_${phys_dev_facter}")
   $phys_dev = $contrail::phys_dev
   $dpdk_dev_pci = $contrail::phys_dev_pci
-  
+
   if $contrail::compute_dpdk_enabled {
+
+    # Temporary dirty hack. In case when we use contrail dpdk repositorise
+    # we don't have nova-compute-kvm package there [FIXME]
+    exec { 'remove_nova_compute_kvm_dependency':
+      path    => '/usr/local/bin:/bin:/usr/bin/',
+      cwd     => '/etc/puppet/modules/nova/manifests/compute/',
+      command => 'sed -i "/nova-compute-.{libvirt_virt_type}/,+5d" libvirt.pp',
+    }
 
     if empty($dev_mac) {
       $dpdk_dev_mac = get_mac_from_vrouter()
@@ -34,9 +42,9 @@ class contrail::compute::vrouter {
     if ( 'bond' in $raw_phys_dev) {
       file_line { 'permanent_mac':
         ensure => present,
-        line => "hwaddress ${dev_mac}",
-        path => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
-        after => "iface ${raw_phys_dev} inet manual",
+        line   => "hwaddress ${dev_mac}",
+        path   => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
+        after  => "iface ${raw_phys_dev} inet manual",
       }
     }
 
@@ -124,6 +132,6 @@ class contrail::compute::vrouter {
   # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
   exec {'no_network_reconfigure':
     command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
-    onlyif => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE',
+    onlyif  => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE',
   }
 }
