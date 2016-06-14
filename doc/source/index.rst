@@ -17,4 +17,5 @@ Guide to the Contrail plugin version 4.0 for Fuel 8.0
     using_network_templates
     verification
     contrail_ui_intro
+    dpdk_on_vf
     appendix
