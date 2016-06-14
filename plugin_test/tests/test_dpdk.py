@@ -124,6 +124,7 @@ class DPDKTests(TestBasic):
             3. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
                 node-2: 'contrail-config', 'contrail-control', 'contrail-db';
+                node-2: 'contrail-config', 'contrail-control', 'contrail-db';
                 node-3: 'contrail-db';
                 node-4: 'compute', 'dpdk';
                 node-5: 'compute', 'ceph-osd';
@@ -236,7 +237,7 @@ class DPDKTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 4)
+        self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
@@ -259,10 +260,11 @@ class DPDKTests(TestBasic):
         openstack.deploy_cluster(self)
         # Run OSTF tests
         if vsrx_setup_result:
+            self.show_step(4)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
         # Delete Compute node and check again
-        plugin.show_range(self, 5, 7)
+            self.show_step(5)
         self.fuel_web.update_nodes(
             self.cluster_id,
             nodes_dict=conf_compute,
@@ -270,9 +272,11 @@ class DPDKTests(TestBasic):
             update_interfaces=False)
 
         # Deploy cluster
+        self.show_step(6)
         openstack.deploy_cluster(self)
         # Run OSTF tests
         if vsrx_setup_result:
+            self.show_step(7)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity'],
                                    should_fail=1,
