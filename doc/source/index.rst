@@ -18,4 +18,5 @@ Guide to the Contrail plugin version 4.0 for Fuel 8.0
     verification
     contrail_ui_intro
     tuning
+    dpdk_on_vf
     appendix
