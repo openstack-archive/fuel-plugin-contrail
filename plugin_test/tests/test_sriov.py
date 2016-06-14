@@ -103,4 +103,5 @@ class SRIOVTests(TestBasic):
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'],
+                                   should_fail=1,
                                    failed_test_name=['Instance live migration'])
