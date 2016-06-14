@@ -28,6 +28,16 @@ class contrail::provision::control {
 && touch /opt/contrail/prov_external_bgp_${name}-DONE",
       creates => "/opt/contrail/prov_external_bgp_${name}-DONE",
     }
+    if contrail::gateway {
+      file_line {"route_to_gw_${name}":
+        line      => "post-up ip route add ${name}/32 via ${contrail::gateway} dev ${contrail::interface}",
+        path      => "/etc/network/interfaces.d/ifcfg-${contrail::interface}",
+        ensure    => 'present',
+      }
+      exec {"route_to_gw_${name}":
+        command => "ip route add ${name}/32 via ${contrail::gateway} dev ${contrail::interface} | exit 0",
+      }
+    }
   }
 
   notify {'Waiting for contrail API':} ->
