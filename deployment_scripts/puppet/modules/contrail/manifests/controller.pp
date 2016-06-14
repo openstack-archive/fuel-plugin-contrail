@@ -26,7 +26,9 @@ class contrail::controller {
   }
 
 # Packages
-  package { 'neutron-server': } ->
+  if !defined(Package['neutron-server']) {
+    package { 'neutron-server': }
+  }
   package { 'python-neutron-lbaas': } ->
   package { 'python-contrail': } ->
   package { 'contrail-utils': } ->
@@ -34,29 +36,103 @@ class contrail::controller {
   package { 'contrail-heat': }
 
 # Nova configuration
+    Nova_config <|  title == 'DEFAULT/enabled_apis' |> {
+      value=> 'ec2,osapi_compute,metadata',
+    }
+
+    Nova_config <|  title == 'DEFAULT/firewall_driver' |> {
+      value=> 'nova.virt.firewall.NoopFirewallDriver',
+    }
+  ensure_resource('nova_config', 'DEFAULT/enabled_apis', {'value' => 'ec2,osapi_compute,metadata'})
+  ensure_resource('nova_config', 'DEFAULT/firewall_driver', {'value' => 'nova.virt.firewall.NoopFirewallDriver'})
+  ensure_resource('nova_config', 'DEFAULT/security_group_api', {'value' => 'neutron'})
   nova_config {
-    'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
     'DEFAULT/neutron_url_timeout': value=> '300';
-    'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
-    'DEFAULT/enabled_apis': value=> 'ec2,osapi_compute,metadata';
-    'DEFAULT/security_group_api': value=> 'neutron';
     'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
-  } ~>
-  service {'nova-api':
-    ensure => running,
-    enable => true,
+  }
+  Nova_config<||> ~> Service['nova-api']
+  if !defined(Class['nova::api']) {
+    service {'nova-api':
+      ensure => running,
+      enable => true,
+    }
   }
 
 # Neutron configuration
+  if !defined(Neutron_config['DEFAULT/core_plugin']) {
+    neutron_config {
+      'DEFAULT/core_plugin': value => 'neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2',
+    }
+  } else {
+    Neutron_config<| title == 'DEFAULT/core_plugin' |> {
+      ensure => present,
+      value  => 'neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2',
+    }
+  }
+  if !defined(Neutron_config['DEFAULT/api_extensions_path']) {
+    neutron_config {
+      'DEFAULT/api_extensions_path': value => 'extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions';
+    }
+  } else {
+    Neutron_config<| title == 'DEFAULT/api_extensions_path' |> {
+      ensure => present,
+      value  => 'extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions',
+    }
+  }
+  if !defined(Neutron_config['DEFAULT/service_plugins']) {
+    neutron_config {
+      'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin';
+    }
+  } else {
+    Neutron_config<| title == 'DEFAULT/service_plugins' |> {
+      ensure => present,
+      value  => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin',
+    }
+  }
+  if !defined(Neutron_config['DEFAULT/allow_overlapping_ips']) {
+    neutron_config {
+      'DEFAULT/allow_overlapping_ips': value => 'True';
+    }
+  } else {
+    Neutron_config<| title == 'DEFAULT/allow_overlapping_ips' |> {
+      ensure => present,
+      value  => 'True',
+    }
+  }
+
+  if !defined(Neutron_config['keystone_authtoken/auth_host']) {
+    neutron_config {
+      'keystone_authtoken/auth_host': value => $contrail::keystone_address;
+    }
+  } else {
+    Neutron_config<| (title == 'keystone_authtoken/auth_host') |> {
+      ensure => present,
+      value  => $contrail::keystone_address,
+    }
+  }
+  if !defined(Neutron_config['keystone_authtoken/auth_port']) {
+    neutron_config {
+      'keystone_authtoken/auth_port': value => '35357';
+    }
+  } else {
+    Neutron_config<| (title == 'keystone_authtoken/auth_port')|> {
+      ensure => present,
+      value  => '35357',
+    }
+  }
+  if !defined(Neutron_config['keystone_authtoken/auth_protocol']) {
+    neutron_config {
+      'keystone_authtoken/auth_protocol': value => $contrail::keystone_protocol;
+    }
+  } else {
+    Neutron_config<| (title == 'keystone_authtoken/auth_protocol') |> {
+      ensure => present,
+      value  => $contrail::keystone_protocol,
+    }
+  }
+
   neutron_config {
-    'DEFAULT/core_plugin': value => 'neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2';
-    'DEFAULT/api_extensions_path': value => 'extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions';
-    'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin';
-    'DEFAULT/allow_overlapping_ips': value => 'True';
     'service_providers/service_provider': value => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
-    'keystone_authtoken/auth_host': value => $contrail::keystone_address;
-    'keystone_authtoken/auth_port': value => '35357';
-    'keystone_authtoken/auth_protocol': value => $contrail::keystone_protocol;
     'QUOTAS/quota_network': value => '-1';
     'QUOTAS/quota_subnet': value => '-1';
     'QUOTAS/quota_port': value => '-1';
@@ -66,10 +142,19 @@ class contrail::controller {
   } ->
   file {'/etc/neutron/plugins/opencontrail/ContrailPlugin.ini':
     content => template('contrail/ContrailPlugin.ini.erb'),
-  } ->
-  file {'/etc/neutron/plugin.ini':
-    ensure => link,
-    target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'
+  }
+  if !defined(File['/etc/neutron/plugin.ini']) {
+    file {'/etc/neutron/plugin.ini':
+      ensure => link,
+      target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini',
+      require => File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
+    }
+  } else {
+    File<| title == '/etc/neutron/plugin.ini' |> {
+      ensure => link,
+      target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini',
+      require => File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
+    }
   }
 
 # Contrail-specific heat templates settings
@@ -82,15 +167,18 @@ class contrail::controller {
     'clients_contrail/api_server': value=> $contrail::contrail_mgmt_vip;
     'clients_contrail/auth_host_ip': value=> $contrail::mos_mgmt_vip;
     'clients_contrail/api_base_url': value=> '/';
-  } ~>
-  service {'heat-engine':
-    ensure     => running,
-    name       => 'p_heat-engine',
-    enable     => true,
-    hasstatus  => true,
-    hasrestart => true,
-    provider   => 'pacemaker',
-    require    => Package['contrail-heat'],
+  }
+  Heat_config<||> ~> Service['heat-engine']
+  if !defined(Service['heat-engine']) {
+    service {'heat-engine':
+      ensure     => running,
+      name       => 'p_heat-engine',
+      enable     => true,
+      hasstatus  => true,
+      hasrestart => true,
+      provider   => 'pacemaker',
+      require    => Package['contrail-heat'],
+    }
   }
 
 # Contrail-specific ceilometer settings
@@ -114,23 +202,44 @@ class contrail::controller {
       }
     }
     else {
-      service {['ceilometer-api','ceilometer-polling']:
-        ensure    => running,
-        enable    => true,
-        subscribe => File['/etc/ceilometer/pipeline.yaml'],
+      if !defined(Service['ceilometer-api']) {
+        service {['ceilometer-api']:
+          ensure    => running,
+          enable    => true,
+          subscribe => File['/etc/ceilometer/pipeline.yaml'],
+        }
+      }
+      if !defined(Service['ceilometer-polling']) {
+        service {['ceilometer-polling']:
+          ensure    => running,
+          enable    => true,
+          subscribe => File['/etc/ceilometer/pipeline.yaml'],
+        }
       }
     }
   }
-
-  service { 'neutron-server':
-    ensure    => running,
-    enable    => true,
-    require   => [Package['neutron-server'],
-                    Package['neutron-plugin-contrail'],
-                    ],
-    subscribe => [File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
-                    File['/etc/neutron/plugin.ini'],
-                    ],
+  if !defined(Service['neutron-server']) {
+    service { 'neutron-server':
+      ensure    => running,
+      enable    => true,
+      require   => [Package['neutron-server'],
+                      Package['neutron-plugin-contrail'],
+                      ],
+      subscribe => [File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
+                      File['/etc/neutron/plugin.ini'],
+                      ],
+    }
+  } else {
+    Service<| title == 'neutron-server' |> {
+      ensure    => running,
+      enable    => true,
+      require   => [Package['neutron-server'],
+                      Package['neutron-plugin-contrail'],
+                      ],
+      subscribe => [File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
+                      File['/etc/neutron/plugin.ini'],
+                      ],
+    }
   }
 
 }

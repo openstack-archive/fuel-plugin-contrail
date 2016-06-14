@@ -27,10 +27,12 @@ class contrail::controller::scheduler {
     }
   }
 
-  Ini_subsetting <||> ~>
-  service { 'nova-scheduler':
-    ensure    => $ensure,
-    enable    => $enabled,
-    hasstatus => true,
+  Ini_subsetting <||> ~> Service['nova-scheduler']
+  if !defined(Class['::nova::scheduler']) {
+    service { 'nova-scheduler':
+      ensure    => $ensure,
+      enable    => $enabled,
+      hasstatus => true,
+    }
   }
 }
