@@ -402,7 +402,7 @@
 - id: contrail-repository
   type: puppet
   groups: [compute]
-  required_for: [tools]
+  required_for: [tools, netconfig]
   requires: [deploy_start, globals]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-repo.pp
@@ -540,4 +540,3 @@
     puppet_modules: /etc/puppet/modules
     timeout: 3600
     cwd: /
-
