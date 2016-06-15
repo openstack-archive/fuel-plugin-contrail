@@ -50,6 +50,7 @@ def import_tests():
     from tests import test_dpdk
     from tests import test_sriov
     from tests import test_dpdk_vf
+    from tests import test_contrail_node_group
 
 
 def run_tests():

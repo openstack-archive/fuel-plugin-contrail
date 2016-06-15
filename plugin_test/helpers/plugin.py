@@ -70,9 +70,11 @@ def install_packages(obj, remote):
     os.path.isfile(obj.add_package)
 
 
-def prepare_contrail_plugin(obj, slaves=None, options={}):
+def prepare_contrail_plugin(obj, slaves=None, snapshot_name=None, options={}):
     """Copy necessary packages to the master node and install them."""
-    obj.env.revert_snapshot("ready_with_%d_slaves" % slaves)
+    if slaves:
+        snapshot_name = "ready_with_%d_slaves" % slaves
+    obj.env.revert_snapshot(snapshot_name)
 
     # copy plugin to the master node
     checkers.upload_tarball(
@@ -100,8 +102,9 @@ def activate_plugin(obj, **kwargs):
     """Enable plugin in contrail settings."""
     plugin_name = 'contrail'
     msg = "Plugin couldn't be enabled. Check plugin version. Test aborted"
+    cluster_id = obj.fuel_web.get_last_created_cluster()
     assert_true(
-        obj.fuel_web.check_plugin_exists(obj.cluster_id, plugin_name),
+        obj.fuel_web.check_plugin_exists(cluster_id, plugin_name),
         msg)
     logger.debug('we have contrail element')
 
@@ -112,7 +115,7 @@ def activate_plugin(obj, **kwargs):
                 {'{0}/value'.format(option): kwargs[option]})
 
     obj.fuel_web.update_plugin_settings(
-        obj.cluster_id, plugin_name, CONTRAIL_PLUGIN_VERSION, options)
+        cluster_id, plugin_name, CONTRAIL_PLUGIN_VERSION, options)
 
 
 def activate_vsrx():
