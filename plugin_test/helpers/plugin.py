@@ -227,4 +227,3 @@ def activate_dpdk_vf(obj):
         'hugepages_amount': '60',
     }
     activate_plugin(obj, **opts)
-

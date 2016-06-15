@@ -26,7 +26,7 @@ from helpers import baremetal
 
 @test(groups=["plugins"])
 class DPDKVFTests(TestBasic):
-    """DPDKTests."""
+    """DPDK VF Tests."""
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-4.0'
     add_package = '/var/www/nailgun/plugins/contrail-4.0/'\
@@ -55,6 +55,7 @@ class DPDKVFTests(TestBasic):
                 * 3 compute + ceph
                 * 1 contrail-config+contrail-control+contrail-db
                 * 1 compute+sriov+dpdk
+                * 1 contrail-db
             4. Deploy cluster.
             5. Run OSTF tests.
 
@@ -108,7 +109,7 @@ class DPDKVFTests(TestBasic):
             self.show_step(5)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity',
-                                              'ha','tests_platform'],
+                                              'ha', 'tests_platform'],
                                    timeout=60 * 60,
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
