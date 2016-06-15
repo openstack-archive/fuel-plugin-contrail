@@ -26,7 +26,7 @@ from helpers import baremetal
 
 @test(groups=["plugins"])
 class DPDKVFTests(TestBasic):
-    """DPDKTests."""
+    """DPDK VF Tests."""
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-4.0'
     add_package = '/var/www/nailgun/plugins/contrail-4.0/'\
