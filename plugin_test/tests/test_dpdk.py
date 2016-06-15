@@ -420,7 +420,7 @@ class DPDKTests(TestBasic):
           groups=["contrail_dpdk_add_controller"])
     @log_snapshot_after_test
     def contrail_dpdk_add_controller(self):
-        """Verify that Contrail compute role can be added after deploying.
+        """Verify that Contrail controller role can be added after deploying.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -509,7 +509,7 @@ class DPDKTests(TestBasic):
           groups=["contrail_dpdk_delete_controller"])
     @log_snapshot_after_test
     def contrail_dpdk_delete_controller(self):
-        """Verify that Contrail compute role can be deleted after deploying.
+        """Verify that Contrail controller role can be deleted after deploying.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
