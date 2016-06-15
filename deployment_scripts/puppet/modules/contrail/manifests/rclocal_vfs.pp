@@ -22,9 +22,9 @@ define contrail::rclocal_vfs (
 {
 
   if (versioncmp($::libnl_version, '3.2.21-1') > 0) {
-    $final_vf = $::contrail::sriov_hash[$network_device]['totalvfs']
+    $final_vf = $totalvfs
   } else {
-    $final_vf = min(30, $::contrail::sriov_hash[$network_device]['totalvfs'])
+    $final_vf = min(30, $totalvfs)
   }
 
   file {"/etc/network/interfaces.d/ifcfg-${network_device}":
