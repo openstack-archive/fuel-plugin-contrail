@@ -540,4 +540,3 @@
     puppet_modules: /etc/puppet/modules
     timeout: 3600
     cwd: /
-

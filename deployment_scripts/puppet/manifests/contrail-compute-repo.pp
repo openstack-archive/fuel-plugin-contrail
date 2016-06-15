@@ -14,8 +14,20 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
+include contrail
+
 apt::pin { 'contrail-main':
   explanation => 'Set priority for common contrail packages',
   priority    => 200,
   label       => 'contrail',
+}
+
+if $contrail::compute_dpdk_enabled {
+  # Temporary dirty hack. In case when we use contrail dpdk repositorise
+  # we don't have nova-compute-kvm package there [FIXME]
+  exec { 'remove_nova_compute_kvm_dependency':
+    path    => '/usr/local/bin:/bin:/usr/bin/',
+    cwd     => '/etc/puppet/modules/nova/manifests/compute/',
+    command => 'sed -i "/nova-compute-.{libvirt_virt_type}/,+5d" libvirt.pp',
+  }
 }
