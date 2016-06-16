@@ -40,6 +40,7 @@ from fuelweb_test.tests.test_net_templates_base import TestNetworkTemplatesBase
 from fuelweb_test import logger
 
 from helpers import plugin
+from helpers import openstack
 
 
 @test(groups=["plugins"])
@@ -136,7 +137,7 @@ class TestMultipleNets(TestNetworkTemplatesBase):
             10. Put new json on master node and update network data
             11. Verify that new IP ranges are applied for network config
             12. Add following nodes to default nodegroup:
-                * 3 controller+mongo+ceph
+                * 3 controller+ceph
             13. Add following nodes to custom nodegroup:
                 * 1 compute
                 * 1 contrail-config+contrail-control+contrail-db
@@ -159,7 +160,7 @@ class TestMultipleNets(TestNetworkTemplatesBase):
                                                 'ephemeral_ceph': True,
                                                 'objects_ceph': True,
                                                 'volumes_lvm': False,
-                                                'ceilometer': True})
+                                                'volumes_lvm': False})
 
         cluster_id = self.fuel_web.get_last_created_cluster()
         self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
@@ -281,11 +282,11 @@ class TestMultipleNets(TestNetworkTemplatesBase):
             cluster_id,
             {
                 'slave-01': [
-                    ['controller', 'ceph-osd', 'mongo'], nodegroup_default],
+                    ['controller', 'ceph-osd'], nodegroup_default],
                 'slave-02': [
-                    ['controller', 'ceph-osd', 'mongo'], nodegroup_default],
+                    ['controller', 'ceph-osd'], nodegroup_default],
                 'slave-03': [
-                    ['controller', 'ceph-osd', 'mongo'], nodegroup_default],
+                    ['controller', 'ceph-osd'], nodegroup_default],
                 'slave-04': [
                     ['contrail-config', 'contrail-control', 'contrail-db'],
                     nodegroup_custom1],
@@ -293,7 +294,7 @@ class TestMultipleNets(TestNetworkTemplatesBase):
             }
         )
         self.show_step(14)
-        self.fuel_web.deploy_cluster_wait(cluster_id)
+        openstack.deploy_cluster(self)
 
         self.show_step(15)
         self.fuel_web.verify_network(cluster_id)

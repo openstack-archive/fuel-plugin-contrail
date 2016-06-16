@@ -40,7 +40,7 @@ Steps
     10. Put new json on master node and update network data
     11. Verify that new IP ranges are applied for network config
     12. Add following nodes to default nodegroup:
-        * 3 controller+mongo+ceph
+        * 3 controller+ceph
     13. Add following nodes to custom nodegroup:
         * 1 compute
         * 1 contrail-config+contrail-control+contrail-db
@@ -145,7 +145,7 @@ Steps
     10. Put new json on master node and update network data
     11. Verify that new IP ranges are applied for network config
     12. Add following nodes to default nodegroup:
-        * 1 controller
+        * 1 controller+mongo
     13. Add following nodes to custom nodegroup:
         * 1 compute
         * 1 contrail-config+contrail-control+contrail-db
