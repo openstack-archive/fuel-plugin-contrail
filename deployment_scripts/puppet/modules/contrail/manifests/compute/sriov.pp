@@ -30,7 +30,8 @@ class contrail::compute::sriov {
       value  => 'pt',
     }
 
-    create_resources(contrail::rclocal_vfs, $::contrail::sriov_hash)
+    $sriov_hash = get_sriov_devices($contrail::compute_dpkd_on_vf, $contrail::phys_dev)
+    create_resources(contrail::rclocal_vfs, $sriov_hash)
 
     file_line {"sriov ${title}":
       ensure => absent,

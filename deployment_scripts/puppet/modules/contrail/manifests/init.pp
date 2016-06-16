@@ -116,7 +116,7 @@ class contrail {
   # DPDK on VF settings
   $compute_dpkd_on_vf    = $compute_dpdk_enabled and $compute_sriov_enabled and $settings['dpdk_on_vf']
   $dpdk_vf_number        = 0
-  $sriov_hash            = get_sriov_devices($compute_dpkd_on_vf, $phys_dev)
+
 
   # ToR agent settings
   $enable_tor_agents  = $settings['enable_tor_agents']

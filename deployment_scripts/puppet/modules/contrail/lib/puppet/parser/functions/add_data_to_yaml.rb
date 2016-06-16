@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -27,9 +27,15 @@ module Puppet::Parser::Functions
     key = args[1]
     value = args[2]
 
-    yaml_string = File.read file_path
-    current_data = YAML.load yaml_string
-    current_data[key] = value
+    if File.file?(file_path)
+      yaml_string = File.read file_path
+      current_data = YAML.load yaml_string
+      current_data[key] = value
+    else
+      current_data = Hash.new
+      current_data[key] = value
+    end
+
     yaml_string = YAML.dump current_data
     File.write(file_path, yaml_string)
 
@@ -37,4 +43,3 @@ module Puppet::Parser::Functions
 
   end
 end
-
