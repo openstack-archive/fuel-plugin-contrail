@@ -41,10 +41,13 @@ contrail-tsn:
   name: Contrail - TSN node
   description: >
     Contrail TSN role. Provides Control TSN and TOR agent components of Contrail.
-  has_primary: false
+  has_primary: true
   public_ip_required: false
   weight: 100
   conflicts:
+    - contrail-control
+    - contrail-config
+    - contrail-db
     - controller
     - compute
     - ceph-osd

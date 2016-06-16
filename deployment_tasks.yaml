@@ -62,6 +62,16 @@
     strategy:
       type: parallel
 
+- id: primary-contrail-tsn
+  type: group
+  role: [primary-contrail-tsn]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts, deploy_start]
+  required_for: [deploy_end]
+  requires: [deploy_start, primary-contrail-control]
+  parameters:
+    strategy:
+      type: parallel
+
 - id: contrail-tsn
   type: group
   role: [contrail-tsn]
@@ -353,7 +363,7 @@
 # Set proper apt pin for Contrail repository
 - id: contrail-repository-tsn
   type: puppet
-  groups: [contrail-tsn]
+  groups: [primary-contrail-tsn]
   required_for: [tools]
   requires: [deploy_start, globals]
   parameters:
@@ -363,7 +373,7 @@
 
 - id: contrail-tsn-vrouter
   type: puppet
-  role: [contrail-tsn]
+  role: [primary-contrail-tsn]
   requires: [post_deployment_start]
   required_for: [reconfigure-contrail-tsn-vrouter]
   parameters:
@@ -373,7 +383,7 @@
 
 - id: reconfigure-contrail-tsn-vrouter
   type: puppet
-  role: [contrail-tsn]
+  role: [primary-contrail-tsn]
   requires: [contrail-tsn-vrouter]
   required_for: [provision-tsn-vrouter]
   parameters:
@@ -384,7 +394,7 @@
 
 - id: provision-tsn-vrouter
   type: puppet
-  role: [contrail-tsn]
+  role: [primary-contrail-tsn]
   required_for: [post_deployment_end]
   requires: [reconfigure-contrail-tsn-vrouter]
   parameters:
