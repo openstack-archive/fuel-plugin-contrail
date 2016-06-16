@@ -51,13 +51,3 @@ Contrail features:
 
 *   Fine grained virtual network access policy control
 
-Licensing information
----------------------
-
-+----------------------+-----------------+
-| Juniper Contrail     | Commercial      |
-+----------------------+-----------------+
-| OpenContrail         | Apache 2.0      |
-+----------------------+-----------------+
-| Fuel Contrail Plugin | Apache 2.0      |
-+----------------------+-----------------+
