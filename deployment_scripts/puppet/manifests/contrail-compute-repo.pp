@@ -30,4 +30,8 @@ if $contrail::compute_dpdk_enabled {
     cwd     => '/etc/puppet/modules/nova/manifests/compute/',
     command => 'sed -i "/nova-compute-.{libvirt_virt_type}/,+5d" libvirt.pp',
   }
+
+  exec {'no_defualt_route_reconfigure':
+    command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/configure_default_route.pp',
+  }
 }
