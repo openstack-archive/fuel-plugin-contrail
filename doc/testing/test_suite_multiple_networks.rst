@@ -165,6 +165,9 @@ Contrail Multiple Networks delete compute
 -----------------------------------------
 
 
+ID
+##
+
 contrail_multiple_nodegroups_delete_compute
 
 
@@ -208,12 +211,15 @@ Steps
 
 Expected results
 ################
+
 All steps must be completed successfully, without any errors
 
 
 Contrail Multiple Networks add compute
------------------------------------------
+--------------------------------------
 
+ID
+##
 
 contrail_multiple_nodegroups_add_compute
 
