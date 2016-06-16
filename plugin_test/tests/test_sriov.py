@@ -439,3 +439,68 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_sriov_add_sriov"])
+    @log_snapshot_after_test
+    def contrail_dpdk_add_sriov(self):
+        """Verify that DPDK role can be added after deploying.
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Deploy cluster with following node configuration:
+                node-01: 'controller', 'ceph-osd';
+                node-02: 'contrail-config', 'contrail-control';
+                node-03: 'contrail-db';
+                node-04: 'compute', 'ceph-osd';
+                node-05: 'compute', 'ceph-osd';
+            4. Run OSTF tests
+            6. Add one node with following configuration:
+                node-bm: "compute", "sriov";
+            7. Deploy changes
+            8. Run OSTF tests
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=5,
+                                       options={'images_ceph': True})
+        self.bm_drv.host_prepare()
+
+        self.show_step(2)
+        # activate plugin with SRiOV feature
+        plugin.activate_sriov(self)
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        plugin.show_range(self, 3, 5)
+        conf_nodes = {
+            'slave-01': ['controller', 'ceph-osd'],
+            'slave-02': ['contrail-config',
+                         'contrail-control',],
+            'slave-03': ['contrail-db'],
+            'slave-04': ['compute', 'ceph-osd'],
+            'slave-05': ['compute', 'ceph-osd'],
+        }
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            nodes_dict=conf_nodes,
+            update_interfaces=False)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Deploy cluster
+        openstack.deploy_cluster(self)
+        # Run OSTF tests
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+
+        self.show_step(6)
+        self.bm_drv.setup_fuel_node(self,
+                                    cluster_id=self.cluster_id,
+                                    roles=['compute', 'sriov'])
+        self.show_step(7)
+        openstack.deploy_cluster(self)
+
+        self.show_step(8)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
