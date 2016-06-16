@@ -48,6 +48,7 @@ class contrail {
   $phys_dev          = get_private_ifname($interface)
   $phys_dev_pci      = get_dev_pci_addr($phys_dev)
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+  $headless_mode     = pick($settings['headless_mode'], true)
 
   # VIPs
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
