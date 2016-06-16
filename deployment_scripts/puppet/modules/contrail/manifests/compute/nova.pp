@@ -64,7 +64,8 @@ class contrail::compute::nova {
     enable => true,
   }
 
-  if ($::contrail::ceilometer_enabled) {
+  $ceilometer_enabled = $contrail::ceilometer_hash['enabled']
+  if ($ceilometer_enabled) {
     file_line { 'decrease interval':
         ensure => present,
         path   => '/etc/ceilometer/pipeline.yaml',
