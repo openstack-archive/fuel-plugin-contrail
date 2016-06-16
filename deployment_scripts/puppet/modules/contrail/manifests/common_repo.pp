@@ -14,7 +14,7 @@
 
 class contrail::common_repo {
 
-  $settings       = hiera('contrail', {})
+  $settings       = hiera_hash('contrail', {})
   $plugin_version = $settings['metadata']['plugin_version']
 
   case $::operatingsystem {
