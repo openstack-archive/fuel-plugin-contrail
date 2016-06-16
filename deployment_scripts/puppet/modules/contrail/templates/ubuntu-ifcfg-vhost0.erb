@@ -8,6 +8,4 @@ network_name contrail
 post-up ip route add <%= route['net'] %> via <%= route['via'] %> dev vhost0
 <% end -%>
 <% end -%>
-post-up ip route delete default
-post-up ip route add default via <%= scope.function_hiera(['management_vrouter_vip']) %>
 
