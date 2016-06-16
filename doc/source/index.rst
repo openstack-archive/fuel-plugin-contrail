@@ -1,6 +1,6 @@
 .. _fuel-plugin-contrail:
 
-Guide to the Contrail plugin version 3.0 for Fuel 7.0
+Guide to the Contrail plugin version 4.0 for Fuel 8.0
 =====================================================
 
 .. toctree::
@@ -12,7 +12,10 @@ Guide to the Contrail plugin version 3.0 for Fuel 7.0
     limitations
     sys_reqs
     install_guide
+    dpdk
+    enable_sriov
     using_network_templates
+    verification
     contrail_ui_intro
+    tuning
     appendix
-
