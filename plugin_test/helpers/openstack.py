@@ -18,7 +18,7 @@ from devops.helpers.helpers import wait
 from fuelweb_test import logger
 from fuelweb_test.settings import DEPLOYMENT_MODE
 from fuelweb_test.helpers.checkers import check_repo_managment
-from . import settings
+import settings
 
 
 def assign_net_provider(obj, **options):

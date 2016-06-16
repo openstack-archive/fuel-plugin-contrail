@@ -420,7 +420,7 @@ class DPDKTests(TestBasic):
           groups=["contrail_dpdk_add_controller"])
     @log_snapshot_after_test
     def contrail_dpdk_add_controller(self):
-        """Verify that Contrail compute role can be added after deploying.
+        """Verify that Contrail controller role can be added after deploying.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -435,7 +435,7 @@ class DPDKTests(TestBasic):
                 node-6: 'compute', 'dpdk';
             4. Run OSTF tests
             5. Add one node with following configuration:
-                node-6: "controller", "ceph-osd";
+                node-7: "controller", "ceph-osd";
             6. Deploy changes
             7. Run OSTF tests
 
@@ -509,7 +509,7 @@ class DPDKTests(TestBasic):
           groups=["contrail_dpdk_delete_controller"])
     @log_snapshot_after_test
     def contrail_dpdk_delete_controller(self):
-        """Verify that Contrail compute role can be deleted after deploying.
+        """Verify that Contrail controller role can be deleted after deploying.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
@@ -523,7 +523,7 @@ class DPDKTests(TestBasic):
                node-05: 'compute', 'cinder';
                node-06: 'compute', 'dpdk';
             4. Run OSTF tests
-            5. Delete node-06 with "controller" role
+            5. Delete node-01 with "controller" role
             6. Deploy changes
             7. Run OSTF tests
 

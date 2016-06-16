@@ -20,8 +20,7 @@ from fuelweb_test import logger
 from fuelweb_test.settings import iface_alias
 from proboscis.asserts import assert_true
 
-from . import settings
-from . import openstack
+import settings
 
 
 class BridgeTool(object):
@@ -265,7 +264,7 @@ class BMDriver(object):
         nailgun_nodes = obj.fuel_web.client.list_cluster_nodes(cluster_id)
         baremetal_macs = self.conf['target_macs']
         for node in nailgun_nodes:
-            if not node['status']== 'discover':
+            if not node['status'] == 'discover':
                 # Skip not discovered nodes
                 continue
             if node['mac'] in baremetal_macs:
