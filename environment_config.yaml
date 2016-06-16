@@ -70,7 +70,7 @@ attributes:
       - action: hide
         condition: not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)
   hugepages_amount:
-    value: '10'
+    value: '60'
     label: 'Hugepages amount (%)'
     description: 'The amount of memory allocated on each compute-node for hugepages in percent'
     weight: 130
@@ -113,7 +113,7 @@ attributes:
         action: "hide"
   dpdk_on_vf:
     value: false
-    label: "DPDK on VF"
+    label: "DPDK on VF (experimental)"
     description: "Configure DPDK vrouter use VF network adapter"
     weight: 160
     type: "checkbox"
@@ -143,7 +143,7 @@ attributes:
         condition: not (settings:contrail.contrail_global_sriov.value == true)
   enable_tor_agents:
     value: false
-    label: "Enable ToR agents"
+    label: "Enable ToR agents (experimental)"
     description: "Enable this option to unlock the Tor Agent configuration feature."
     weight: 230
     type: "checkbox"
