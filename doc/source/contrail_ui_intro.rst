@@ -5,6 +5,10 @@ This document describes very basic operations with Contrail UI.
 For detailed information on Contrail operations, please refer to official `Juniper documentation
 <http://www.juniper.net/techpubs/en_US/contrail2.0/information-products/pathway-pages/getting-started.html#configuration>`_.
 
+.. raw:: latex
+
+   \pagebreak
+
 Logging in
 ----------
 
@@ -13,17 +17,20 @@ Log into Contrail UI using the `OpenStack admin credentials.
 
 .. image:: images/contrail-login.png
 
+.. raw:: latex
+
+   \pagebreak
 
 Checking services status
 ------------------------
 
-Verify the status of Contrail Control Analytics and Config nodes along with vRouters in *Infrastructure* using­ *Dashboard*
+Verify the status of Contrail Control Analytics and Config nodes along with vRouters in *Infrastructure* using *Dashboard*
 tab of the left-hand *Monitor* menu.
 
 .. image:: images/contrail-services.png
 
 
-Сreating the virtual networks
+Creating the virtual networks
 -----------------------------
 
 
@@ -34,7 +41,7 @@ tab of the left-hand *Monitor* menu.
 
  *  To create an external network, you need to add ``Shared`` and ``External``  flags to the created network using
     the ``Advanced Options`` sections and provide a proper Routing mark in Route Targets section to let this network to be
-    announced to public routing table.
+    announced to the public routing table.
     The Routing mark is two numbers divided by a semicolon, e.g. 64512:10000.
 
     .. image:: images/contrail-create-ext-net.png
