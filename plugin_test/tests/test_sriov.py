@@ -195,6 +195,86 @@ class SRIOVTests(TestBasic):
                                    )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_sriov_delete_compute"])
+    @log_snapshot_after_test
+    def contrail_sriov_delete_compute(self):
+        """Verify that Contrail compute role can be deleted after deploying.
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Deploy cluster with following node configuration:
+                node-01: 'controller';
+                node-02: 'contrail-control', 'contrail-config', 'contrail-db';
+                node-03: 'contrail-db';
+                node-04: 'compute', 'sriov';
+                node-05: 'compute', 'cinder';
+                node-06: 'compute';
+            4. Run OSTF tests
+            5. Delete node-06 with "compute" role
+            6. Deploy changes
+            7. Run OSTF tests
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=9)
+        self.bm_drv.host_prepare()
+
+        self.show_step(2)
+        # activate plugin with SRIOV feature
+        plugin.activate_sriov(self)
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        self.show_step(3)
+        self.bm_drv.setup_fuel_node(self,
+                                    cluster_id=self.cluster_id,
+                                    roles=['compute', 'sriov'])
+        conf_no_compute = {
+            'slave-01': ['controller'],
+            'slave-02': ['contrail-control',
+                         'contrail-config',
+                         'contrail-db'],
+            'slave-03': ['contrail-db'],
+            'slave-04': ['compute', 'cinder'],
+        }
+        conf_compute = {'slave-05': ['compute']}
+
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            nodes_dict=dict(conf_no_compute, **conf_compute),
+            update_interfaces=False)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Deploy cluster
+        openstack.deploy_cluster(self)
+        # Run OSTF tests
+        if vsrx_setup_result:
+            self.show_step(4)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+
+        # Delete Compute node and check again
+        self.show_step(5)
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            nodes_dict=conf_compute,
+            pending_addition=False, pending_deletion=True,
+            update_interfaces=False)
+
+        # Deploy cluster
+        self.show_step(6)
+        openstack.deploy_cluster(self)
+        # Run OSTF tests
+        if vsrx_setup_result:
+            self.show_step(7)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity'],
+                                   should_fail=1,
+                                   failed_test_name=['Check that required '
+                                                     'services are running']
+                                   )
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_sriov_add_controller"])
     @log_snapshot_after_test
     def contrail_sriov_add_controller(self):
