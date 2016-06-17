@@ -1,19 +1,23 @@
+<%-
+fqdns = Array.new
+fqdns = @network_metadata['nodes'].map {|_,v| v['fqdn']}
+-%>
 ---
 sources:
     - name: meter_source
-      interval: 60
+      interval: 600
       meters:
           - "*"
       sinks:
           - meter_sink
     - name: cpu_source
-      interval: 60
+      interval: 600
       meters:
           - "cpu"
       sinks:
           - cpu_sink
     - name: disk_source
-      interval: 60
+      interval: 600
       meters:
           - "disk.read.bytes"
           - "disk.read.requests"
@@ -26,7 +30,7 @@ sources:
       sinks:
           - disk_sink
     - name: network_source
-      interval: 60
+      interval: 600
       meters:
           - "network.incoming.bytes"
           - "network.incoming.packets"
@@ -34,6 +38,18 @@ sources:
           - "network.outgoing.packets"
       sinks:
           - network_sink
+<% unless fqdns.nil? -%>
+    - name: hardware_source
+      interval: 600
+      meters:
+          - "hardware.*"
+      resources:
+<%- fqdns.each_with_index do |fqdn| -%>
+          - snmp://<%= fqdn %>
+<%- end -%>
+      sinks:
+          - meter_sink
+<% end -%>
     - name: contrail_source
       interval: 600
       meters:
@@ -42,14 +58,14 @@ sources:
         - "ip.floating.receive.bytes"
         - "ip.floating.transmit.bytes"
       resources:
-          - contrail://<%= scope.lookupvar('contrail::contrail_private_vip') %>:8081
+        - contrail://<%= scope.lookupvar('contrail::contrail_private_vip') %>:8081
       sinks:
         - contrail_sink
 sinks:
     - name: meter_sink
       transformers:
       publishers:
-          - notifier://
+          - rpc://
     - name: cpu_sink
       transformers:
           - name: "rate_of_change"
@@ -60,7 +76,7 @@ sinks:
                     type: "gauge"
                     scale: "100.0 / (10**9 * (resource_metadata.cpu_number or 1))"
       publishers:
-          - notifier://
+          - rpc://
     - name: disk_sink
       transformers:
           - name: "rate_of_change"
@@ -75,7 +91,7 @@ sinks:
                         unit: "\\1/s"
                     type: "gauge"
       publishers:
-          - notifier://
+          - rpc://
     - name: network_sink
       transformers:
           - name: "rate_of_change"
@@ -90,8 +106,8 @@ sinks:
                         unit: "\\1/s"
                     type: "gauge"
       publishers:
-          - notifier://
+          - rpc://
     - name: contrail_sink
       publishers:
-        - rpc://
+          - rpc://
       transformers:

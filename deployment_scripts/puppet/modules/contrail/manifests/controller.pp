@@ -14,6 +14,8 @@
 
 class contrail::controller {
 
+  $network_metadata = $contrail::network_metadata
+
 # Resources defaults
   Package { ensure => present }
 
@@ -97,10 +99,13 @@ class contrail::controller {
   $ceilometer_enabled = $contrail::ceilometer_hash['enabled']
 
   if ($ceilometer_enabled) {
-    package { 'ceilometer-plugin-contrail': } ->
-    file {'/etc/ceilometer/pipeline.yaml':
-      ensure  => file,
-      content => template('contrail/pipeline.yaml.erb'),
+    package { 'ceilometer-plugin-contrail': }
+    if !defined(File['/etc/ceilometer/pipeline.yaml']) {
+      file { '/etc/ceilometer/pipeline.yaml':
+        ensure  => present,
+        content => template('contrail/pipeline.yaml.erb'),
+        require => Package['ceilometer-plugin-contrail'],
+      }
     }
     if $contrail::ceilometer_ha_mode {
       service {'ceilometer-agent-central':
