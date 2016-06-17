@@ -16,14 +16,20 @@ class contrail::compute::aggregate {
 
   if $contrail::compute_dpdk_enabled {
 
-    $nodes_hash          = hiera('nodes')
-    $dpdk_compute_nodes  = nodes_with_roles(['dpdk'], 'fqdn')
-    $dpdk_hosts          = join($dpdk_compute_nodes, ',')
-    $nova_hash           = hiera_hash('nova', {})
-    $keystone_tenant     = pick($nova_hash['tenant'], 'services')
-    $keystone_user       = pick($nova_hash['user'], 'nova')
-    $service_endpoint    = hiera('service_endpoint')
-    $region              = hiera('region', 'RegionOne')
+    $nodes_hash             = hiera('nodes')
+    $dpdk_compute_nodes     = nodes_with_roles(['dpdk'], 'fqdn')
+    $dpdk_hosts             = join($dpdk_compute_nodes, ',')
+    $nova_hash              = hiera_hash('nova', {})
+    $keystone_tenant        = pick($nova_hash['tenant'], 'services')
+    $keystone_user          = pick($nova_hash['user'], 'nova')
+    $service_endpoint       = hiera('service_endpoint')
+    $region                 = hiera('region', 'RegionOne')
+    $ssl_hash               = hiera_hash('use_ssl', {})
+    $internal_auth_protocol = get_ssl_property($ssl_hash, {}, 'keystone', 'internal', 'protocol', 'http')
+    $internal_auth_address  = get_ssl_property($ssl_hash, {}, 'keystone', 'internal', 'hostname', [$service_endpoint])
+    $auth_api_version       = 'v2.0'
+    $identity_uri           = "${internal_auth_protocol}://${internal_auth_address}:5000"
+    $auth_url               = "${identity_uri}/${auth_api_version}"
 
     Exec {
       provider    => 'shell',
@@ -34,7 +40,7 @@ class contrail::compute::aggregate {
         "OS_TENANT_NAME=${keystone_tenant}",
         "OS_USERNAME=${keystone_user}",
         "OS_PASSWORD=${nova_hash['user_password']}",
-        "OS_AUTH_URL=http://${service_endpoint}:5000/v2.0/",
+        "OS_AUTH_URL=${auth_url}",
         'OS_ENDPOINT_TYPE=internalURL',
         "OS_REGION_NAME=${region}",
         'NOVA_ENDPOINT_TYPE=internalURL',
