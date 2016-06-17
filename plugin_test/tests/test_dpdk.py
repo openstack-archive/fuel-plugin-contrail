@@ -587,7 +587,6 @@ class DPDKTests(TestBasic):
                                                      'services are running']
                                    )
 
-
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_add_to_dpdk_sriov"])
     @log_snapshot_after_test
@@ -595,7 +594,8 @@ class DPDKTests(TestBasic):
         """Verify that Contrail controller role can be added after deploying.
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+            1. Create an environment with "Neutron with tunneling segmentation"
+                as a network configuration
             2. Enable and configure Contrail plugin
             3. Enable dpdk and sriov
             4. Deploy cluster with following node configuration:
@@ -663,4 +663,3 @@ class DPDKTests(TestBasic):
         if vsrx_setup_result:
             self.show_step(9)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-
