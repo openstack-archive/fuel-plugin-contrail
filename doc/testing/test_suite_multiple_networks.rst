@@ -144,11 +144,12 @@ Steps
     9. Update network.json  with customized ip ranges
     10. Put new json on master node and update network data
     11. Verify that new IP ranges are applied for network config
-    12. Add following nodes to default nodegroup:
+    12. Add following nodes to custom nodegroup:
         * 1 controller+mongo
-    13. Add following nodes to custom nodegroup:
+    13. Add following nodes to default nodegroup:
         * 1 compute
         * 1 contrail-config+contrail-control+contrail-db
+        * 1 cinder
     14. Deploy cluster
     15. Run health checks (OSTF)
     16. Add 1 controller node
@@ -253,7 +254,7 @@ Steps
     12. Add following nodes to default nodegroup:
         * 3 controller
     13. Add following nodes to custom nodegroup:
-        * 2 compute
+        * 1 compute
         * 1 contrail-config+contrail-control+contrail-db
     14. Deploy cluster
     15. Run health checks (OSTF)

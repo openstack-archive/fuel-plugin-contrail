@@ -73,7 +73,7 @@ class ContrailPlugin(TestBasic):
         contrail_route_target = '10000'
         contrail_external = '10.100.1.0/24'
         contrail_asnum = '64512'
-        hugepages_amount = '10'
+        hugepages_amount = '60'
         hugepages_size = '2'
         vrouter_core_mask = '0x3'
         sriov_physnet = 'physnet1'
