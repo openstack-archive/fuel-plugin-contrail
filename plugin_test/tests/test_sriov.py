@@ -478,7 +478,7 @@ class SRIOVTests(TestBasic):
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
-                         'contrail-control',],
+                         'contrail-control'],
             'slave-03': ['contrail-db'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
