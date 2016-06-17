@@ -17,6 +17,9 @@ import os
 import time
 import subprocess
 
+from devops.helpers.helpers import tcp_ping
+from devops.helpers.helpers import wait
+
 from fuelweb_test import logger
 from fuelweb_test.helpers import checkers
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PATH
@@ -190,6 +193,40 @@ def net_group_preparation(obj):
     for i in commands:
         node_ssh.execute_async(i)
         time.sleep(40)
+
+
+def vsrx_multiple_networks(obj, vsrx_ip='10.109.4.250', net_name='private2'):
+    """Configure routing on vsrx to no default private network.
+
+    :param obj: Test case object
+    :param vsrx_ip: ip of vSRX router
+    :param net_name: name of no default private network
+
+    """
+    ip_private_net = obj.env.d_env.get_network(name=net_name).ip_network
+
+    ip_private_net_default = obj.env.d_env.get_network(
+        name='private').ip_network
+
+    commands = [
+        'cli',
+        'configure',
+        'set protocols bgp group Contrail_Controller allow {0}'.format(
+            ip_private_net),
+        'set routing-options static route {0} next-hop {1}'.format(
+            ip_private_net, ip_private_net_default.split('0/').pop(0) + '1'),
+        'delete routing-options static route {0} ' + \
+        'next-table public.inet.0'.format(ip_private_net_default),
+        'set routing-options dynamic-tunnels dynamic_overlay_tunnels' + \
+        ' destination-networks {0}'.format(ip_private_net),
+        'commit']
+
+    wait(
+        lambda: tcp_ping(vsrx_ip, 22), timeout=60 * 2, interval=10,
+        timeout_msg="Node {0} is not accessible by SSH.".format(vsrx_ip))
+    with obj.env.d_env.get_ssh_to_remote(vsrx_ip) as remote:
+        for command in commands:
+            remote.execute_async(command)
 
 
 def show_range(obj, start_value, end_value):
