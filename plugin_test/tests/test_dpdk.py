@@ -586,3 +586,81 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_add_to_dpdk_sriov"])
+    @log_snapshot_after_test
+    def contrail_add_to_dpdk_sriov(self):
+        """Verify that Contrail controller role can be added after deploying.
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+            2. Enable and configure Contrail plugin
+            3. Enable dpdk and sriov
+            4. Deploy cluster with following node configuration:
+                node-1: 'controller';
+                node-2: 'contrail-config', 'contrail-control', 'contrail-db';
+                node-3: 'compute', 'cinder';
+                node-4: 'compute', 'dpdk', 'sriov';
+            5. Deploy cluster
+            6. Run OSTF
+            7. Add "contrail-config", "contrail-control", "contrail-db" roles
+            8. Deploy changes
+            9. Run OSTF
+        """
+        plugin.show_range(self, 1, 3)
+        plugin.prepare_contrail_plugin(self, slaves=5)
+        self.bm_drv.host_prepare()
+
+        self.show_step(3)
+        # activate plugin with DPDK feature
+        plugin.activate_dpdk(self)
+        # enable plugin and ativate SR-IOV in contrail settings
+        plugin.activate_sriov(self)
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        self.show_step(4)
+        self.bm_drv.setup_fuel_node(self,
+                                    cluster_id=self.cluster_id,
+                                    roles=['compute', 'dpdk', 'sriov'])
+        conf_nodes = {
+            'slave-01': ['controller'],
+            'slave-02': ['contrail-config',
+                         'contrail-control',
+                         'contrail-db'],
+            'slave-03': ['compute', 'cinder'],
+        }
+        conf_controller = {'slave-04': ['contrail-config',
+                                        'contrail-control',
+                                        'contrail-db']}
+
+        # Cluster configuration
+        self.fuel_web.update_nodes(self.cluster_id,
+                                   nodes_dict=conf_nodes,
+                                   update_interfaces=False)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Deploy cluster
+        self.show_step(5)
+        openstack.deploy_cluster(self)
+        # Run OSTF tests
+        if vsrx_setup_result:
+            self.show_step(6)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+
+        # Add Contrail node and check again
+        self.show_step(7)
+        # Cluster configuration
+        self.fuel_web.update_nodes(self.cluster_id,
+                                   nodes_dict=conf_controller,
+                                   update_interfaces=False)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Deploy cluster
+        self.show_step(8)
+        openstack.deploy_cluster(self)
+        # Run OSTF tests
+        if vsrx_setup_result:
+            self.show_step(9)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+
