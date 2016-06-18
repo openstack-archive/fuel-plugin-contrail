@@ -35,7 +35,7 @@ class contrail::compute::override {
     packages    => $common_pkg,
   }
 
-  if $contrail::compute_dpdk_enabled {
+  if $contrail::compute_dpdk_enabled or $contrail::compute_sriov_enabled {
     # Create local dpdk repository
     package { 'dpdk-depends-packages':
       ensure => present,

@@ -35,7 +35,7 @@ class contrail::compute::nova {
     'DEFAULT/heal_instance_info_cache_interval': value => '0';
   }
 
-  if $contrail::compute_dpdk_enabled {
+  if $contrail::compute_dpdk_enabled or $contrail::compute_sriov_enabled {
     nova_config {
       'libvirt/virt_type': value => 'kvm';
       'CONTRAIL/use_userspace_vhost': value => true;
