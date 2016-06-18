@@ -81,33 +81,33 @@ config.serviceEndPointTakePublicURL = true;
  *      if you do not want to specify then use ''
  *****************************************************************************/
 config.networkManager = {};
-config.networkManager.ip = '<%= scope.lookupvar('contrail::mos_mgmt_vip') %>';
+config.networkManager.ip = '<%= scope.lookupvar('contrail::internal_neutron_endpoint') %>';
 config.networkManager.port = '9696'
-config.networkManager.authProtocol = 'http';
+config.networkManager.authProtocol = '<%= scope.lookupvar('contrail::internal_neutron_protocol') %>';
 config.networkManager.apiVersion = [];
 config.networkManager.strictSSL = false;
 config.networkManager.ca = '';
 
 config.imageManager = {};
-config.imageManager.ip = '<%= scope.lookupvar('contrail::mos_mgmt_vip') %>';
+config.imageManager.ip = '<%= scope.lookupvar('contrail::internal_glance_endpoint') %>';
 config.imageManager.port = '9292';
-config.imageManager.authProtocol = 'http';
+config.imageManager.authProtocol = '<%= scope.lookupvar('contrail::internal_glance_protocol') %>';
 config.imageManager.apiVersion = ['v1', 'v2'];
 config.imageManager.strictSSL = false;
 config.imageManager.ca = '';
 
 config.computeManager = {};
-config.computeManager.ip = '<%= scope.lookupvar('contrail::mos_mgmt_vip') %>';
+config.computeManager.ip = '<%= scope.lookupvar('contrail::internal_nova_endpoint') %>';
 config.computeManager.port = '8774';
-config.computeManager.authProtocol = 'http';
+config.computeManager.authProtocol = '<%= scope.lookupvar('contrail::internal_nova_protocol') %>';
 config.computeManager.apiVersion = ['v1.1', 'v2'];
 config.computeManager.strictSSL = false;
 config.computeManager.ca = '';
 
 config.identityManager = {};
-config.identityManager.ip = '<%= scope.lookupvar('contrail::mos_mgmt_vip') %>';
+config.identityManager.ip = '<%= scope.lookupvar('contrail::internal_auth_address') %>';
 config.identityManager.port = '5000';
-config.identityManager.authProtocol = 'http';
+config.identityManager.authProtocol = '<%= scope.lookupvar('contrail::internal_auth_protocol') %>';
 /******************************************************************************
  * Note: config.identityManager.apiVersion is not controlled by boolean flag
  * config.serviceEndPointFromConfig. If specified apiVersion here, then these
@@ -120,9 +120,9 @@ config.identityManager.strictSSL = false;
 config.identityManager.ca = '';
 
 config.storageManager = {};
-config.storageManager.ip = '<%= scope.lookupvar('contrail::mos_mgmt_vip') %>';
+config.storageManager.ip = '<%= scope.lookupvar('contrail::internal_cinder_endpoint') %>';
 config.storageManager.port = '8776';
-config.storageManager.authProtocol = 'http';
+config.storageManager.authProtocol = '<%= scope.lookupvar('contrail::internal_cinder_endpoint') %>';
 config.storageManager.apiVersion = ['v1'];
 config.storageManager.strictSSL = false;
 config.storageManager.ca = '';

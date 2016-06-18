@@ -62,6 +62,28 @@ class contrail {
   $public_ssl         = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'usage', false)
   $public_ssl_path    = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'path', [''])
 
+  #NOTE(AK858F): Modern way to get the ssl values with understandable variables names
+  $public_horizon_endpoint = get_ssl_property($ssl_hash, {}, 'horizon', 'public', 'hostname', [$mos_public_vip])
+  $public_horizon_protocol = get_ssl_property($ssl_hash, {}, 'horizon', 'public', 'protocol', 'http')
+
+  $internal_neutron_endpoint = get_ssl_property($ssl_hash, {}, 'neutron', 'internal', 'hostname', [$mos_mgmt_vip])
+  $internal_neutron_protocol = get_ssl_property($ssl_hash, {}, 'neutron', 'internal', 'protocol', 'http')
+
+  $internal_glance_endpoint  = get_ssl_property($ssl_hash, {}, 'glance', 'internal', 'hostname', [$mos_mgmt_vip])
+  $internal_glance_protocol  = get_ssl_property($ssl_hash, {}, 'glance', 'internal', 'protocol', 'http')
+
+  $internal_cinder_endpoint  = get_ssl_property($ssl_hash, {}, 'cinder', 'internal', 'hostname', [$mos_mgmt_vip])
+  $internal_cinder_protocol  = get_ssl_property($ssl_hash, {}, 'cinder', 'internal', 'protocol', 'http')
+
+  $internal_nova_endpoint    = get_ssl_property($ssl_hash, {}, 'nova', 'internal', 'hostname', [$mos_mgmt_vip])
+  $internal_nova_protocol    = get_ssl_property($ssl_hash, {}, 'nova', 'internal', 'protocol', 'http')
+
+  $internal_auth_address     = get_ssl_property($ssl_hash, {}, 'keystone', 'internal', 'hostname', [hiera('service_endpoint', ''), $mos_mgmt_vip])
+  $internal_auth_protocol    = get_ssl_property($ssl_hash, {}, 'keystone', 'internal', 'protocol', 'http')
+
+  #NOTE(AK858F): There are duplicate variables with the different names, we have
+  # to switch to one format
+
   # Internal SSL for keystone connections
   $keystone_ssl       = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'usage', false)
   $keystone_protocol  = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'protocol', 'http')
