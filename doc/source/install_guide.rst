@@ -54,8 +54,7 @@ Configuring Contrail Plugin
     .. image:: images/compute.png
 
 
-#.  Please select Neutron with tunneling segmentation network model.
-    GRE segmentation is also supported, but you need to set it from Fuel CLI
+#.  Please select Contrail SDN networking setup.
 
     .. image:: images/networking_setup.png
 
@@ -103,18 +102,13 @@ Configuring Contrail Plugin
         .. image:: images/conf-interfaces.png
 
 
-    *   Set *Private* network to the separate network interface as the untagged network.
+    *   Set *Private* network to the separate network interface.
         **DO NOT USE THIS PHYSICAL INTERFACE FOR ANY OTHER NETWORK.**
-        This interface will be used by contrail vRouter as the untagged port.
+        This interface will be used by contrail vRouter.
         It is recommended to set the bigger MTU for Private interfaces (e.g. 9000) if the switching hardware supports
         Jumbo Frames.
         This will enhance contrail network performance by avoiding packet fragmentation within Private network.
 
-
-    For other networking options please refer to `Mirantis OpenStack User Guide <https://docs.mirantis.com/openstack/fuel/fuel-8.0/pdf/Fuel-8.0-UserGuide.pdf>`_.
-    In case of using multiple L2 segments, you may need to configure networking according to the `Operations Guide
-    <https://docs.mirantis.com/openstack/fuel/fuel-8.0/mos-planning-guide.html#network-multiple-cluster-networks>`_ and supply
-    static routes to BGP peers and other cluster networks in network_1.yaml file.
 
 #.  Example network configuration
 
@@ -146,3 +140,4 @@ Configuring Contrail Plugin
 
         **First usable addresses from the Private network will be used as VIP for Contrail controllers.**
         For example, if your Private network CIDR is 192.168.200.0/24, then Contrail VIP will be **192.168.200.1**.
+        If you want to use other IP as VIP, you need to specify a range for this network.

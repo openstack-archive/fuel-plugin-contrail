@@ -49,6 +49,7 @@ latex_elements = {
     'classoptions': ',openany,oneside',
     'babel': '\\usepackage[english]{babel}',
     'preamble':mypreamble,
+    'fontpkg': '\usepackage[T1]{fontenc}'
 }
 
 if LooseVersion(sphinx_version) >= LooseVersion('1.3.1'):
