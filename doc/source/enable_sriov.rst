@@ -36,10 +36,15 @@ How to enable SR-IOV in fuel
 
     .. image:: images/enable_sriov_settings.png
 
-#. Assign SR-IOV role to compute hosts. SR-IOV will be enabled on all SR-IOV
-capable interfaces, not assigned to Fuel bridges(networks in Fuel UI).
+#. Assign SR-IOV role to compute hosts. 
 
     .. image:: images/enable_sriov_role_node.png
+
+#. **SR-IOV will be enabled on all SR-IOV capable interfaces, not assigned
+   to Fuel bridges(networks in Fuel UI).**
+   List of interfaces can be modified manually after deployment.
+
+    .. image:: images/sriov_interfaces.png
 
 #. Perform deploy as in 5.3.10 :doc:`/install_guide`
 
