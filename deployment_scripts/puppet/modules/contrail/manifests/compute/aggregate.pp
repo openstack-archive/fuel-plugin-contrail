@@ -42,8 +42,9 @@ class contrail::compute::aggregate {
     }
 
     exec { 'aggr_add_host':
-      command => "bash -c \"nova aggregate-add-host hpgs-aggr ${::fqdn}\"",
-      unless  => "bash -c \"nova aggregate-details hpgs-aggr | grep ${::fqdn}\"",
+      command => "bash -c \"nova aggregate-add-host hpgs-aggr ${::fqdn}\" && touch /opt/contrail/aggr_add_host-DONE",
+      unless  => "bash -c \"nova aggregate-details hpgs-aggr | grep -q ${::fqdn}\"",
+      creates => '/opt/contrail/aggr_add_host-DONE',
     }
   }
 }
