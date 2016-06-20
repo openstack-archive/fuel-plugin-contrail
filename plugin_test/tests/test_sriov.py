@@ -541,7 +541,7 @@ class SRIOVTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        self.show_step(3)
+        plugin.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'sriov'])
@@ -570,7 +570,7 @@ class SRIOVTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(4)
+        plugin.show_step(4)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
