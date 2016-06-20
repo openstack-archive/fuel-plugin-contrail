@@ -6,9 +6,7 @@ The plugin has the following requirements for software and hardware:
 +--------------------------------+-----------------------------------------------------------------+
 | Fuel version                   | 8.0                                                             |
 +--------------------------------+-----------------------------------------------------------------+
-| Juniper Contrail version       | 3.0.1                                                           |
-+--------------------------------+-----------------------------------------------------------------+
-| OpenContrail                   | not available yet                                               |
+| Juniper Contrail version       | 3.0.2                                                           |
 +--------------------------------+-----------------------------------------------------------------+
 | Hardware                       | *   At least 1 additional server for Contrail controller        |
 |                                |     (contrail-control, contrail-config, contrail-db roles).     |

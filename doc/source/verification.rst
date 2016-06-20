@@ -52,14 +52,14 @@ Basic checks
     Login to Contrail WebUI, go to Monitor -> Control nodes, choose any and select a “Peers” tab. You should see your compute nodes(vRouters) and external router in a list of peers. Status should be “Established”
 
     .. image:: images/check_list_of_peers.png
-       :width: 80%
+
 
 #. Check that external router was provisioned correctly:
 
     Login to Contrail WebUI, go to Configure -> Infrastructure -> BGP routers. Verify the IP address of router
 
     .. image:: images/check_external_router.png
-       :width: 80%
+
 
     After that you can use health checks in Fuel UI, also called OSTF tests.
 
@@ -80,29 +80,29 @@ OSTF tests
     #. Create network “net04”
 
         .. image:: images/create_network_net04.png
-           :width: 80%
+
 
     #. Create network “net04_ext”.
 
         .. image:: images/create_network_net04_ext.png
-           :width: 80%
+
 
         It should be marked as “shared” and “external”
 
         .. image:: images/create_network_net04_ext2.png
-            :width: 80%
+
 
         And have same route target as configured in external router
 
         .. image:: images/create_network_net04_ext3.png
-           :width: 80%
+
 
     #. Allocate floating IP addresses from net04_ext
 
         Go to Contrail WebUI --> Configure -> Networking -> Manage Floating IPs
 
         .. image:: images/allocate_floating_ip_addresses.png
-           :width: 80%
+
 
 After checking networks and floating IP addresses, start OSTF tests. For more details, refer to `Fuel user-guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#post-deployment-check>`_.
 
