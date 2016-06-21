@@ -14,6 +14,30 @@
 
 class contrail::controller {
 
+  $custom_yaml_settings = {
+    'sources' => [
+      {
+        'name'     => 'contrail_source',
+        'interval' => '600',
+        'meters'   => [
+          'ip.floating.receive.packets',
+          'ip.floating.transmit.packets',
+          'ip.floating.receive.bytes',
+          'ip.floating.transmit.bytes',
+        ],
+        'resources' => ["contrail://${contrail::contrail_private_vip}:8081"],
+        'sinks'     => ['contrail_sink'],
+      }
+    ],
+    'sinks' => [
+      {
+        'name'         => 'contrail_sink',
+        'publishers'   => ['rpc://'],
+        'transformers' => '',
+      }
+    ]
+  }
+
 # Resources defaults
   Package { ensure => present }
 
@@ -153,8 +177,8 @@ class contrail::controller {
   }
   if !defined(File['/etc/neutron/plugin.ini']) {
     file {'/etc/neutron/plugin.ini':
-      ensure => link,
-      target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini',
+      ensure  => link,
+      target  => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini',
       require => File['/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'],
     }
   } else {
@@ -193,11 +217,16 @@ class contrail::controller {
   $ceilometer_enabled = $contrail::ceilometer_hash['enabled']
 
   if ($ceilometer_enabled) {
-    package { 'ceilometer-plugin-contrail': } ->
-    file {'/etc/ceilometer/pipeline.yaml':
-      ensure  => file,
-      content => template('contrail/pipeline.yaml.erb'),
+    package { 'ceilometer-plugin-contrail': }
+
+    merge_yaml_settings { 'contrail_ceilometer_pipeline_yaml':
+      ensure            => present,
+      path              => '/etc/ceilometer/pipeline.yaml',
+      sample_settings   => '/etc/ceilometer/pipeline.yaml',
+      override_settings => $custom_yaml_settings,
+      require           => Package['ceilometer-plugin-contrail'],
     }
+
     if $contrail::ceilometer_ha_mode {
       service {'ceilometer-agent-central':
         ensure     => running,
@@ -206,7 +235,7 @@ class contrail::controller {
         hasstatus  => true,
         hasrestart => true,
         provider   => 'pacemaker',
-        subscribe  => File['/etc/ceilometer/pipeline.yaml'],
+        subscribe  => Merge_yaml_settings['contrail_ceilometer_pipeline_yaml'],
       }
     }
     else {
@@ -214,14 +243,14 @@ class contrail::controller {
         service {['ceilometer-api']:
           ensure    => running,
           enable    => true,
-          subscribe => File['/etc/ceilometer/pipeline.yaml'],
+          subscribe => Merge_yaml_settings['contrail_ceilometer_pipeline_yaml'],
         }
       }
       if !defined(Service['ceilometer-polling']) {
         service {['ceilometer-polling']:
           ensure    => running,
           enable    => true,
-          subscribe => File['/etc/ceilometer/pipeline.yaml'],
+          subscribe => Merge_yaml_settings['contrail_ceilometer_pipeline_yaml'],
         }
       }
     }
