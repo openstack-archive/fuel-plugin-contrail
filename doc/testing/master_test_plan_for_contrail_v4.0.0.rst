@@ -1,5 +1,5 @@
 =================================================
-Master Test Plan for Contrail v 3.0.x Fuel Plugin
+Master Test Plan for Contrail v 4.0.0 Fuel Plugin
 =================================================
 
 
@@ -10,7 +10,7 @@ Master Test Plan for Contrail v 3.0.x Fuel Plugin
 1.1. Purpose
 ############
 
-This document describes Master Test Plan for Contrail v 3.0.x Fuel Plugin. The scope of this plan defines the following objectives:
+This document describes Master Test Plan for Contrail v 4.0.0 Fuel Plugin. The scope of this plan defines the following objectives:
 
 * describe testing activities;
 * outline testing approach, test types, test cycles that will be used;
@@ -27,14 +27,14 @@ This document is intended for Contrail project team staff (QA and Dev engineers 
 2. Governing Evaluation Mission
 -------------------------------
 
-Contrail plugin for Fuel provides the functionality to add Сontrail SDN for Mirantis OpenStack as networking backend option.
+Contrail plugin for Fuel provides the functionality to add Contrail SDN for Mirantis OpenStack as networking backend option.
 
 It uses Fuel plugin architecture along with pluggable architecture enhancements introduced in latest Mirantis OpenStack Fuel.
 
-The plugin must be compatible with  the  version 7.0 of Mirantis OpenStack and Contrail release 3.0.x.
+The plugin must be compatible with  the  version 8.0 of Mirantis OpenStack and Contrail release 4.0.0.
 It will be allowed to deploy an only Contrail Controller (for test-bed environments) and add more controllers later (to add true HA).
 
-See Contrail Plugin 3.0.x Proposal for more details
+See Contrail Plugin 4.0.0 Proposal for more details
 
 
 2.1. Evaluation Test Mission
@@ -193,3 +193,7 @@ Not Run test cases - this metric shows a count of test cases which should be run
 .. include:: test_suite_system.rst
 .. include:: test_suite_dpdk.rst
 .. include:: test_suite_sriov.rst
+.. include:: test_suite_dpdk_vf.rst
+.. include:: test_suite_multiple_networks.rst
+.. include:: test_suite_tsn.rst
+
