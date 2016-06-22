@@ -1,14 +1,13 @@
-Verification
-============
-After deploy finishes, you can verify your installation. First, proceed with basic checks described below.
+Verify Contrail plugin
+======================
 
-Basic checks
-------------
+To verify your installation after deployment, perform the basic checks described below.
 
-#.  Check that Contrail services are running.
+#.  Verify that Contrail services are running.
 
-    Login to Contrail controller node and run contrail-status command. All services should be in "active" state:
-    ::
+    #. Login to the Contrail controller node and run ``contrail-status`` command.
+       All services should be in "active" state:
+       ::
 
         # contrail-status
             == Contrail Control ==
@@ -47,68 +46,90 @@ Basic checks
             contrail-database-nodemgr     active
             kafka                         active
 
-#. Check the list of peers and peering status
+#. Verify the list of peers and peering status
 
-    Login to Contrail WebUI, go to Monitor -> Control nodes, choose any and select a “Peers” tab. You should see your compute nodes(vRouters) and external router in a list of peers. Status should be “Established”
+   #. Login to Contrail web UI
+   #. Go to :guilabel:`Monitor -> Control nodes`
+   #. Choose any and select a :guilabel:`Peers` tab.
+      You should see your compute nodes (vRouters) and external router
+      in a list of peers with status ``Established``
 
     .. image:: images/check_list_of_peers.png
 
 
-#. Check that external router was provisioned correctly:
+#. Verify that external router has been provisioned correctly:
 
-    Login to Contrail WebUI, go to Configure -> Infrastructure -> BGP routers. Verify the IP address of router
+    #. Login to Contrail web UI
+    #. Go to :guilabel:`Configure -> Infrastructure -> BGP routers`.
+    #. Verify the IP address of the router
 
     .. image:: images/check_external_router.png
 
 
-    After that you can use health checks in Fuel UI, also called OSTF tests.
+    #. Use health checks in Fuel web UI, also called OSTF tests.
 
-OSTF tests
-----------
+Run OSTF tests
+--------------
 
-- **Prerequisites for OSTF:**
+Prerequisites for OSTF
+++++++++++++++++++++++
 
-    #. OSTF tests require two pre-defined networks created - net04 and net04_ext. The networks are created by Fuel during deployment. This section includes instructions how to create them if they were accidentally deleted. Floating IP addresses from net04_ext should be accessible from Fuel master node.
-    #. 3 tests from “Functional tests” set require floating IP addresses. They  should be configured on external router, routable from Fuel master node and     populated in Contrail/Openstack environment.
-    #. HA tests require at least 3 Openstack controllers.
-    #. “Platform services functional tests.” require Ceilometer and Mongo.
+    #. OSTF tests require two pre-defined networks created - ``net04`` and ``net04_ext``.
+       The networks are created by Fuel during deployment. This section includes
+       instructions how to create them if they were accidentally deleted. Floating
+       IP addresses from net04_ext should be accessible from Fuel master node.
+    #. Three tests from ``Functional tests`` set require floating IP addresses.
+       They  should be configured on external router, routable from Fuel master node and
+       populated in the Openstack with Contrail environment.
+    #. HA tests require at least three Openstack controllers.
+    #. ``Platform services functional tests.`` require Ceilometer and MongoDB.
 
-- **OSTF networks and floating IPs configuration:**
+Configure OSTF networks and floating IPs
+++++++++++++++++++++++++++++++++++++++++
 
-    To create networks go to Contrail WebUI -> Configure -> Networking -> Networks
+To configure OSTF networks and floating IPs:
 
-    #. Create network “net04”
+#. Go to Contrail web UI :guilabel:`Configure -> Networking -> Networks`
+
+#. Create network ``net04``
 
         .. image:: images/create_network_net04.png
 
 
-    #. Create network “net04_ext”.
+#. Create network ``net04_ext``.
 
-        .. image:: images/create_network_net04_ext.png
+   .. image:: images/create_network_net04_ext.png
 
+   It should be marked as ``shared`` and ``external``
 
-        It should be marked as “shared” and “external”
+   .. image:: images/create_network_net04_ext2.png
 
-        .. image:: images/create_network_net04_ext2.png
+   And have same route target as configured in an external router
 
-
-        And have same route target as configured in external router
-
-        .. image:: images/create_network_net04_ext3.png
+   .. image:: images/create_network_net04_ext3.png
 
 
-    #. Allocate floating IP addresses from net04_ext
+#. Allocate floating IP addresses from ``net04_ext``
 
-        Go to Contrail WebUI --> Configure -> Networking -> Manage Floating IPs
+   #. Go to Contrail WebUI :guilabel:`Configure -> Networking -> Manage Floating IPs`
 
-        .. image:: images/allocate_floating_ip_addresses.png
+      .. image:: images/allocate_floating_ip_addresses.png
 
 
-After checking networks and floating IP addresses, start OSTF tests. For more details, refer to `Fuel user-guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#post-deployment-check>`_.
+#. Start OSTF tests.
+
+.. seealso::
+
+   `Fuel user-guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#post-deployment-check>`_.
 
 Troubleshooting
 ---------------
 
-Start with checking output of contrail-status command. Then check the logs for corresponding serivice.
-Contrail logs are located in /var/log/contrail/ directory, and log names match with contrail service name.
-Cassandra logs are located in  /var/log/cassandra/, zookeeper's is in /var/log/zookeeper/.
+To troubleshoot:
+
+#. Verify output of the ``contrail-status`` command.
+#. Verify the logs for corresponding serivice:
+
+   * Contrail logs are located in ``/var/log/contrail/`` directory, and log names match with contrail service name.
+   * Cassandra logs are located in  ``/var/log/cassandra/``
+   * Zookeeper logs are in ``/var/log/zookeeper/``

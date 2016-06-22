@@ -1,16 +1,21 @@
-Using network templates
-=======================
+Use network templates
+=====================
 
-Starting from Fuel 7.0 it is possible to reduce the number of logical networks.
-This is implemented with the function called network templates.
-For detailed information on this feature, refer to
-`Operations guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/operations.html#using-networking-templates>`_
+Starting from Fuel 7.0, you can reduce the number of logical networks
+using network templates.
 
-This document provides sample configuration with network template.
-It is designed to get customers up and running quickly.
-The provided template utilizes 3 networks: Admin (PXE), Public and Private.
+.. seealso::
 
-#.  First do steps 5.3.1 - 5.3.7 from :doc:`/install_guide`
+   `Operations guide <https://docs.mirantis.com/openstack/fuel/fuel-7.0/operations.html#using-networking-templates>`_
+
+This document provides a sample configuration with a network template
+to get customers up and running quickly.
+
+The provided template utilizes three networks: Admin (PXE), Public, and Private.
+
+To use the network template:
+
+#.  Perform steps 5.3.1 - 5.3.7 from :doc:`/install_guide`
 
 #.  Configure interfaces as shown on figure:
 
@@ -20,23 +25,22 @@ The provided template utilizes 3 networks: Admin (PXE), Public and Private.
 
     \pagebreak
 
-3.  Next, we need to set gateway for the private network.
-    Here is how to do it with Fuel CLI:
+3.  Set a gateway for the private network:
 
-    *   Login with ssh to Fuel master node.
-    *   List existing network-groups
+    #. Login with ssh to Fuel master node.
+    #. List existing network-groups:
         ::
 
           fuel network-group --env 1
 
-    *   Remove and create again network-group *private* to set a gateway
+    #. Remove and create again network-group ``private`` to set a gateway:
         ::
 
           fuel network-group --delete --network 5
           fuel network-group --create --name private \
           --cidr 10.109.3.0/24 --gateway 10.109.3.1 --nodegroup 1
 
-#.  Set the ``render_addr_mask`` parameter to `internal` for this network by typing:
+#.  Set the ``render_addr_mask`` parameter to ``internal`` for this network by typing:
     ::
 
       fuel network-group --set --network 6 \
@@ -53,4 +57,4 @@ The provided template utilizes 3 networks: Admin (PXE), Public and Private.
 
       fuel --env 1 network-template --upload --dir /root/
 
-#.  Start deploy, pressing "Deploy changes" button.
+#.  Start deployment by pressing :guilabel:`Deploy changes` button.
