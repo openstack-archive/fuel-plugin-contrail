@@ -11,7 +11,7 @@ attributes:
     weight: 20
     type: "text"
     regex:
-      source: '^(?:(6553[0-4])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9][0-9]{0,2}))$'
+      source: '^(6553[0-4])|(655[0-2]\d)|(65[0-4]\d{2})|(6[0-4]\d{3})|([1-5]\d{4})|([1-9][0-9]{0,3})$'
       error: "Invalid AS number"
   contrail_gateways:
     value: '10.109.4.250'
@@ -88,7 +88,7 @@ attributes:
     weight: 131
     type: "text"
     regex:
-      source: '0[xX][0-9a-fA-F]+'
+      source: '^0[xX][0-9a-fA-F]+$'
       error: "Invalid hexadecimal value"
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
