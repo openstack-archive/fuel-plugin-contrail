@@ -4,33 +4,42 @@ Installation Guide
 Prerequisites
 -------------
 
-This guide assumes that you have `installed Fuel <https://docs.mirantis.com/openstack/fuel/fuel-8.0/pdf/Fuel-8.0-UserGuide.pdf>`_
+This guide assumes that you have installed `Fuel <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
 and all the nodes of your future environment are discovered and functional.
 
-Installing Contrail Plugin
---------------------------
+Install Contrail Plugin
+-----------------------
 
-#.  Download Contrail plugin from the `Fuel Plugins Catalog <https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/>`_.
+To install the Contrail plugin:
 
-#.  Copy the rpm downloaded at previous step to the Fuel Master node and install the plugin
+#.  Download the Contrail plugin from the
+    `Fuel Plugins Catalog <https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/>`_.
+
+#.  Copy the rpm package downloaded at the previous step to the Fuel Master node and install the plugin
     ::
 
-        scp contrail-4.0-4.0.0.noarch.rpm  <Fuel Master node ip>:/tmp/
+        scp contrail-4.0-4.0.0-1.noarch.rpm  <Fuel Master node ip>:/tmp/
 
 #.  Log into the Fuel Master node and install the plugin
     ::
 
         ssh <the Fuel Master node ip>
-        fuel plugins --install contrail-4.0-4.0.0.noarch.rpm
+        fuel plugins --install contrail-4.0-4.0.0-1.noarch.rpm
 
     You should get the following output
     ::
 
         Plugin <plugin-name-version>.rpm was successfully installed
 
-#.  Copy Juniper contrail install package (obtained from Juniper by subscription, more information can be found on
-    `official Juniper Contrail web-site <http://www.juniper.net/us/en/products-services/sdn/contrail/contrail-networking/>`_ )
-    to the Fuel Master node and run the installation script to unpack the vendor package and populate plugin repository
+#.  Copy the Juniper Contrail installation package to the Fuel Master node and run the installation
+    script to unpack the vendor package and populate the plugin repository:
+
+    .. note::
+
+       You can obtain the Juniper Contrail installation package from Juniper by subscription.
+       More information can be found on the
+       `official Juniper Contrail web-site <http://www.juniper.net/us/en/products-services/sdn/contrail/contrail-networking/>`__.
+    
     ::
 
         scp contrail-install-packages_3.0.2.0-51~14.04-liberty_all.deb \
@@ -42,10 +51,14 @@ Installing Contrail Plugin
     \clearpage
 
 
-Configuring Contrail Plugin
-----------------------------
+Configure Contrail Plugin
+-------------------------
 
-#.  First, you need to `create environment (page 3) <https://docs.mirantis.com/openstack/fuel/fuel-8.0/pdf/Fuel-8.0-UserGuide.pdf>`_ in Fuel UI.
+To configure the Contrail plugin, follow the steps below:
+
+#.  First, you need to
+    `create environment <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
+    in Fuel web UI.
 
     .. image:: images/name_and_release.png
 
@@ -67,11 +80,12 @@ Configuring Contrail Plugin
     .. image:: images/additional_services.png
 
 
-#.  Activate the plugin and fill configuration fields with correct values:
+#.  Enable the plugin and fill configuration fields with correct values:
 
-    *   AS number for BGP Gateway nodes communication: (defaults to 64512).
+    *   AS number for BGP Gateway nodes communication defaults to 64512
 
-    *   Gateway nodes IP addresses (provided as a comma-separated list) - peer addresses for BGP interaction with border routers.
+    *   IP addresses of gateway nodes provided as a comma-separated list - peer addresses
+        for BGP interaction with border routers.
 
 .. raw:: latex
 
@@ -83,12 +97,15 @@ Configuring Contrail Plugin
 
     *   At least 1 Compute
 
-    *   At least 1 node with Contrail-Control, Contrail-Config,Contrail-DB roles selected ( 3 or other odd number of nodes
-        recommended for HA)
+    *   At least 1 node with Contrail-Control, Contrail-Config, Contrail-DB roles selected
+
+        .. note::
+
+           Three or the greater odd number of nodes recommended for HA.
 
     *   If you plan to use Heat with autoscaling, in addition to Ceilometer you need to add node with MongoDB role
 
-    These 3 roles are not necessary need to be on the same node.
+    These three roles are not necessary need to be on the same node.
     You can place them on different nodes if needed.
 
     .. image:: images/contrail-roles.png
@@ -99,55 +116,65 @@ Configuring Contrail Plugin
     .. image:: images/node-roles.png
 
 
-#.  The recommended size of partition for Contrail database is 256 GB or more.
+#.  The recommended size of partition for the Contrail database is 256 GB or more.
 
-#.  Configure the network settings. See details at `Mirantis OpenStack User Guide (page 16) <https://docs.mirantis.com/openstack/fuel/fuel-8.0/pdf/Fuel-8.0-UserGuide.pdf>`_.
+#.  Configure the network settings. See details at
+    `Fuel User Guide <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_.
 
-    Open "Nodes" tab, select all the nodes and press **Configure interfaces** button
+    Open :guilabel:`Nodes` tab, select all the nodes and press :guilabel:`Configure interfaces` button
 
     .. image:: images/conf-interfaces.png
 
 
-    Set *Private* network to the separate network interface.
-    **DO NOT USE THIS PHYSICAL INTERFACE FOR ANY OTHER NETWORK.**
-    This interface will be used by contrail vRouter.
-    It is recommended to set the bigger MTU for Private interfaces (e.g. 9000) if the switching hardware supports
+    Set Private network to the separate network interface.
+
+    .. warning::
+
+       Do not use this physical interface for any other network.
+
+    Contrail vRouter will use this interface.
+    Set the bigger MTU for Private interfaces, for example 9000, if switching hardware supports
     Jumbo Frames.
-    This will enhance contrail network performance by avoiding packet fragmentation within Private network.
+    This will enhance contrail network performance by avoiding packet fragmentation within
+    Private network.
 
     .. image:: images/public-net.png
 
     .. warning::
 
-        **First usable addresses from the Private network will be used as VIP for Contrail controllers.**
-        For example, if your Private network CIDR is 192.168.200.0/24, then Contrail VIP will be **192.168.200.1**.
+        First usable addresses from the Private network will be used as VIP for Contrail controllers.
+        For example, if your Private network CIDR is ``192.168.200.0/24``, then Contrail VIP will be ``192.168.200.1``.
         If you want to use other IP as VIP, you need to specify a range for this network.
 
 .. raw:: latex
 
     \pagebreak
 
-9.  Example network configuration
+9.  Example of network configuration
 
-    Hardware servers with two network interfaces are used as openstack nodes.
-    The interfaces configuration is following:
+    Use hardware servers with two network interfaces as OpenStack nodes.
+    The interfaces configuration is as follows:
 
-    *   Management and Storage networks on the same interface with Admin net, using tagged VLANs
+    *   Management and Storage networks are on the same interface with ``Admin`` network using tagged VLANs
 
-    *   The second interface is dedicated for Public network as untagged
+    *   The second interface is dedicated to Public network as untagged
 
-    *   The forth interface is dedicated for Contrail operations as untagged (Private network)
+    *   The forth interface is dedicated to Contrail operations as untagged (Private network)
 
     .. image:: images/conf-interfaces2.png
 
     .. warning::
-       Be sure to launch `network verification check <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#verify-networks-ug>`_
-       before starting deployment. **Incorrect network configuration will result in non-functioning environment.**
+       Be sure to launch
+       `network verification check <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
+       before starting deployment. Incorrect network configuration will result in
+       non-functioning environment.
 
-#.  Press **Deploy changes** to `deploy the environment (page 25) <https://docs.mirantis.com/openstack/fuel/fuel-8.0/pdf/Fuel-8.0-UserGuide.pdf>`_.
+#.  Press :guilabel:`Deploy changes` to `deploy the environment (page 25)
+    <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_.
 
-    After installation is finished, `Contrail Web UI <http://www.juniper.net/techpubs/en_US/contrail2.0/topics/task/configuration
-    /monitor-dashboard-vnc.html>`_ can be accessed by the same IP address as Horizon, but using HTTPS protocol and port 8143.
-    For example, if you configured public network as described on screenshot below, then Contrail Web UI can be accessed by
-    **https://<Public-VIP>:8143**
+    After installation is finished,
+    `Contrail web UI <http://www.juniper.net/techpubs/en_US/contrail2.0/topics/task/configuration/monitor-dashboard-vnc.html>`_
+    can be accessed by the same IP address as OpenStack Dashboard, but using HTTPS protocol and port 8143.
+    For example, if you configured public network as described on the screenshot above, then you can
+    access Contrail web UI through ``https://<Public-VIP>:8143``.
 

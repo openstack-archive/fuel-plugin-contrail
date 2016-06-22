@@ -30,8 +30,8 @@ master_doc = 'index'
 project = u'Contrail plugin for Fuel'
 copyright = u'2015, Mirantis Inc.'
 
-version = '4.0'
-release = '4.0-4.0.0'
+version = '4.0-4.0.0-1'
+release = '4.0-4.0.0-1'
 
 pygments_style = 'sphinx'
 

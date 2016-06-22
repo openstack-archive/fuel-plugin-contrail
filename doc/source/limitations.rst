@@ -1,19 +1,19 @@
 Limitations
 ===========
 
-*   Removing Contrail-DB nodes from cluster is not supported by plugin, it can lead to data loss, so this must be
+*   Plugin does not support removing Contrail-DB nodes from a cluster. This can lead to data loss and must be
     a manual procedure.
-    Adding new Contrail-DB nodes to the environment is supported.
+    Plugin supports adding new Contrail-DB nodes to the environment.
 
 *   In case of using contrail service chaining with service instances, you may need to add *neutron* service user
-    to a current tenant after you have deployed the environment:
+    to a current project after you have deployed the environment:
 
-    *   Open Horizon dashboard, navigate to Identity - Projects page.
+    *   Open OpenStack Dashboard, navigate to the :guilabel:`Identity - Projects` page.
 
-    *   Click *modify users* button on the right side of *admin* project.
+    *   Click :guilabel:`modify users` button on the right side of the ``admin`` project.
 
-    *   Add *neutron* user to project members with *_member_* role.
+    *   Add the ``neutron`` user to project members with ``_member_`` role.
 
-*   Changing the default OpenStack tenant name is not supported. Default tenant name should be 'admin'.
+*   Changing the default OpenStack project name is not supported. Default project name should be ``admin``.
 
-*   The password of OpenStack admin user should not contain following characters: **$**, **`**, **\\** and **!**
+*   The password of OpenStack ``admin`` user should not contain following characters: ``$``, `````, ``\\`` and ``!``

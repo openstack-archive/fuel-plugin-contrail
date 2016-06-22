@@ -38,20 +38,20 @@ Key terms, acronyms and abbreviations
 Overview
 --------
 
-Contrail plugin for Fuel provides the functionality to add Contrail SDN for Mirantis OpenStack as networking backend option
-using Fuel Web UI in a user-friendly manner.
-Juniper Networks Contrail is an open software defined networking solution that automates and orchestrates the creation of
-highly scalable virtual networks.
+Contrail plugin for Fuel adds Contrail SDN to Mirantis OpenStack as a networking back end option
+using Fuel web UI in a user-friendly manner.
+Juniper Networks Contrail is an open software defined networking solution that automates and
+orchestrates the creation of highly scalable virtual networks.
 
 Contrail features:
 
 *   Powerful API calls (REST or direct python class calls)
 
-*   Analytics engine: Traffic flow reports, statistics
+*   Analytics engine: traffic flow reports, statistics
 
 *   Network management at 2-4 OSI layers
 
-*   Service chaining architecture: you can transparently pass traffic through service instances, such as IDS, firewalls, DPI.
+*   Service chaining architecture: you can transparently pass traffic through service instances
+    such as IDS, firewalls, and DPI.
 
 *   Fine grained virtual network access policy control
-
