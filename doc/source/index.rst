@@ -1,7 +1,7 @@
 .. _fuel-plugin-contrail:
 
-Guide to the Contrail plugin version 4.0 for Fuel 8.0
-=====================================================
+Guide to the Contrail plugin version 4.0-4.0.0-1 for Fuel 8.0
+=============================================================
 
 .. toctree::
     :maxdepth: 2
