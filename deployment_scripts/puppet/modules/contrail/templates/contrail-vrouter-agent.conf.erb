@@ -3,6 +3,11 @@
 log_file=/var/log/contrail/contrail-vrouter-agent.log
 log_level=SYS_NOTICE
 log_local=1
+
+log_flow=1
+use_syslog=1
+syslog_facility=LOG_LOCAL0
+
 headless_mode=true
 <%- if scope.lookupvar('contrail::compute_dpdk_enabled') == true then -%>
 platform=dpdk
