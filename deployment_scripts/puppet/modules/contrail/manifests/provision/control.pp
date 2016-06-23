@@ -28,6 +28,9 @@ class contrail::provision::control {
 && touch /opt/contrail/prov_external_bgp_${name}-DONE",
       creates => "/opt/contrail/prov_external_bgp_${name}-DONE",
     }
+  }
+
+  define contrail::provision::add_route_to_mx {
     if $contrail::gateway {
       file_line {"route_to_gw_${name}":
         ensure    => 'present',
@@ -79,4 +82,7 @@ then exit 1; fi",
     }
   }
 
+  contrail::provision::add_route_to_mx { $contrail::gateways:
+      require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
+    }
 }
