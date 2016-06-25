@@ -664,7 +664,7 @@ class IntegrationTests(TestBasic):
         tenant = os_conn.get_tenant(SERVTEST_TENANT)
 
         self.show_step(3)
-        chars = string.letters + string.digits + string.punctuation
+        chars = string.ascii_letters + string.digits + string.punctuation
         new_password = ''.join(
             [choice(chars) for i in range(max_password_lengh)])
         new_username = ''.join(
