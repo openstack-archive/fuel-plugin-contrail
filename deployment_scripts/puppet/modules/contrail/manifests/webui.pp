@@ -45,9 +45,10 @@ class contrail::webui {
     ensure    => running,
     enable    => true,
     require   => Package['contrail-openstack-webui'],
-    subscribe => [File['/etc/contrail/contrail-webui-userauth.js'],
-                    File['/etc/contrail/config.global.js'],
-                    ],
+    subscribe => [
+      File['/etc/contrail/contrail-webui-userauth.js'],
+      File['/etc/contrail/config.global.js'],
+      ],
   }
 
 }
