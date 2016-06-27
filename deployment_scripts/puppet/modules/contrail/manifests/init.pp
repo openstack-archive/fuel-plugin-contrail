@@ -28,6 +28,8 @@ class contrail {
   $master_ip        = hiera('master_ip')
   $node_name        = hiera('user_node_name')
   $nodes            = hiera('nodes')
+  $region           = hiera('region', 'RegionOne')
+  $dpdk_hash        = hiera_hash('dpdk', {})
 
   # Network configuration
   prepare_network_config($network_scheme)
@@ -39,7 +41,6 @@ class contrail {
   } else {
     $gateway = false
   }
-
 
   $address           = get_network_role_property('neutron/mesh', 'ipaddr')
   $cidr              = get_network_role_property('neutron/mesh', 'cidr')
@@ -92,6 +93,8 @@ class contrail {
   $keystone_address   = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'hostname', [$mos_mgmt_vip])
   $auth_url           = "${keystone_protocol}://${keystone_address}:35357/v2.0"
 
+  $neutron_ssl      = get_ssl_property($ssl_hash, {}, 'neutron', 'admin', 'usage', false)
+  $neutron_protocol = get_ssl_property($ssl_hash, {}, 'neutron', 'admin', 'protocol', 'http')
   $neutron_config   = hiera_hash('neutron_config', {})
   $floating_net     = try_get_value($neutron_config, 'default_floating_net', 'net04_ext')
   $private_net      = try_get_value($neutron_config, 'default_private_net', 'net04')
@@ -149,7 +152,7 @@ class contrail {
   $rabbit_hosts_ports = hiera('amqp_hosts')
 
   # RabbitMQ nodes Mgmt IP list
-  $rabbit_ips         = split(inline_template("<%= @rabbit_hosts_ports.split(',').map {|c| c.strip.gsub(/:[0-9]*$/,'')}.join(',') %>"),',')
+  $rabbit_ips            = split(inline_template("<%= @rabbit_hosts_ports.split(',').map {|c| c.strip.gsub(/:[0-9]*$/,'')}.join(',') %>"),',')
 
   # Contrail DB nodes Private IP list
   $primary_contrail_db_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-db'])
@@ -165,4 +168,12 @@ class contrail {
   # Contrail Config nodes Private IP list
   $contrail_config_nodes_hash     = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-config', 'contrail-config'])
   $contrail_config_ips            = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
+  $contrail_config_ips_adm        = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'fw-admin')))
+
+  # Cassandra, Kafka & Zookeeper servers list
+  $cassandra_server_list      = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:9042\" }.join(' ') %>")
+  $cassandra_server_list_9160 = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:9160\" }.join(' ') %>")
+  $kafka_broker_list          = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:9092\" }.join(' ') %>")
+  $zk_server_ip               = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:2181\" }.join(' ') %>")
+  $zk_comma                   = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:2181\" }.join(',') %>")
 }
