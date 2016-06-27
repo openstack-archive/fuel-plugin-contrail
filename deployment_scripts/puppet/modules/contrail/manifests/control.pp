@@ -40,13 +40,28 @@ class contrail::control {
   package { 'contrail-openstack-control': }
 
 # Contrail control config files
-  file { '/etc/contrail/contrail-control.conf':
-    content => template('contrail/contrail-control.conf.erb'),
+  contrail_control_config {
+    'DEFAULT/hostip':    value => $contrail::address;
+    'DEFAULT/hostname':  value => $::fqdn;
+    'DEFAULT/log_file':  value => '/var/log/contrail/contrail-control.log';
+    'DEFAULT/log_level': value => 'SYS_NOTICE';
+    'DEFAULT/log_local': value => '1';
+    'DISCOVERY/server':  value => $contrail::contrail_private_vip;
+    'IFMAP/certs_store': value => ' ';
+    'IFMAP/password':    value => $contrail::address;
+    'IFMAP/user':        value => $contrail::address;
   }
 
-  file { '/etc/contrail/contrail-dns.conf':
-    content => template('contrail/contrail-dns.conf.erb'),
-    require => Package['contrail-dns'],
+  contrail_dns_config {
+    'DEFAULT/hostip':    value => $contrail::address;
+    'DEFAULT/hostname':  value => $::fqdn;
+    'DEFAULT/log_file':  value => '/var/log/contrail/contrail-dns.log';
+    'DEFAULT/log_level': value => 'SYS_NOTICE';
+    'DEFAULT/log_local': value => '1';
+    'DISCOVERY/server':  value => $contrail::contrail_private_vip;
+    'IFMAP/certs_store': value => ' ';
+    'IFMAP/password':    value => $contrail::address;
+    'IFMAP/user':        value => $contrail::address;
   }
 
   file { '/etc/contrail/dns/contrail-named.conf':
@@ -59,25 +74,30 @@ class contrail::control {
     require => Package['contrail-dns'],
   }
 
-  file { '/etc/contrail/contrail-control-nodemgr.conf':
-    content => template('contrail/contrail-control-nodemgr.conf.erb'),
+  contrail_control_nodemgr_config {
+    'DISCOVERY/server': value => $contrail::contrail_private_vip;
+    'DISCOVERY/port':   value => '5998';
   }
 
 # Control service
   service { 'contrail-named':
     ensure    => running,
-    subscribe => [Package['contrail-dns'],
-                  File['/etc/contrail/dns/contrail-named.conf'],
-                  File['/etc/contrail/dns/contrail-rndc.conf'],
-                  ]
+    require   => Package['contrail-dns'],
+    subscribe => [
+      File['/etc/contrail/dns/contrail-named.conf'],
+      File['/etc/contrail/dns/contrail-rndc.conf'],
+      ]
   }
-  service { 'supervisor-control':
-    ensure    => $contrail::service_ensure,
-    enable    => true,
-    subscribe =>  [Package['contrail-openstack-control'],Package['contrail-control'],
-                  File['/etc/contrail/contrail-control.conf'],
-                  File['/etc/contrail/contrail-dns.conf'],
-                  ],
+    service { 'supervisor-control':
+      ensure  => $contrail::service_ensure,
+      enable  => true,
+      require => [
+        Package['contrail-openstack-control'],
+        Package['contrail-control']
+        ],
   }
+
+  Contrail_control_config <||> ~> Service['supervisor-control']
+  Contrail_dns_config <||> ~>     Service['supervisor-control']
 
 }
