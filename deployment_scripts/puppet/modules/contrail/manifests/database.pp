@@ -97,8 +97,11 @@ class contrail::database {
   }
 
 # Supervisor-database
-  file { '/etc/contrail/contrail-database-nodemgr.conf':
-    content => template('contrail/contrail-database-nodemgr.conf.erb'),
+  contrail_database_nodemgr_config {
+    'DEFAULT/hostip':         value => $contrail::address;
+    'DEFAULT/minimum_diskGB': value => '4';
+    'DISCOVERY/server':       value => $contrail::contrail_private_vip;
+    'DISCOVERY/port':         value => '5998';
   }
 
   service { 'contrail-database':
@@ -115,10 +118,7 @@ class contrail::database {
     ensure    => running,
     enable    => true,
     require   => [Service['contrail-database'],Package['contrail-openstack-database']],
-    subscribe => [
-      File['/etc/cassandra/cassandra.yaml'],
-      File['/etc/contrail/contrail-database-nodemgr.conf'],
-    ],
+    subscribe => File['/etc/cassandra/cassandra.yaml']
   }
 
   notify{ 'Waiting for cassandra seed node': } ->
@@ -138,4 +138,5 @@ class contrail::database {
     try_sleep => 30,
     require   => Service['supervisor-database'],
   }
+  Contrail_database_nodemgr_config <||> ~> Service['supervisor-database']
 }

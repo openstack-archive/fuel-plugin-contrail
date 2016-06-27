@@ -39,9 +39,24 @@ class contrail::compute::dpdk_on_vf {
       content => template('contrail/72-contrail-dpdk-on-vf.rules.erb'),
     }
 
-    file {'/etc/contrail/contrail-vrouter-agent.conf':
-      ensure  => present,
-      content => template('contrail/contrail-vrouter-agent.conf.erb'),
+    contrail_vrouter_agent_config {
+      'DEFAULT/log_file':                          value => '/var/log/contrail/contrail-vrouter-agent.log';
+      'DEFAULT/log_level':                         value => 'SYS_NOTICE';
+      'DEFAULT/log_local':                         value => '1';
+      'DEFAULT/log_flow':                          value => '1';
+      'DEFAULT/use_syslog':                        value => '1';
+      'DEFAULT/syslog_facility':                   value => 'LOG_LOCAL0';
+      'DEFUALT/headless_mode':                     value => true;
+      'DISCOVERY/server':                          value => $contrail::contrail_private_vip;
+      'DISCOVERY/max_control_nodes':               value => '2';
+      'HYPERVISOR/type':                           value => 'kvm';
+      'METADATA/metadata_proxy_secret':            value => $contrail::metadata_secret;
+      'NETWORKS/control_network_ip':               value => $contrail::address;
+      'VIRTUAL-HOST-INTERFACE/name':               value => 'vhost0';
+      'VIRTUAL-HOST-INTERFACE/ip':                 value => "${contrail::address}/${contrail::netmask_short}";
+      'VIRTUAL-HOST-INTERFACE/physical_interface': value => $contrail::phys_dev;
+      'VIRTUAL-HOST-INTERFACE/gateway':            value => pick($contrail::gateway, false);
+      'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
     }
 
     nova_config {
@@ -56,8 +71,10 @@ class contrail::compute::dpdk_on_vf {
     service {'supervisor-vrouter':
       ensure    => running,
       enable    => true,
-      subscribe => [Exec['rename-dpdk-vf'],
-                    File['/etc/contrail/contrail-vrouter-agent.conf']],
+      subscribe => [Exec['rename-dpdk-vf']],
     }
+
+    Contrail_vrouter_agent_config <||> ~> Service['supervisor-vrouter']
+
   }
 }
