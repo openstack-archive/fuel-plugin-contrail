@@ -34,11 +34,13 @@ class contrail::compute::nova {
     'DEFAULT/security_group_api':                value => 'neutron';
     'DEFAULT/heal_instance_info_cache_interval': value => '0';
   }
+
   if $contrail::compute_dpdk_enabled {
     nova_config {
       'CONTRAIL/use_userspace_vhost':            value => true;
     }
   }
+
   Nova_config <||> ~>
   service { 'nova-compute':
     ensure => running,
