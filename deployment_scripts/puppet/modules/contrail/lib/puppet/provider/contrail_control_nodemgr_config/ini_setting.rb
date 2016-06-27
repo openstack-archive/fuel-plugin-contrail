@@ -1,4 +1,4 @@
-Puppet::Type.type(:contrail_control_nodemgr_agent_config).provide(
+Puppet::Type.type(:contrail_control_nodemgr_config).provide(
   :ini_setting,
   :parent => Puppet::Type.type(:ini_setting).provider(:ruby)
 ) do
