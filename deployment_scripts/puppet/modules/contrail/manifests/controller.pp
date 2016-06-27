@@ -14,7 +14,7 @@
 
 class contrail::controller {
 
-# Resources defaults
+  # Resources defaults
   Package { ensure => present }
 
   File {
@@ -25,14 +25,13 @@ class contrail::controller {
     require => Package['neutron-plugin-contrail'],
   }
 
-# Packages
+  # Packages
   package { 'neutron-server': } ->
   package { 'python-neutron-lbaas': } ->
   package { 'python-contrail': } ->
   package { 'contrail-utils': } ->
   package { 'neutron-plugin-contrail': } ->
   package { 'contrail-heat': }
-
 
 #Fix for certifi CA blocking self signed certificates
   if $contrail::public_ssl {
@@ -43,38 +42,38 @@ class contrail::controller {
     }
   }
 
-# Nova configuration
+  # Nova configuration
   nova_config {
-    'DEFAULT/network_api_class': value=> 'nova.network.neutronv2.api.API';
-    'DEFAULT/neutron_url_timeout': value=> '300';
-    'DEFAULT/firewall_driver': value=> 'nova.virt.firewall.NoopFirewallDriver';
-    'DEFAULT/enabled_apis': value=> 'ec2,osapi_compute,metadata';
-    'DEFAULT/security_group_api': value=> 'neutron';
-    'DEFAULT/service_neutron_metadata_proxy': value=> 'True';
+    'DEFAULT/network_api_class':              value => 'nova.network.neutronv2.api.API';
+    'DEFAULT/neutron_url_timeout':            value => '300';
+    'DEFAULT/firewall_driver':                value => 'nova.virt.firewall.NoopFirewallDriver';
+    'DEFAULT/enabled_apis':                   value => 'ec2,osapi_compute,metadata';
+    'DEFAULT/security_group_api':             value => 'neutron';
+    'DEFAULT/service_neutron_metadata_proxy': value => 'True';
   } ~>
   service {'nova-api':
     ensure => running,
     enable => true,
   }
 
-# Neutron configuration
+  # Neutron configuration
   neutron_config {
-    'DEFAULT/core_plugin': value => 'neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2';
-    'DEFAULT/api_extensions_path': value => 'extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions:/usr/lib/python2.7/dist-packages/neutron_lbaas/extensions/';
-    'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2';
-    'DEFAULT/allow_overlapping_ips': value => 'True';
-    'service_providers/service_provider': value => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
-    'keystone_authtoken/admin_user': value => 'neutron';
-    'keystone_authtoken/admin_password': value => $::contrail::service_token;
+    'DEFAULT/core_plugin': value                  => 'neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2';
+    'DEFAULT/api_extensions_path': value          => 'extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions:/usr/lib/python2.7/dist-packages/neutron_lbaas/extensions/';
+    'DEFAULT/service_plugins': value              => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2';
+    'DEFAULT/allow_overlapping_ips': value        => 'True';
+    'service_providers/service_provider': value   => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
+    'keystone_authtoken/admin_user': value        => 'neutron';
+    'keystone_authtoken/admin_password': value    => $::contrail::service_token;
     'keystone_authtoken/admin_tenant_name': value => $::contrail::service_tenant;
-    'keystone_authtoken/auth_host': value => $::contrail::keystone_address;
-    'keystone_authtoken/auth_type': ensure => absent;
-    'keystone_authtoken/auth_port': value => '35357';
-    'keystone_authtoken/auth_protocol': value => $::contrail::keystone_protocol;
-    'keystone_authtoken/identity_uri': value => $::identity_uri;
-    'QUOTAS/quota_network': value => '-1';
-    'QUOTAS/quota_subnet': value => '-1';
-    'QUOTAS/quota_port': value => '-1';
+    'keystone_authtoken/auth_host': value         => $::contrail::keystone_address;
+    'keystone_authtoken/auth_type': ensure        => absent;
+    'keystone_authtoken/auth_port': value         => '35357';
+    'keystone_authtoken/auth_protocol': value     => $::contrail::keystone_protocol;
+    'keystone_authtoken/identity_uri': value      => $::identity_uri;
+    'QUOTAS/quota_network': value                 => '-1';
+    'QUOTAS/quota_subnet': value                  => '-1';
+    'QUOTAS/quota_port': value                    => '-1';
   }
   file_line {'add_neutron_defaults':
     ensure => 'present',
@@ -84,9 +83,19 @@ class contrail::controller {
   }
   file { '/etc/contrail/vnc_api_lib.ini':
     content => template('contrail/vnc_api_lib.ini.erb')
-  }
-  file {'/etc/neutron/plugins/opencontrail/contrailplugin.ini':
-    content => template('contrail/contrailplugin.ini.erb'),
+  } ->
+  contrailplugin_ini_config {
+  'APISERVER/api_server_ip':       value => $contrail::contrail_mgmt_vip;
+  'APISERVER/api_server_port':     value => '8082';
+  'APISERVER/multi_tenancy':       value => 'True';
+  'APISERVER/contrail_extensions': value => 'ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None';
+  'COLLECTOR/analytics_api_ip':    value => $contrail::contrail_mgmt_vip;
+  'COLLECTOR/analytics_api_port':  value => '8081';
+  'KEYSTONE/auth_url':             value => $contrail::auth_url;
+  'KEYSTONE/admin_token':          value => $contrail::admin_token;
+  'KEYSTONE/admin_user':           value => $contrail::neutron_user;
+  'KEYSTONE/admin_password':       value => $contrail::service_token;
+  'KEYSTONE/admin_tenant_name':    value => $contrail::service_tenant;
   } ->
   file {'/etc/neutron/plugin.ini':
     ensure => link,
@@ -95,14 +104,14 @@ class contrail::controller {
 
 # Contrail-specific heat templates settings
   heat_config {
-    'DEFAULT/plugin_dirs': value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat/resources,/usr/lib/python2.7/dist-packages/vnc_api/gen/heat/resources';
-    'clients_contrail/contrail-user': value=> 'neutron';
-    'clients_contrail/user': value=> $contrail::neutron_user;
-    'clients_contrail/password': value=> $contrail::service_token;
-    'clients_contrail/tenant': value=> $contrail::service_tenant;
-    'clients_contrail/api_server': value=> $contrail::contrail_mgmt_vip;
-    'clients_contrail/auth_host_ip': value=> $contrail::mos_mgmt_vip;
-    'clients_contrail/api_base_url': value=> '/';
+    'DEFAULT/plugin_dirs':            value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat/resources,/usr/lib/python2.7/dist-packages/vnc_api/gen/heat/resources';
+    'clients_contrail/contrail-user': value => 'neutron';
+    'clients_contrail/user':          value => $contrail::neutron_user;
+    'clients_contrail/password':      value => $contrail::service_token;
+    'clients_contrail/tenant':        value => $contrail::service_tenant;
+    'clients_contrail/api_server':    value => $contrail::contrail_mgmt_vip;
+    'clients_contrail/auth_host_ip':  value => $contrail::mos_mgmt_vip;
+    'clients_contrail/api_base_url':  value => '/';
   } ~>
   service {'heat-engine':
     ensure     => running,
@@ -147,11 +156,10 @@ class contrail::controller {
   service { 'neutron-server':
     ensure    => running,
     enable    => true,
-    subscribe => [Package['neutron-server'],Package['neutron-plugin-contrail'],
-                    File['/etc/neutron/plugins/opencontrail/contrailplugin.ini'],
-                    File['/etc/neutron/plugin.ini'],
-                    File_line['add_neutron_defaults'],
-                    ],
+    require   => [
+      Package['neutron-server'],
+      Package['neutron-plugin-contrail'],
+      ],
+    subscribe => File['/etc/neutron/plugin.ini'],
   }
-
 }
