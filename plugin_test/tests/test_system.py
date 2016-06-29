@@ -14,6 +14,7 @@ under the License.
 """
 
 import os
+import ssl
 
 from devops.helpers.helpers import tcp_ping
 from devops.helpers.helpers import wait
@@ -150,7 +151,7 @@ class SystemTests(TestBasic):
         self.env.make_snapshot("systest_setup", is_make=True)
 
     @test(depends_on=[systest_setup],
-          groups=["create_new_network_via_contrail"])
+          groups=["create_new_network_via_contrail", 'contrail_system_tests'])
     @log_snapshot_after_test
     def create_new_network_via_contrail(self):
         """Create a new network via Contrail.
@@ -234,7 +235,8 @@ class SystemTests(TestBasic):
                 '{0} is not attached to network {1}'.format(
                     instance.name, net_name))
 
-    @test(depends_on=[systest_setup], groups=["create_networks"])
+    @test(depends_on=[systest_setup],
+          groups=["create_networks", 'contrail_system_tests'])
     @log_snapshot_after_test
     def create_networks(self):
         """Create and terminate networks and verify in Contrail UI.
@@ -298,7 +300,8 @@ class SystemTests(TestBasic):
             assert_true(net['id'] == net_contrail)
 
     @test(depends_on=[systest_setup],
-          groups=["contrail_vm_connection_in_different_tenants"])
+          groups=["contrail_vm_connection_in_different_tenants",
+                  'contrail_system_tests'])
     @log_snapshot_after_test
     def contrail_vm_connection_in_different_tenants(self):
         """Create a new network via Contrail.
@@ -434,7 +437,7 @@ class SystemTests(TestBasic):
                 srv_2.name, net_test))
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_ceilometer_metrics"])
+          groups=["contrail_ceilometer_metrics", 'contrail_system_tests'])
     @log_snapshot_after_test
     def contrail_ceilometer_metrics(self):
         """Check that ceilometer collects contrail metrics.
@@ -550,3 +553,31 @@ class SystemTests(TestBasic):
                         collect_metric_type == metric_type,
                         "Type of metric {0} not equel to {1}.".format(
                             collect_metric_type, metric_type))
+
+
+    @test(depends_on=[systest_setup],
+          groups=["https_tls_selected", 'contrail_system_tests'])
+    @log_snapshot_after_test
+    def https_tls_selected(self):
+        """Create a new network via Contrail.
+
+        Scenario:
+            1. Setup systest_setup.
+            2. Get fingerprints from Openstack Horizon UI certificate
+            3. Get fingerprints from Contrail UI certificate
+            4. Get fingerprints from Contrail API certificate
+            5. Verify that keys are identical
+
+
+        Duration: 15 min
+
+        """
+        # constants
+        import ipdb
+        ipdb.set_trace()
+        self.show_step(1)
+        cluster_id = self.fuel_web.get_last_created_cluster()
+
+        self.show_step(2)
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        pass

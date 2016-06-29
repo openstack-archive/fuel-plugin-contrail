@@ -325,3 +325,41 @@ Expected results
 ################
 
 All contrail ceilometer metrics should be collected by ceilometer.
+
+
+Verify HTTPS on Contrail with selected TLS for OpenStack public endpoints
+-------------------------------------------------------------------------
+
+
+ID
+##
+
+https_tls_selected
+
+
+Description
+###########
+
+Verify HTTPS on Contrail with selected TLS for OpenStack public endpoints
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Deploy Contrail cluster with selected TLS for OPenStack public endpoints
+    2. Get fingerprints from Openstack Horizon UI certificate
+    3. Get fingerprints from Contrail UI certificate
+    4. Get fingerprints from Contrail API certificate
+    5. Verify that keys are identical
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
