@@ -1,7 +1,7 @@
 [APISERVER]
 api_server_ip = <%= scope.lookupvar('contrail::contrail_mgmt_vip') %>
 api_server_port = 8082
-multi_tenancy = True
+multi_tenancy = <%= scope.lookupvar('contrail::multi_tenancy') %>
 contrail_extensions = ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None
 
 [COLLECTOR]
