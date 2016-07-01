@@ -555,7 +555,6 @@ class SystemTests(TestBasic):
                         "Type of metric {0} not equel to {1}.".format(
                             collect_metric_type, metric_type))
 
-
     @test(depends_on=[systest_setup],
           groups=["https_tls_selected", 'contrail_system_tests'])
     @log_snapshot_after_test
