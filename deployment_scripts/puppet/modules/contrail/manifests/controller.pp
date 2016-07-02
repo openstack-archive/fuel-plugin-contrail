@@ -90,7 +90,7 @@ class contrail::controller {
 
 # Contrail-specific heat templates settings
   heat_config {
-    'DEFAULT/plugin_dirs': value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat';
+    'DEFAULT/plugin_dirs': value => '/usr/lib/heat,/usr/lib/python2.7/dist-packages/contrail_heat/resources,/usr/lib/python2.7/dist-packages/vnc_api/gen/heat/resources';
     'clients_contrail/contrail-user': value=> 'neutron';
     'clients_contrail/user': value=> $contrail::neutron_user;
     'clients_contrail/password': value=> $contrail::service_token;
