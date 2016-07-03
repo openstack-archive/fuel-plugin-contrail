@@ -1,0 +1,11 @@
+Code-Review+1: Dmitriy Stremkovskiy <dstremkouski@mirantis.com>
+Code-Review+1: Dmitry Ukov <dukov@mirantis.com>
+Code-Review+1: Pavel Basov <pbasov@mirantis.com>
+Code-Review+2: Oleksandr Martsyniuk <omartsyniuk@mirantis.com>
+Workflow+1: Oleksandr Martsyniuk <omartsyniuk@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Sun, 03 Jul 2016 12:32:51 +0000
+Reviewed-on: https://review.openstack.org/336712
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/fuel9-kilo
