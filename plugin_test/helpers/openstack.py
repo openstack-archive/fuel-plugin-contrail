@@ -33,6 +33,7 @@ def assign_net_provider(obj, **options):
         "objects_ceph": False,
         "volumes_lvm": True,
         "ceilometer": False,
+        "osd_pool_size": '3'
     }
 
     if "assert_deny" not in options:
