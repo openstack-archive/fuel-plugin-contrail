@@ -14,11 +14,21 @@ under the License.
 """
 
 import os
+
 from proboscis import test
+from proboscis.asserts import assert_true
+
+from devops.helpers.helpers import wait
+
+from fuelweb_test.helpers import os_actions
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
+from fuelweb_test.settings import SERVTEST_PASSWORD
+from fuelweb_test.settings import SERVTEST_TENANT
+from fuelweb_test.settings import SERVTEST_USERNAME
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+
 from helpers import plugin
 from helpers import openstack
 from helpers import baremetal
@@ -590,3 +600,237 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_sriov_setup"])
+    @log_snapshot_after_test
+    def contrail_sriov_setup(self):
+        """Contrail SRIOV setup.
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration and CEPH storage.
+            2. Enable and configure Contrail plugin.
+            3. Enable sriov.
+            4. Deploy cluster with following node configuration:
+                node-01: 'controller', 'ceph-osd';
+                node-02: 'compute';
+                node-03: 'contrail-db', 'contrail-config', 'contrail-control';
+                node-sriov: 'compute', sriov'.
+            5. Run OSTF tests.
+
+        Duration 120 min
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=5,
+                                       options={'images_ceph': True,
+                                                'volumes_ceph': True,
+                                                'ephemeral_ceph': True,
+                                                'objects_ceph': True,
+                                                'volumes_lvm': False,
+                                                'osd_pool_size': '1'})
+        self.bm_drv.host_prepare()
+
+        plugin.show_range(self, 2, 4)
+        # enable plugin and ativate SR-IOV in contrail settings
+        plugin.activate_sriov(self)
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        self.show_step(4)
+        self.bm_drv.setup_fuel_node(self,
+                                    cluster_id=self.cluster_id,
+                                    roles=['compute', 'sriov'])
+
+        conf_nodes = {
+            'slave-01': ['controller', 'ceph-osd'],
+            'slave-02': ['compute'],
+            'slave-03': ['contrail-db', 'contrail-config', 'contrail-control'],
+        }
+        # Cluster configurationeplication factor
+        self.fuel_web.update_nodes(self.cluster_id,
+                                   nodes_dict=conf_nodes,
+                                   update_interfaces=False)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Deploy cluster
+        openstack.deploy_cluster(self)
+
+        self.show_step(5)
+        # Run OSTF tests
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=1,
+                failed_test_name=['Instance live migration'])
+
+    @test(depends_on=[contrail_sriov_setup],
+          groups=["contrail_sriov_boot_snapshot_vm"])
+    @log_snapshot_after_test
+    def contrail_sriov_boot_snapshot_vm(self):
+        """Launch instance, create snapshot, launch instance from snapshot.
+
+        Scenario:
+            1. Setup contrail_sriov_setup.
+            2. Create physical network.
+            3. Create a subnet.
+            4. Create a port.
+            5. Boot the instance with the port on the SRIOV host.
+            6. Create snapshot of instance.
+            7. Delete the instance created in step 5.
+            8. Launch instance from snapshot.
+            9. Delete the instance created in step 8.
+
+        Duration 5 min
+
+        """
+        net_name = 'sriov'
+        subnet_cidr = '192.168.112.0/24'
+        cluster_id = self.fuel_web.get_last_created_cluster()
+        binding_port = 'direct'
+
+        self.show_step(2)
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+
+        body = {
+            'network': {
+                'name': net_name,
+                'provider:physical_network': 'physnet1',
+                'provider:segmentation_id': '5'}}
+        network = os_conn.neutron.create_network(body)['network']
+
+        self.show_step(3)
+        os_conn.create_subnet(
+            subnet_name=net_name,
+            network_id=network['id'],
+            cidr=subnet_cidr,
+            ip_version=4)
+
+        self.show_step(4)
+
+        port = os_conn.neutron.create_port(
+            {"port": {
+                "network_id": network['id'],
+                "binding:vnic_type": binding_port}})['port']
+
+        self.show_step(5)
+        images_list = os_conn.nova.images.list()
+        flavors = os_conn.nova.flavors.list()
+        flavor = [f for f in flavors if f.name == 'm1.micro'][0]
+
+        srv_1 = os_conn.nova.servers.create(
+            flavor=flavor, name='test1',
+            image=images_list[0], nics=[{'port-id': port['id']}])
+
+        openstack.verify_instance_state(os_conn)
+
+        self.show_step(6)
+        image = os_conn.nova.servers.create_image(srv_1, 'image1')
+        wait(lambda: os_conn.nova.images.get(image).status == 'ACTIVE',
+             timeout=300, timeout_msg='Image is not active.')
+
+        self.show_step(7)
+        os_conn.delete_instance(srv_1)
+        assert_true(
+            os_conn.verify_srv_deleted(srv_1),
+            "Instance was not deleted.")
+
+        self.show_step(8)
+        port = os_conn.neutron.create_port(
+            {"port": {
+                "network_id": network['id'],
+                "binding:vnic_type": binding_port}})['port']
+
+        srv_2 = os_conn.nova.servers.create(
+            flavor=flavor, name='test1',
+            image=image, nics=[{'port-id': port['id']}])
+        openstack.verify_instance_state(os_conn, instances=[srv_2])
+
+        self.show_step(9)
+        os_conn.delete_instance(srv_2)
+        assert_true(
+            os_conn.verify_srv_deleted(srv_2),
+            "Instance was not deleted.")
+
+    @test(depends_on=[contrail_sriov_setup],
+          groups=["contrail_sriov_volume"])
+    @log_snapshot_after_test
+    def contrail_sriov_volume(self):
+        """Create volume and boot instance from it.
+
+        Scenario:
+            1. Setup contrail_sriov_setup.
+            2. Create physical network.
+            3. Create a subnet.
+            4. Create a port.
+            5. Create a new small-size volume from image.
+            6. Wait for volume status to become "available".
+            7. Launch instance from created volume and port on the SRIOV host.
+            8. Wait for "Active" status.
+            9. Delete instance.
+            10. Delete volume and verify that volume deleted.
+
+        Duration 5 min
+
+        """
+        net_name = 'sriov'
+        subnet_cidr = '192.168.112.0/24'
+        cluster_id = self.fuel_web.get_last_created_cluster()
+        binding_port = 'direct'
+
+        self.show_step(2)
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+
+        body = {
+            'network': {
+                'name': net_name,
+                'provider:physical_network': 'physnet1',
+                'provider:segmentation_id': '5'}}
+        network = os_conn.neutron.create_network(body)['network']
+
+        self.show_step(3)
+        os_conn.create_subnet(
+            subnet_name=net_name,
+            network_id=network['id'],
+            cidr=subnet_cidr,
+            ip_version=4)
+
+        self.show_step(4)
+
+        port = os_conn.neutron.create_port(
+            {"port": {
+                "network_id": network['id'],
+                "binding:vnic_type": binding_port}})['port']
+
+        plugin.show_range(self, 5, 7)
+        images_list = os_conn.nova.images.list()
+        flavors = os_conn.nova.flavors.list()
+        flavor = [f for f in flavors if f.name == 'm1.micro'][0]
+        volume = os_conn.create_volume(image_id=images_list[0].id)
+
+        self.show_step(7)
+        srv_1 = os_conn.nova.servers.create(
+            flavor=flavor, name='test1',
+            image=images_list[0],
+            block_device_mapping={'vda': volume.id + ':::0'},
+            nics=[{'port-id': port['id']}])
+
+        self.show_step(8)
+        openstack.verify_instance_state(os_conn, instances=[srv_1])
+
+        self.show_step(9)
+        os_conn.delete_instance(srv_1)
+        assert_true(os_conn.verify_srv_deleted(srv_1),
+                    "Instance was not deleted.")
+
+        self.show_step(10)
+        os_conn.delete_volume_and_wait(volume)

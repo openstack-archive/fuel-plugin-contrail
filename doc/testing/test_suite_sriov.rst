@@ -315,3 +315,97 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors
+
+
+Contrail SRIOV boot instance
+----------------------------
+
+
+ID
+##
+
+contrail_sriov_boot_snapshot_vm
+
+
+Description
+###########
+
+Launch instance, create snapshot, launch instance from snapshot.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and CEPH storage.
+    2. Enable and configure Contrail plugin.
+    3. Deploy cluster with some controller+ceph, compute, compute+sriov
+       and contrail-specified nodes.
+    4. Run OSTF tests.
+    5. Create physical network.
+    6. Create a subnet.
+    7. Create a port.
+    8. Boot the instance with the port on the SRIOV host.
+    9.  Delete the instance created in step 8.
+    10. Launch instance from snapshot.
+    11. Delete the instance created in step 10.
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Contrail SRIOV boot instance from volume
+----------------------------------------
+
+
+ID
+##
+
+contrail_sriov_volume
+
+
+Description
+###########
+
+Create volume and boot instance from it.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and CEPH storage.
+    2. Enable and configure Contrail plugin.
+    3. Deploy cluster with some controller+ceph, compute, compute+sriov and
+       contrail-specified nodes.
+    4. Run OSTF tests.
+    5. Create physical network.
+    6. Create a subnet.
+    7. Create a port.
+    8. Create a new small-size volume from image.
+    9. Wait for volume status to become "available".
+    10. Launch instance from created volume and port on the SRIOV host.
+    11. Wait for "Active" status.
+    12. Delete instance.
+    13. Delete volume and verify that volume deleted.
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
