@@ -359,3 +359,101 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Contrail DPDK boot instance
+---------------------------
+
+
+ID
+##
+
+contrail_dpdk_boot_snapshot_vm
+
+
+Description
+###########
+
+Launch instance, create snapshot, launch instance from snapshot.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and CEPH storage.
+    2. Enable and configure Contrail plugin.
+    3. Enable dpdk.
+    4. Deploy cluster with some controller+ceph, compute, compute+dpdk
+       and contrail-specified nodes.
+    5. Run OSTF tests.
+    6. Create no default network with subnet.
+    7. Get existing flavor with hpgs.
+    8. Launch an instance using the default image and flavor with hpgs
+       in the hpgs availability zone.
+    9. Make snapshot of the created instance.
+    10. Delete the last created instance.
+    11. Launch another instance from the snapshot created in step 2
+       and flavor with hpgs in the hpgs availability zone.
+    12. Delete the last created instance..
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Contrail DPDK boot instance from volume
+---------------------------------------
+
+
+ID
+##
+
+contrail_dpdk_volume
+
+
+Description
+###########
+
+Create volume and boot instance from it.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and CEPH storage.
+    2. Enable and configure Contrail plugin.
+    3. Enable dpdk
+    4. Deploy cluster with some controller+ceph, compute, compute+dpdk and
+       contrail-specified nodes.
+    5. Run OSTF tests.
+    6. Create no default network with subnet.
+    7. Get existing flavor with hpgs.
+    8. Create a new small-size volume from image.
+    9. Wait for volume status to become "available".
+    10. Launch an instance using the default image and flavor with hpgs
+       in the hpgs availability zone.
+    11. Wait for "Active" status.
+    12. Delete the last created instance.
+    13. Delete volume and verify that volume deleted.
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.

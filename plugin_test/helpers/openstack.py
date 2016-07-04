@@ -14,10 +14,14 @@ under the License.
 """
 
 import time
+
+from proboscis.asserts import assert_true
+from devops.error import TimeoutError
 from devops.helpers.helpers import wait
 from fuelweb_test import logger
 from fuelweb_test.settings import DEPLOYMENT_MODE
 from fuelweb_test.helpers.checkers import check_repo_managment
+
 import settings
 
 
@@ -33,6 +37,7 @@ def assign_net_provider(obj, **options):
         "objects_ceph": False,
         "volumes_lvm": True,
         "ceilometer": False,
+        "osd_pool_size": '3'
     }
 
     if "assert_deny" not in options:
@@ -159,3 +164,31 @@ def wait_for_cluster_status(obj, cluster_id,
     logger.info('Wait cluster id:"{}" deploy done in {}sec.'.format(cluster_id,
                                                                     wtime))
     return wtime
+
+
+def verify_instance_state(self, os_conn, instances=None,
+                          expected_state='ACTIVE',
+                          boot_timeout=300):
+    """Verify that current state of each instance/s is expected.
+
+    :param os_conn: type object, openstack
+    :param instances: type list, list of created instances
+    :param expected_state: type string, expected state of instance
+    :param boot_timeout: type int, time in seconds to build instance
+    """
+    if not instances:
+        instances = os_conn.nova.servers.list()
+    for instance in instances:
+        try:
+            wait(
+                lambda:
+                os_conn.get_instance_detail(
+                    instance).status == expected_state,
+                timeout=boot_timeout)
+        except TimeoutError:
+            current_state = os_conn.get_instance_detail(instance).status
+            assert_true(
+                current_state == expected_state,
+                "Timeout is reached. Current state of {0} is {1}".format(
+                    instance.name, current_state)
+            )
