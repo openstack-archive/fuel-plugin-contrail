@@ -39,6 +39,7 @@ class contrail::config {
 # Packages
   package { 'openjdk-7-jre-headless': }->
   package { 'ifmap-server': }->
+  package { 'python-memcache': }->
   package { 'contrail-config': }
   package { 'contrail-openstack-config': }->
 
