@@ -32,6 +32,11 @@ class contrail::config {
     require => Package['contrail-openstack-config'],
   }
 
+  class { 'memcached':
+    listen_ip  => '127.0.0.1',
+    max_memory => '10%',
+  }
+
   tweaks::ubuntu_service_override { 'supervisor-config':
     package_name => 'contrail-config',
   }
@@ -144,7 +149,8 @@ class contrail::config {
                   File['/etc/contrail/contrail-device-manager.conf'],
                   File['/etc/contrail/contrail-config-nodemgr.conf'],
                   File['/etc/contrail/supervisord_config.conf'],
-                  File['/etc/ifmap-server/basicauthusers.properties']],
+                  File['/etc/ifmap-server/basicauthusers.properties'],
+                  Class[memcached]],
   }
 
 }
