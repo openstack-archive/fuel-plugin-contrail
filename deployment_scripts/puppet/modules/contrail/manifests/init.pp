@@ -153,6 +153,11 @@ class contrail {
   # RabbitMQ nodes Mgmt IP list
   $rabbit_ips         = split(inline_template("<%= @rabbit_hosts_ports.split(',').map {|c| c.strip.gsub(/:[0-9]*$/,'')}.join(',') %>"),',')
 
+  # Memcache nodes list
+  $memcache_roles = hiera('memcache_roles', ['primary-controller', 'controller'])
+  $memcache_nodes_hash = get_nodes_hash_by_roles($network_metadata, $memcache_roles)
+  $memcache_ips = sort(values(get_node_to_ipaddr_map_by_network_role($memcache_nodes_hash, 'mgmt/memcache')))
+
   # Contrail DB nodes Private IP list
   $primary_contrail_db_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-db'])
   $primary_contrail_db_ip         = sort(values(get_node_to_ipaddr_map_by_network_role($primary_contrail_db_nodes_hash, 'neutron/mesh')))
