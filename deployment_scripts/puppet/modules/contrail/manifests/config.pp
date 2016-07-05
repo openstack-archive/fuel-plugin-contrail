@@ -39,6 +39,7 @@ class contrail::config {
 # Packages
   package { 'openjdk-7-jre-headless': }->
   package { 'ifmap-server': }->
+  package { 'python-memcache': }->
   package { 'contrail-config': }
   package { 'contrail-openstack-config': }->
 
@@ -144,7 +145,8 @@ class contrail::config {
                   File['/etc/contrail/contrail-device-manager.conf'],
                   File['/etc/contrail/contrail-config-nodemgr.conf'],
                   File['/etc/contrail/supervisord_config.conf'],
-                  File['/etc/ifmap-server/basicauthusers.properties']],
+                  File['/etc/ifmap-server/basicauthusers.properties'],
+                  Class[memcached]],
   }
 
 }
