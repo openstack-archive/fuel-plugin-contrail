@@ -35,15 +35,6 @@ then exit 1; fi",
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_config_node-DONE",
     creates => '/opt/contrail/prov_config_node-DONE',
-  } ->
-
-  exec { 'prov_analytics_node':
-    command => "python /opt/contrail/utils/provision_analytics_node.py \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
---oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
---admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
-&& touch /opt/contrail/prov_analytics_node-DONE",
-    creates => '/opt/contrail/prov_analytics_node-DONE',
   }
 
   if $contrail::node_role == 'primary-contrail-config' {
