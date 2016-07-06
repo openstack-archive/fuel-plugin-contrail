@@ -15,6 +15,9 @@ under the License.
 
 import os
 import ssl
+import string
+import time
+from random import choice
 
 from devops.helpers.helpers import tcp_ping
 from devops.helpers.helpers import wait
@@ -30,9 +33,10 @@ from fuelweb_test.settings import SERVTEST_TENANT
 from fuelweb_test.settings import SERVTEST_USERNAME
 from fuelweb_test.settings import DISABLE_SSL
 
-
 from proboscis import test
 from proboscis.asserts import assert_true
+from proboscis.asserts import assert_equal
+from proboscis import SkipTest
 
 from helpers.contrail_client import ContrailClient
 from helpers import plugin
@@ -592,3 +596,84 @@ class SystemTests(TestBasic):
             raise Exception("ContrailUI certificate is not valid")
         if not horizon_cert == contrail_api_cert:
             raise Exception("Contrail API certificate is not valid")
+
+    @test(depends_on=[systest_setup],
+          groups=["contrail_login_password"])
+    @log_snapshot_after_test
+    def contrail_login_password(self):
+        """Create a new network via Contrail.
+
+        Scenario:
+            1. Setup systest_setup.
+            2. Login as admin to Openstack Horizon UI.
+            3. Create new user.
+            4. Login as user to Openstack Horizon UI.
+            5. Change login and password for user.
+            6. Login to Openstack Horizon UI with new credentials.
+            7. Login to Contrail Ui with same credentials.
+
+        Duration: 15 min
+
+        """
+        # constants
+        max_password_lengh = 64
+        port = 18082
+
+        self.show_step(1)
+        cluster_id = self.fuel_web.get_last_created_cluster()
+
+        self.show_step(2)
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+        contrail_client = ContrailClient(os_ip, contrail_port=port)
+        projects = contrail_client.get_projects()
+
+        tenant = os_conn.get_tenant(SERVTEST_TENANT)
+
+        self.show_step(3)
+        chars = string.letters + string.digits + string.punctuation
+        new_password = ''.join(
+            [choice(chars) for i in range(max_password_lengh)])
+        new_username = ''.join(
+            [choice(chars) for i in range(max_password_lengh)])
+        logger.info(
+            'New username: {0}, new password: {1}'.format(
+                new_username, new_password))
+        new_user = os_conn.create_user(new_username, new_password, tenant)
+        role = [role for role in os_conn.keystone.roles.list()
+                if role.name == 'admin'].pop()
+        os_conn.keystone.roles.add_user_role(new_user.id, role.id, tenant.id)
+
+        self.show_step(4)
+        os_actions.OpenStackActions(
+            os_ip, new_username,
+            new_password,
+            SERVTEST_TENANT)
+
+        self.show_step(5)
+        new_password = ''.join(
+            [choice(chars) for i in range(max_password_lengh)])
+        new_user.manager.update_password(new_user, new_password)
+        logger.info(
+            'New username: {0}, new password: {1}'.format(
+                new_username, new_password))
+        time.sleep(30)  # need to update password for new user
+
+        self.show_step(6)
+        os_actions.OpenStackActions(
+            os_ip, new_username,
+            new_password,
+            SERVTEST_TENANT)
+        contrail = ContrailClient(
+            os_ip, contrail_port=port,
+            credentials={
+                'username': new_username,
+                'tenant_name': SERVTEST_TENANT,
+                'password': new_password})
+
+        assert_equal(
+            projects, contrail.get_projects(),
+            "Can not give info by Contrail API.")
