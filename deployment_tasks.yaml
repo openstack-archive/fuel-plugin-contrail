@@ -41,6 +41,27 @@
     strategy:
       type: parallel
 #
+# Contrail - Analytics
+- id: primary-contrail-analytics
+  type: group
+  role: [primary-contrail-analytics]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts, deploy_start]
+  required_for: [deploy_end]
+  requires: [deploy_start, contrail-db, primary-contrail-config]
+  parameters:
+    strategy:
+      type: one_by_one
+
+- id: contrail-analytics
+  type: group
+  role: [contrail-analytics]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts, deploy_start]
+  required_for: [deploy_end]
+  requires: [deploy_start, contrail-db, primary-contrail-analytics]
+  parameters:
+    strategy:
+      type: parallel
+#
 # Contrail - Control
 - id: primary-contrail-control
   type: group
@@ -88,6 +109,7 @@
   type: group
   role: [primary-contrail-db, contrail-db,
     primary-contrail-config,contrail-config,
+    primary-contrail-analytics,contrail-analytics,
     primary-contrail-control,contrail-control]
   tasks: [configure_default_route, dns-client, ntp-client]
   required_for: [post_deployment_end]
@@ -126,6 +148,7 @@
   type: puppet
   groups: [primary-contrail-db, contrail-db,
     primary-contrail-config,contrail-config,
+    primary-contrail-analytics,contrail-analytics,
     primary-contrail-control,contrail-control]
   required_for: [deploy_end]
   requires: [deploy_start, hosts]
@@ -198,6 +221,17 @@
   requires: [contrail-config-all]
   parameters:
     puppet_manifest: puppet/manifests/contrail-config-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+# Install and configure Contrail Analytics Node
+- id: contrail-analytics-all
+  type: puppet
+  groups: [primary-contrail-analytics,contrail-analytics]
+  required_for: [deploy_end]
+  requires: [contrail-utils]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-analytics.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
