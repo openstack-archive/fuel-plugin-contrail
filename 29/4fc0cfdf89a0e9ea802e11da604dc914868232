@@ -1,0 +1,8 @@
+Code-Review+2: Oleksandr Martsyniuk <omartsyniuk@mirantis.com>
+Workflow+1: Oleksandr Martsyniuk <omartsyniuk@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 06 Jul 2016 12:19:46 +0000
+Reviewed-on: https://review.openstack.org/334704
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/fuel9-kilo
