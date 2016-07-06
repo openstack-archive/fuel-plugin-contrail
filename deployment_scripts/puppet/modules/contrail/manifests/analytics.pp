@@ -103,27 +103,25 @@ class contrail::analytics {
                     ],
   }
 
-  # Cron job for transfer contrail-logs to Fuel master
-  # Runs on primary analytics node
-  if $contrail::node_role == 'primary-contrail-config' {
-    file { 'contrailsyslog.sh':
-      ensure  => 'present',
-      path    => '/usr/local/sbin/contrailsyslog.sh',
-      mode    => '0700',
-      owner   => 'root',
-      group   => 'root',
-      content => template('contrail/contrailsyslog.sh.erb'),
-    }
+# Cron job for transfer contrail-logs to Fuel master
+# Runs on primary analytics node
+  file { 'contrailsyslog.sh':
+    ensure  => 'present',
+    path    => '/usr/local/sbin/contrailsyslog.sh',
+    mode    => '0700',
+    owner   => 'root',
+    group   => 'root',
+    content => template('contrail/contrailsyslog.sh.erb'),
+  }
 
-    cron { 'contrail-syslog':
-      command => '/usr/local/sbin/contrailsyslog.sh',
-      user    => 'root',
-      minute  => '*/1',
-      require => [
-        Service['supervisor-analytics'],
-        File['contrailsyslog.sh'],
-      ],
-    }
+  cron { 'contrail-syslog':
+    command => '/usr/local/sbin/contrailsyslog.sh',
+    user    => 'root',
+    minute  => '*/1',
+    require => [
+      Service['supervisor-analytics'],
+      File['contrailsyslog.sh'],
+    ],
   }
 
 }

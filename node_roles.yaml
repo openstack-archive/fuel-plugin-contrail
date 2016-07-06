@@ -24,6 +24,19 @@ contrail-config:
     - ceph-osd
     - cinder
 
+contrail-analytics:
+  name: Contrail - Analytics
+  description: >
+    Contrail analytics role. Provides Collector, Analytics API, Query engine and Topology services.
+  has_primary: false
+  public_ip_required: false
+  weight: 100
+  conflicts:
+    - controller
+    - compute
+    - ceph-osd
+    - cinder
+
 contrail-control:
   name: Contrail - Control
   description: >
