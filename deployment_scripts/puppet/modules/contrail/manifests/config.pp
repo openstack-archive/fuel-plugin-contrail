@@ -77,10 +77,6 @@ class contrail::config {
     content => template('contrail/basicauthusers.properties.erb'),
   }
 
-  file { '/etc/contrail/vnc_api_lib.ini':
-    content => template('contrail/vnc_api_lib.ini.erb')
-  }
-
   file { '/etc/contrail/contrail-api.conf':
     content => template('contrail/contrail-api.conf.erb'),
   }

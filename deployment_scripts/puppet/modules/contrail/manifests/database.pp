@@ -30,11 +30,6 @@ class contrail::database {
   package { 'cassandra': } ->
   package { 'contrail-openstack-database': }
 
-# VNC API
-  file { '/etc/contrail/vnc_api_lib.ini':
-    content => template('contrail/vnc_api_lib.ini.erb')
-  }
-
 # Zookeeper
   file { '/etc/zookeeper/conf/myid':
     content => $contrail::uid,
