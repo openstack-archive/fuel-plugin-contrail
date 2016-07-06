@@ -23,9 +23,9 @@ newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
   ) do |args|
      brname = args[0]
      ifname = String.new
-     yml = YAML.load(File.open("/etc/astute.yaml"))
+     network_scheme = function_hiera_hash(['network_scheme', {}])
 
-     yml['network_scheme']['transformations'].each do |entry|
+     network_scheme['transformations'].each do |entry|
        if entry['bridge'] == brname
          ifname = entry['name']
        end
