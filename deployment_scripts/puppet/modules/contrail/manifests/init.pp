@@ -48,6 +48,7 @@ class contrail {
   $netmask_short     = netmask_to_cidr($netmask)
   $phys_dev          = get_private_ifname($interface)
   $phys_dev_pci      = get_dev_pci_addr($phys_dev)
+  $phys_dev_mtu      = get_physdev_mtu(regsubst($phys_dev, '\..*' , ''))
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
 
   # VIPs
