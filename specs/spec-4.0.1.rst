@@ -143,3 +143,66 @@ References
 
 [0] https://github.com/Juniper/contrail-controller/wiki/Roles-Daemons-Ports
 [1] http://www.juniper.net/techpubs/en_US/contrail3.0/topics/task/installation/hardware-reqs-vnc.html
+
+
+Provide using memcache for caching keystone tokens in contrail
+==============================================================
+
+Problem description
+-------------------
+In highly scaled environments under load by thousands of network objects
+and instances validating the identity of every client on every request can cost a lot of
+computing resources that can produces a big latency in work of Contrail and OpenStack services.
+That can negatively impact the performance of whole environment.
+
+Proposed solution
+-----------------
+Enable caching keystone tokens for Contrail purposes. Similar to `OpenStack approach <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_
+Contrail can cache authentication responses from the keystone in memcache. This feature will be enabled by
+default and doesn't require any additional settings from Fuel UI. For caching will used memcache services that installed on OpenStack controller nodes.
+
+UI impact
+---------
+
+There are no changes in plugin settings tab.
+
+Performance impact
+------------------
+
+Using caching keystone tokens for Contrail can reduce load of keystone service
+respectively enhance performance of Contrail and OpenStack services
+
+Documentation Impact
+--------------------
+
+None
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+In order to use memcached it is necessary to install the python-memcached library.
