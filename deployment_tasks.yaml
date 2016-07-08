@@ -105,13 +105,10 @@
 
 #
 # Group for post-deployment tasks
-- id: contrail-post-deploy
+- id: controller-post-deploy
   type: group
-  role: [primary-contrail-db, contrail-db,
-    primary-contrail-config,contrail-config,
-    primary-contrail-analytics,contrail-analytics,
-    primary-contrail-control,contrail-control]
-  tasks: [configure_default_route, dns-client, ntp-client]
+  role: [primary-controller,controller]
+  tasks: [openstack-haproxy-contrail]
   required_for: [post_deployment_end]
   requires: [post_deployment_start]
   parameters:
@@ -389,6 +386,16 @@
     puppet_manifest: puppet/manifests/controller-hiera-post.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
+
+- id: openstack-haproxy-contrail-post
+  type: puppet
+  role: [primary-controller, controller]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-vip.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
 
 # Create networks for ostf-tests and provision route target
 - id: openstack-controller-provision
