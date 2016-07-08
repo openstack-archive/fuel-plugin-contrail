@@ -103,7 +103,7 @@ class contrail::analytics {
     'DEFAULTS/log_local':         value => '1';
     'DEFAULTS/log_level':         value => 'SYS_NOTICE';
     'DEFAULTS/log_file':          value => '/var/log/contrail/contrail-snmp-collector.log';
-    'DEFAULTS/zookeeper':         value => $contrail::zk_comma;
+    'DEFAULTS/zookeeper':         value => $contrail::zk_server_ip;
     'DISCOVERY/disc_server_ip':   value => $contrail::contrail_private_vip;
     'DISCOVERY/disc_server_port': value => '5998';
   }
@@ -124,7 +124,7 @@ class contrail::analytics {
     'DEFAULTS/log_local':         value => '1';
     'DEFAULTS/log_level':         value => 'SYS_NOTICE';
     'DEFAULTS/log_file':          value => '/var/log/contrail/contrail-topology.log';
-    'DEFAULTS/zookeeper':         value => $contrail::zk_comma;
+    'DEFAULTS/zookeeper':         value => $contrail::zk_server_ip;
     'DISCOVERY/disc_server_ip':   value => $contrail::contrail_private_vip;
     'DISCOVERY/disc_server_port': value => '5998';
   }
