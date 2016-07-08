@@ -118,6 +118,16 @@
     strategy:
       type: parallel
 
+- id: controller-post-deploy
+  type: group
+  role: [primary-controller,controller]
+  tasks: [openstack-haproxy-contrail]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    strategy:
+      type: parallel
+
 #
 # Compute dpdk feature
 - id: dpdk
