@@ -754,7 +754,7 @@ class DPDKTests(TestBasic):
                in the hpgs availability zone.
             5. Make snapshot of the created instance.
             6. Delete the last created instance.
-            7. Launch another instance from the snapshot created in step 2
+            7. Launch another instance from the snapshot created in step 5.
                and flavor with hpgs in the hpgs availability zone.
             8. Delete the last created instance.
 
@@ -918,7 +918,6 @@ class DPDKTests(TestBasic):
             os_ip, SERVTEST_USERNAME,
             SERVTEST_PASSWORD,
             SERVTEST_TENANT)
-        tenant = os_conn.get_tenant(SERVTEST_TENANT)
 
         network = os_conn.create_network(
             network_name=net_name)['network']
@@ -929,7 +928,12 @@ class DPDKTests(TestBasic):
             ip_version=4)
 
         self.show_step(3)
-        router = os_conn.create_router('router_1', tenant=tenant)
+        gateway = {
+            "network_id": os_conn.get_network('admin_floating_net')['id'],
+            "enable_snat": True}
+        router_param = {'router': {
+            'name': 'df', 'external_gateway_info': gateway}}
+        router = os_conn.neutron.create_router(body=router_param)['router']
         os_conn.add_router_interface(
             router_id=router["id"],
             subnet_id=subnet["id"])
@@ -949,16 +953,15 @@ class DPDKTests(TestBasic):
 
         self.show_step(9)
         wait(
-            lambda: tcp_ping(fip, 22), timeout=60, interval=5,
+            lambda: tcp_ping(fip, 22), timeout=120, interval=5,
             timeout_msg="Node {0} is not accessible by SSH.".format(fip))
 
         self.show_step(10)
-        remote = self.fuel_web.get_nailgun_primary_node(
-            self.env.d_env.nodes().slaves[0])
-        assert_true(
-            os_conn.execute_through_host(
-                remote, fip, ping_command)['exit_code'] == 0,
-            'Ping responce is not received.')
+        with self.fuel_web.get_ssh_for_node("slave-01") as remote:
+            assert_true(
+                os_conn.execute_through_host(
+                    remote, fip, ping_command)['exit_code'] == 0,
+                'Ping responce is not received.')
 
         self.show_step(11)
         os_conn.delete_instance(srv)
