@@ -5,6 +5,8 @@ Limitations
     a manual procedure.
     Plugin supports adding new Contrail-DB nodes to the environment.
 
+*   The Fuel Networking option "Assign public network to all nodes" is not compatible with Contrail Plugin.
+
 *   In case of using contrail service chaining with service instances, you may need to add *neutron* service user
     to a current project after you have deployed the environment:
 
