@@ -97,7 +97,7 @@ To configure the Contrail plugin, follow the steps below:
 
     *   At least 1 Compute
 
-    *   At least 1 node with Contrail-Control, Contrail-Config, Contrail-DB roles selected
+    *   At least 1 node with Contrail-Control, Contrail-Config, Contrail-Analytics and Contrail-DB roles selected
 
         .. note::
 
@@ -106,7 +106,7 @@ To configure the Contrail plugin, follow the steps below:
     *   If you plan to use Heat with autoscaling, in addition to Ceilometer you need to add node with MongoDB role
 
     These three roles are not necessary need to be on the same node.
-    You can place them on different nodes if needed.
+    You can place them on different nodes if needed, for example, Database and Analytics can be placed on dedicated nodes to improve performance.
 
     .. image:: images/contrail-roles.png
 
