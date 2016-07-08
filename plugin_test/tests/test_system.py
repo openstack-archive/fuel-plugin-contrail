@@ -44,7 +44,7 @@ from helpers import openstack
 from helpers.settings import OSTF_RUN_TIMEOUT
 
 
-@test(groups=["plugins"])
+@test(groups=["contrail_system_tests"])
 class SystemTests(TestBasic):
     """System test suite.
 
@@ -127,7 +127,8 @@ class SystemTests(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=5)
+        plugin.prepare_contrail_plugin(
+            self, slaves=5, options={'ceilometer': True})
 
         # activate vSRX image
         plugin.activate_vsrx()
@@ -142,7 +143,7 @@ class SystemTests(TestBasic):
                 'slave-01': ['contrail-config',
                              'contrail-control',
                              'contrail-db'],
-                'slave-02': ['controller'],
+                'slave-02': ['controller', 'mongo'],
                 'slave-03': ['compute'],
                 'slave-04': ['compute'],
             })
@@ -156,7 +157,7 @@ class SystemTests(TestBasic):
         self.env.make_snapshot("systest_setup", is_make=True)
 
     @test(depends_on=[systest_setup],
-          groups=["create_new_network_via_contrail", 'contrail_system_tests'])
+          groups=["create_new_network_via_contrail"])
     @log_snapshot_after_test
     def create_new_network_via_contrail(self):
         """Create a new network via Contrail.
@@ -176,6 +177,7 @@ class SystemTests(TestBasic):
         # constants
         net_name = 'net_1'
         self.show_step(1)
+        self.env.revert_snapshot('systest_setup')
         cluster_id = self.fuel_web.get_last_created_cluster()
 
         self.show_step(2)
@@ -241,7 +243,7 @@ class SystemTests(TestBasic):
                     instance.name, net_name))
 
     @test(depends_on=[systest_setup],
-          groups=["create_networks", 'contrail_system_tests'])
+          groups=["create_networks"])
     @log_snapshot_after_test
     def create_networks(self):
         """Create and terminate networks and verify in Contrail UI.
@@ -262,6 +264,7 @@ class SystemTests(TestBasic):
         net_names = ['net_1', 'net_2']
 
         self.show_step(1)
+        self.env.revert_snapshot('systest_setup')
         cluster_id = self.fuel_web.get_last_created_cluster()
 
         self.show_step(2)
@@ -305,8 +308,7 @@ class SystemTests(TestBasic):
             assert_true(net['id'] == net_contrail)
 
     @test(depends_on=[systest_setup],
-          groups=["contrail_vm_connection_in_different_tenants",
-                  'contrail_system_tests'])
+          groups=["contrail_vm_connection_in_different_tenants"])
     @log_snapshot_after_test
     def contrail_vm_connection_in_different_tenants(self):
         """Create a new network via Contrail.
@@ -327,8 +329,8 @@ class SystemTests(TestBasic):
         net_admin = 'net_1'
         net_test = 'net_2'
         cidr = '192.168.115.0'
-        self.env.revert_snapshot('systest_setup')
         self.show_step(1)
+        self.env.revert_snapshot('systest_setup')
         cluster_id = self.fuel_web.get_last_created_cluster()
 
         self.show_step(2)
@@ -441,8 +443,8 @@ class SystemTests(TestBasic):
             '{0} is not attached to network {1}'.format(
                 srv_2.name, net_test))
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_ceilometer_metrics", 'contrail_system_tests'])
+    @test(depends_on=[systest_setup],
+          groups=["contrail_ceilometer_metrics"])
     @log_snapshot_after_test
     def contrail_ceilometer_metrics(self):
         """Check that ceilometer collects contrail metrics.
@@ -483,6 +485,8 @@ class SystemTests(TestBasic):
         message = "Ceilometer doesn't collect metric {0}."
 
         self.show_step(1)
+        self.env.revert_snapshot('systest_setup')
+        """
         plugin.prepare_contrail_plugin(
             self,
             slaves=3,
@@ -511,7 +515,7 @@ class SystemTests(TestBasic):
                 cluster_id=self.cluster_id,
                 test_sets=['smoke', 'tests_platform'],
                 timeout=OSTF_RUN_TIMEOUT)
-
+        """
         self.show_step(10)
         cluster_id = self.fuel_web.get_last_created_cluster()
         os_ip = self.fuel_web.get_public_vip(cluster_id)
@@ -535,7 +539,7 @@ class SystemTests(TestBasic):
 
         self.show_step(11)
         controller = self.fuel_web.get_nailgun_primary_node(
-            self.env.d_env.nodes().slaves[0])
+            self.env.d_env.nodes().slaves[1])
         self.ping_instance_from_instance(
             os_conn, controller.name, {fip_1.ip: [fip_2.ip]})
 
@@ -560,7 +564,7 @@ class SystemTests(TestBasic):
                             collect_metric_type, metric_type))
 
     @test(depends_on=[systest_setup],
-          groups=["https_tls_selected", 'contrail_system_tests'])
+          groups=["https_tls_selected"])
     @log_snapshot_after_test
     def https_tls_selected(self):
         """Create a new network via Contrail.
@@ -581,6 +585,7 @@ class SystemTests(TestBasic):
             raise SkipTest()
 
         self.show_step(1)
+        self.env.revert_snapshot('systest_setup')
         cluster_id = self.fuel_web.get_last_created_cluster()
 
         os_ip = self.fuel_web.get_public_vip(cluster_id)
@@ -617,9 +622,9 @@ class SystemTests(TestBasic):
         """
         # constants
         max_password_lengh = 64
-        port = 18082
 
         self.show_step(1)
+        self.env.revert_snapshot('systest_setup')
         cluster_id = self.fuel_web.get_last_created_cluster()
 
         self.show_step(2)
@@ -628,7 +633,7 @@ class SystemTests(TestBasic):
             os_ip, SERVTEST_USERNAME,
             SERVTEST_PASSWORD,
             SERVTEST_TENANT)
-        contrail_client = ContrailClient(os_ip, contrail_port=port)
+        contrail_client = ContrailClient(os_ip)
         projects = contrail_client.get_projects()
 
         tenant = os_conn.get_tenant(SERVTEST_TENANT)
@@ -668,7 +673,7 @@ class SystemTests(TestBasic):
             new_password,
             SERVTEST_TENANT)
         contrail = ContrailClient(
-            os_ip, contrail_port=port,
+            os_ip,
             credentials={
                 'username': new_username,
                 'tenant_name': SERVTEST_TENANT,
