@@ -42,7 +42,7 @@ from helpers import settings
 
 @test(groups=["contrail_multiple_networks"])
 class TestMultipleNets(TestMultipleClusterNets):
-    """IntegrationTests."""
+    """TestMultipleNets."""
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-4.0'
     add_package = \
@@ -152,10 +152,10 @@ class TestMultipleNets(TestMultipleClusterNets):
             updated_mgmt_default, updated_mgmt_custom
 
     @test(depends_on=[SetupEnvironment.prepare_release],
-          groups=["contrail_ha_multiple_nodegroups"])
+          groups=["contrail_ha_multiple_networks"])
     @log_snapshot_after_test
     @check_fuel_statistics
-    def contrail_ha_multiple_nodegroups(self):
+    def contrail_ha_multiple_networks(self):
         """Deploy HA environment with Neutron GRE and 2 nodegroups.
 
         Scenario:
@@ -174,7 +174,8 @@ class TestMultipleNets(TestMultipleClusterNets):
                 * 3 controller+ceph
             13. Add following nodes to custom nodegroup:
                 * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db
+                * 1 contrail-config+contrail-control+contrail-db+
+                  contrail-analytics
             14. Deploy cluster
             15. Run network verification
             16. Verify that excluded ip is not used for nodes or VIP
@@ -238,8 +239,8 @@ class TestMultipleNets(TestMultipleClusterNets):
                 'slave-03': [
                     ['controller', 'ceph-osd'], nodegroup_default],
                 'slave-04': [
-                    ['contrail-config', 'contrail-control', 'contrail-db'],
-                    nodegroup_custom1],
+                    ['contrail-config', 'contrail-control', 'contrail-db',
+                     'contrail-analytics'], nodegroup_custom1],
                 'slave-05': [['compute'], nodegroup_custom1],
             }
         )
@@ -305,14 +306,17 @@ class TestMultipleNets(TestMultipleClusterNets):
                                                 updated_mgmt_default[0][-1]))
         self.show_step(17)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=cluster_id,
+                test_sets=['smoke', 'sanity'],
+                timeout=settings.OSTF_RUN_TIMEOUT)
 
     @test(depends_on=[SetupEnvironment.prepare_release],
-          groups=["contrail_multiple_nodegroups_add_controller"])
+          groups=["contrail_multiple_networks_add_controller"])
     @log_snapshot_after_test
     @check_fuel_statistics
-    def contrail_multiple_nodegroups_add_controller(self):
-        """Deploy HA environment with Neutron GRE and 2 nodegroups.
+    def contrail_multiple_networks_add_controller(self):
+        """Check Contrail deploy multiple networks add controller.
 
         Scenario:
             1. Revert snapshot with ready master node
@@ -330,7 +334,8 @@ class TestMultipleNets(TestMultipleClusterNets):
                 * 1 controller+mongo
             13. Add following nodes to default nodegroup:
                 * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db
+                * 1 contrail-config+contrail-control+contrail-db+
+                  contrail-analytics
                 * 1 cinder
             14. Deploy cluster
             15. Run health checks (OSTF)
@@ -383,8 +388,8 @@ class TestMultipleNets(TestMultipleClusterNets):
             cluster_id,
             {
                 'slave-01': [
-                    ['contrail-config', 'contrail-control', 'contrail-db'],
-                    nodegroup_default],
+                    ['contrail-config', 'contrail-control', 'contrail-db',
+                        'contrail-analytics'], nodegroup_default],
                 'slave-02': [['compute'], nodegroup_default],
                 'slave-03': [['cinder'], nodegroup_default],
                 'slave-04': [['controller', 'mongo'], nodegroup_custom1],
@@ -420,11 +425,11 @@ class TestMultipleNets(TestMultipleClusterNets):
             )
 
     @test(depends_on=[SetupEnvironment.prepare_release],
-          groups=["contrail_multiple_nodegroups_delete_controller"])
+          groups=["contrail_multiple_networks_delete_controller"])
     @log_snapshot_after_test
     @check_fuel_statistics
-    def contrail_multiple_nodegroups_delete_controller(self):
-        """Deploy HA environment with Neutron GRE and 2 nodegroups.
+    def contrail_multiple_networks_delete_controller(self):
+        """Check Contrail deploy multiple networks remove controller.
 
         Scenario:
             1. Revert snapshot with ready master node
@@ -439,10 +444,14 @@ class TestMultipleNets(TestMultipleClusterNets):
             10. Put new json on master node and update network data
             11. Verify that new IP ranges are applied for network config
             12. Add following nodes to default nodegroup:
-                * 3 controller
+                * 1 controller+cinder
+                * 2 controller
             13. Add following nodes to custom nodegroup:
                 * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db
+                * 1 contrail-config
+                * 1 contrail-control
+                * 1 contrail-db
+                * 1 contrail-analytics
             14. Deploy cluster
             15. Run health checks (OSTF)
             16. Remove 1 controller node
@@ -478,7 +487,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.fuel_web.client.delete_nodegroup(custom_group2['id'])
 
         self.show_step(7)
-        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:5])
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:9])
 
         self.show_step(8)
         updated_storage_default, updated_storage_custom, \
@@ -492,13 +501,15 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.fuel_web.update_nodes(
             cluster_id,
             {
-                'slave-01': [['controller'], nodegroup_custom1],
+                'slave-01': [['controller', 'cinder'], nodegroup_custom1],
                 'slave-02': [['controller'], nodegroup_custom1],
                 'slave-03': [['controller'], nodegroup_custom1],
-                'slave-04': [
-                    ['contrail-config', 'contrail-control', 'contrail-db'],
-                    nodegroup_default],
+                'slave-04': [['compute', 'cinder'], nodegroup_default],
                 'slave-05': [['compute'], nodegroup_default],
+                'slave-06': [['contrail-config'], nodegroup_default],
+                'slave-07': [['contrail-control'], nodegroup_default],
+                'slave-08': [['contrail-db'], nodegroup_default],
+                'slave-09': [['contrail-analytics'], nodegroup_default],
             }
         )
         self.show_step(14)
@@ -532,11 +543,11 @@ class TestMultipleNets(TestMultipleClusterNets):
             )
 
     @test(depends_on=[SetupEnvironment.prepare_release],
-          groups=["contrail_multiple_nodegroups_delete_compute"])
+          groups=["contrail_multiple_networks_delete_compute"])
     @log_snapshot_after_test
     @check_fuel_statistics
-    def contrail_multiple_nodegroups_delete_compute(self):
-        """Deploy HA environment with Neutron GRE and 2 nodegroups.
+    def contrail_multiple_networks_delete_compute(self):
+        """Check Contrail deploy multiple networks remove compute.
 
         Scenario:
             1. Revert snapshot with ready master node
@@ -554,7 +565,8 @@ class TestMultipleNets(TestMultipleClusterNets):
                 * 3 controller
             13. Add following nodes to custom nodegroup:
                 * 2 compute
-                * 1 contrail-config+contrail-control+contrail-db
+                * 1 contrail-config+contrail-control+contrail-db+
+                  contrail-analytics
             14. Deploy cluster
             15. Run health checks (OSTF)
             16. Remove 1 compute node
@@ -608,8 +620,8 @@ class TestMultipleNets(TestMultipleClusterNets):
                 'slave-02': [['controller'], nodegroup_default],
                 'slave-03': [['controller'], nodegroup_default],
                 'slave-04': [
-                    ['contrail-config', 'contrail-control', 'contrail-db'],
-                    nodegroup_custom1],
+                    ['contrail-config', 'contrail-control', 'contrail-db',
+                     'contrail-analytics'], nodegroup_custom1],
                 'slave-05': [['compute'], nodegroup_custom1],
                 'slave-06': [['compute'], nodegroup_custom1],
             }
@@ -619,7 +631,10 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         self.show_step(15)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=cluster_id,
+                test_sets=['smoke', 'sanity'],
+                timeout=settings.OSTF_RUN_TIMEOUT)
 
         self.show_step(16)
         conf_compute = {'slave-06': [['compute'], nodegroup_custom1], }
@@ -641,11 +656,11 @@ class TestMultipleNets(TestMultipleClusterNets):
             )
 
     @test(depends_on=[SetupEnvironment.prepare_release],
-          groups=["contrail_multiple_nodegroups_add_compute"])
+          groups=["contrail_multiple_networks_add_compute"])
     @log_snapshot_after_test
     @check_fuel_statistics
-    def contrail_multiple_nodegroups_add_compute(self):
-        """Deploy HA environment with Neutron GRE and 2 nodegroups.
+    def contrail_multiple_networks_add_compute(self):
+        """Check Contrail deploy multiple networks add compute.
 
         Scenario:
             1. Revert snapshot with ready master node
@@ -662,8 +677,9 @@ class TestMultipleNets(TestMultipleClusterNets):
             12. Add following nodes to default nodegroup:
                 * 3 controller
             13. Add following nodes to custom nodegroup:
-                * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db
+                * 1 compute+ceph-osd
+                * 1 contrail-config+contrail-control+contrail-db+
+                  contrail-analytics
             14. Deploy cluster
             15. Run health checks (OSTF)
             16. Add 1 compute node
@@ -678,7 +694,15 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.show_step(1, initialize=True)
         self.env.revert_snapshot("ready")
         self.show_step(2)
-        plugin.prepare_contrail_plugin(self, snapshot_name="ready")
+        plugin.prepare_contrail_plugin(
+            self, snapshot_name="ready",
+            options={
+                'images_ceph': True,
+                'volumes_ceph': True,
+                'ephemeral_ceph': True,
+                'objects_ceph': True,
+                'volumes_lvm': False,
+                'osd_pool_size': '1'})
 
         cluster_id = self.fuel_web.get_last_created_cluster()
         self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
@@ -717,9 +741,9 @@ class TestMultipleNets(TestMultipleClusterNets):
                 'slave-02': [['controller'], nodegroup_default],
                 'slave-03': [['controller'], nodegroup_default],
                 'slave-04': [
-                    ['contrail-config', 'contrail-control', 'contrail-db'],
-                    nodegroup_custom1],
-                'slave-05': [['compute'], nodegroup_custom1],
+                    ['contrail-config', 'contrail-control', 'contrail-db',
+                     'contrail-analytics'], nodegroup_custom1],
+                'slave-05': [['compute', 'ceph-osd'], nodegroup_custom1],
             }
         )
         self.show_step(14)
@@ -739,4 +763,104 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         self.show_step(18)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=cluster_id,
+                test_sets=['smoke', 'sanity'],
+                timeout=settings.OSTF_RUN_TIMEOUT)
+
+    @test(depends_on=[SetupEnvironment.prepare_release],
+          groups=["contrail_different_ha_in_multinet"])
+    @log_snapshot_after_test
+    @check_fuel_statistics
+    def contrail_different_ha_in_multinet(self):
+        """Check Contrail deploy multiple networks with contrail HA.
+
+        Scenario:
+            1. Revert snapshot with ready master node
+            2. Install contrail plugin
+            3. Bootstrap slaves from default nodegroup
+            4. Create cluster with Neutron GRE and custom nodegroups
+            5. Activate plugin and configure plugins setings
+            6. Remove 2nd custom nodegroup which is added automatically
+            7. Bootstrap slave nodes from custom nodegroup
+            8. Download network configuration
+            9. Update network.json  with customized ip ranges
+            10. Put new json on master node and update network data
+            11. Verify that new IP ranges are applied for network config
+            12. Add following nodes to default nodegroup:
+                * 1 controller
+                * 2 contrail-config+contrail-control+contrail-db+
+                  contrail-analytics
+            13. Add following nodes to custom nodegroup:
+                * 1 cinder
+                * 1 contrail-config+contrail-control+contrail-db+
+                  contrail-analytics
+            14. Deploy cluster
+            15. Run health checks (OSTF)
+
+        Duration 2.5 hours
+
+        """
+        if not MULTIPLE_NETWORKS:
+            raise SkipTest()
+        self.show_step(1, initialize=True)
+        self.env.revert_snapshot("ready")
+        self.show_step(2)
+        plugin.prepare_contrail_plugin(self, snapshot_name="ready")
+
+        cluster_id = self.fuel_web.get_last_created_cluster()
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
+
+        plugin.activate_plugin(self)
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+        plugin.vsrx_multiple_networks(self)
+
+        self.show_step(6)
+        self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
+        custom_group2 = self.fuel_web.get_nodegroup(
+            cluster_id, name=NODEGROUPS[2]['name'])
+        wait(lambda: not self.is_update_dnsmasq_running(
+            self.fuel_web.client.get_tasks()), timeout=60,
+            timeout_msg="Timeout exceeded while waiting for task "
+                        "'update_dnsmasq' is finished!")
+        self.fuel_web.client.delete_nodegroup(custom_group2['id'])
+
+        self.show_step(7)
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:5])
+
+        self.show_step(8)
+        updated_storage_default, updated_storage_custom, \
+            updated_mgmt_default, updated_mgmt_custom = \
+            self.update_network_config(cluster_id)
+
+        self.show_step(12)
+        self.show_step(13)
+        nodegroup_default = NODEGROUPS[0]['name']
+        nodegroup_custom1 = NODEGROUPS[1]['name']
+        self.fuel_web.update_nodes(
+            cluster_id,
+            {
+                'slave-01': [
+                    ['controller'], nodegroup_default],
+                'slave-02': [['compute'], nodegroup_default],
+                'slave-03': [
+                    ['contrail-config', 'contrail-control', 'contrail-db',
+                     'contrail-analytics'], nodegroup_default],
+                'slave-04': [
+                    ['contrail-config', 'contrail-control', 'contrail-db',
+                     'contrail-analytics'], nodegroup_custom1],
+                'slave-05': [
+                    ['contrail-config', 'contrail-control', 'contrail-db',
+                     'contrail-analytics'], nodegroup_custom1],
+            }
+        )
+        self.show_step(14)
+        openstack.deploy_cluster(self)
+
+        self.show_step(15)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(
+                cluster_id=cluster_id,
+                test_sets=['smoke', 'sanity'],
+                timeout=settings.OSTF_RUN_TIMEOUT)
