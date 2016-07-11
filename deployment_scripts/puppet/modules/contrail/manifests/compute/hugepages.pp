@@ -20,8 +20,11 @@ class contrail::compute::hugepages {
     Kernel_parameter {
       provider => 'grub2',
     }
-
     if $contrail::hugepages_size == 2 {
+      $max_map_count=$contrail::hugepages_number * 2
+      sysctl::value { 'vm.max_map_count':
+        value => "${max_map_count} ",
+      } ->
       sysctl::value { 'vm.nr_hugepages':
         value => "${contrail::hugepages_number} ",
       }
