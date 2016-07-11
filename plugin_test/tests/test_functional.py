@@ -54,13 +54,11 @@ class IntegrationTests(TestBasic):
         """Verify that Controller node can be deleted and added after deploying.
 
         Scenario:
-            1. Create an environment with
-               "Neutron with tunneling segmentation"
-               as a network configuration
+            1. Create an environment
             2. Enable and configure Contrail plugin
-            3. Add some controller (at least 3), compute and storage nodes
-            4. Add 3 nodes with "contrail-db", "contarail-config" and
-               "contrail-control" roles on all nodes
+            3. Add 3 controllers, a compute and a storage nodes
+            4. Add 3 nodes with "contrail-db", "contrail-config",
+               "contrail-analytics" and "contrail-control" roles on all nodes
             5. Deploy cluster
             6. Run OSTF tests
             7. Delete a Controller node and deploy changes
@@ -87,13 +85,16 @@ class IntegrationTests(TestBasic):
             'slave-05': ['cinder'],
             'slave-06': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
             'slave-07': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
             'slave-08': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
         }
         conf_ctrl = {'slave-03': ['controller']}
 
@@ -123,20 +124,18 @@ class IntegrationTests(TestBasic):
             test_sets=['smoke', 'ha'],
             timeout=settings.OSTF_RUN_TIMEOUT)
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_plugin_add_delete_compute_node"])
     @log_snapshot_after_test
     def contrail_plugin_add_delete_compute_node(self):
         """Verify that Compute node can be deleted and added after deploying.
 
         Scenario:
-            1. Create an environment with
-               "Neutron with tunneling segmentation"
-               as a network configuration and Cinder storage
+            1. Create an environment
             2. Enable and configure Contrail plugin
-            3. Add some controller, compute + storage (at least 4) nodes
-            4. Add a node with "contrail-db", "contarail-config" and
-               "contrail-control" roles
+            3. Add a controller and 3 compute + storage nodes
+            4. Add a node with "contrail-db", "contarail-config",
+               "contrail-analytics" and "contrail-control" roles
             5. Deploy cluster
             6. Run OSTF tests
             7. Delete a compute node and deploy changes
@@ -146,7 +145,7 @@ class IntegrationTests(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9)
+        plugin.prepare_contrail_plugin(self, slaves=5)
 
         self.show_step(2)
         plugin.activate_plugin(self)
@@ -157,18 +156,16 @@ class IntegrationTests(TestBasic):
         plugin.show_range(self, 3, 5)
         conf_no_controller = {
             'slave-01': ['controller'],
-            'slave-02': ['controller'],
-            'slave-03': ['controller'],
-            'slave-05': ['compute', 'cinder'],
-            'slave-06': ['compute', 'cinder'],
-            'slave-07': ['compute', 'cinder'],
-            # Here slave-8
-            'slave-09': ['contrail-db',
+            'slave-02': ['compute', 'cinder'],
+            'slave-03': ['compute', 'cinder'],
+            # Here slave-4
+            'slave-05': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
 
         }
-        conf_compute = {'slave-08': ['compute', 'cinder']}
+        conf_compute = {'slave-04': ['compute', 'cinder']}
 
         plugin.show_range(self, 5, 7)
         openstack.update_deploy_check(self,
@@ -202,13 +199,11 @@ class IntegrationTests(TestBasic):
         """Verify HA with deleting Contrail roles.
 
         Scenario:
-            1. Create an environment with
-               "Neutron with tunneling segmentation"
-               as a network configuration
+            1. Create an environment
             2. Enable and configure Contrail plugin
             3. Add some controller, compute and storage nodes
-            4. Add 4 nodes with "contrail-db", "contarail-config" and
-               "contrail-control" roles
+            4. Add 3 nodes with "contrail-db", "contarail-config"
+               "contrail-analytics" and "contrail-control" roles
             5. Deploy cluster
             6. Run OSTF tests
             7. Check Controller and Contrail nodes status
@@ -234,19 +229,18 @@ class IntegrationTests(TestBasic):
             # Here slave-06 with contrail
             'slave-07': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
             'slave-08': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
-            'slave-09': ['contrail-db',
-                         'contrail-config',
-                         'contrail-control'],
-
+                         'contrail-control',
+                         'contrail-analytics']
         }
         conf_contrail = {
             'slave-06': ['contrail-db',
                          'contrail-config',
-                         'contrail-control']
+                         'contrail-control',
+                         'contrail-analytics']
         }
 
         def check_node_state(cluster_id, node_name, node_state):
@@ -298,19 +292,16 @@ class IntegrationTests(TestBasic):
         """Verify that Contrail control role can be added after deploying.
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration
+            1. Create an environment
             2. Enable and configure Contrail plugin
-            3. Add some controller, compute nodes
-            4. Add 1 node with "contrail-control", "contrail-config"
-               and "contrail-db" roles
-            5. Deploy cluster
-            6. Run OSTF tests
-            7. Check Controller and Contrail nodes status
+            3. Add a controller and a compute+cinder nodes
+            4. Add a node with "contrail-control" and "contrail-db" roles
+            5. Add a node with "contrail-config" and "contrail-analytics" roles
+            6. Deploy cluster
+            7. Run OSTF tests
             8. Add one node with "contrail-control" role
             9. Deploy changes
             10. Run OSTF tests
-            11. Check Controller and Contrail nodes status
 
         """
         self.show_step(1)
@@ -322,17 +313,18 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 5)
+        plugin.show_range(self, 3, 6)
         conf_nodes = {
             'slave-01': ['controller'],
-            'slave-02': ['compute'],
+            'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-control',
-                         'contrail-config',
                          'contrail-db'],
+            'slave-04': ['contrail-config',
+                         'contrail-analytics']
         }
-        conf_control = {'slave-04': ['contrail-control']}
+        conf_control = {'slave-05': ['contrail-control']}
 
-        plugin.show_range(self, 5, 7)
+        plugin.show_range(self, 6, 8)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
@@ -347,19 +339,16 @@ class IntegrationTests(TestBasic):
         """Verify that Contrail config role can be added after deploying.
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration
+            1. Create an environment
             2. Enable and configure Contrail plugin
-            3. Add some controller, compute nodes
-            4. Add 1 node with "contrail-control", "contrail-config"
-               and "contrail-db" roles
-            5. Deploy cluster
-            6. Run OSTF tests
-            7. Check Controller and Contrail nodes status
+            3. Add a controller and a compute+cinder nodes
+            4. Add a node with "contrail-config" and "contrail-db" roles
+            5. Add a "contrail-control"+"contrail-analytics" node
+            6. Deploy cluster
+            7. Run OSTF tests
             8. Add one node with "contrail-config" role
             9. Deploy changes
             10. Run OSTF tests
-            11. Check Controller and Contrail nodes status
 
         """
         self.show_step(1)
@@ -371,17 +360,18 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 5)
+        plugin.show_range(self, 3, 6)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
-            'slave-03': ['contrail-control',
-                         'contrail-config',
+            'slave-03': ['contrail-config',
                          'contrail-db'],
+            'slave-04': ['contrail-control',
+                         'contrail-analytics']
         }
-        conf_config = {'slave-04': ['contrail-config']}
+        conf_config = {'slave-05': ['contrail-config']}
 
-        plugin.show_range(self, 5, 7)
+        plugin.show_range(self, 6, 8)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
@@ -396,19 +386,16 @@ class IntegrationTests(TestBasic):
         """Verify that Contrail control role can be deleted after deploying.
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration
+            1. Create an environment
             2. Enable and configure Contrail plugin
-            3. Add some controller, compute nodes
-            4. Add 1 node with "contrail-control", "contrail-config" and
-               "contrail-db" roles and 1 node with "contrail-control" role
-            5. Deploy cluster
-            6. Run OSTF tests
-            7. Check Controller and Contrail nodes status
+            3. Add a controller and a compute+cinder nodes
+            4. Add a node with all contrail roles
+            5. Add a node with "contrail-control" role
+            6. Deploy cluster
+            7. Run OSTF tests
             8. Delete one "contrail-control" role
             9. Deploy changes
             10. Run OSTF tests
-            11. Check Controller and Contrail nodes status
 
         """
         self.show_step(1)
@@ -420,18 +407,19 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 5)
+        plugin.show_range(self, 3, 6)
         conf_no_control = {
             'slave-01': ['controller'],
-            'slave-02': ['compute'],
+            'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
             # Here slave-4
         }
         conf_control = {'slave-04': ['contrail-control']}
 
-        plugin.show_range(self, 5, 7)
+        plugin.show_range(self, 6, 8)
         openstack.update_deploy_check(self,
                                       dict(conf_no_control, **conf_control),
                                       is_vsrx=vsrx_setup_result)
@@ -447,20 +435,16 @@ class IntegrationTests(TestBasic):
         """Verify that Contrail config role can be deleted after deploying.
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration
+            1. Create an environment
             2. Enable and configure Contrail plugin
-            3. Add some controller, compute nodes
-            4. Add 1 node with "contrail-control", "contrail-config" and
-               1 node with "contrail-config", "contrail-db" and 1 node with
-               "contrail-config" roles
-            5. Deploy cluster
-            6. Run OSTF tests
-            7. Check Controller and Contrail nodes status
+            3. Add a controller and a compute+cinder nodes
+            4. Add a node with all contrail roles
+            5. Add a node with "contrail-config" role
+            6. Deploy cluster
+            7. Run OSTF tests
             8. Delete one "contrail-config" role
             9. Deploy changes
             10. Run OSTF tests
-            11. Check Controller and Contrail nodes status
 
         """
         self.show_step(1)
@@ -472,19 +456,19 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 5)
+        plugin.show_range(self, 3, 6)
         conf_no_config = {
             'slave-01': ['controller'],
-            'slave-02': ['compute'],
+            'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-control',
-                         'contrail-config'],
-            'slave-04': ['contrail-config',
-                         'contrail-db'],
-            # Here slave-5
+                         'contrail-config',
+                         'contrail-db',
+                         'contrail-analytics'],
+            # Here slave-4
         }
-        conf_config = {'slave-05': ['contrail-config']}
+        conf_config = {'slave-04': ['contrail-config']}
 
-        plugin.show_range(self, 5, 7)
+        plugin.show_range(self, 6, 8)
         openstack.update_deploy_check(self,
                                       dict(conf_no_config, **conf_config),
                                       is_vsrx=vsrx_setup_result)
@@ -497,20 +481,17 @@ class IntegrationTests(TestBasic):
           groups=["contrail_add_db"])
     @log_snapshot_after_test
     def contrail_add_db(self):
-        """Verify that Contrail DB role can be added and deleted after deploy.
+        """Verify that Contrail DB role can be added after deploy.
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration
+            1. Create an environment
             2. Enable and configure Contrail plugin
-            3. Add some controller, compute nodes
-            4. Add 1 node with "contrail-control", "contrail-config" and
-               "contrail-db" roles
+            3. Add a controller and a compute+cinder nodes
+            4. Add a node with all contrail roles
             5. Deploy cluster
-            6. Check Controller and Contrail nodes status
-            7. Add one node with "contrail-db" role
-            8. Deploy changes
-            9. Run OSTF tests
+            6. Add one node with "contrail-db" role
+            7. Deploy changes
+            8. Run OSTF tests
 
         """
         self.show_step(1)
@@ -525,10 +506,11 @@ class IntegrationTests(TestBasic):
         plugin.show_range(self, 3, 5)
         conf_no_db = {
             'slave-01': ['controller'],
-            'slave-02': ['compute'],
+            'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
             # Here slave-4
         }
         conf_db = {'slave-04': ['contrail-db']}
@@ -537,27 +519,24 @@ class IntegrationTests(TestBasic):
         openstack.update_deploy_check(self,
                                       conf_no_db,
                                       is_vsrx=vsrx_setup_result)
-        plugin.show_range(self, 7, 10)
+        plugin.show_range(self, 6, 9)
         openstack.update_deploy_check(self,
                                       conf_db,
                                       is_vsrx=vsrx_setup_result)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_plugin_add_delete_compute_ceph"])
+          groups=["contrail_add_delete_compute_ceph"])
     @log_snapshot_after_test
-    def contrail_plugin_add_delete_compute_ceph(self):
+    def contrail_add_delete_compute_ceph(self):
         """Verify that compute node can be added and deleted in env with Ceph.
 
         Scenario:
-            1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration
+            1. Create an environment
             2. Enable and configure Contrail plugin
-            3. Add 1 node with "controller" + "mongo" roles and
-               3 nodes with "compute" + "ceph-osd" roles
-            4. Add node with "contrail-control", "contrail-config" and
-               "contrail-db" roles
-            5. Deploy cluster and run OSTF tests
-            6. Check Controller and Contrail nodes status
+            3. Add a node with "controller" + "mongo" roles
+            4. Add 3 nodes with "compute" + "ceph-osd" roles
+            5. Add a node with all contrail roles
+            6. Deploy cluster and run OSTF tests
             7. Add node with "compute" role
             8. Deploy changes and run OSTF tests
             9. Delete node with "compute" role
@@ -579,7 +558,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 5)
+        plugin.show_range(self, 3, 6)
         conf_no_db = {
             'slave-01': ['controller', 'mongo'],
             'slave-02': ['compute', 'ceph-osd'],
@@ -587,12 +566,13 @@ class IntegrationTests(TestBasic):
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
             # Here slave-6
         }
         conf_db = {'slave-06': ['compute']}
 
-        self.show_step(5)
+        self.show_step(6)
         openstack.update_deploy_check(self, conf_no_db,
                                       is_vsrx=vsrx_setup_result)
         plugin.show_range(self, 7, 9)
@@ -720,3 +700,99 @@ class IntegrationTests(TestBasic):
         assert_true(
             contrail_gateways in bgp_ips,
             message.format(contrail_gateways, bgp_ips))
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_add_analytics"])
+    @log_snapshot_after_test
+    def contrail_add_analytics(self):
+        """Verify that Contrail-Analytics role can be added after deploy.
+
+        Scenario:
+            1. Create an environment
+            2. Enable and configure Contrail plugin
+            3. Add a controller and a compute+cinder nodes
+            4. Add a node with "contrail-config" and "contrail-control" roles
+            5. Add a "contrail-db"+"contrail-analytics" node
+            6. Deploy cluster
+            7. Run OSTF tests
+            8. Add one node with "contrail-analytics" role
+            9. Deploy changes
+            10. Run OSTF tests
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        self.show_step(2)
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        plugin.show_range(self, 3, 6)
+        conf_nodes = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute', 'cinder'],
+            'slave-03': ['contrail-config',
+                         'contrail-control'],
+            'slave-04': ['contrail-db',
+                         'contrail-analytics']
+        }
+        conf_config = {'slave-05': ['contrail-analytics']}
+
+        plugin.show_range(self, 6, 8)
+        openstack.update_deploy_check(self, conf_nodes,
+                                      is_vsrx=vsrx_setup_result)
+
+        plugin.show_range(self, 8, 11)
+        openstack.update_deploy_check(self, conf_config,
+                                      is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_delete_analytics"])
+    @log_snapshot_after_test
+    def contrail_delete_analytics(self):
+        """Verify that Contrail analytics role can be deleted after deploying.
+
+        Scenario:
+            1. Create an environment
+            2. Enable and configure Contrail plugin
+            3. Add a controller and a compute+cinder nodes
+            4. Add a node with all contrail roles
+            5. Add a node with "contrail-analytics" role
+            6. Deploy cluster
+            7. Run OSTF tests
+            8. Delete one "contrail-analytics" role
+            9. Deploy changes
+            10. Run OSTF tests
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        self.show_step(2)
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        plugin.show_range(self, 3, 6)
+        conf_no_config = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute', 'cinder'],
+            'slave-03': ['contrail-control',
+                         'contrail-config',
+                         'contrail-db',
+                         'contrail-analytics'],
+            # Here slave-4
+        }
+        conf_config = {'slave-04': ['contrail-analytics']}
+
+        plugin.show_range(self, 6, 8)
+        openstack.update_deploy_check(self,
+                                      dict(conf_no_config, **conf_config),
+                                      is_vsrx=vsrx_setup_result)
+        plugin.show_range(self, 8, 11)
+        openstack.update_deploy_check(self,
+                                      conf_config, delete=True,
+                                      is_vsrx=vsrx_setup_result)
