@@ -42,7 +42,7 @@ from helpers import settings
 
 @test(groups=["contrail_multiple_networks"])
 class TestMultipleNets(TestMultipleClusterNets):
-    """IntegrationTests."""
+    """TestMultipleNets."""
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-4.0'
     add_package = \
@@ -174,7 +174,7 @@ class TestMultipleNets(TestMultipleClusterNets):
                 * 3 controller+ceph
             13. Add following nodes to custom nodegroup:
                 * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db+ \
+                * 1 contrail-config+contrail-control+contrail-db+
                   contrail-analytics
             14. Deploy cluster
             15. Run network verification
@@ -331,7 +331,7 @@ class TestMultipleNets(TestMultipleClusterNets):
                 * 1 controller+mongo
             13. Add following nodes to default nodegroup:
                 * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db+ \
+                * 1 contrail-config+contrail-control+contrail-db+
                   contrail-analytics
                 * 1 cinder
             14. Deploy cluster
@@ -562,7 +562,7 @@ class TestMultipleNets(TestMultipleClusterNets):
                 * 3 controller
             13. Add following nodes to custom nodegroup:
                 * 2 compute
-                * 1 contrail-config+contrail-control+contrail-db+ \
+                * 1 contrail-config+contrail-control+contrail-db+
                   contrail-analytics
             14. Deploy cluster
             15. Run health checks (OSTF)
@@ -672,7 +672,7 @@ class TestMultipleNets(TestMultipleClusterNets):
                 * 3 controller
             13. Add following nodes to custom nodegroup:
                 * 1 compute+ceph-osd
-                * 1 contrail-config+contrail-control+contrail-db+ \
+                * 1 contrail-config+contrail-control+contrail-db+
                   contrail-analytics
             14. Deploy cluster
             15. Run health checks (OSTF)
@@ -690,12 +690,13 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.show_step(2)
         plugin.prepare_contrail_plugin(
             self, snapshot_name="ready",
-             {'images_ceph': True,
-              'volumes_ceph': True,
-              'ephemeral_ceph': True,
-              'objects_ceph': True,
-              'volumes_lvm': False,
-              'osd_pool_size': '1'})
+            options={
+                'images_ceph': True,
+                'volumes_ceph': True,
+                'ephemeral_ceph': True,
+                'objects_ceph': True,
+                'volumes_lvm': False,
+                'osd_pool_size': '1'})
 
         cluster_id = self.fuel_web.get_last_created_cluster()
         self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
@@ -779,11 +780,11 @@ class TestMultipleNets(TestMultipleClusterNets):
             11. Verify that new IP ranges are applied for network config
             12. Add following nodes to default nodegroup:
                 * 1 controller
-                * 2 contrail-config+contrail-control+contrail-db\
+                * 2 contrail-config+contrail-control+contrail-db+
                   contrail-analytics
             13. Add following nodes to custom nodegroup:
                 * 1 cinder
-                * 1 contrail-config+contrail-control+contrail-db+\
+                * 1 contrail-config+contrail-control+contrail-db+
                   contrail-analytics
             14. Deploy cluster
             15. Run network verification
