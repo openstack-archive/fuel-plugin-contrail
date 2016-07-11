@@ -211,7 +211,13 @@ class contrail::controller {
   if !defined(File['/etc/neutron/plugin.ini']) {
     file {'/etc/neutron/plugin.ini':
       ensure => link,
-      target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'
+      target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini',
+    }
+  }
+  else {
+    File <| (title == '/etc/neutron/plugin.ini') |> {
+      ensure => link,
+      target => '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini',
     }
   }
   if !defined(Service['neutron-server']) {
