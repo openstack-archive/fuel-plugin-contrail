@@ -63,9 +63,10 @@ class SRIOVTests(TestBasic):
                 node-03: 'controller', 'ceph-osd';
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'compute', 'ceph-osd';
-                node-07: 'contrail-db';
-                node-08: 'contrail-config';
-                node-09: 'contrail-control';
+                node-06: 'contrail-db';
+                node-07: 'contrail-config';
+                node-08: 'contrail-control';
+                node-09: 'contrail-analytics';
                 node-sriov: 'compute', sriov';
             4. Run OSTF tests
 
@@ -101,6 +102,7 @@ class SRIOVTests(TestBasic):
             'slave-06': ['contrail-db'],
             'slave-07': ['contrail-config'],
             'slave-08': ['contrail-control'],
+            'slave-09': ['contrail-analytics']
         }
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
@@ -129,7 +131,8 @@ class SRIOVTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
-                node-2: 'contrail-config', 'contrail-control', 'contrail-db';
+                node-2: 'contrail-config', 'contrail-control',
+                        'contrail-db', 'contrail-analytics';
                 node-3: 'contrail-db';
                 node-4: 'compute', 'ceph-osd';
                 node-5: 'compute', 'ceph-osd';
@@ -164,7 +167,8 @@ class SRIOVTests(TestBasic):
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control',
-                         'contrail-db'],
+                         'contrail-db',
+                         'contrail-analytic'],
             'slave-03': ['contrail-db'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
@@ -216,19 +220,19 @@ class SRIOVTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                 node-01: 'controller';
-                node-02: 'contrail-control', 'contrail-db';
-                node-03: 'contrail-config', 'contrail-db';
-                node-04: 'compute', 'cinder';
-                node-05: 'compute';
+                node-02: 'contrail-control', 'contrail-config',
+                         'contrail-db', 'contrail-analytics';
+                node-03: 'compute', 'cinder';
+                node-04: 'compute';
                 node-bm: 'compute', 'sriov';
             4. Run OSTF tests
-            5. Delete node-06 with "compute" role
+            5. Delete node-04 with "compute" role
             6. Deploy changes
             7. Run OSTF tests
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9)
+        plugin.prepare_contrail_plugin(self, slaves=5)
         self.bm_drv.host_prepare()
 
         self.show_step(2)
@@ -244,12 +248,12 @@ class SRIOVTests(TestBasic):
         conf_no_compute = {
             'slave-01': ['controller'],
             'slave-02': ['contrail-control',
-                         'contrail-db'],
-            'slave-03': ['contrail-config',
-                         'contrail-db'],
-            'slave-04': ['compute', 'cinder'],
+                         'contrail-config',
+                         'contrail-db',
+                         'contrail-analytics'],
+            'slave-03': ['compute', 'cinder'],
         }
-        conf_compute = {'slave-05': ['compute']}
+        conf_compute = {'slave-04': ['compute']}
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -296,14 +300,14 @@ class SRIOVTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
-                node-2: 'contrail-config', 'contrail-control', 'contrail-db';
-                node-3: 'contrail-db';
+                node-2: 'contrail-config', 'contrail-control',
+                        'contrail-db', 'contrail-analytics';
                 node-4: 'compute', 'ceph-osd';
                 node-5: 'compute', 'ceph-osd';
-                node-6: 'compute', 'sriov';
+                node-bm: 'compute', 'sriov';
             4. Run OSTF tests
             5. Add one node with following configuration:
-                node-7: "controller", "ceph-osd";
+                node-6: "controller", "ceph-osd";
             6. Deploy changes
             7. Run OSTF tests
 
@@ -331,12 +335,12 @@ class SRIOVTests(TestBasic):
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control',
-                         'contrail-db'],
-            'slave-03': ['contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
+            'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
-            'slave-05': ['compute', 'ceph-osd'],
         }
-        conf_controller = {'slave-06': ['controller', 'ceph-osd']}
+        conf_controller = {'slave-05': ['controller', 'ceph-osd']}
 
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
@@ -373,7 +377,7 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Instance live migration']
                                    )
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_sriov_delete_controller"])
     @log_snapshot_after_test
     def contrail_sriov_delete_controller(self):
@@ -385,19 +389,19 @@ class SRIOVTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                node-01: 'controller';
-               node-02: 'controller';
-               node-03: 'contrail-control', 'contrail-config', 'contrail-db';
-               node-04: 'contrail-db';
-               node-05: 'compute', 'cinder';
-               node-06: 'compute', 'sriov';
+               node-02: 'contrail-control', 'contrail-config',
+                        'contrail-db', 'contrail-analytics';
+               node-03: 'compute', 'cinder';
+               node-04: 'controller';
+               node-bm: 'compute', 'sriov';
             4. Run OSTF tests
-            5. Delete node-01 with "controller" role
+            5. Delete node-04 with "controller" role
             6. Deploy changes
             7. Run OSTF tests
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9)
+        plugin.prepare_contrail_plugin(self, slaves=5)
         self.bm_drv.host_prepare()
 
         self.show_step(2)
@@ -414,11 +418,11 @@ class SRIOVTests(TestBasic):
             'slave-01': ['controller'],
             'slave-02': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
-            'slave-03': ['contrail-db'],
-            'slave-04': ['compute', 'cinder'],
+                         'contrail-db',
+                         'contrail-analytics']
+            'slave-03': ['compute', 'cinder'],
         }
-        conf_controller = {'slave-05': ['controller']}
+        conf_controller = {'slave-04': ['controller']}
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -463,7 +467,7 @@ class SRIOVTests(TestBasic):
             3. Deploy cluster with following node configuration:
                 node-01: 'controller', 'ceph-osd';
                 node-02: 'contrail-config', 'contrail-control';
-                node-03: 'contrail-db';
+                node-03: 'contrail-db', 'contrail-analytics';
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'compute', 'ceph-osd';
             4. Run OSTF tests
@@ -489,7 +493,7 @@ class SRIOVTests(TestBasic):
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control'],
-            'slave-03': ['contrail-db'],
+            'slave-03': ['contrail-db', 'contrail-analytics'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
         }
@@ -529,9 +533,12 @@ class SRIOVTests(TestBasic):
                 node-01: 'controller';
                 node-02: 'controller';
                 node-03: 'controller', 'cinder';
-                node-04: 'contrail-control', 'contrail-config', 'contrail-db';
-                node-05: 'contrail-control', 'contrail-config', 'contrail-db';
-                node-06: 'contrail-control', 'contrail-config', 'contrail-db';
+                node-04: 'contrail-control', 'contrail-config',
+                         'contrail-db', 'contrail-analytics';
+                node-05: 'contrail-control', 'contrail-config',
+                         'contrail-db', 'contrail-analytics';
+                node-06: 'contrail-control', 'contrail-config',
+                         'contrail-db', 'contrail-analytics';
                 node-07: 'compute';
                 node-08: 'compute';
                 node-bm: 'compute', 'sriov';
@@ -561,13 +568,16 @@ class SRIOVTests(TestBasic):
             'slave-03': ['controller', 'cinder'],
             'slave-04': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
             'slave-05': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
             'slave-06': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
             'slave-07': ['compute'],
             'slave-08': ['compute']
         }
