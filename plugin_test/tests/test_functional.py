@@ -58,9 +58,9 @@ class IntegrationTests(TestBasic):
                "Neutron with tunneling segmentation"
                as a network configuration
             2. Enable and configure Contrail plugin
-            3. Add some controller (at least 3), compute and storage nodes
-            4. Add 3 nodes with "contrail-db", "contarail-config" and
-               "contrail-control" roles on all nodes
+            3. Add 3 controllers, a compute and a storage nodes
+            4. Add 3 nodes with "contrail-db", "contrail-config",
+               "contrail-analytics" and "contrail-control" roles on all nodes
             5. Deploy cluster
             6. Run OSTF tests
             7. Delete a Controller node and deploy changes
@@ -87,13 +87,16 @@ class IntegrationTests(TestBasic):
             'slave-05': ['cinder'],
             'slave-06': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
             'slave-07': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
             'slave-08': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
         }
         conf_ctrl = {'slave-03': ['controller']}
 
@@ -123,7 +126,7 @@ class IntegrationTests(TestBasic):
             test_sets=['smoke', 'ha'],
             timeout=settings.OSTF_RUN_TIMEOUT)
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_plugin_add_delete_compute_node"])
     @log_snapshot_after_test
     def contrail_plugin_add_delete_compute_node(self):
@@ -134,9 +137,9 @@ class IntegrationTests(TestBasic):
                "Neutron with tunneling segmentation"
                as a network configuration and Cinder storage
             2. Enable and configure Contrail plugin
-            3. Add some controller, compute + storage (at least 4) nodes
-            4. Add a node with "contrail-db", "contarail-config" and
-               "contrail-control" roles
+            3. Add a controller and 3 compute + storage nodes
+            4. Add a node with "contrail-db", "contarail-config",
+               "contrail-analytics" and "contrail-control" roles
             5. Deploy cluster
             6. Run OSTF tests
             7. Delete a compute node and deploy changes
@@ -146,7 +149,7 @@ class IntegrationTests(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9)
+        plugin.prepare_contrail_plugin(self, slaves=5)
 
         self.show_step(2)
         plugin.activate_plugin(self)
@@ -157,18 +160,16 @@ class IntegrationTests(TestBasic):
         plugin.show_range(self, 3, 5)
         conf_no_controller = {
             'slave-01': ['controller'],
-            'slave-02': ['controller'],
-            'slave-03': ['controller'],
-            'slave-05': ['compute', 'cinder'],
-            'slave-06': ['compute', 'cinder'],
-            'slave-07': ['compute', 'cinder'],
-            # Here slave-8
-            'slave-09': ['contrail-db',
+            'slave-02': ['compute', 'cinder'],
+            'slave-03': ['compute', 'cinder'],
+            # Here slave-4
+            'slave-05': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
 
         }
-        conf_compute = {'slave-08': ['compute', 'cinder']}
+        conf_compute = {'slave-04': ['compute', 'cinder']}
 
         plugin.show_range(self, 5, 7)
         openstack.update_deploy_check(self,
@@ -207,8 +208,8 @@ class IntegrationTests(TestBasic):
                as a network configuration
             2. Enable and configure Contrail plugin
             3. Add some controller, compute and storage nodes
-            4. Add 4 nodes with "contrail-db", "contarail-config" and
-               "contrail-control" roles
+            4. Add 3 nodes with "contrail-db", "contarail-config"
+               "contrail-analytics" and "contrail-control" roles
             5. Deploy cluster
             6. Run OSTF tests
             7. Check Controller and Contrail nodes status
@@ -234,19 +235,18 @@ class IntegrationTests(TestBasic):
             # Here slave-06 with contrail
             'slave-07': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
+                         'contrail-control',
+                         'contrail-analytics'],
             'slave-08': ['contrail-db',
                          'contrail-config',
-                         'contrail-control'],
-            'slave-09': ['contrail-db',
-                         'contrail-config',
-                         'contrail-control'],
-
+                         'contrail-control',
+                         'contrail-analytics']
         }
         conf_contrail = {
             'slave-06': ['contrail-db',
                          'contrail-config',
-                         'contrail-control']
+                         'contrail-control',
+                         'contrail-analytics']
         }
 
         def check_node_state(cluster_id, node_name, node_state):
