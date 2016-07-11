@@ -31,7 +31,7 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Add some controller (at least 3), compute and storage nodes
-    4. Add 3 nodes with "contrail-db", "contarail-config" and "contrail-control" roles on all nodes
+    4. Add 3 nodes with "contrail-db", "contrail-config", "contrail-analytics" and "contrail-control" roles on all nodes
     5. Deploy cluster
     6. Run OSTF tests
     7. Delete a Controller node and deploy changes
@@ -74,7 +74,7 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and Cinder storage
     2. Enable and configure Contrail plugin
     3. Add some controller, compute + storage nodes
-    4. Add a node with "contrail-db", "contarail-config" and "contrail-control" roles
+    4. Add a node with "contrail-db", "contarail-config", "contrail-analytics"  and "contrail-control" roles
     5. Deploy cluster
     6. Run OSTF tests
     7. Delete a compute node and deploy changes
