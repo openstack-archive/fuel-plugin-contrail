@@ -182,8 +182,8 @@ class ContrailPlugin(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable Contrail plugin
-            3. Add 1 node with contrail-config, contrail-control and
-               contrail-db roles
+            3. Add a node with contrail-config, contrail-control and
+               contrail-db and contrail-analytics roles
             4. Add a node with controller role
             5. Add a node with compute role
             6. Deploy cluster with plugin
@@ -203,7 +203,8 @@ class ContrailPlugin(TestBasic):
             {
                 'slave-01': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-02': ['controller'],
                 'slave-03': ['compute'],
             })
@@ -227,11 +228,12 @@ class ContrailPlugin(TestBasic):
             2. Enable Contrail plugin
             3. Add 3 nodes with contrail-db role
             4. Add a node with contrail-config role
-            5. Add a node with contrail-control role
-            6. Add a node with with controller role
-            7. Add a node with compute + cinder role
-            8. Deploy cluster with plugin
-            9. Run OSTF tests
+            5. Add a node with contrail-analytics role
+            6. Add a node with contrail-control role
+            7. Add a node with with controller role
+            8. Add a node with compute + cinder role
+            9. Deploy cluster with plugin
+            10. Run OSTF tests
 
         Duration 110 min
 
@@ -244,22 +246,23 @@ class ContrailPlugin(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 8)
+        plugin.show_range(self, 3, 9)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
                 'slave-01': ['contrail-config'],
                 'slave-02': ['contrail-control'],
-                'slave-03': ['contrail-db'],
+                'slave-03': ['contrail-analytics'],
                 'slave-04': ['contrail-db'],
                 'slave-05': ['contrail-db'],
-                'slave-06': ['controller'],
-                'slave-07': ['compute', 'cinder'],
+                'slave-06': ['contrail-db'],
+                'slave-07': ['controller'],
+                'slave-08': ['compute', 'cinder'],
             })
 
-        self.show_step(8)
+        self.show_step(9)
         openstack.deploy_cluster(self)
 
-        self.show_step(9)
+        self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
