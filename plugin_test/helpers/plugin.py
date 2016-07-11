@@ -57,7 +57,7 @@ def upload_contrail_packages(obj):
     node_ssh = obj.env.d_env.get_admin_remote()
     if os.path.splitext(obj.pack_path)[1] == ".deb":
         pkg_name = os.path.basename(obj.pack_path)
-        logger.debug("Uploading package {0} "
+        logger.info("Uploading package {0} "
                      "to master node".format(pkg_name))
         node_ssh.upload(obj.pack_path, obj.pack_copy_path)
     else:
@@ -88,7 +88,7 @@ def prepare_contrail_plugin(obj, slaves=None, snapshot_name=None, options={}):
     checkers.install_plugin_check_code(
         obj.env.d_env.get_admin_remote(),
         plugin=os.path.basename(CONTRAIL_PLUGIN_PATH))
-    # FIXME: when opencontrail v3.0 is available
+    # FIXME: when opencontrail is supported
     # FIXME: remove the following line from 'or True'
     if obj.CONTRAIL_DISTRIBUTION == 'juniper' or True:
         # copy additional packages to the master node
