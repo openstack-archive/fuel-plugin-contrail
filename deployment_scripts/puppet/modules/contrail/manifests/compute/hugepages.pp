@@ -20,8 +20,11 @@ class contrail::compute::hugepages {
     Kernel_parameter {
       provider => 'grub2',
     }
-
     if $contrail::hugepages_size == 2 {
+      $max_map_count=$contrail::hugepages_number * 2
+      sysctl::value { 'vm.max_map_count':
+        value => "${max_map_count} ",
+      } ->
       sysctl::value { 'vm.nr_hugepages':
         value => "${contrail::hugepages_number} ",
       }
@@ -43,6 +46,9 @@ class contrail::compute::hugepages {
       }
 
       #This need for vrouter start when 1Gb hugepages not enabled yet
+      sysctl::value { 'vm.max_map_count':
+        value => "512 ",
+      } ->
       exec { 'temporary_add_hugepages':
         path    => ['/sbin', '/usr/bin'],
         command => 'sysctl -w vm.nr_hugepages=256',
