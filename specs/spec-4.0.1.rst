@@ -88,6 +88,72 @@ Server requirements are described in [1].
 There is no additional disk space requirements for this role, as analytics
 services store the data in Cassandra database.
 
+
+
+Enable memcache support for contrail keystone middleware
+========================================================
+
+Problem description
+-------------------
+
+In highly scaled environments under load by thousands of network objects
+and instances validating the identity of every client on every request can cost a lot of
+computing resources that can produces a big latency in work of Contrail and OpenStack services.
+That can negatively impact the performance of whole environment.
+
+Proposed solution
+-----------------
+
+Enable caching keystone tokens for Contrail purposes. Similar to `OpenStack approach <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_
+Contrail can cache authentication responses from the keystone in memcache. This feature will be enabled by
+default and doesn't require any additional settings from Fuel UI. Kyestone middleware will use memcache servers running on OpenStack controllers.
+
+UI impact
+---------
+
+There are no changes in plugin settings tab.
+
+Performance impact
+------------------
+
+Using caching keystone tokens for Contrail can reduce load of keystone service
+respectively enhance performance of Contrail and OpenStack services
+
+Documentation Impact
+--------------------
+
+None
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
 Implementation
 ==============
 
@@ -115,16 +181,15 @@ Work items
 
  - Update the plugins metadata with 'contrail-analytics' role definition
  - Create new deployment tasks
- - Re-factor the contrail module to ensure that all analytics tasks can be executed
-separately
+ - Re-factor the contrail module to ensure that all analytics tasks can be executed separately
  - Update other manifests to support dedicated analytics nodes
  - Adjust the experimental upgrade scripts to run on contrail-analytics role
+ - Add python-memcache package to manifests for 'contrail-config' role and adjust the contrail-keystone configuration with memcached server IPs
 
 * Testing
 
  - Update tests and test plans to cover new functionality
- - Automation scripts should be updated to deploy environments which contain nodes
-with 'contrail-analytics' role
+ - Automation scripts should be updated to deploy environments which contain nodes with 'contrail-analytics' role
 
 * Documentation
 
