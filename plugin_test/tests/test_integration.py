@@ -45,7 +45,7 @@ class IntegrationTests(TestBasic):
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_ha"])
+          groups=["contrail_ha", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_ha(self):
         """Check Contrail deploy on HA environment.
@@ -56,11 +56,10 @@ class IntegrationTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with controller role
             4. Add 3 nodes with "compute" and "Ceph-OSD" roles
-            5. Add a node with contrail-config role
-            6. Add a node with contrail-control role
-            7. Add a node with contrail-db role
-            8. Deploy cluster with plugin
-            9. Run OSTF tests
+            5. Add a node with contrail-config, contrail-control,
+                contrail-db and contrail-analytics roles
+            6. Deploy cluster with plugin
+            7. Run OSTF tests
 
         Duration 120 min
 
@@ -88,9 +87,10 @@ class IntegrationTests(TestBasic):
                 'slave-04': ['compute', 'ceph-osd'],
                 'slave-05': ['compute', 'ceph-osd'],
                 'slave-06': ['compute', 'ceph-osd'],
-                'slave-07': ['contrail-config'],
-                'slave-08': ['contrail-control'],
-                'slave-09': ['contrail-db'],
+                'slave-07': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db',
+                             'contrail-analytics'],
             })
 
         self.show_step(8)
@@ -101,7 +101,7 @@ class IntegrationTests(TestBasic):
                                    test_sets=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_ha_baseos"])
+          groups=["contrail_ha_baseos", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_ha_baseos(self):
         """Check deploy HA-contrail on an environment with a base-os node.
@@ -113,8 +113,8 @@ class IntegrationTests(TestBasic):
             3. Add a node with controller role
             4. Add 2 nodes with "compute" and "Storage-cinder" roles
             5. Add a node with Base-OS role
-            6. Add 3 nodes with "contrail-config", "contrail-control" and
-             "contrail-db" roles
+            6. Add 3 nodes with "contrail-config", "contrail-control",
+                "contrail-db" and "contrail-analytics" roles
             7. Deploy cluster with plugin
             8. Run OSTF tests
 
@@ -139,13 +139,16 @@ class IntegrationTests(TestBasic):
                 'slave-04': ['base-os'],
                 'slave-05': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-06': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-07': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
             })
 
         self.show_step(7)
@@ -155,7 +158,7 @@ class IntegrationTests(TestBasic):
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_ceilometer"])
+          groups=["contrail_ceilometer", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_ceilometer(self):
         """Check deploy environment with Contrail and Ceilometer.
@@ -170,8 +173,8 @@ class IntegrationTests(TestBasic):
             6. Add a node with "compute" + "ceph-OSD" + "cinder" multiroles
             7. Add a node with "compute" + "ceph-OSD" multiroles
             8. Add a node with "MongoDB" role
-            9. Add a node with "contrail-config", "contrail-control" and
-               "contrail-db" roles
+            9. Add a node with "contrail-config", "contrail-control",
+                "contrail-db" and "contrail-analytics" roles
             10. Deploy cluster with plugin
             11. Run OSTF tests
 
@@ -202,7 +205,8 @@ class IntegrationTests(TestBasic):
                 'slave-06': ['mongo'],
                 'slave-07': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
             })
         self.show_step(9)
         openstack.deploy_cluster(self)
@@ -214,7 +218,7 @@ class IntegrationTests(TestBasic):
                 timeout=60 * 60)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_jumbo"])
+          groups=["contrail_jumbo", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_jumbo(self):
         """Check deploy contrail on an environment with jumbo-frames support.
@@ -225,8 +229,8 @@ class IntegrationTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Add a node with "controller" and "Ceph OSD" roles
             4. Add 2 nodes with "compute" and "Storage-Ceph OSD" roles
-            5. Add a node with "contrail-config", "contrail-control" and
-               "contrail-db" roles
+            5. Add a node with "contrail-config", "contrail-control",
+                "contrail-db" and "contrail-analytics" roles
             6. Add 2 nodes with "contrail-config", "contrail-control" roles
             7. Configure MTU on network interfaces (Jumbo-frames)
             8. Deploy cluster with plugin
@@ -290,7 +294,8 @@ class IntegrationTests(TestBasic):
                 'slave-03': ['compute', 'ceph-osd'],
                 'slave-04': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-05': ['contrail-config',
                              'contrail-control'],
                 'slave-06': ['contrail-config',
@@ -324,7 +329,7 @@ class IntegrationTests(TestBasic):
                             jumbo.get_node_iface(remote, "enp0s6")))
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_bonding"])
+          groups=["contrail_bonding", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_bonding(self):
         """Check deploy contrail with aggregation of network interfaces.
@@ -335,8 +340,8 @@ class IntegrationTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with controller role
             4. Add 2 nodes with "compute" roles
-            5. Add 3 nodes with "contrail-config", "contrail-control" and
-               "contrail-db" roles
+            5. Add 3 nodes with "contrail-config", "contrail-control".
+                "contrail-db" and "contrail-analytics" roles
             6. Bond network interfaces with balance-rr mode
             7. Deploy cluster with plugin
             8. Run OSTF tests
@@ -364,13 +369,16 @@ class IntegrationTests(TestBasic):
                 'slave-05': ['compute'],
                 'slave-06': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-07': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-08': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
             },
         )
 
@@ -407,7 +415,7 @@ class IntegrationTests(TestBasic):
         )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_vlan"])
+          groups=["contrail_vlan", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_vlan(self):
         """Check deploy contrail on an environment with vlan-tagging.
@@ -420,7 +428,7 @@ class IntegrationTests(TestBasic):
             4. Add 2 nodes with "compute" and "Storage-cinder" roles
             5. Add a node with "contrail-config" and "contrail-db" roles
             6. Add a node with "contrail-db", "contrail-control" roles
-            7. Add a node with "contrail-db" role
+            7. Add a node with "contrail-db", "contrail-analytics" roles
             8. Configure VLAN on network interfaces
             9. Deploy cluster with plugin
             10. Run OSTF tests
@@ -451,7 +459,7 @@ class IntegrationTests(TestBasic):
                 'slave-05': ['compute', 'cinder'],
                 'slave-06': ['contrail-config', 'contrail-db'],
                 'slave-07': ['contrail-control', 'contrail-db'],
-                'slave-08': ['contrail-db'],
+                'slave-08': ['contrail-db', 'contrail-analytics'],
             })
 
         self.show_step(9)
@@ -464,7 +472,7 @@ class IntegrationTests(TestBasic):
                 test_sets=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_ceph_multirole"])
+          groups=["contrail_ceph_multirole", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_ceph_multirole(self):
         """Check deploy contrail with Controller + Ceph multirole.
@@ -475,8 +483,8 @@ class IntegrationTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with "controller" + "Ceph-OSD" multirole
             4. Add 2 nodes with "compute" role
-            5. Add 1 node with "contrail-config", "contrail-control" and
-               "contrail-db" roles
+            5. Add 1 node with "contrail-config", "contrail-control",
+                "contrail-db" and "contrail-analytics" roles
             6. Deploy cluster with plugin
             7. Run OSTF tests
 
@@ -509,7 +517,8 @@ class IntegrationTests(TestBasic):
                 'slave-05': ['compute'],
                 'slave-06': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
             })
 
         self.show_step(6)
@@ -521,7 +530,7 @@ class IntegrationTests(TestBasic):
                                    test_sets=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_cinder_multirole"])
+          groups=["contrail_cinder_multirole", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_cinder_multirole(self):
         """Check deploy contrail with Controller + Cinder multirole.
@@ -531,9 +540,9 @@ class IntegrationTests(TestBasic):
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with "controller" + "storage-cinder" multirole
-            4. Add 1 node with "compute" role
-            5. Add 2 nodes with "contrail-config", "contrail-control" and
-               "contrail-db" roles
+            4. Add 2 nodes with "compute" role
+            5. Add 1 node with "contrail-config", "contrail-control",
+                "contrail-db" and "contrail-analytics" roles
             6. Deploy cluster with plugin
             8. Run OSTF tests
 
@@ -555,12 +564,11 @@ class IntegrationTests(TestBasic):
                 'slave-02': ['controller', 'cinder'],
                 'slave-03': ['controller', 'cinder'],
                 'slave-04': ['compute'],
-                'slave-05': ['contrail-config',
-                             'contrail-control',
-                             'contrail-db'],
+                'slave-05': ['compute'],
                 'slave-06': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
             })
 
         self.show_step(6)
@@ -572,23 +580,24 @@ class IntegrationTests(TestBasic):
                                    test_sets=['smoke', 'sanity', 'ha'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_cinder_ceph_multirole"])
+          groups=["contrail_cinder_ceph_multirole",
+                  "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_cinder_ceph_multirole(self):
         """Check deploy contrail with Controller + Cinder + Ceph multirole.
 
         Scenario:
             1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration and CEPH storage
+                segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
-            3. Add 1 node with "controller" + "storage-cinder" +
-               "Ceph-OSD" multirole
+            3. Add 1 node with "controller", "storage-cinder",
+                and "Ceph-OSD" roles
             4. Add 1 node with "controller" + "storage-cinder" and 1 node
-               with "controller" + "Ceph-OSD" multiroles
-            5. Add 2 nodes with "compute" role
-            6. Add 3 nodes with "contrail-config", "contrail-control" and
-               "contrail-db" roles
-            7. Add a node with "Ceph-OSD" role
+                with "controller" + "Ceph-OSD" multiroles
+            5. Add 1 nodes with "compute", "cinder", "ceph-osd" roles
+            6. Add 1 nodes with "compute" role
+            7. Add 3 nodes with "contrail-config", "contrail-control",
+                "contrail-db"  and "contrail-analytics" roles
             8. Deploy cluster with plugin
             9. Run OSTF tests
 
@@ -611,18 +620,20 @@ class IntegrationTests(TestBasic):
                 'slave-01': ['controller', 'cinder', 'ceph-osd'],
                 'slave-02': ['controller', 'cinder'],
                 'slave-03': ['controller', 'ceph-osd'],
-                'slave-04': ['compute'],
+                'slave-04': ['compute', 'cinder', 'ceph-osd'],
                 'slave-05': ['compute'],
                 'slave-06': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-07': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-08': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
-                'slave-09': ['ceph-osd']
+                             'contrail-db',
+                             'contrail-analytics'],
             })
 
         self.show_step(7)
