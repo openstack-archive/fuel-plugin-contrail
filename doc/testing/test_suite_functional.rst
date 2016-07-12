@@ -468,7 +468,7 @@ Steps
        * contrail_external
        * contrail_asnum
     4. Add nodes:
-       1 contrail-config+contrail-control+contrail-db
+       1 all contrail-specified roles
        1 controller
        1 compute
     5. Deploy cluster.

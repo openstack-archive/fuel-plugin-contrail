@@ -35,8 +35,8 @@ from helpers import openstack
 from helpers import settings
 
 
-@test(groups=["plugins"])
-class IntegrationTests(TestBasic):
+@test(groups=["contrail_functional_tests"])
+class FunctionalTests(TestBasic):
     """IntegrationTests."""
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-4.0'
@@ -600,7 +600,7 @@ class IntegrationTests(TestBasic):
                *contrail_external
                *contrail_asnum
             4. Add nodes:
-                1 contrail-config+contrail-control+contrail-db
+                1 all contrail-specified roles
                 1 controller
                 1 compute
             5. Deploy cluster.
@@ -641,7 +641,8 @@ class IntegrationTests(TestBasic):
             {
                 'slave-01': ['contrail-config',
                              'contrail-control',
-                             'contrail-db'],
+                             'contrail-db',
+                             'contrail-analytics'],
                 'slave-02': ['controller'],
                 'slave-03': ['compute'],
             })
