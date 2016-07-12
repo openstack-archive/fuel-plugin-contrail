@@ -132,14 +132,14 @@ class DPDKTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
-                node-2: 'contrail-config', 'contrail-control', 'contrail-db';
-                node-3: 'contrail-db';
+                node-2: 'contrail-config', 'contrail-control',
+                    'contrail-db', 'contrail-analytics';
+                node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
-                node-5: 'compute', 'ceph-osd';
-                node-6: 'compute', 'dpdk';
+                node-dpdk: 'compute', 'dpdk';
             4. Run OSTF tests
             5. Add one node with following configuration:
-                node-6: "compute", "ceph-osd";
+                node-5: "compute", "ceph-osd";
             6. Deploy changes
             7. Run OSTF tests
 
@@ -167,8 +167,9 @@ class DPDKTests(TestBasic):
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control',
-                         'contrail-db'],
-            'slave-03': ['contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
+            'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
         }
@@ -221,13 +222,14 @@ class DPDKTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                 node-01: 'controller';
-                node-02: 'contrail-control', 'contrail-config', 'contrail-db';
+                node-02: 'contrail-control', 'contrail-config',
+                    'contrail-db', 'contrail-analytics';
                 node-03: 'contrail-db';
-                node-04: 'compute', 'dpdk';
-                node-05: 'compute', 'cinder';
-                node-06: 'compute';
+                node-04: 'compute', 'cinder';
+                node-05: 'compute';
+                node-06: 'contrail-db';
             4. Run OSTF tests
-            5. Delete node-06 with "compute" role
+            5. Delete node-05 with "compute" role
             6. Deploy changes
             7. Run OSTF tests
 
@@ -250,9 +252,12 @@ class DPDKTests(TestBasic):
             'slave-01': ['controller'],
             'slave-02': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
             'slave-03': ['contrail-db'],
             'slave-04': ['compute', 'cinder'],
+            # node-05
+            'slave-06': ['contrail-db'],
         }
         conf_compute = {'slave-05': ['compute']}
 
@@ -301,13 +306,15 @@ class DPDKTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                 node-01: 'controller', 'ceph-osd';
-                node-02: 'contrail-config', 'contrail-control', 'contrail-db';
-                node-03: 'contrail-db';
+                node-02: 'contrail-config', 'contrail-control',
+                    'contrail-db', 'contrail-analytics';
+                node-03: 'compute', 'ceph-osd';
                 node-04: 'compute', 'ceph-osd';
-                node-05: 'compute', 'ceph-osd';
+                node-05: 'controller', 'cinder';
+                node-06: 'controller', 'cinder';
             4. Run OSTF tests
             6. Add one node with following configuration:
-                node-6: "compute", "dpdk";
+                node-dpdk: "compute", "dpdk";
             7. Deploy changes
             8. Run OSTF tests
 
@@ -328,10 +335,12 @@ class DPDKTests(TestBasic):
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control',
-                         'contrail-db'],
-            'slave-03': ['contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
+            'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
-            'slave-05': ['compute', 'ceph-osd'],
+            'slave-05': ['controller', 'cinder'],
+            'slave-06': ['controller', 'cinder'],
         }
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -366,14 +375,14 @@ class DPDKTests(TestBasic):
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
-                node-01: 'controller', 'ceph-osd';
-                node-02: 'contrail-control', 'contrail-config', 'contrail-db';
-                node-03: 'contrail-db';
+                node-01: 'controller', 'ceph-osd', 'cinder';
+                node-02: 'contrail-control', 'contrail-config',
+                    'contrail-db', 'contrail-analytics';
+                node-03: 'compute', 'ceph-osd';
                 node-04: 'compute', 'ceph-osd';
-                node-05: 'ceph-osd', 'cinder';
-                node-06: 'compute', 'dpdk';
+                node-dpdk: 'compute', 'dpdk';
             4. Run OSTF tests
-            5. Delete node-06 with "dpdk" and "compute" roles
+            5. Delete node "node-dpdk" with "dpdk" and "compute" roles
             6. Deploy changes
             7. Run OSTF tests
 
@@ -394,13 +403,13 @@ class DPDKTests(TestBasic):
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
         conf_no_dpdk = {
-            'slave-01': ['controller', 'ceph-osd'],
+            'slave-01': ['controller', 'ceph-osd', 'cinder'],
             'slave-02': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
-            'slave-03': ['contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
+            'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
-            'slave-05': ['ceph-osd', 'cinder'],
         }
 
         self.fuel_web.update_nodes(
@@ -444,20 +453,19 @@ class DPDKTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
-                node-2: 'contrail-config', 'contrail-control', 'contrail-db';
-                node-3: 'contrail-db';
+                node-2: 'contrail-config', 'contrail-control',
+                    'contrail-db', 'contrail-analytics';
+                node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
-                node-5: 'compute', 'ceph-osd';
-                node-6: 'compute', 'dpdk';
             4. Run OSTF tests
             5. Add one node with following configuration:
-                node-7: "controller", "ceph-osd";
+                node-5: 'controller', 'ceph-osd';
             6. Deploy changes
             7. Run OSTF tests
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9,
+        plugin.prepare_contrail_plugin(self, slaves=5,
                                        options={'images_ceph': True,
                                                 'volumes_ceph': True,
                                                 'ephemeral_ceph': True,
@@ -479,12 +487,12 @@ class DPDKTests(TestBasic):
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control',
-                         'contrail-db'],
-            'slave-03': ['contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
+            'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
-            'slave-05': ['compute', 'ceph-osd'],
         }
-        conf_controller = {'slave-06': ['controller', 'ceph-osd']}
+        conf_controller = {'slave-05': ['controller', 'ceph-osd']}
 
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
@@ -532,12 +540,12 @@ class DPDKTests(TestBasic):
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
-               node-01: 'controller';
-               node-02: 'controller';
-               node-03: 'contrail-control', 'contrail-config', 'contrail-db';
-               node-04: 'contrail-db';
-               node-05: 'compute', 'cinder';
-               node-06: 'compute', 'dpdk';
+                node-01: 'controller';
+                node-02: 'contrail-control', 'contrail-config',
+                    'contrail-db', 'contrail-analytics';
+                node-03: 'controller';
+                node-04: 'compute', 'cinder';
+                node-05: 'controller';
             4. Run OSTF tests
             5. Delete node-01 with "controller" role
             6. Deploy changes
@@ -545,7 +553,7 @@ class DPDKTests(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9)
+        plugin.prepare_contrail_plugin(self, slaves=5)
         self.bm_drv.host_prepare()
 
         self.show_step(2)
@@ -562,11 +570,13 @@ class DPDKTests(TestBasic):
             'slave-01': ['controller'],
             'slave-02': ['contrail-control',
                          'contrail-config',
-                         'contrail-db'],
-            'slave-03': ['contrail-db'],
+                         'contrail-db',
+                         'contrail-analytics'],
+            'slave-03': ['controller'],
             'slave-04': ['compute', 'cinder'],
+            'slave-05': ['controller'],
         }
-        conf_controller = {'slave-05': ['controller']}
+        conf_controller = {'slave-01': ['controller']}
 
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -610,13 +620,17 @@ class DPDKTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Enable dpdk and sriov
             4. Deploy cluster with following node configuration:
-                node-1: 'controller';
-                node-2: 'contrail-config', 'contrail-control', 'contrail-db';
+                node-2: 'contrail-config', 'contrail-control',
+                    'contrail-db', 'contrail-analytics';
                 node-3: 'compute', 'cinder';
-                node-4: 'compute', 'dpdk', 'sriov';
+                node-4: 'contrail-config', 'contrail-control',
+                    'contrail-db', 'contrail-analytics';
+                node-5: 'contrail-config', 'contrail-control',
+                    'contrail-db', 'contrail-analytics';
             5. Deploy cluster
             6. Run OSTF
-            7. Add "contrail-config", "contrail-control", "contrail-db" roles
+            5. Add one node with following configuration:
+                node-1: 'controller';
             8. Deploy changes
             9. Run OSTF
         """
@@ -637,15 +651,16 @@ class DPDKTests(TestBasic):
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk', 'sriov'])
         conf_nodes = {
-            'slave-01': ['controller'],
-            'slave-02': ['contrail-config',
-                         'contrail-control',
-                         'contrail-db'],
+            # node-01
+            'slave-02': ['contrail-config', 'contrail-control',
+                         'contrail-db', 'contrail-analytics'],
             'slave-03': ['compute', 'cinder'],
+            'slave-04': ['contrail-config', 'contrail-control',
+                         'contrail-db', 'contrail-analytics'],
+            'slave-05': ['contrail-config', 'contrail-control',
+                         'contrail-db', 'contrail-analytics'],
         }
-        conf_controller = {'slave-04': ['contrail-config',
-                                        'contrail-control',
-                                        'contrail-db']}
+        conf_controller = {'slave-01': ['controller']}
 
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
