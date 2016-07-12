@@ -418,7 +418,7 @@ class SRIOVTests(TestBasic):
             'slave-02': ['contrail-control',
                          'contrail-config',
                          'contrail-db',
-                         'contrail-analytics']
+                         'contrail-analytics'],
             'slave-03': ['compute', 'cinder'],
         }
         conf_controller = {'slave-04': ['controller']}
