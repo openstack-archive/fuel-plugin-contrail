@@ -57,8 +57,7 @@ def upload_contrail_packages(obj):
     node_ssh = obj.env.d_env.get_admin_remote()
     if os.path.splitext(obj.pack_path)[1] == ".deb":
         pkg_name = os.path.basename(obj.pack_path)
-        logger.info("Uploading package {0} "
-                     "to master node".format(pkg_name))
+        logger.info("Uploading package {0} to master node".format(pkg_name))
         node_ssh.upload(obj.pack_path, obj.pack_copy_path)
     else:
         raise Exception('Failed to upload file to the master node')

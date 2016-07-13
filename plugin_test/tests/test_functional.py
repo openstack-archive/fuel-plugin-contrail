@@ -802,7 +802,7 @@ class FunctionalTests(TestBasic):
           groups=["contrail_add_all_contrail"])
     @log_snapshot_after_test
     def contrail_add_all_contrail(self):
-        """Verify that after deploying can be added an all contrail roles node
+        """Verify that after deploying can be added an all contrail roles node.
 
         Scenario:
             1. Create an environment with Ceph-OSD storage
