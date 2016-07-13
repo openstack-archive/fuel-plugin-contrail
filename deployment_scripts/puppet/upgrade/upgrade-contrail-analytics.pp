@@ -12,11 +12,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/upgrade-contrail-config.pp')
+notice('MODULAR: contrail/upgrade-contrail-analytics.pp')
 
 include contrail
 
 Package <||> { ensure => latest }
 
-class { 'contrail::config': }
-class { 'contrail::webui': }
+class { 'contrail::analytics': }

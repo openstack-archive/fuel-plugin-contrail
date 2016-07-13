@@ -14,14 +14,25 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-- id: upgrade-contrail-stop
+- id: upgrade-contrail-stop-config
   skipped: true
   type: puppet
   required_for: [post_deployment_end]
   requires: [post_deployment_start]
   role: [primary-contrail-config,contrail-config]
   parameters:
-    puppet_manifest: puppet/upgrade/upgrade-contrail-stop.pp
+    puppet_manifest: puppet/upgrade/upgrade-contrail-stop-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: upgrade-contrail-stop-analytics
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-contrail-analytics,contrail-analytics]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-stop-analytics.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
@@ -44,6 +55,17 @@
   role: [primary-contrail-config,contrail-config]
   parameters:
     puppet_manifest: puppet/upgrade/upgrade-contrail-config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: upgrade-contrail-analytics
+  skipped: true
+  type: puppet
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  role: [primary-contrail-analytics,contrail-anlaytics]
+  parameters:
+    puppet_manifest: puppet/upgrade/upgrade-contrail-analytics.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
