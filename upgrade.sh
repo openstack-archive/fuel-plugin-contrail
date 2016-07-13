@@ -50,6 +50,7 @@ get_nodes_list () {
 start_task_on_node () {
   local _nodes=$1
   local _tasks=$2
+
   fuel node --node-id $_nodes --task $_tasks 2>/dev/null
 }
 
@@ -97,9 +98,19 @@ controllers*)
     start_task_on_node $nodes upgrade-contrail-pre
     wait_for_tasks
 
-    # Stop the contrail collector and config services
+    # Stop the contrail config services
     nodes=$(get_nodes_list contrail-config)
-    start_task_on_node $nodes upgrade-contrail-stop
+    start_task_on_node $nodes upgrade-contrail-stop-config
+    wait_for_tasks
+
+    # Stop the contrail collector services
+    nodes=$(get_nodes_list contrail-analytics)
+    if [ -n "$nodes" ]; then
+      start_task_on_node $nodes upgrade-contrail-stop-analytics
+    else
+      nodes_cfg=$(get_nodes_list contrail-config)
+      start_task_on_node $nodes_cfg upgrade-contrail-stop-analytics
+    fi
     wait_for_tasks
 
     # Start the upgrade tasks on database nodes
@@ -110,6 +121,16 @@ controllers*)
     # Start the upgrade tasks on config nodes
     nodes=$(get_nodes_list contrail-config)
     start_task_on_node $nodes upgrade-contrail-config
+    wait_for_tasks
+
+    # Start the upgrade tasks on collector nodes
+    nodes=$(get_nodes_list contrail-analytics)
+    if [ -n "$nodes" ]; then
+      start_task_on_node $nodes upgrade-contrail-analytics
+    else
+      nodes_cfg=$(get_nodes_list contrail-config)
+      start_task_on_node $nodes_cfg upgrade-contrail-analytics
+    fi
     wait_for_tasks
 
     # Start the upgrade tasks on control nodes, one by one
