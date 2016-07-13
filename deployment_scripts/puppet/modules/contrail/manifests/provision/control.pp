@@ -47,7 +47,7 @@ class contrail::provision::control {
   notify {'Waiting for contrail API':} ->
 
   exec {'wait_for_api':
-    command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
+    command   => "if ! [[ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` =~ ^(200|401)$ ]];\
 then exit 1; fi",
     tries     => 10,
     try_sleep => 10,
