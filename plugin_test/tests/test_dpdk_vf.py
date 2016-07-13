@@ -22,6 +22,7 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
 from helpers import openstack
 from helpers import baremetal
+from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["plugins"])
@@ -114,3 +115,8 @@ class DPDKVFTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            TestContrailCheck(self).cloud_check(
+               ['dpdk'],
+               should_fail=[
+                   'test_contrail_dpdk_check_public_connectivity_from_instance']
+           )
