@@ -12,9 +12,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/upgrade-contrail-stop.pp')
+notice('MODULAR: contrail/upgrade-contrail-stop-analytics.pp')
 
-# Stop cfgm and collector
-service {['supervisor-config','supervisor-analytics']:
+# Stop collector
+service {'supervisor-analytics':
   ensure => stopped,
 }
