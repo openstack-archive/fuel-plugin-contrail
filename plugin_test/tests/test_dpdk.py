@@ -16,23 +16,16 @@ under the License.
 import os
 
 from proboscis import test
-from proboscis.asserts import assert_true
-
-from devops.helpers.helpers import tcp_ping
-from devops.helpers.helpers import wait
 
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
-from fuelweb_test.helpers import os_actions
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
-from fuelweb_test.settings import SERVTEST_PASSWORD
-from fuelweb_test.settings import SERVTEST_TENANT
-from fuelweb_test.settings import SERVTEST_USERNAME
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
 
 from helpers import plugin
 from helpers import openstack
 from helpers import baremetal
+from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["plugins"])
@@ -119,6 +112,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            TestContrailCheck(self).cloud_check(['dpdk'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_compute"])
@@ -208,6 +202,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            TestContrailCheck(self).cloud_check(['dpdk'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_delete_compute"])
@@ -288,6 +283,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            TestContrailCheck(self).cloud_check(['dpdk'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_dpdk"])
@@ -354,6 +350,7 @@ class DPDKTests(TestBasic):
         self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            TestContrailCheck(self).cloud_check(['dpdk'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_delete_dpdk"])
@@ -431,6 +428,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            TestContrailCheck(self).cloud_check(['dpdk'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_controller"])
@@ -520,6 +518,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            TestContrailCheck(self).cloud_check(['dpdk'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_delete_controller"])
@@ -597,6 +596,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            TestContrailCheck(self).cloud_check(['dpdk'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_add_to_dpdk_sriov"])
@@ -674,6 +674,7 @@ class DPDKTests(TestBasic):
         if vsrx_setup_result:
             self.show_step(9)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            TestContrailCheck(self).cloud_check(['dpdk'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_dpdk_setup"])
@@ -740,231 +741,4 @@ class DPDKTests(TestBasic):
                 should_fail=1,
                 failed_test_name=['Instance live migration'])
 
-    @test(depends_on=[contrail_dpdk_setup],
-          groups=["contrail_dpdk_boot_snapshot_vm"])
-    @log_snapshot_after_test
-    def contrail_dpdk_boot_snapshot_vm(self):
-        """Launch instance, create snapshot, launch instance from snapshot.
-
-        Scenario:
-            1. Setup contrail_dpdk_setup.
-            2. Create no default network with subnet.
-            3. Get existing flavor with hpgs.
-            4. Launch an instance using the default image and flavor with hpgs
-               in the hpgs availability zone.
-            5. Make snapshot of the created instance.
-            6. Delete the last created instance.
-            7. Launch another instance from the snapshot created in step 5.
-               and flavor with hpgs in the hpgs availability zone.
-            8. Delete the last created instance.
-
-        Duration 5 min
-
-        """
-        az_name = 'hpgs'
-        subnet_cidr = '192.168.112.0/24'
-        cluster_id = self.fuel_web.get_last_created_cluster()
-        net_name = 'net_1'
-
-        self.show_step(2)
-        os_ip = self.fuel_web.get_public_vip(cluster_id)
-        os_conn = os_actions.OpenStackActions(
-            os_ip, SERVTEST_USERNAME,
-            SERVTEST_PASSWORD,
-            SERVTEST_TENANT)
-
-        network = os_conn.create_network(
-            network_name=net_name)['network']
-        os_conn.create_subnet(
-            subnet_name=net_name,
-            network_id=network['id'],
-            cidr=subnet_cidr,
-            ip_version=4)
-
-        self.show_step(3)
-        flavor = [
-            f for f in os_conn.nova.flavors.list()
-            if az_name in f.name][0]
-
-        self.show_step(4)
-        srv_1 = os_conn.create_server_for_migration(
-            neutron=True, availability_zone=az_name,
-            label=net_name, flavor=flavor)
-
-        self.show_step(5)
-        image = os_conn.nova.servers.create_image(srv_1, 'image1')
-        wait(lambda: os_conn.nova.images.get(image).status == 'ACTIVE',
-             timeout=300, timeout_msg='Image is not active.')
-
-        self.show_step(6)
-        os_conn.delete_instance(srv_1)
-        assert_true(
-            os_conn.verify_srv_deleted(srv_1),
-            "Instance was not deleted.")
-
-        self.show_step(7)
-        srv_2 = os_conn.nova.servers.create(
-            flavor=flavor, name='srv_2', image=image,
-            availability_zone=az_name, nics=[{'net-id': network['id']}])
-        openstack.verify_instance_state(os_conn, instances=[srv_2])
-
-        self.show_step(8)
-        os_conn.delete_instance(srv_2)
-        assert_true(
-            os_conn.verify_srv_deleted(srv_2),
-            "Instance was not deleted.")
-
-    @test(depends_on=[contrail_dpdk_setup],
-          groups=["contrail_dpdk_volume"])
-    @log_snapshot_after_test
-    def contrail_dpdk_volume(self):
-        """Create volume and boot instance from it.
-
-        Scenario:
-            1. Setup contrail_dpdk_setup.
-            2. Create no default network with subnet.
-            3. Get existing flavor with hpgs.
-            4. Create a new small-size volume from image.
-            5. Wait for volume status to become "available".
-            6. Launch an instance using the default image and flavor with hpgs
-               in the hpgs availability zone.
-            7. Wait for "Active" status.
-            8. Delete the last created instance.
-            9. Delete volume and verify that volume deleted.
-
-        Duration 5 min
-
-        """
-        az_name = 'hpgs'
-        subnet_cidr = '192.168.112.0/24'
-        cluster_id = self.fuel_web.get_last_created_cluster()
-        net_name = 'net_1'
-
-        self.show_step(2)
-        os_ip = self.fuel_web.get_public_vip(cluster_id)
-        os_conn = os_actions.OpenStackActions(
-            os_ip, SERVTEST_USERNAME,
-            SERVTEST_PASSWORD,
-            SERVTEST_TENANT)
-
-        network = os_conn.create_network(
-            network_name=net_name)['network']
-        os_conn.create_subnet(
-            subnet_name=net_name,
-            network_id=network['id'],
-            cidr=subnet_cidr,
-            ip_version=4)
-
-        self.show_step(3)
-        flavor = [
-            f for f in os_conn.nova.flavors.list()
-            if az_name in f.name][0]
-
-        plugin.show_range(self, 4, 6)
-        images_list = os_conn.nova.images.list()
-        volume = os_conn.create_volume(image_id=images_list[0].id)
-
-        self.show_step(6)
-        srv_1 = os_conn.create_server_for_migration(
-            neutron=True, availability_zone=az_name,
-            label=net_name, flavor=flavor,
-            block_device_mapping={'vda': volume.id + ':::0'})
-
-        self.show_step(7)
-        openstack.verify_instance_state(os_conn, instances=[srv_1])
-
-        self.show_step(8)
-        os_conn.delete_instance(srv_1)
-        assert_true(
-            os_conn.verify_srv_deleted(srv_1),
-            "Instance was not deleted.")
-
-        self.show_step(9)
-        os_conn.delete_volume_and_wait(volume)
-
-    @test(depends_on=[contrail_dpdk_setup],
-          groups=["contrail_dpdk_check_public_connectivity_from_instance"])
-    @log_snapshot_after_test
-    def contrail_dpdk_check_public_connectivity_from_instance(self):
-        """Check network connectivity from instance via floating IP.
-
-        Scenario:
-            1. Setup contrail_dpdk_setup.
-            2. Create no default network with subnet.
-            3. Create Router_01, set gateway and add interface
-               to external network.
-            4. Get existing flavor with hpgs.
-            5. Create a new security group (if it doesn`t exist yet).
-            6. Launch an instance using the default image and flavor with hpgs
-               in the hpgs availability zone.
-            7. Create a new floating IP.
-            8. Assign the new floating IP to the instance.
-            9. Check connectivity to the floating IP using ping command.
-            10. Check that public IP 8.8.8.8 can be pinged from instance.
-            11. Delete instance.
-
-        Duration 5 min
-
-        """
-        az_name = 'hpgs'
-        subnet_cidr = '192.168.112.0/24'
-        cluster_id = self.fuel_web.get_last_created_cluster()
-        net_name = 'net_1'
-        ping_command = "ping -c 5 8.8.8.8"
-
-        self.show_step(2)
-        os_ip = self.fuel_web.get_public_vip(cluster_id)
-        os_conn = os_actions.OpenStackActions(
-            os_ip, SERVTEST_USERNAME,
-            SERVTEST_PASSWORD,
-            SERVTEST_TENANT)
-
-        network = os_conn.create_network(
-            network_name=net_name)['network']
-        subnet = os_conn.create_subnet(
-            subnet_name=net_name,
-            network_id=network['id'],
-            cidr=subnet_cidr,
-            ip_version=4)
-
-        self.show_step(3)
-        gateway = {
-            "network_id": os_conn.get_network('admin_floating_net')['id'],
-            "enable_snat": True}
-        router_param = {'router': {
-            'name': 'df', 'external_gateway_info': gateway}}
-        router = os_conn.neutron.create_router(body=router_param)['router']
-        os_conn.add_router_interface(
-            router_id=router["id"],
-            subnet_id=subnet["id"])
-
-        self.show_step(4)
-        flavor = [
-            f for f in os_conn.nova.flavors.list()
-            if az_name in f.name][0]
-
-        plugin.show_range(self, 5, 7)
-        srv = os_conn.create_server_for_migration(
-            neutron=True, availability_zone=az_name,
-            label=net_name, flavor=flavor)
-
-        plugin.show_range(self, 7, 9)
-        fip = os_conn.assign_floating_ip(srv).ip
-
-        self.show_step(9)
-        wait(
-            lambda: tcp_ping(fip, 22), timeout=120, interval=5,
-            timeout_msg="Node {0} is not accessible by SSH.".format(fip))
-
-        self.show_step(10)
-        with self.fuel_web.get_ssh_for_node("slave-01") as remote:
-            assert_true(
-                os_conn.execute_through_host(
-                    remote, fip, ping_command)['exit_code'] == 0,
-                'Ping responce is not received.')
-
-        self.show_step(11)
-        os_conn.delete_instance(srv)
-        assert_true(
-            os_conn.verify_srv_deleted(srv),
-            "Instance was not deleted.")
+            TestContrailCheck(self).cloud_check(['dpdk'])
