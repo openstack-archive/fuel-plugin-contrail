@@ -258,7 +258,9 @@ class contrail::config {
       File['/etc/ifmap-server/basicauthusers.properties']
       ],
   }
-  Service['supervisor-config'] ->        Contrail_api_ini_config <||>
+
+  Package['contrail-config'] ->          Contrail_api_ini_config <||>
+  Contrail_api_ini_config <||> ~>        Service['supervisor-config']
   Contrail_svc_monitor_config <||> ~>    Service['supervisor-config']
   Contrail_schema_config <||> ~>         Service['supervisor-config']
   Contrail_discovery_config <||> ~>      Service['supervisor-config']
