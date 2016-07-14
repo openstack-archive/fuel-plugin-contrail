@@ -527,7 +527,7 @@
   type: puppet
   role: [compute]
   required_for: [post_deployment_end, contrail-compute-nova]
-  requires: [post_deployment_start]
+  requires: [post_deployment_start,configure_default_route]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-network.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
