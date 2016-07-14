@@ -239,7 +239,7 @@ class contrail::controller {
     'clients_contrail/password':      value => $contrail::service_token;
     'clients_contrail/tenant':        value => $contrail::service_tenant;
     'clients_contrail/api_server':    value => $contrail::contrail_mgmt_vip;
-    'clients_contrail/auth_host_ip':  value => $contrail::mos_mgmt_vip;
+    'clients_contrail/auth_host_ip':  value => $contrail::keystone_address;
     'clients_contrail/api_base_url':  value => '/';
   }
   if !defined(Service['heat-engine']) {
