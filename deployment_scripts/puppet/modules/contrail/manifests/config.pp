@@ -131,8 +131,8 @@ class contrail::config {
   service { 'supervisor-config':
     ensure    => $contrail::service_ensure,
     enable    => true,
-    require   => [Package['contrail-openstack-config'],Package['contrail-config']],
-    subscribe => [File['/etc/contrail/contrail-api.conf'],
+    subscribe =>  [Package['contrail-openstack-config'],Package['contrail-config'],
+                  File['/etc/contrail/contrail-api.conf'],
                   File['/etc/contrail/supervisord_config_files/contrail-api.ini'],
                   File['/etc/contrail/contrail-discovery.conf'],
                   File['/etc/contrail/contrail-keystone-auth.conf'],
