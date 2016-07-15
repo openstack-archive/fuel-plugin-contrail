@@ -70,6 +70,7 @@ contrail-tsn:
   public_ip_required: false
   weight: 100
   conflicts:
+    - contrail-analytics
     - contrail-control
     - contrail-config
     - contrail-db
@@ -90,6 +91,7 @@ dpdk:
     - contrail-db
     - contrail-config
     - contrail-control
+    - contrail-analytics
     - ceph-osd
     - cinder
 
@@ -105,3 +107,4 @@ sriov:
     - contrail-db
     - contrail-config
     - contrail-control
+    - contrail-analytics
