@@ -417,10 +417,21 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+
+- id: contrail-tsn-network
+  type: puppet
+  role: [primary-contrail-tsn]
+  required_for: [post_deployment_end, contrail-tsn-vrouter]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-network.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 - id: contrail-tsn-vrouter
   type: puppet
   role: [primary-contrail-tsn]
-  requires: [post_deployment_start]
+  requires: [post_deployment_start, contrail-tsn-network]
   required_for: [reconfigure-contrail-tsn-vrouter]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
