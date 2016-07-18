@@ -19,6 +19,15 @@ class contrail::provision::control {
     path     => '/usr/bin:/bin:/sbin',
   }
 
+  if !defined(Exec['wait_for_api']) {
+    exec {'wait_for_api':
+      command   => "bash -c 'if ! [[ $(curl -s -o /dev/null -w \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082) =~ ^(200|401)$ ]];\
+then exit 1; fi'",
+      tries     => 10,
+      try_sleep => 10,
+    }
+  }
+
   define contrail::provision::prov_ext_bgp {
     exec { "prov_external_bgp_${name}":
       command => "python /opt/contrail/utils/provision_mx.py  \
@@ -27,15 +36,6 @@ class contrail::provision::control {
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_external_bgp_${name}-DONE",
       creates => "/opt/contrail/prov_external_bgp_${name}-DONE",
-    }
-  }
-
-  if !defined(Exec['wait_for_api']) {
-    exec {'wait_for_api':
-      command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:${contrail::api_server_port}` -lt 401 ];\
-then exit 1; fi",
-      tries     => 10,
-      try_sleep => 10,
     }
   }
 
