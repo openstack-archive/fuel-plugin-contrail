@@ -99,6 +99,13 @@ class contrail::compute::nova {
       ensure => running,
       enable => true,
     }
+  }else{
+    Service<| title == 'nova-compute' |> {
+      ensure     => running,
+      enable     => true,
+      hasstatus  => true,
+      hasrestart => true,
+    }
   }
 
   Nova_config <||> ~> Service['nova-compute']
