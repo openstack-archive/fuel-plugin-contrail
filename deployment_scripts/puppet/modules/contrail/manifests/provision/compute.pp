@@ -26,8 +26,8 @@ class contrail::provision::compute {
     content => template('contrail/vnc_api_lib.ini.erb')
   } ->
   exec {'wait_for_api':
-    command   => "if ! [[ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` =~ ^(200|401)$ ]];\
-then exit 1; fi",
+    command   => "bash -c 'if ! [[ $(curl -s -o /dev/null -w \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082) =~ ^(200|401)$ ]];\
+then exit 1; fi'",
     tries     => 10,
     try_sleep => 10,
   } ->
