@@ -17,17 +17,23 @@ require 'yaml'
 module Puppet::Parser::Functions
 newfunction(:get_dev_pci_addr, :type => :rvalue, :doc => <<-EOS
       Returns interface's PCI address, else returns "0000:00:00.0"
+      Arguments: interface name, network_scheme
     EOS
   ) do |args|
       # Get the real interface name if argument is '<ifname>.<vlanid>'
-      ifname = args[0].split('.').first
-      yml = YAML.load(File.open("/etc/astute.yaml"))
-      ifyml = yml['network_scheme']['interfaces'][ifname]
+      if_name = args[0].split('.').first
+      network_scheme = args[1]
 
-      if ifyml and ifyml['vendor_specific']
-        return ifyml['vendor_specific']['bus_info']
+      raise ArgumentError, 'No interface name is provided!' unless if_name and if_name.length > 0
+      raise ArgumentError, 'network_scheme should be a hash!' unless network_scheme.is_a? Hash
+      raise ArgumentError, 'There is no "interfaces" section in the network_scheme!' unless network_scheme.key? 'interfaces'
+
+      if_yml = network_scheme['interfaces'][if_name]
+
+      if if_yml and if_yml['vendor_specific']
+        if_yml['vendor_specific']['bus_info']
       else
-        return '0000:00:00.0'
+        '0000:00:00.0'
       end
     end
 end
