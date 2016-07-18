@@ -28,11 +28,10 @@ class contrail::provision::db {
 
   if !defined(Exec['wait_for_api']) {
     exec {'wait_for_api':
-      command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:${contrail::api_server_port}` -lt 401 ];\
-      then exit 1; fi",
+      command   => "bash -c 'if ! [[ $(curl -s -o /dev/null -w \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:${contrail::api_server_port}) =~ ^(200|401)$ ]];\
+then exit 1; fi'",
       tries     => 10,
       try_sleep => 10,
-      notify    => Exec['prov_database_node'],
     }
   }
 
@@ -43,5 +42,6 @@ class contrail::provision::db {
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_database_node-DONE",
     creates => '/opt/contrail/prov_database_node-DONE',
+    require => Exec['wait_for_api'],
   }
 }
