@@ -14,5 +14,5 @@
 
 notice('MODULAR: contrail/controller-provision.pp')
 
-include contrail
-class { 'contrail::provision::controller': }
+#include contrail
+#class { 'contrail::provision::controller': }
