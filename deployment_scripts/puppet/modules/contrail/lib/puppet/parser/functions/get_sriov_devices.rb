@@ -41,7 +41,8 @@ module Puppet::Parser::Functions
       network_interface_path = "/sys/class/net/" + network_interface
       if (File.exists?(network_interface_path + "/device/sriov_totalvfs") and
           not bridge_interfaces.include?(network_interface) and
-          not bond_interfaces.include?(network_interface))
+          not bond_interfaces.include?(network_interface)) and
+          IO.read(network_interface_path + "/operstate").to_s.strip == "up"
         sriov_hash[network_interface] = Hash.new
         sriov_hash[network_interface]["totalvfs"] = IO.read(network_interface_path + "/device/sriov_totalvfs").to_i
         sriov_hash[network_interface]["numvfs"] = IO.read(network_interface_path + "/device/sriov_numvfs").to_i
