@@ -39,6 +39,7 @@ Steps
        * 1 TSN
        * 3 Compute + Ceph
        * 1 Contrail-config + contrail-control + contrail-db
+       * 1 contrail-analytics
     4. Configure interfaces on nodes.
     5. Configure network settings.
     6. Configure Contrail plugin settings:
