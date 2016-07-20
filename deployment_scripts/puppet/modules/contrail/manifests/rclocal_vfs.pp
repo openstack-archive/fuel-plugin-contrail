@@ -21,7 +21,7 @@ define contrail::rclocal_vfs (
   )
 {
 
-  if (versioncmp($::libnl_version, '3.2.21-1') > 0) {
+  if (versioncmp($::libnl_version, '3.2.24-2') >= 0) {
     $final_vf = $totalvfs
   } else {
     $final_vf = min(30, $totalvfs)
