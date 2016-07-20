@@ -94,7 +94,8 @@ class DPDKVFTests(TestBasic):
             'slave-05': ['compute', 'ceph-osd'],
             'slave-06': ['compute', 'ceph-osd'],
             'slave-07': ['contrail-db', 'contrail-config', 'contrail-control'],
-            'slave-08': ['contrail-db'],
+            'slave-08': ['contrail-db', 'contrail-analytics'],
+            'slave-09': ['contrail-db'],
         }
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
