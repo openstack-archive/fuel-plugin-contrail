@@ -56,6 +56,7 @@ class DPDKVFTests(TestBasic):
                 * 3 compute + ceph
                 * 1 contrail-config+contrail-control+contrail-db
                 * 1 compute+sriov+dpdk
+                * 1 contrail-db+contrail-analytics
                 * 1 contrail-db
             4. Deploy cluster.
             5. Run OSTF tests.
@@ -94,7 +95,8 @@ class DPDKVFTests(TestBasic):
             'slave-05': ['compute', 'ceph-osd'],
             'slave-06': ['compute', 'ceph-osd'],
             'slave-07': ['contrail-db', 'contrail-config', 'contrail-control'],
-            'slave-08': ['contrail-db'],
+            'slave-08': ['contrail-db', 'contrail-analytics'],
+            'slave-09': ['contrail-db'],
         }
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
