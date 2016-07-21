@@ -649,6 +649,7 @@ class FunctionalTests(TestBasic):
 
         self.show_step(5)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(6)
         os_ip = self.fuel_web.get_public_vip(cluster_id)
