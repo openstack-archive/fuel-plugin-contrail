@@ -49,7 +49,7 @@ class contrail::compute::vrouter {
     file {'/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini':
       ensure  => present,
       content => template('contrail/contrail-vrouter-dpdk.ini.erb'),
-      require => Class[Contrail::Package],
+      require => Package[$install_packages],
       notify  => Service['supervisor-vrouter'],
     }
   } else {
