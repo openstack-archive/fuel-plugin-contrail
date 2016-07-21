@@ -18,20 +18,24 @@ module Puppet::Parser::Functions
 newfunction(:get_private_ifname, :type => :rvalue, :doc => <<-EOS
     Returns interface selected as "Private network" in web UI
     example:
-      get_private_ifname('br-mesh')
+      get_private_ifname('br-mesh', $network_scheme)
     EOS
   ) do |args|
-     brname = args[0]
-     ifname = String.new
-     network_scheme = function_hiera_hash(['network_scheme', {}])
+   br_name = args[0]
+   network_scheme = args[1]
 
-     network_scheme['transformations'].each do |entry|
-       if entry['bridge'] == brname
-         ifname = entry['name']
-       end
-    end
+   raise ArgumentError, 'No bridge name is provided!' unless br_name and br_name.length > 0
+   raise ArgumentError, 'network_scheme should be a hash!' unless network_scheme.is_a? Hash
+   raise ArgumentError, 'There is no "transformations" section in the network_scheme!' unless network_scheme.key? 'transformations'
 
-    return ifname.to_s
-    end
+   if_name = nil
+   network_scheme['transformations'].each do |entry|
+     if_name = entry['name'] if entry['bridge'] == br_name
+   end
+
+  if_name
+  end
 end
+
+
 
