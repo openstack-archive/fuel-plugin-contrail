@@ -112,7 +112,7 @@ class SRIOVTests(TestBasic):
                 test_sets=['smoke', 'sanity', 'ha'],
                 should_fail=1,
                 failed_test_name=['Instance live migration'])
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_sriov_add_compute"])
@@ -183,7 +183,7 @@ class SRIOVTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
         # Add Compute node and check again
         self.show_step(5)
@@ -202,7 +202,7 @@ class SRIOVTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_sriov_delete_compute"])
@@ -262,7 +262,7 @@ class SRIOVTests(TestBasic):
         if vsrx_setup_result:
             self.show_step(4)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
         # Delete Compute node and check again
         self.show_step(5)
@@ -284,7 +284,7 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_sriov_add_controller"])
@@ -355,7 +355,7 @@ class SRIOVTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
         # Add Compute node and check again
         self.show_step(5)
@@ -375,7 +375,7 @@ class SRIOVTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_sriov_delete_controller"])
@@ -434,7 +434,7 @@ class SRIOVTests(TestBasic):
         # Run OSTF tests
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
         # Delete Compute node and check again
         plugin.show_range(self, 5, 7)
@@ -454,7 +454,7 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_sriov_add_sriov"])
@@ -508,7 +508,7 @@ class SRIOVTests(TestBasic):
         # Run OSTF tests
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
         self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
@@ -520,7 +520,7 @@ class SRIOVTests(TestBasic):
         self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_sriov_delete_sriov"])
@@ -596,7 +596,7 @@ class SRIOVTests(TestBasic):
         self.show_step(4)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
         self.show_step(5)
         self.bm_drv.setup_fuel_node(self,
@@ -614,4 +614,4 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            TestContrailCheck(self).cloud_check(['sriov'])
+            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
