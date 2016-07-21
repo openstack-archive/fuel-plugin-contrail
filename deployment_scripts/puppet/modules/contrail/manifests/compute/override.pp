@@ -18,7 +18,7 @@ class contrail::compute::override {
   $common_pkg  = ['iproute2', 'haproxy', 'libatm1', 'libxen-4.4']
   $libvirt_pkg = ['libvirt-bin', 'libvirt0']
   $qemu_pkg    = ['qemu','qemu-*']
-  $nova_pkg    = ['nova-compute', 'nova-common', 'python-nova', 'python-urllib3']
+  $nova_pkg    = ['nova-compute', 'nova-common', 'python-nova', 'python-urllib3', 'nova-compute-libvirt', 'nova-compute-kvm']
 
   $keep_config_files = '-o Dpkg::Options::="--force-confold"'
   $force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
