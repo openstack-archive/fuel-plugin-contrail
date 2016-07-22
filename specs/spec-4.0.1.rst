@@ -196,6 +196,105 @@ Work items
  - User guide should be updated to cover the new roles and features
 
 
+Make OSTF networks provisioning optional
+========================================
+
+Problem description
+-------------------
+
+In some environments network allocated for floating IP addresses can have some
+exclusions, for example some routers or switches using IP addresses from this
+network. In this case, those addresses should be excluded from allocation pool.
+This action affects ability to add compute nodes in future.
+
+Proposed solution
+-----------------
+
+Make OSTF networks provisioning optional, so if user needs to have exclusions in
+floating IP pool, he could provision this network manually, without loosing
+ability to add compute nodes.
+
+
+UI impact
+---------
+Checkbox for OSTF networks provisioning added. It should be enabled by default.
+
+Performance impact
+------------------
+
+None
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information about this checkbox.
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
+Implementation
+==============
+
+Assignee(s)
+-----------
+
+Primary assignee:
+
+- Oleksandr Martsyniuk <omartsyniuk> - tech lead, developer
+- Przemylaw Szypowicz <pszypowicz> - developer
+
+Project manager:
+
+- Andrian Noga <anoga>
+
+Quality assurance:
+
+- Oleksandr Kosse <okosse>
+- Olesya Tsvigun <otsvigun>
+
+Work items
+----------
+
+* Development
+
+ - Add checkbox to environment config
+ - Make network provisioning conditional
+
+* Testing
+
+ - Update tests and test plans to cover new functionality
+
+* Documentation
+
+ - User guide should be updated to cover this checkbox
+
 Acceptance criteria
 ===================
 
