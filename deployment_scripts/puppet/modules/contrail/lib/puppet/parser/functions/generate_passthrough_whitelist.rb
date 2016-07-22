@@ -23,9 +23,10 @@ module Puppet::Parser::Functions
     physnet = args[0]
     dpdk_on_vf = args[1]
     sriov_hash = function_get_sriov_devices([])
+    network_scheme = function_hiera_hash(['network_scheme', {}])
 
     list = sriov_hash.map { |dev, _|
-      pci_address = function_get_dev_pci_addr([dev])
+      pci_address = function_get_dev_pci_addr([dev, network_scheme])
       Hash["address" => pci_address, "physical_network" => physnet]
     }
 
