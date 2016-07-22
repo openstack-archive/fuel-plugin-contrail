@@ -613,3 +613,41 @@ class TestContrailCheck(object):
                     "Timeout is reached. Current state of {0} is {1}".format(
                         instance.name, current_state)
                 )
+
+    def test_contrail_node_status(self):
+        """Check contrail nodes for their status."""
+        cluster_id = self.obj.fuel_web.get_last_created_cluster()
+        logger.info('Check contrail node for cluster {}'.format(cluster_id))
+        contrail_node_roles = {
+            'contrail-config',
+            'contrail-control',
+            'contrail-db',
+            'contrail-analytics'
+        }
+
+        def check_status(host_name):
+            # command = "contrail-status | grep contrail| 'awk {print $2}'"
+            command = "contrail-status | grep contrail"
+            with self.obj.fuel_web.get_ssh_for_node(host_name) as remote:
+                out = remote.execute(command)['stdout']
+                for res in out:
+                    logger.info('Check status: {}'.format(res))
+                    assert('active' in res,
+                           "Contrail node status invalid: {}".format(out))
+            return True
+
+        nailgun_nodes = self.obj.fuel_web.client.list_cluster_nodes(cluster_id)
+        logger.info('Nailgun nodes 1: {}'.format([n['name'] for n in nailgun_nodes]))
+
+        nailgun_nodes = [node for node in nailgun_nodes
+                         if not node['pending_addition'] and
+                         set(node['roles']) & contrail_node_roles]
+
+        logger.info('Nailgun nodes 2: {}'.format([n['name'] for n in nailgun_nodes]))
+
+        devops_nodes = self.obj.fuel_web.get_devops_nodes_by_nailgun_nodes(
+            nailgun_nodes)
+
+        for node in devops_nodes:
+            logger.debug("Check contrail status for node {}".format(node.name))
+            check_status(node.name)

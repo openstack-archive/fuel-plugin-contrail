@@ -42,6 +42,7 @@ from helpers.contrail_client import ContrailClient
 from helpers import plugin
 from helpers import openstack
 from helpers.settings import OSTF_RUN_TIMEOUT
+from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["contrail_system_tests"])
@@ -156,6 +157,7 @@ class SystemTests(TestBasic):
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'tests_platform'],
             timeout=OSTF_RUN_TIMEOUT)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.env.make_snapshot("systest_setup", is_make=True)
 
