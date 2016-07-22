@@ -168,3 +168,9 @@ attributes:
     restrictions:
       - condition: "settings:contrail.enable_tor_agents.value == false"
         action: "hide"
+  provision_networks:
+    value: true
+    label: "Provision ostf networks"
+    description: "Disable this option to disable provisioning ostf networks"
+    weight: 260
+    type: "checkbox"
