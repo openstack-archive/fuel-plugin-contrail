@@ -154,6 +154,68 @@ Requirements
 
 None
 
+Make provisioning of default networks optional
+==============================================
+
+Problem description
+-------------------
+
+Some environemnts may require changes to default networks created during deployment for OSTF tests.
+As an example, network allocated for floating IP addresses may need some exclusions in address
+allocation for more-specific routes.
+This affects the ability to deploy changes to OpenStack environments, with fails on default
+network creation.
+
+Proposed solution
+-----------------
+
+Make default networks provisioning optional, and allow manual networks creation.
+
+
+UI impact
+---------
+Checkbox for default networks provisioning added. It should be enabled by default.
+
+Performance impact
+------------------
+
+None
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information about this checkbox.
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
 Implementation
 ==============
 
@@ -185,6 +247,8 @@ Work items
  - Update other manifests to support dedicated analytics nodes
  - Adjust the experimental upgrade scripts to run on contrail-analytics role
  - Add python-memcache package to manifests for 'contrail-config' role and adjust the contrail-keystone configuration with memcached server IPs
+ - Add checkbox to environment config
+ - Make network provisioning conditional
 
 * Testing
 
@@ -194,7 +258,6 @@ Work items
 * Documentation
 
  - User guide should be updated to cover the new roles and features
-
 
 Acceptance criteria
 ===================
