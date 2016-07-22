@@ -40,6 +40,11 @@ class contrail::compute::hugepages {
       enable => true,
     }
 
+    kernel_parameter { 'transparent_hugepage':
+      ensure => present,
+      value  => 'never',
+    }
+
     Augeas['qemu_hugepages'] ~> Service<| title == 'qemu-kvm'|>
     Service<| title == 'qemu-kvm'|> -> Service<| title == $contrail::libvirt_name |>
   }
