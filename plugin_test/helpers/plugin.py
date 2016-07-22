@@ -228,6 +228,22 @@ def vsrx_multiple_networks(obj, vsrx_ip='10.109.4.250', net_name='private2'):
             remote.execute_async(command)
 
 
+def upload_vsrx_config(obj, config_path, vsrx_ip='10.109.4.250'):
+    """Upload and commit configuration for VSRX."""
+
+    commands = [
+        'cli', 'configure',
+        'load override {0}'.format(config_path.split('/').pop()),
+        'commit']
+    wait(
+        lambda: tcp_ping(vsrx_ip, 22), timeout=60 * 2, interval=10,
+        timeout_msg="Node {0} is not accessible by SSH.".format(vsrx_ip))
+    with obj.env.d_env.get_ssh_to_remote(vsrx_ip) as remote:
+        remote.upload(config_path, '/cf/root')
+        for command in commands:
+            remote.execute_async(command)
+
+
 def show_range(obj, start_value, end_value):
     """Show several steps."""
     for i in range(start_value, end_value):

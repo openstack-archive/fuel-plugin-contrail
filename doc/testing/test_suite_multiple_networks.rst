@@ -10,7 +10,7 @@ Contrail HA Multiple Networks
 ID
 ##
 
-contrail_ha_multiple_nodegroups
+contrail_ha_multiple_networks
 
 
 Description
@@ -43,7 +43,7 @@ Steps
         * 3 controller+ceph
     13. Add following nodes to custom nodegroup:
         * 1 compute
-        * 1 contrail-config+contrail-control+contrail-db
+        * 1 contrail-config+contrail-control+contrail-db+contrail-analytics
     14. Deploy cluster
     15. Run network verification
     16. Verify that excluded ip is not used for nodes or VIP
@@ -62,7 +62,7 @@ Contrail Multiple Networks delete controller
 ID
 ##
 
-contrail_multiple_nodegroups_delete_controller
+contrail_multiple_networks_delete_controller
 
 
 Description
@@ -92,10 +92,14 @@ Steps
     10. Put new json on master node and update network data
     11. Verify that new IP ranges are applied for network config
     12. Add following nodes to default nodegroup:
-        * 3 controller
+        * 1 controller+cinder
+        * 2 controller
     13. Add following nodes to custom nodegroup:
         * 1 compute
-        * 1 contrail-config+contrail-control+contrail-db
+        * 1 contrail-config
+        * 1 contrail-control
+        * 1 contrail-db
+        * 1 contrail-analytics
     14. Deploy cluster
     15. Run health checks (OSTF)
     16. Remove 1 controller node
@@ -115,7 +119,7 @@ Contrail Multiple Networks add controller
 ID
 ##
 
-contrail_multiple_nodegroups_add_controller
+contrail_multiple_networks_add_controller
 
 
 Description
@@ -148,7 +152,7 @@ Steps
         * 1 controller+mongo
     13. Add following nodes to default nodegroup:
         * 1 compute
-        * 1 contrail-config+contrail-control+contrail-db
+        * 1 contrail-config+contrail-control+contrail-db+contrail-analytics
         * 1 cinder
     14. Deploy cluster
     15. Run health checks (OSTF)
@@ -169,7 +173,7 @@ Contrail Multiple Networks delete compute
 ID
 ##
 
-contrail_multiple_nodegroups_delete_compute
+contrail_multiple_networks_delete_compute
 
 
 Description
@@ -202,7 +206,7 @@ Steps
         * 3 controller
     13. Add following nodes to custom nodegroup:
         * 2 compute
-        * 1 contrail-config+contrail-control+contrail-db
+        * 1 contrail-config+contrail-control+contrail-db+contrail-analytics
     14. Deploy cluster
     15. Run health checks (OSTF)
     16. Remove 1 compute node
@@ -222,7 +226,7 @@ Contrail Multiple Networks add compute
 ID
 ##
 
-contrail_multiple_nodegroups_add_compute
+contrail_multiple_networks_add_compute
 
 
 Description
@@ -254,13 +258,65 @@ Steps
     12. Add following nodes to default nodegroup:
         * 3 controller
     13. Add following nodes to custom nodegroup:
-        * 1 compute
-        * 1 contrail-config+contrail-control+contrail-db
+        * 1 compute+ceph-osd
+        * 1 contrail-config+contrail-control+contrail-db+contrail-analytics
     14. Deploy cluster
     15. Run health checks (OSTF)
     16. Add 1 compute node
     17. Redeploy cluster
     18. Run health checks (OSTF)
+
+
+Expected results
+################
+All steps must be completed successfully, without any errors
+
+
+Contrail Multiple Networks contrail HA
+--------------------------------------
+
+ID
+##
+
+contrail_different_ha_in_multinet
+
+
+Description
+###########
+
+Check Contrail deploy multiple networks with contrail HA
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Revert snapshot with ready master node
+    2. Install contrail plugin
+    3. Bootstrap slaves from default nodegroup
+    4. Create cluster with Neutron GRE and custom nodegroups
+    5. Activate plugin and configure plugins setings
+    6. Remove 2nd custom nodegroup which is added automatically
+    7. Bootstrap slave nodes from custom nodegroup
+    8. Download network configuration
+    9. Update network.json  with customized ip ranges
+    10. Put new json on master node and update network data
+    11. Verify that new IP ranges are applied for network config
+    12. Add following nodes to default nodegroup:
+        * 1 controller
+        * 2 contrail-config+contrail-control+contrail-db+
+          contrail-analytics
+    13. Add following nodes to custom nodegroup:
+        * 1 cinder
+        * 1 contrail-config+contrail-control+contrail-db+
+          contrail-analytics
+    14. Deploy cluster
+    15. Run health checks (OSTF)
 
 
 Expected results
