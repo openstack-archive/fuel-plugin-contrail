@@ -112,7 +112,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_compute", "contrail_dpdk_tests"])
@@ -184,7 +184,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Add Compute node and check again
         self.show_step(5)
@@ -204,7 +204,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_delete_compute", "contrail_dpdk_tests"])
@@ -268,7 +268,7 @@ class DPDKTests(TestBasic):
         if vsrx_setup_result:
             self.show_step(4)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Delete Compute node and check again
         self.show_step(5)
@@ -290,7 +290,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_dpdk", "contrail_dpdk_tests"])
@@ -351,7 +351,7 @@ class DPDKTests(TestBasic):
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
@@ -363,7 +363,7 @@ class DPDKTests(TestBasic):
         self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_delete_dpdk", "contrail_dpdk_tests"])
@@ -423,7 +423,7 @@ class DPDKTests(TestBasic):
         # Run OSTF tests
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         self.show_step(5)
         self.bm_drv.setup_fuel_node(self,
@@ -442,7 +442,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_controller", "contrail_dpdk_tests"])
@@ -512,7 +512,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Add Compute node and check again
         self.show_step(5)
@@ -532,7 +532,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_delete_controller", "contrail_dpdk_tests"])
@@ -593,7 +593,7 @@ class DPDKTests(TestBasic):
         # Run OSTF tests
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Delete Compute node and check again
         plugin.show_range(self, 5, 7)
@@ -613,7 +613,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_add_to_dpdk_sriov", "contrail_dpdk_tests"])
@@ -681,7 +681,7 @@ class DPDKTests(TestBasic):
         if vsrx_setup_result:
             self.show_step(6)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Add Contrail node and check again
         self.show_step(7)
@@ -697,4 +697,4 @@ class DPDKTests(TestBasic):
         if vsrx_setup_result:
             self.show_step(9)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['dpdk'])
+            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])

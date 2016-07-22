@@ -38,6 +38,8 @@ from fuelweb_test.tests.test_multiple_networks import TestMultipleClusterNets
 from helpers import plugin
 from helpers import openstack
 from helpers import settings
+from tests.test_contrail_check import TestContrailCheck
+
 
 
 @test(groups=["contrail_multiple_networks"])
@@ -246,6 +248,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         )
         self.show_step(14)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(15)
         self.fuel_web.verify_network(cluster_id)
@@ -398,6 +401,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         self.show_step(14)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(15)
         if vsrx_setup_result:
@@ -415,6 +419,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         self.show_step(17)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(18)
         if vsrx_setup_result:
@@ -514,6 +519,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         )
         self.show_step(14)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(15)
         if vsrx_setup_result:
@@ -532,6 +538,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         self.show_step(17)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(18)
         if vsrx_setup_result:
@@ -628,6 +635,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         )
         self.show_step(14)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(15)
         if vsrx_setup_result:
@@ -645,6 +653,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         self.show_step(17)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(18)
         if vsrx_setup_result:
@@ -748,6 +757,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         )
         self.show_step(14)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(15)
         if vsrx_setup_result:
@@ -760,6 +770,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         self.show_step(17)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(18)
         if vsrx_setup_result:

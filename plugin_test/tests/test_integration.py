@@ -26,6 +26,7 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from fuelweb_test.tests.test_jumbo_frames import TestJumboFrames
 from helpers import plugin
 from helpers import openstack
+from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["plugins"])
@@ -95,6 +96,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(8)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(9)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
@@ -153,6 +155,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(7)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
@@ -210,6 +213,7 @@ class IntegrationTests(TestBasic):
             })
         self.show_step(9)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
@@ -313,7 +317,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(8)
         openstack.deploy_cluster(self)
-
+        TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(9)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
@@ -394,6 +398,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(7)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         # TODO(unknown)
         # Tests using north-south connectivity are expected to fail because
@@ -464,6 +469,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(9)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(10)
         if vsrx_setup_result:
@@ -523,6 +529,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(6)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(7)
         if vsrx_setup_result:
@@ -573,6 +580,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(6)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(7)
         if vsrx_setup_result:
@@ -638,6 +646,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(7)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(8)
         if vsrx_setup_result:

@@ -118,7 +118,7 @@ class DPDKVFTests(TestBasic):
                                    failed_test_name=['Instance live migration']
                                    )
             TestContrailCheck(self).cloud_check(
-                ['dpdk'],
+                ['dpdk', 'contrail'],
                 should_fail=[
                     'test_dpdk_check_public_connectivity_from_instance'
                 ]
