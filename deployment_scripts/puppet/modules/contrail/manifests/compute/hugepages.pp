@@ -18,6 +18,11 @@ class contrail::compute::hugepages {
   $node_hash       = hiera_hash('node', {})
   $nova_huge_pages = pick($node_hash['nova_hugepages_enabled'], false)
 
+  kernel_parameter { 'transparent_hugepage':
+      ensure => present,
+      value  => 'never',
+  }
+
   if $contrail::compute_dpdk_enabled and !$nova_huge_pages and ($::osfamily == 'Debian') {
     $qemu_hugepages_value    = 'set KVM_HUGEPAGES 1'
     $libvirt_hugetlbfs_mount = 'set hugetlbfs_mount /run/hugepages/kvm'
