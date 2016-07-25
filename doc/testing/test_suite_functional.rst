@@ -613,3 +613,40 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+ID
+##
+
+contrail_ostf_net_provisioning_disable
+
+
+Description
+###########
+
+Verify that we can disable OSTF networks provisioning
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
+    2. Enable and configure Contrail plugin without OSTF network provisioning
+    3. Add some controller, compute and cinder nodes
+    4. Add a node with "contrail-config" and "contrail-control" roles
+    5. Add a node with "contrail-db" and "contrail-analytics" roles
+    6. Deploy cluster
+    7. Run OSTF tests
+    8. Check Controller and Contrail nodes status
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.

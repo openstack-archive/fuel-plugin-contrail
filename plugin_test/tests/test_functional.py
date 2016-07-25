@@ -853,3 +853,49 @@ class FunctionalTests(TestBasic):
         plugin.show_range(self, 7, 9)
         openstack.update_deploy_check(self, conf_ha_contrail,
                                       is_vsrx=vsrx_setup_result)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_ostf_net_provisioning_disable"])
+    @log_snapshot_after_test
+    def contrail_ostf_net_provisioning_disable(self):
+        """Verify that we can disable OSTF networks provisioning.
+
+        Scenario:
+            1. Create an environment
+            2. Enable and configure Contrail plugin without
+               OSTF network provisioning
+            3. Add a controller and a compute+cinder nodes
+            4. Add a node with "contrail-config" and "contrail-control" roles
+            5. Add a "contrail-db"+"contrail-analytics" node
+            6. Deploy cluster
+            7. Run OSTF tests
+            8. Check Controller and Contrail nodes status
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=5)
+
+        self.show_step(2)
+
+        # Disable OSTF networks provisioning
+        opts = {
+            'provision_networks': False,
+        }
+        plugin.activate_plugin(self, **opts)
+
+        # activate vSRX image
+        vsrx_setup_result = plugin.activate_vsrx()
+
+        plugin.show_range(self, 3, 6)
+        conf_nodes = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute', 'cinder'],
+            'slave-03': ['contrail-config',
+                         'contrail-control'],
+            'slave-04': ['contrail-db',
+                         'contrail-analytics']
+        }
+
+        plugin.show_range(self, 6, 8)
+        openstack.update_deploy_check(self, conf_nodes,
+                                      is_vsrx=vsrx_setup_result)
