@@ -33,6 +33,7 @@ from helpers.contrail_client import ContrailClient
 from helpers import plugin
 from helpers import openstack
 from helpers import settings
+from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["contrail_functional_tests"])
