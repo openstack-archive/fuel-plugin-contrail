@@ -57,9 +57,10 @@ class DPDKTests(TestBasic):
                 node-03: 'controller', 'ceph-osd';
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'compute', 'ceph-osd';
-                node-07: 'contrail-db';
-                node-08: 'contrail-config';
-                node-09: 'contrail-control';
+                node-06: 'contrail-db';
+                node-07: 'contrail-config';
+                node-08: 'contrail-control';
+                node-09: 'contrail-analytics';
                 node-dpdk: 'compute', dpdk';
             4. Run OSTF tests
 
@@ -95,6 +96,7 @@ class DPDKTests(TestBasic):
             'slave-06': ['contrail-db'],
             'slave-07': ['contrail-config'],
             'slave-08': ['contrail-control'],
+            'slave-09': ['contrail-analytics'],
         }
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
