@@ -309,12 +309,10 @@ Steps
     11. Verify that new IP ranges are applied for network config
     12. Add following nodes to default nodegroup:
         * 1 controller
-        * 2 contrail-config+contrail-control+contrail-db+
-          contrail-analytics
+        * 2 contrail-config+contrail-control+contrail-db+contrail-analytics
     13. Add following nodes to custom nodegroup:
         * 1 cinder
-        * 1 contrail-config+contrail-control+contrail-db+
-          contrail-analytics
+        * 1 contrail-config+contrail-control+contrail-db+contrail-analytics
     14. Deploy cluster
     15. Run health checks (OSTF)
 

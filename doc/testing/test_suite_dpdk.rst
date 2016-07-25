@@ -31,15 +31,15 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin
     3. Deploy cluster with following node configuration:
-        node-01: 'controller';
-        node-02: 'controller';
-        node-03: 'controller', 'ceph-osd';
-        node-04: 'compute', 'ceph-osd';
-        node-05: 'compute', 'ceph-osd';
-        node-07: 'contrail-db';
-        node-08: 'contrail-config';
-        node-09: 'contrail-control';
-        node-dpdk: 'compute', dpdk';
+       node-01: 'controller';
+       node-02: 'controller';
+       node-03: 'controller', 'ceph-osd';
+       node-04: 'compute', 'ceph-osd';
+       node-05: 'compute', 'ceph-osd';
+       node-07: 'contrail-db';
+       node-08: 'contrail-config';
+       node-09: 'contrail-control';
+       node-dpdk: 'compute', dpdk';
     4. Run OSTF tests
 
 
@@ -77,17 +77,16 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Deploy cluster with following node configuration:
-        node-1: 'controller', 'ceph-osd';
-        node-2: 'contrail-config', 'contrail-control',
-            'contrail-db', 'contrail-analytics';
-        node-3: 'compute', 'ceph-osd';
-        node-4: 'compute', 'ceph-osd';
-        node-dpdk: 'compute', 'dpdk';
+       node-1: 'controller', 'ceph-osd';
+       node-2: 'contrail-config', 'contrail-control', 'contrail-db', 'contrail-analytics';
+       node-3: 'compute', 'ceph-osd';
+       node-4: 'compute', 'ceph-osd';
+       node-dpdk: 'compute', 'dpdk';
     4. Run OSTF tests
     5. Add one node with following configuration:
-        node-5: "compute", "ceph-osd";
-    7. Deploy changes
-    8. Run OSTF tests
+       node-5: "compute", "ceph-osd";
+    6. Deploy changes
+    7. Run OSTF tests
 
 
 Expected results
@@ -124,12 +123,12 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Deploy cluster with following node configuration:
-        node-01: 'controller';
-        node-02: 'contrail-control', 'contrail-config', 'contrail-db', 'contrail-analytics';
-        node-03: 'contrail-db';
-        node-04: 'compute', 'cinder';
-        node-05: 'compute';
-        node-06: 'contrail-db';
+       node-01: 'controller';
+       node-02: 'contrail-control', 'contrail-config', 'contrail-db', 'contrail-analytics';
+       node-03: 'contrail-db';
+       node-04: 'compute', 'cinder';
+       node-05: 'compute';
+       node-06: 'contrail-db';
     4. Run OSTF tests
     5. Delete node-05 with "compute" role
     6. Deploy changes
@@ -170,17 +169,16 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Deploy cluster with following node configuration:
-        node-01: 'controller', 'ceph-osd';
-        node-02: 'contrail-config', 'contrail-control',
-            'contrail-db', 'contrail-analytics';
-        node-03: 'compute', 'ceph-osd';
-        node-04: 'compute', 'ceph-osd';
-        node-05: 'controller', 'cinder';
-        node-06: 'controller', 'cinder';
-    4. Run OSTF tests
-    6. Add one node with following configuration:
-        node-dpdk: "compute", "dpdk";
-    7. Deploy changes
+       node-01: 'controller', 'ceph-osd';
+       node-02: 'contrail-config', 'contrail-control', 'contrail-db', 'contrail-analytics';
+       node-03: 'compute', 'ceph-osd';
+       node-04: 'compute', 'ceph-osd';
+       node-05: 'controller', 'cinder';
+       node-06: 'controller', 'cinder';
+    4. Run OSTF tests;
+    5. Add one node with following configuration:
+       node-dpdk: "compute", "dpdk";
+    6. Deploy changes
     7. Run OSTF tests
 
 
@@ -218,12 +216,11 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Deploy cluster with following node configuration:
-        node-01: 'controller', 'ceph-osd', 'cinder';
-        node-02: 'contrail-control', 'contrail-config',
-            'contrail-db', 'contrail-analytics';
-        node-03: 'compute', 'ceph-osd';
-        node-04: 'compute', 'ceph-osd';
-        node-dpdk: 'compute', 'dpdk';
+       node-01: 'controller', 'ceph-osd', 'cinder';
+       node-02: 'contrail-control', 'contrail-config', 'contrail-db', 'contrail-analytics';
+       node-03: 'compute', 'ceph-osd';
+       node-04: 'compute', 'ceph-osd';
+       node-dpdk: 'compute', 'dpdk';
     4. Run OSTF tests
     5. Delete node "node-dpdk" with "dpdk" and "compute" roles
     6. Deploy changes
@@ -300,14 +297,13 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Deploy cluster with following node configuration:
-        node-1: 'controller', 'ceph-osd';
-        node-2: 'contrail-config', 'contrail-control',
-            'contrail-db', 'contrail-analytics';
-        node-3: 'compute', 'ceph-osd';
-        node-4: 'compute', 'ceph-osd';
+       node-1: 'controller', 'ceph-osd';
+       node-2: 'contrail-config', 'contrail-control', 'contrail-db', 'contrail-analytics';
+       node-3: 'compute', 'ceph-osd';
+       node-4: 'compute', 'ceph-osd';
     4. Run OSTF tests
     5. Add one node with following configuration:
-        node-5: 'controller', 'ceph-osd';
+       node-5: 'controller', 'ceph-osd';
     6. Deploy changes
     7. Run OSTF tests
 
@@ -346,12 +342,11 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
     2. Enable and configure Contrail plugin
     3. Deploy cluster with following node configuration:
-        node-01: 'controller';
-        node-02: 'contrail-control', 'contrail-config',
-            'contrail-db', 'contrail-analytics';
-        node-03: 'controller';
-        node-04: 'compute', 'cinder';
-        node-05: 'controller';
+       node-01: 'controller';
+       node-02: 'contrail-control', 'contrail-config', 'contrail-db', 'contrail-analytics';
+       node-03: 'controller';
+       node-04: 'compute', 'cinder';
+       node-05: 'controller';
     4. Run OSTF tests
     5. Delete node-01 with "controller" role
     6. Deploy changes
@@ -394,16 +389,13 @@ Steps
     3. Add dpdk and sriov nodes
     4. Deploy cluster with following node configuration:
        node-1: 'controller';
-       node-2: 'contrail-config', 'contrail-control',
-               'contrail-db', 'contrail-analytics';
+       node-2: 'contrail-config', 'contrail-control', 'contrail-db', 'contrail-analytics';
        node-3: 'compute', 'cinder',
     5. Deploy cluster
     6. Run OSTF
     7. Add nodes with configurations:
-       node-4: 'contrail-config', 'contrail-control',
-               'contrail-db', 'contrail-analytics';
-       node-5: 'contrail-config', 'contrail-control',
-               'contrail-db', 'contrail-analytics';
+       node-4: 'contrail-config', 'contrail-control', 'contrail-db', 'contrail-analytics';
+       node-5: 'contrail-config', 'contrail-control', 'contrail-db', 'contrail-analytics';
     8. Deploy changes
     9. Run OSTF
 

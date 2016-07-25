@@ -298,13 +298,13 @@ Steps
     3. Add some controller, compute and cinder nodes
     4. Add a node with all contrail roles
     5. Add a node with "contrail-config" role
-    5. Deploy cluster
-    6. Run OSTF tests
-    7. Check Controller and Contrail nodes status
-    8. Remove the node with "contrail-config" role
-    9. Deploy changes
-    10. Run OSTF tests
-    11. Check Controller and Contrail nodes status
+    6. Deploy cluster
+    7. Run OSTF tests
+    8. Check Controller and Contrail nodes status
+    9. Remove the node with "contrail-config" role
+    10. Deploy changes
+    11. Run OSTF tests
+    12. Check Controller and Contrail nodes status
 
 
 Expected results

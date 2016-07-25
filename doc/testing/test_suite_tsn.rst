@@ -54,3 +54,7 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors
+
+
+NOOP
+----
