@@ -24,6 +24,8 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
 from helpers.settings import CONTRAIL_PLUGIN_VERSION
 
+from tests.test_contrail_check import TestContrailCheck
+
 
 @test(groups=["plugins"])
 class FailoverTests(TestBasic):
@@ -70,6 +72,7 @@ class FailoverTests(TestBasic):
         self.show_step(5)
         task = self.fuel_web.deploy_cluster(self.cluster_id)
         self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["cannot_deploy_only_contrail_config"])
@@ -138,6 +141,7 @@ class FailoverTests(TestBasic):
         self.show_step(5)
         task = self.fuel_web.deploy_cluster(self.cluster_id)
         self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["contrail_uninstall"])

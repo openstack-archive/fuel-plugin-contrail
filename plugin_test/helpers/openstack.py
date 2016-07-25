@@ -21,6 +21,7 @@ from fuelweb_test.settings import DEPLOYMENT_MODE
 from fuelweb_test.helpers.checkers import check_repo_managment
 
 import settings
+from tests.test_contrail_check import TestContrailCheck
 
 
 def assign_net_provider(obj, **options):
@@ -130,6 +131,8 @@ def update_deploy_check(obj, nodes, delete=False, is_vsrx=True,
             ostf_params['should_fail'] = len(ostf_fail_tests)
             ostf_params['failed_test_name'] = ostf_fail_tests
         obj.fuel_web.run_ostf(cluster_id=obj.cluster_id, **ostf_params)
+
+        TestContrailCheck(obj).cloud_check(['contrail'])
 
 
 def wait_for_cluster_status(obj, cluster_id,

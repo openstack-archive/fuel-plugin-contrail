@@ -28,6 +28,7 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
 from helpers import openstack
 from helpers.settings import CONTRAIL_PLUGIN_VERSION
+from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["plugins"])
@@ -211,6 +212,7 @@ class ContrailPlugin(TestBasic):
 
         self.show_step(6)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_bvt"])
@@ -262,6 +264,7 @@ class ContrailPlugin(TestBasic):
 
         self.show_step(9)
         openstack.deploy_cluster(self)
+        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(10)
         if vsrx_setup_result:
