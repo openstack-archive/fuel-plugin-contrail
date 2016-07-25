@@ -625,19 +625,19 @@ class DPDKTests(TestBasic):
             1. Create an environment with "Neutron with tunneling segmentation"
                 as a network configuration
             2. Enable and configure Contrail plugin
-            3. Enable dpdk and sriov
-            4. Add dpdk and sriov nodes
-            5. Deploy cluster with following node configuration:
-                node-2: 'contrail-config', 'contrail-control',
-                    'contrail-db', 'contrail-analytics';
-                node-3: 'compute', 'cinder';
-                node-4: 'contrail-config', 'contrail-control',
-                    'contrail-db', 'contrail-analytics';
-                node-5: 'contrail-config', 'contrail-control',
-                    'contrail-db', 'contrail-analytics';
+            3. Add dpdk and sriov nodes
+            4. Deploy cluster with following node configuration:
+               node-1: 'controller';
+               node-2: 'contrail-config', 'contrail-control',
+                       'contrail-db', 'contrail-analytics';
+               node-3: 'compute', 'cinder',
+            5. Deploy cluster
             6. Run OSTF
-            7. Add one node with following configuration:
-                node-1: 'controller';
+            7. Add nodes with configurations:
+               node-4: 'contrail-config', 'contrail-control',
+                       'contrail-db', 'contrail-analytics';
+               node-5: 'contrail-config', 'contrail-control',
+                       'contrail-db', 'contrail-analytics';
             8. Deploy changes
             9. Run OSTF
         """
@@ -658,16 +658,17 @@ class DPDKTests(TestBasic):
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk', 'sriov'])
         conf_nodes = {
-            # node-01
+            'slave-01': ['controller'],
             'slave-02': ['contrail-config', 'contrail-control',
                          'contrail-db', 'contrail-analytics'],
             'slave-03': ['compute', 'cinder'],
+        }
+        conf_controller = {
             'slave-04': ['contrail-config', 'contrail-control',
                          'contrail-db', 'contrail-analytics'],
             'slave-05': ['contrail-config', 'contrail-control',
                          'contrail-db', 'contrail-analytics'],
         }
-        conf_controller = {'slave-01': ['controller']}
 
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
