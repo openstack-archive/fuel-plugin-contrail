@@ -96,7 +96,7 @@ class contrail::compute::vrouter {
 
     if $sriov_in_kernel {
       class { 'contrail::compute::dpdk_on_vf':
-        require => [Class[Contrail::Package],Exec['remove-ovs-modules'],
+        require => [Package[$install_packages],Exec['remove-ovs-modules'],
                     File['/etc/contrail/agent_param',
                     '/etc/contrail/contrail-vrouter-nodemgr.conf']],
       }
@@ -109,7 +109,7 @@ class contrail::compute::vrouter {
       service {'supervisor-vrouter':
         ensure  => stopped,
         enable  => false,
-        require => Class[Contrail::Package],
+        require => Package[$install_packages],
       }
     }
 
