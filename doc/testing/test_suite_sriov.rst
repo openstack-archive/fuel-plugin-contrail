@@ -35,6 +35,7 @@ Steps
     5. Deploy cluster
     6. Run OSTF tests
     7. Run contrail check tests
+    8. Run contrail health check tests
 
 
 Expected results
@@ -76,6 +77,7 @@ Steps
     6. Deploy changes
     7. Run OSTF tests
     8. Run contrail check tests
+    9. Run contrail health check tests
 
 
 Expected results
@@ -117,6 +119,7 @@ Steps
     6. Deploy changes
     7. Run OSTF tests
     8. Run contrail check tests
+    9. Run contrail health check tests
 
 
 Expected results
@@ -159,6 +162,7 @@ Steps
     6. Deploy changes
     7. Run OSTF tests
     8. Run contrail check tests
+    9. Run contrail health check tests
 
 
 Expected results
@@ -200,6 +204,7 @@ Steps
     6. Deploy changes
     7. Run OSTF tests
     8. Run contrail check tests
+    9. Run contrail health check tests
 
 
 Expected results
@@ -276,6 +281,7 @@ Steps
     5. Add a node with controller+ceph role
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail health check tests
 
 
 Expected results
@@ -316,6 +322,7 @@ Steps
     5. Delete a node with "controller" role
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail health check tests
 
 
 Expected results
