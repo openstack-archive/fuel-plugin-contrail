@@ -34,6 +34,7 @@ Steps
     4. And contrail-control, contrail-config, contrail-db and contrail-analytics nodes
     5. Deploy cluster
     6. Run OSTF tests
+    7. Run contrail check tests
 
 
 Expected results
@@ -74,6 +75,7 @@ Steps
     5. Add a node with compute+ceph roles
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -114,6 +116,7 @@ Steps
     5. Delete a node with compute role
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -155,6 +158,7 @@ Steps
     5. Add a node with compute+sriov role
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -195,6 +199,7 @@ Steps
     5. Delete a node with compute+sriov roles
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -317,3 +322,86 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors
+
+
+Contrail SRIOV boot instance
+----------------------------
+
+
+ID
+##
+
+test_sriov_boot_snapshot_vm
+
+
+Description
+###########
+
+Launch instance, create snapshot, launch instance from snapshot.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create physical network.
+    2. Create a subnet.
+    3. Create a port.
+    4. Boot the instance with the port on the SRIOV host.
+    5. Create snapshot of instance.
+    6. Delete the instance created in step 5.
+    7. Launch instance from snapshot.
+    8. Delete the instance created in step 7.
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Contrail SRIOV boot instance from volume
+----------------------------------------
+
+
+ID
+##
+
+test_sriov_volume
+
+
+Description
+###########
+
+Create volume and boot instance from it.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create physical network.
+    2. Create a subnet.
+    3. Create a port.
+    4. Create a new small-size volume from image.
+    5. Wait for volume status to become "available".
+    6. Launch instance from created volume and port on the SRIOV host.
+    7. Wait for "Active" status.
+    8. Delete instance.
+    9. Delete volume and verify that volume deleted..
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.

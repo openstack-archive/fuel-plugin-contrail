@@ -42,6 +42,7 @@ Steps
        node-09: 'contrail-analytics';
        node-dpdk: 'compute', dpdk';
     4. Run OSTF tests
+    5. Run contrail check tests
 
 
 Expected results
@@ -88,6 +89,7 @@ Steps
        node-5: "compute", "ceph-osd";
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -134,6 +136,7 @@ Steps
     5. Delete node-05 with "compute" role
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -181,6 +184,7 @@ Steps
        node-dpdk: "compute", "dpdk";
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -226,6 +230,7 @@ Steps
     5. Delete node "node-dpdk" with "dpdk" and "compute" roles
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -307,6 +312,7 @@ Steps
        node-5: 'controller', 'ceph-osd';
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -352,6 +358,7 @@ Steps
     5. Delete node-01 with "controller" role
     6. Deploy changes
     7. Run OSTF tests
+    8. Run contrail check tests
 
 
 Expected results
@@ -399,6 +406,136 @@ Steps
        node-5: 'contrail-config', 'contrail-control', 'contrail-db', 'contrail-analytics';
     8. Deploy changes
     9. Run OSTF
+    10. Run contrail check tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Contrail DPDK boot instance
+---------------------------
+
+
+ID
+##
+
+test_dpdk_boot_snapshot_vm
+
+
+Description
+###########
+
+Launch instance, create snapshot, launch instance from snapshot.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create no default network with subnet.
+    2. Get existing flavor with hpgs.
+    3. Launch an instance using the default image and flavor with hpgs
+       in the hpgs availability zone.
+    4. Make snapshot of the created instance.
+    5. Delete the last created instance.
+    6. Launch another instance from the snapshot created in step 4
+       and flavor with hpgs in the hpgs availability zone.
+    7. Delete the last created instance.
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Contrail DPDK boot instance from volume
+---------------------------------------
+
+
+ID
+##
+
+test_dpdk_volume
+
+
+Description
+###########
+
+Create volume and boot instance from it.
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create no default network with subnet.
+    2. Get existing flavor with hpgs.
+    3. Create a new small-size volume from image.
+    4. Wait for volume status to become "available".
+    5. Launch an instance using the default image and flavor with hpgs
+       in the hpgs availability zone.
+    6. Wait for "Active" status.
+    7. Delete the last created instance.
+    8. Delete volume and verify that volume deleted.
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Contrail DPDK Check network connectivity from instance via floating IP
+----------------------------------------------------------------------
+
+
+ID
+##
+
+test_dpdk_check_public_connectivity_from_instance
+
+
+Description
+###########
+
+Check network connectivity from instance via floating IP
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Create no default network with subnet.
+    2. Create Router_01, set gateway and add interface
+       to external network.
+    3. Get existing flavor with hpgs.
+    4. Create a new security group (if it doesn`t exist yet).
+    5. Launch an instance using the default image and flavor with hpgs
+       in the hpgs availability zone.
+    6. Create a new floating IP.
+    7. Assign the new floating IP to the instance.
+    8. Check connectivity to the floating IP using ping command.
+    9. Check that public IP 8.8.8.8 can be pinged from instance.
+    10. Delete instance.
 
 
 Expected results

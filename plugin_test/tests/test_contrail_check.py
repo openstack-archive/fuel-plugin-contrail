@@ -84,16 +84,16 @@ class TestContrailCheck(object):
                 results[test_name] = 'Passed'
             except Exception as exc:
                 if exc.message == 'SkipTest':
-                    logger.debug('{0} skipped.'.format(test_name))
+                    logger.info('{0} skipped.'.format(test_name))
                     results[test_name] = 'Skipped'
                 else:
-                    logger.debug('{0} failed with error {1}'.format(
+                    logger.info('{0} failed with error {1}'.format(
                         test_name, exc))
                     results[test_name] = 'Failed'
             try:
                 self._clear_openstack()
             except Exception as exc:
-                logger.debug('{0}'.format(exc))
+                logger.info('{0}'.format(exc))
         return results
 
     def _create_table_of_results(self, test_results):
@@ -116,7 +116,7 @@ class TestContrailCheck(object):
                           according bug
         """
         test_result = self._run_tests(set_tests)
-        logger.debug('{0}'.format(self._create_table_of_results(test_result)))
+        logger.info('{0}'.format(self._create_table_of_results(test_result)))
         if should_fail:
             for failed_test in should_fail:
                 test_result.pop(failed_test)
@@ -138,17 +138,17 @@ class TestContrailCheck(object):
 
     def _remove_network(self):
         """Remove network."""
-        logger.debug('Remove network.')
+        logger.info('Remove network.')
         network_id = self.os_conn.nova.networks.find(label=self.net_name).id
         if network_id:
             try:
                 self.os_conn.neutron.delete_network(network_id)
             except Exception as exc:
-                logger.debug('Network was not deleted. {0}'.format(exc))
+                logger.info('Network was not deleted. {0}'.format(exc))
 
     def _remove_subnets(self):
         """Remove subnets."""
-        logger.debug('Remove subnets.')
+        logger.info('Remove subnets.')
         subnet_ids = [
             sub['id'] for sub in self.os_conn.neutron.list_subnets()['subnets']
             if sub['name'] == self.net_name]
@@ -157,11 +157,11 @@ class TestContrailCheck(object):
                 try:
                     self.os_conn.neutron.delete_subnet(subnet_id)
                 except Exception as exc:
-                    logger.debug('Subnet was not deleted. {0}'.format(exc))
+                    logger.info('Subnet was not deleted. {0}'.format(exc))
 
     def _remove_routers(self):
         """Remove routers."""
-        logger.debug('Remove routers.')
+        logger.info('Remove routers.')
         router_ids = [
             router['id']
             for router in self.os_conn.neutron.list_routers()['routers']
@@ -178,11 +178,11 @@ class TestContrailCheck(object):
                             router, {"subnet_id": subnet_ids[0]})
                     self.os_conn.neutron.delete_router(router)
                 except Exception as exc:
-                    logger.debug('Router was not deleted. {0}'.format(exc))
+                    logger.info('Router was not deleted. {0}'.format(exc))
 
     def _remove_instances(self):
         """Remove instances."""
-        logger.debug('Remove instances.')
+        logger.info('Remove instances.')
         instances = self.os_conn.get_servers()
         if instances:
             for instance in instances:
@@ -192,11 +192,11 @@ class TestContrailCheck(object):
                         self.os_conn.verify_srv_deleted(instance),
                         "Instance was not deleted.")
                 except Exception as exc:
-                    logger.debug('Instance was not deleted. {0}'.format(exc))
+                    logger.info('Instance was not deleted. {0}'.format(exc))
 
     def _remove_security_groups(self):
         """Remove security groups."""
-        logger.debug('Remove security groups.')
+        logger.info('Remove security groups.')
         security_groups = [
             sg
             for sg
@@ -207,25 +207,25 @@ class TestContrailCheck(object):
                 try:
                     self.os_conn.nova.security_groups.delete(group['id'])
                 except Exception as exc:
-                    logger.debug(
+                    logger.info(
                         'Security group {0} was not deleted. {1}'.format(
                             group['name'], exc))
 
     def _remove_floating_ips(self):
         """Remove floatig ips."""
-        logger.debug('Remove floatig ips.')
+        logger.info('Remove floatig ips.')
         floating_ips = self.os_conn.nova.floating_ips.list()
         if floating_ips:
             for fip in floating_ips:
                 try:
                     self.os_conn.nova.floating_ips.delete(fip)
                 except Exception as exc:
-                    logger.debug('Floating ip {0} was not deleted. {1}'.format(
+                    logger.info('Floating ip {0} was not deleted. {1}'.format(
                         fip, exc))
 
     def _remove_images(self):
         """Remove images."""
-        logger.debug('Remove image.')
+        logger.info('Remove image.')
         images = [
             image for image in self.os_conn.nova.images.list()
             if image['name'] == self.image_name]
@@ -234,7 +234,7 @@ class TestContrailCheck(object):
                 try:
                     self.os_conn.nova.images.delete(image.id)
                 except Exception as exc:
-                    logger.debug('Image {0} was not deleted. {1}'.format(
+                    logger.info('Image {0} was not deleted. {1}'.format(
                         image.name, exc))
 
     def test_dpdk_boot_snapshot_vm(self):
@@ -649,5 +649,5 @@ class TestContrailCheck(object):
             nailgun_nodes)
 
         for node in devops_nodes:
-            logger.debug("Check contrail status for node {}".format(node.name))
+            logger.info("Check contrail status for node {}".format(node.name))
             check_status(node.name)
