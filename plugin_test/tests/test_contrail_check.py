@@ -279,7 +279,7 @@ class TestContrailCheck(object):
         logger.info('Make snapshot of the created instance.')
         image = self.os_conn.nova.servers.create_image(srv_1, self.image_name)
         wait(lambda: self.os_conn.nova.images.get(image).status == 'ACTIVE',
-             timeout=500, timeout_msg='Image is not active.')
+             timeout=1800, timeout_msg='Image is not active.')
 
         logger.info('Delete the last created instance.')
         self.os_conn.delete_instance(srv_1)
@@ -589,7 +589,7 @@ class TestContrailCheck(object):
             self.os_conn.delete_volume_and_wait(volume)
 
     def _verify_instance_state(self, instances=None,
-                               expected_state='ACTIVE', boot_timeout=300):
+                               expected_state='ACTIVE', boot_timeout=400):
         """Verify that current state of each instance/s is expected.
 
         :paramself.os_conn: type object, openstack
@@ -637,13 +637,15 @@ class TestContrailCheck(object):
             return True
 
         nailgun_nodes = self.obj.fuel_web.client.list_cluster_nodes(cluster_id)
-        logger.info('Nailgun nodes 1: {}'.format([n['name'] for n in nailgun_nodes]))
+        logger.info(
+            'Nailgun nodes 1: {}'.format([n['name'] for n in nailgun_nodes]))
 
         nailgun_nodes = [node for node in nailgun_nodes
                          if not node['pending_addition'] and
                          set(node['roles']) & contrail_node_roles]
 
-        logger.info('Nailgun nodes 2: {}'.format([n['name'] for n in nailgun_nodes]))
+        logger.info(
+            'Nailgun nodes 2: {}'.format([n['name'] for n in nailgun_nodes]))
 
         devops_nodes = self.obj.fuel_web.get_devops_nodes_by_nailgun_nodes(
             nailgun_nodes)

@@ -28,7 +28,6 @@ from helpers import plugin
 from tests.test_contrail_check import TestContrailCheck
 
 
-
 @test(groups=["contrail_net_template"])
 class TestNetworkTemplates(TestNetworkTemplatesBase, TestBasic):
     """TestNetworkTemplates."""

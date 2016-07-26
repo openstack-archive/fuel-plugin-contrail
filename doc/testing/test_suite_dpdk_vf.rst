@@ -43,6 +43,7 @@ Steps
        * 1 contrail-db
     4. Deploy cluster.
     5. Run OSTF tests.
+    6. Run contrail health check tests
 
 
 Expected results

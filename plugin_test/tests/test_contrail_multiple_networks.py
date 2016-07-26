@@ -41,7 +41,6 @@ from helpers import settings
 from tests.test_contrail_check import TestContrailCheck
 
 
-
 @test(groups=["contrail_multiple_networks"])
 class TestMultipleNets(TestMultipleClusterNets):
     """TestMultipleNets."""
