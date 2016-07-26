@@ -60,6 +60,7 @@ class DPDKVFTests(TestBasic):
                 * 1 contrail-db
             4. Deploy cluster.
             5. Run OSTF tests.
+            6. Run contrail health check tests
 
         Duration 120 min
 
@@ -117,6 +118,7 @@ class DPDKVFTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            self.show_step(6)
             TestContrailCheck(self).cloud_check(
                 ['dpdk', 'contrail'],
                 should_fail=[

@@ -63,6 +63,7 @@ class DPDKTests(TestBasic):
                 node-09: 'contrail-analytics';
                 node-dpdk: 'compute', dpdk';
             4. Run OSTF tests
+            5. Run contrail health check tests
 
         Duration 120 min
 
@@ -114,6 +115,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            self.show_step(5)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -138,6 +140,7 @@ class DPDKTests(TestBasic):
                 node-5: "compute", "ceph-osd";
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -206,6 +209,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -230,6 +234,7 @@ class DPDKTests(TestBasic):
             5. Delete node-05 with "compute" role
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -292,6 +297,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -317,6 +323,7 @@ class DPDKTests(TestBasic):
                 node-dpdk: "compute", "dpdk";
             7. Deploy changes
             8. Run OSTF tests
+            9. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -365,6 +372,7 @@ class DPDKTests(TestBasic):
         self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.show_step(9)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -388,6 +396,7 @@ class DPDKTests(TestBasic):
             5. Delete node "node-dpdk" with "dpdk" and "compute" roles
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -444,6 +453,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -467,6 +477,7 @@ class DPDKTests(TestBasic):
                 node-5: 'controller', 'ceph-osd';
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -534,6 +545,7 @@ class DPDKTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -557,6 +569,7 @@ class DPDKTests(TestBasic):
             5. Delete node-01 with "controller" role
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -615,6 +628,7 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -642,6 +656,8 @@ class DPDKTests(TestBasic):
                        'contrail-db', 'contrail-analytics';
             8. Deploy changes
             9. Run OSTF
+            10. Run contrail health check tests
+
         """
         plugin.show_range(self, 1, 3)
         plugin.prepare_contrail_plugin(self, slaves=5)
@@ -700,4 +716,5 @@ class DPDKTests(TestBasic):
         if vsrx_setup_result:
             self.show_step(9)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.show_step(10)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])

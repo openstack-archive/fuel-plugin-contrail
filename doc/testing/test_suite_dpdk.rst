@@ -42,7 +42,7 @@ Steps
        node-09: 'contrail-analytics';
        node-dpdk: 'compute', dpdk';
     4. Run OSTF tests
-    5. Run contrail check tests
+    5. Run contrail health check tests
 
 
 Expected results
@@ -89,7 +89,7 @@ Steps
        node-5: "compute", "ceph-osd";
     6. Deploy changes
     7. Run OSTF tests
-    8. Run contrail check tests
+    8. Run contrail health check tests
 
 
 Expected results
@@ -136,7 +136,7 @@ Steps
     5. Delete node-05 with "compute" role
     6. Deploy changes
     7. Run OSTF tests
-    8. Run contrail check tests
+    8. Run contrail health check tests
 
 
 Expected results
@@ -184,7 +184,7 @@ Steps
        node-dpdk: "compute", "dpdk";
     6. Deploy changes
     7. Run OSTF tests
-    8. Run contrail check tests
+    8. Run contrail health check tests
 
 
 Expected results
@@ -230,7 +230,7 @@ Steps
     5. Delete node "node-dpdk" with "dpdk" and "compute" roles
     6. Deploy changes
     7. Run OSTF tests
-    8. Run contrail check tests
+    8. Run contrail health check tests
 
 
 Expected results
@@ -312,7 +312,7 @@ Steps
        node-5: 'controller', 'ceph-osd';
     6. Deploy changes
     7. Run OSTF tests
-    8. Run contrail check tests
+    8. Run contrail health check tests
 
 
 Expected results
@@ -358,7 +358,7 @@ Steps
     5. Delete node-01 with "controller" role
     6. Deploy changes
     7. Run OSTF tests
-    8. Run contrail check tests
+    8. Run contrail health check tests
 
 
 Expected results
@@ -406,7 +406,7 @@ Steps
        node-5: 'contrail-config', 'contrail-control', 'contrail-db', 'contrail-analytics';
     8. Deploy changes
     9. Run OSTF
-    10. Run contrail check tests
+    10. Run contrail health check tests
 
 
 Expected results

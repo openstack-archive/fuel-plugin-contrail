@@ -63,6 +63,7 @@ class SRIOVTests(TestBasic):
                 node-09: 'contrail-analytics';
                 node-sriov: 'compute', sriov';
             4. Run OSTF tests
+            5. Run contrail health check tests
 
         Duration 120 min
 
@@ -112,6 +113,7 @@ class SRIOVTests(TestBasic):
                 test_sets=['smoke', 'sanity', 'ha'],
                 should_fail=1,
                 failed_test_name=['Instance live migration'])
+            self.show_step(5)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -137,6 +139,7 @@ class SRIOVTests(TestBasic):
                 node-6: "compute", "ceph-osd";
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -202,6 +205,7 @@ class SRIOVTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -225,6 +229,7 @@ class SRIOVTests(TestBasic):
             5. Delete node-04 with "compute" role
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -284,6 +289,7 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -308,6 +314,7 @@ class SRIOVTests(TestBasic):
                 node-5: "controller", "ceph-osd";
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -375,6 +382,7 @@ class SRIOVTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -398,6 +406,7 @@ class SRIOVTests(TestBasic):
             5. Delete node-04 with "controller" role
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -454,6 +463,7 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -477,6 +487,7 @@ class SRIOVTests(TestBasic):
                 node-bm: "compute", "sriov";
             7. Deploy changes
             8. Run OSTF tests
+            9. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -520,6 +531,7 @@ class SRIOVTests(TestBasic):
         self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.show_step(9)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -549,6 +561,7 @@ class SRIOVTests(TestBasic):
             5. Delete node-bm with "sriov" and "compute" roles
             6. Deploy changes
             7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -614,4 +627,5 @@ class SRIOVTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
