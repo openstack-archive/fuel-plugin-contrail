@@ -637,13 +637,15 @@ class TestContrailCheck(object):
             return True
 
         nailgun_nodes = self.obj.fuel_web.client.list_cluster_nodes(cluster_id)
-        logger.info('Nailgun nodes 1: {}'.format([n['name'] for n in nailgun_nodes]))
+        logger.info(
+            'Nailgun nodes 1: {}'.format([n['name'] for n in nailgun_nodes]))
 
         nailgun_nodes = [node for node in nailgun_nodes
                          if not node['pending_addition'] and
                          set(node['roles']) & contrail_node_roles]
 
-        logger.info('Nailgun nodes 2: {}'.format([n['name'] for n in nailgun_nodes]))
+        logger.info(
+            'Nailgun nodes 2: {}'.format([n['name'] for n in nailgun_nodes]))
 
         devops_nodes = self.obj.fuel_web.get_devops_nodes_by_nailgun_nodes(
             nailgun_nodes)

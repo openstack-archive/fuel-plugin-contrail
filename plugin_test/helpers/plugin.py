@@ -230,7 +230,6 @@ def vsrx_multiple_networks(obj, vsrx_ip='10.109.4.250', net_name='private2'):
 
 def upload_vsrx_config(obj, config_path, vsrx_ip='10.109.4.250'):
     """Upload and commit configuration for VSRX."""
-
     commands = [
         'cli', 'configure',
         'load override {0}'.format(config_path.split('/').pop()),
