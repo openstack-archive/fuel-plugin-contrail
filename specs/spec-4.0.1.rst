@@ -287,143 +287,6 @@ Requirements
 
 None
 
-DPDK-based vRouter on virtual function (VF)
-===========================================
-
-Problem description
--------------------
-
-DPDK (Data Plane Development Kit) allows access to the hardware directly from
-applications by passing Linux networking stack (binding interface will not be
-seen by the kernel). This reduces latency and allows more packets to be processed.
-However, it has many `limitations <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_
-and many features that Linux provides are not available with DPDK. Binding interface is not
-seen by the kernel and accordingly - the user can't reuse it. For environment with complex network
-schema or on servers with low amount of network interfaces it can be significant disadvantage.
-
-Proposed solution
------------------
-
-Instead of whole interface use the Virtual Function as a target for DPDK-based
-vRouter. This will allow to use same hardware adapter as used for DPDK-based vRouter for other purposes.
-
-UI impact
----------
-Checkbox in DPDK section of contrail settings. It will be disabled by default.
-Also DPDK and SRIOV roles need to be assigned on node to enable this feature
-(more details will be described in documentation).
-
-Performance impact
-------------------
-
-No additional impact compared to the main DPDK feature.
-
-Documentation Impact
---------------------
-
-User guide should be updated with information about usage of this feature.
-
-Upgrade impact
---------------
-
-None
-
-Data model impact
------------------
-
-None
-
-Other end user impact
----------------------
-
-None
-
-Security impact
----------------
-
-None
-
-Notifications impact
---------------------
-
-None
-
-Requirements
-------------
-
-None
-
-Enable HTTPS for public Contrail endpoints
-==========================================
-
-Problem description
--------------------
-
-OpenStack and Contrail services receive requests from public networks that are untrusted area.
-As the network path between the end-users and the services is untrusted, encryption is required to
-ensure confidentiality. This can be achieved by implementing Secure Sockets Layer as recommended in
-the OpenStack security guide.
-
-Proposed solution
------------------
-
-Fuel can configure secure access for public-facing OpenStack services such as Nova API and Horizon
-by configuring Haproxy to recieve SSL connections as described in [2].
-However, Contrail configuration API has no encryption enabled, but is exposed on public endpoint.
-Contrail Web UI has SSL enabled, but uses self-signed certificate by default.
-Fuel Contrail plugin should inherit SSL/TLS settings from Fuel UI configuration and configure
-encrypted public endpoints for Contrail API and Contrail Web UI using the hostname and cerificate
-shared with Horizon.
-
-UI impact
----------
-
-There are no changes in plugin settings tab.
-
-Performance impact
-------------------
-
-The SSL-overhead is generally small. The major cost of HTTPS is the SSL handshaking so depending the
-typical session length and the caching behavior of clients the overhead may be different. For very
-short sessions you can see performance issue.
-
-Documentation Impact
---------------------
-
-None
-
-Upgrade impact
---------------
-
-None
-
-Data model impact
------------------
-
-None
-
-Other end user impact
----------------------
-
-None
-
-Security impact
----------------
-
-Using encrypted connections to Contrail API via public network and using Horizon certificate for
-Contrail Web UI improves the confidentiality and security.
-
-Notifications impact
---------------------
-
-None
-
-Requirements
-------------
-
-None
-
-
 DPDK-based vRouter feature
 ==========================
 
@@ -505,6 +368,221 @@ Requirements
 Network card on Computes which are selected to use DPDK, should support DPDK.
 _`List of supported NICs <http://dpdk.org/doc/nics>`
 
+Enable SRIOV for Contrail
+=========================
+
+Problem description
+-------------------
+
+The PCI-SIG Single Root I/O Virtualization and Sharing (SR-IOV) specification
+defines a standardized mechanism to create natively shared devices providing dedicated
+resources within the Ethernet controller (Physical Function) via Virtual Functions.
+Contrail supports SRV-IOV starting from version 3.0, so the Fuel Contrail plugin should
+also support this feature.
+
+Proposed solution
+-----------------
+
+To select the compute nodes with SR-IOV enabled, a plugin-defined role will be added.
+The NICs on hosts carrying this role will be configured to use the maximum number of VFs
+supported on the particular system. The network cards for SR-IOV are selected to satisfy
+such conditions:
+- NIC supports SR-IOV
+- NIC is not a part of any bond, bridge and is not used with vRouter
+- link state is up
+The list of PCI IDs of SR-IOV NICs will be added to pci_passthrough_whitelist on compute nodes,
+PciPassthroughFilter will be enabled on controllers.
+
+UI impact
+---------
+
+SR-IOV compute role should be present in list of node roles.
+Plugin settings should have a checkbox that enables SR-IOV globally.
+
+Performance impact
+------------------
+
+SR-IOV makes it possible to run a large number of VMs with high network load per compute host
+without increasing the number of physical NICs, off-loading the hypervisor and significantly improving
+both throughput and gaining deterministic network performance.
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information on how to enable SR-IOV
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+A new role with name 'SR-IOV' will be available for assigning to
+computes in nodes tab of the Fuel Web UI.
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+Compute nodes are expected to be equipped with network cards cappable of SR-IOV,
+SR-IOV must be enabled in BIOS settings.
+
+DPDK-based vRouter on virtual function (VF)
+===========================================
+
+Problem description
+-------------------
+
+DPDK (Data Plane Development Kit) allows access to the hardware directly from
+applications by passing Linux networking stack (binding interface will not be
+seen by the kernel). This reduces latency and allows more packets to be processed.
+However, it has many `limitations <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_
+and many features that Linux provides are not available with DPDK. Binding interface is not
+seen by the kernel and accordingly - the user can't reuse it. For environment with complex network
+schema or on servers with low amount of network interfaces it can be significant disadvantage.
+
+Proposed solution
+-----------------
+
+Instead of whole interface use the Virtual Function as a target for DPDK-based
+vRouter. This will allow to use same hardware adapter as used for DPDK-based vRouter for other purposes.
+
+UI impact
+---------
+Checkbox in DPDK section of contrail settings. It will be disabled by default.
+Also DPDK and SRIOV roles need to be assigned on node to enable this feature
+(more details will be described in documentation).
+
+Performance impact
+------------------
+
+No additional impact compared to the main DPDK feature.
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information about usage of this feature.
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
+
+Enable HTTPS for public Contrail endpoints
+==========================================
+
+Problem description
+-------------------
+
+OpenStack and Contrail services receive requests from public networks that are untrusted area.
+As the network path between the end-users and the services is untrusted, encryption is required to
+ensure confidentiality. This can be achieved by implementing Secure Sockets Layer as recommended in
+the OpenStack security guide.
+
+Proposed solution
+-----------------
+
+Fuel can configure secure access for public-facing OpenStack services such as Nova API and Horizon
+by configuring Haproxy to recieve SSL connections as described in [2].
+However, Contrail configuration API has no encryption enabled, but is exposed on public endpoint.
+Contrail Web UI has SSL enabled, but uses self-signed certificate by default.
+Fuel Contrail plugin should inherit SSL/TLS settings from Fuel UI configuration and configure
+encrypted public endpoints for Contrail API and Contrail Web UI using the hostname and cerificate
+shared with Horizon.
+
+UI impact
+---------
+
+There are no changes in plugin settings tab.
+
+Performance impact
+------------------
+
+The SSL-overhead is generally small. The major cost of HTTPS is the SSL handshaking so depending the
+typical session length and the caching behavior of clients the overhead may be different. For very
+short sessions you can see performance issue.
+
+Documentation Impact
+--------------------
+
+None
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+Using encrypted connections to Contrail API via public network and using Horizon certificate for
+Contrail Web UI improves the confidentiality and security.
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
+
+
+
 
 Implementation
 ==============
@@ -549,6 +627,7 @@ Work items
  - Update the manifests to use ssl settings for haproxy
  - Add checkbox to environment config
  - Make network provisioning conditional
+ - Add checkbox for SR-IOV feature
  - Add checkbox for DPDK on VF feature
  - Add additional puppet class that will enable DPDK on VF feature on compute nodes
  - Ensure idempotency of DPDK on VF feature in puppet code.
