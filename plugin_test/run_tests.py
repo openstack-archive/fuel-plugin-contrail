@@ -54,7 +54,6 @@ def import_tests():
     from tests import test_smoke_bvt  # noqa
     from tests import test_integration  # noqa
     from tests import test_functional  # noqa
-    from tests import test_network_templates  # noqa
     from tests import test_failover  # noqa
     from tests import test_system  # noqa
     from tests import test_dpdk  # noqa

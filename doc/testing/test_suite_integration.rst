@@ -377,53 +377,6 @@ Expected results
 All steps must be completed successfully, without any errors.
 
 
-Deploy cluster with Contrail plugin and network template
---------------------------------------------------------
-
-
-ID
-##
-
-contrail_net_template
-
-
-Description
-###########
-
-Deploy cluster with Contrail plugin and network template
-
-
-Complexity
-##########
-
-Core
-
-
-Steps
-#####
-
-    1. Configure interfaces
-    2. Next we need to set gateway for private network with Fuel CLI:
-       * Login with ssh to Fuel master node.
-       * List existing network-groups
-       fuel network-group --env 1
-    3. Remove and create again network-group private to set a gateway
-       fuel network-group --delete --network 5
-       fuel network-group --create --name private --cidr 10.109.3.0/24 --gateway 10.109.3.1 --nodegroup 1
-    4. Set the render_addr_mask parameter to internal for this network by typing:
-       fuel network-group --set --network 6 --meta '{"name": "private", "notation": "cidr", "render_type": null, "map_priority": 2, "configurable": true, "use_gateway": true, "render_addr_mask": "internal", "vlan_start": null, "cidr": "10.109.3.0/24"}'
-    5. Save sample :download:
-       network template<examples/network_template_1.yaml>
-    6. Upload the network template by typing:
-       fuel --env 1 network-template --upload --dir /root/
-    7. Start deploy, pressing "Deploy changes" button.
-
-Expected results
-################
-
-All steps must be completed successfully, without any errors.
-
-
 Check updating core repos with Contrail plugin
 ----------------------------------------------
 
