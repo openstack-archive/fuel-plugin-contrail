@@ -615,6 +615,10 @@ Expected results
 All steps must be completed successfully, without any errors.
 
 
+Verify that we can disable OSTF networks provisioning
+-----------------------------------------------------
+
+
 ID
 ##
 
@@ -624,7 +628,7 @@ contrail_ostf_net_provisioning_disable
 Description
 ###########
 
-Verify that we can disable OSTF networks provisioning
+Verify that we can deploy environment with disabled OSTF networks provisioning 
 
 
 Complexity
