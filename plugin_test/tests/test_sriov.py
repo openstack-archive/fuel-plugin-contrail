@@ -42,7 +42,7 @@ class SRIOVTests(TestBasic):
     bm_drv = baremetal.BMDriver()
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_ha_sriov"])
+          groups=["contrail_ha_sriov", "contrail_sriov_tests"])
     @log_snapshot_after_test
     def contrail_ha_sriov(self):
         """Check Contrail deploy on HA environment.
@@ -115,7 +115,7 @@ class SRIOVTests(TestBasic):
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_sriov_add_compute"])
+          groups=["contrail_sriov_add_compute", "contrail_sriov_tests"])
     @log_snapshot_after_test
     def contrail_sriov_add_compute(self):
         """Verify that Contrail compute role can be added after deploying.
@@ -205,7 +205,7 @@ class SRIOVTests(TestBasic):
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_sriov_delete_compute"])
+          groups=["contrail_sriov_delete_compute", "contrail_sriov_tests"])
     @log_snapshot_after_test
     def contrail_sriov_delete_compute(self):
         """Verify that Contrail compute role can be deleted after deploying.
@@ -287,7 +287,7 @@ class SRIOVTests(TestBasic):
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_sriov_add_controller"])
+          groups=["contrail_sriov_add_controller", "contrail_sriov_tests"])
     @log_snapshot_after_test
     def contrail_sriov_add_controller(self):
         """Verify that Contrail controller role can be added after deploying.
@@ -378,7 +378,7 @@ class SRIOVTests(TestBasic):
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_sriov_delete_controller"])
+          groups=["contrail_sriov_delete_controller", "contrail_sriov_tests"])
     @log_snapshot_after_test
     def contrail_sriov_delete_controller(self):
         """Verify that Contrail controller role can be deleted after deploying.
@@ -457,7 +457,7 @@ class SRIOVTests(TestBasic):
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_sriov_add_sriov"])
+          groups=["contrail_sriov_add_sriov", "contrail_sriov_tests"])
     @log_snapshot_after_test
     def contrail_sriov_add_sriov(self):
         """Verify that SRiOV role can be added after deploying.
@@ -523,7 +523,7 @@ class SRIOVTests(TestBasic):
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_sriov_delete_sriov"])
+          groups=["contrail_sriov_delete_sriov", "contrail_sriov_tests"])
     @log_snapshot_after_test
     def contrail_sriov_delete_sriov(self):
         """Verify that SRiOV role can be deleted after deploying.
