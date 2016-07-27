@@ -216,6 +216,66 @@ Requirements
 
 None
 
+
+DPDK-based vRouter on virtual function (VF)
+======================================
+
+Problem description
+-------------------
+
+DPDK (Data Plane Development Kit) allows access to the hardware directly from applications, bypassing the Linux networking stack (binding interface will not be seen by the kernel). This reduces latency and allows more packets to be processed. However, it has many `limitations <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_ and many features that Linux provides are not available with DPDK.
+
+Proposed solution
+-----------------
+
+Instead of hole interface use the Virtual Function as a target for DPDK-based vRouter. This will allow to use same hardware adapter as used for DPDK-based vRouter for other purposes.
+
+UI impact
+---------
+Checkbox in DPDK section of contrail settings. It will be disabled by default.
+
+Performance impact
+------------------
+
+No additional impact compared to the main DPDK feature.
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information about usage of this feature.
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
+
+
 Implementation
 ==============
 
@@ -249,6 +309,9 @@ Work items
  - Add python-memcache package to manifests for 'contrail-config' role and adjust the contrail-keystone configuration with memcached server IPs
  - Add checkbox to environment config
  - Make network provisioning conditional
+ - Add checkbox for DPDK on VF feature
+ - Add additional puppet class that will enable DPDK on VF feature on compute nodes
+ - Ensure idempotency of DPDK on VF feature in puppet code.
 
 * Testing
 
