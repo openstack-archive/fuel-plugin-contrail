@@ -24,8 +24,6 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
 from helpers.settings import CONTRAIL_PLUGIN_VERSION
 
-from tests.test_contrail_check import TestContrailCheck
-
 
 @test(groups=["plugins"])
 class FailoverTests(TestBasic):
@@ -38,110 +36,6 @@ class FailoverTests(TestBasic):
     cluster_id = ''
     pack_path = CONTRAIL_PLUGIN_PACK_UB_PATH
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
-
-    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
-          groups=["cannot_deploy_only_contrail_db"])
-    @log_snapshot_after_test
-    def cannot_deploy_only_contrail_db(self):
-        """Check can not deploy Contrail cluster with "contrail_db" only.
-
-        Scenario:
-            1. Create an environment with
-               "Neutron with tunneling segmentation"
-               as a network configuration
-            2. Enable and configure Contrail plugin
-            3. Add 1 node with "Controller" and 1 node with "Compute" role
-            4. Add 1 nodes with "contrail-db" role
-            5. Deploy cluster and verify that it will fail
-        """
-        self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=3)
-
-        self.show_step(2)
-        plugin.activate_plugin(self)
-
-        plugin.show_range(self, 3, 5)
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
-                'slave-01': ['controller'],
-                'slave-02': ['compute'],
-                'slave-03': ['contrail-db']
-            })
-
-        self.show_step(5)
-        task = self.fuel_web.deploy_cluster(self.cluster_id)
-        self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
-        TestContrailCheck(self).cloud_check(['contrail'])
-
-    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
-          groups=["cannot_deploy_only_contrail_config"])
-    @log_snapshot_after_test
-    def cannot_deploy_only_contrail_config(self):
-        """Check can not deploy Contrail cluster with "contrail_config" only.
-
-        Scenario:
-            1. Create an environment with
-               "Neutron with tunneling segmentation"
-               as a network configuration
-            2. Enable and configure Contrail plugin
-            3. Add 1 node with "Controller" and 1 node with "Compute" role
-            4. Add 1 nodes with "contrail-config" role
-            5. Deploy cluster and verify that it will fail
-        """
-        self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=3)
-
-        self.show_step(2)
-        plugin.activate_plugin(self)
-
-        plugin.show_range(self, 3, 5)
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
-                'slave-01': ['controller'],
-                'slave-02': ['compute'],
-                'slave-03': ['contrail-config']
-            })
-
-        self.show_step(5)
-        task = self.fuel_web.deploy_cluster(self.cluster_id)
-        self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
-
-    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
-          groups=["cannot_deploy_only_contrail_control"])
-    @log_snapshot_after_test
-    def cannot_deploy_only_contrail_control(self):
-        """Check can not deploy Contrail cluster with "contrail_control" only.
-
-        Scenario:
-            1. Create an environment with
-               "Neutron with tunneling segmentation"
-               as a network configuration
-            2. Enable and configure Contrail plugin
-            3. Add 1 node with "Controller" and 1 node with "Compute" role
-            4. Add 1 nodes with "contrail-control" role
-            5. Deploy cluster and verify that it will fail
-        """
-        self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=3)
-
-        self.show_step(2)
-        plugin.activate_plugin(self)
-
-        plugin.show_range(self, 3, 5)
-        self.fuel_web.update_nodes(
-            self.cluster_id,
-            {
-                'slave-01': ['controller'],
-                'slave-02': ['compute'],
-                'slave-03': ['contrail-control']
-            })
-
-        self.show_step(5)
-        task = self.fuel_web.deploy_cluster(self.cluster_id)
-        self.fuel_web.assert_task_failed(task, timeout=130 * 60, interval=30)
-        TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["contrail_uninstall"])
