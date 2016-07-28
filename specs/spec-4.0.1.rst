@@ -89,7 +89,6 @@ There is no additional disk space requirements for this role, as analytics
 services store the data in Cassandra database.
 
 
-
 Enable memcache support for contrail keystone middleware
 ========================================================
 
@@ -138,6 +137,70 @@ Other end user impact
 ---------------------
 
 None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
+Add TOR/TSN functionality to Contrail Plugin
+============================================
+
+Problem description
+-------------------
+
+Plugin needs to have TSN/TOR functionality.
+
+Proposed solution
+-----------------
+
+Provide new node role in fuel: Tor Services Node (TSN). This host
+will configure TSN services, and agent to comunicate with TOR switches.
+Users will provide all information in settings tab, and based on this we will
+configure TOR agents - one per TOR provided by user.
+
+
+UI impact
+---------
+
+additional node role for TSN, checkbox for TSN functionality in settings, textfield in settings
+for providing TOR informations.
+
+Performance impact
+------------------
+
+None
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information on new node role.
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+A new role with name 'contrail-tsn' will be available for assigning to
+slaves in nodes tab of Fuel Web UI.
 
 Security impact
 ---------------
