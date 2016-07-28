@@ -89,7 +89,6 @@ There is no additional disk space requirements for this role, as analytics
 services store the data in Cassandra database.
 
 
-
 Enable memcache support for contrail keystone middleware
 ========================================================
 
@@ -140,6 +139,76 @@ Other end user impact
 ---------------------
 
 None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
+Add TOR/TSN functionality to Contrail Plugin
+============================================
+
+Problem description
+-------------------
+
+Contrail provides ability of extending a cluster to include bare metal servers and other virtual
+instances connected to a top-of-rack (TOR) switch that supports the Open vSwitch Database Management
+(OVSDB) Protocol. The bare metal servers and other virtual instances can belong to any of the
+virtual networks configured in the Contrail cluster, facilitating communication with the virtual
+instances running in the cluster. Contrail policy configurations can be used to control this
+communication.
+User need to have ability to configure ToR service node and ToR agents by plugin.
+
+Proposed solution
+-----------------
+
+Provide new node role in fuel: ToR Services Node (TSN). This host will configure TSN services and
+agent to comunicate with ToR switches. Users will provide all information in settings tab, and based
+on this plugin will configure ToR agents - one per ToR switch provided by user.
+TSN node role should be standalone and incompatible  with following roles: contrail-analytics,
+contrail-control, contrail-config, contrail-db, controller, compute, ceph-osd, cinder
+
+UI impact
+---------
+
+Additional node role for TSN, checkbox for TSN functionality in settings, textfield in settings
+for providing TOR informations. TOR settings have to be provided in YAML format.
+
+Performance impact
+------------------
+
+None
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information on new node role.
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+A new role with name 'contrail-tsn' will be available for assigning to
+slaves in nodes tab of Fuel Web UI.
 
 Security impact
 ---------------
