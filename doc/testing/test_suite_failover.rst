@@ -77,161 +77,20 @@ Expected results
 Ping should get a response.
 
 
-Check can not deploy Contrail cluster with  "contrail_db" only
---------------------------------------------------------------
+Uninstall of plugin with environment
+------------------------------------
 
 
 ID
 ##
 
-cannot_deploy_only_contrail_db
+contrail_uninstall
 
 
 Description
 ###########
 
-Check can not deploy Contrail cluster with  "contrail_db" only
-
-
-Complexity
-##########
-
-advanced
-
-
-Steps
-#####
-
-    1. Log into the Fuel web UI
-    2. Press "New OpenStack Environment"
-    3. Specify Environment name as test
-    4. Set QEMU or KVM as compute
-    5. Select "Neutron with tunneling segmentation" as a network configuration
-    6. Set "default" glance and cinder
-    7. Do not use any additional services
-    8. Press "Create"
-    9. Open the Settings tab of the Fuel web UI
-    10. Select the Contrail plugin checkbox and configure plugin settings
-    11. Configure network
-    12. Add 1 nodes with "contrail-db" role
-    13. Add 1 node with "Controller" and 1 node with "Compute" role
-    14. Start deploy
-
-
-Expected results
-################
-
-Deploy must failed
-
-
-Check can not deploy Contrail cluster with  "contrail_config" only
-------------------------------------------------------------------
-
-
-ID
-##
-
-cannot_deploy_only_contrail_config
-
-
-Description
-###########
-
-Check can not deploy Contrail cluster with  "contrail_config" only
-
-
-Complexity
-##########
-
-advanced
-
-
-Steps
-#####
-
-    1. Log into the Fuel web UI
-    2. Press "New OpenStack Environment"
-    3. Specify Environment name as test
-    4. Set QEMU or KVM as compute
-    5. Select "Neutron with tunneling segmentation" as a network configuration
-    6. Set "default" glance and cinder
-    7. Do not use any additional services
-    8. Press "Create"
-    9. Open the Settings tab of the Fuel web UI
-    10. Select the Contrail plugin checkbox and configure plugin settings
-    11. Configure network
-    12. Add 1 nodes with "contrail-config" role
-    13. Add 1 node with "Controller" and 1 node with "Compute" role
-    14. Start deploy
-
-
-Expected results
-################
-
-Deploy must failed
-
-
-Check can not deploy Contrail cluster with  "contrail_control" only
--------------------------------------------------------------------
-
-
-ID
-##
-
-cannot_deploy_only_contrail_control
-
-
-Description
-###########
-
-Check can not deploy Contrail cluster with  "contrail_control" only
-
-
-Complexity
-##########
-
-advanced
-
-
-Steps
-#####
-
-    1. Log into the Fuel web UI
-    2. Press "New OpenStack Environment"
-    3. Specify Environment name as test
-    4. Set QEMU or KVM as compute
-    5. Select "Neutron with tunneling segmentation" as a network configuration
-    6. Set "default" glance and cinder
-    7. Do not use any additional services
-    8. Press "Create"
-    9. Open the Settings tab of the Fuel web UI
-    10. Select the Contrail plugin checkbox and configure plugin settings
-    11. Configure network
-    12. Add 1 nodes with "contrail-control" role
-    13. Add 1 node with "Controller" and 1 node with "Compute" role
-    14. Start deploy
-
-
-Expected results
-################
-
-Deploy must failed
-
-
-Uninstall of plugin with deployed environment
----------------------------------------------
-
-
-ID
-##
-
-uninstall_contrail_plugin_with_deployed_environment
-
-
-Description
-###########
-
-Uninstall of plugin with deployed environment
+Uninstall of plugin with environment
 
 
 Complexity
