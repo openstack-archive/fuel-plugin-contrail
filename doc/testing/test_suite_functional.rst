@@ -355,41 +355,6 @@ Expected results
 All steps must be completed successfully, without any errors.
 
 
-Uninstall of plugin
--------------------
-
-
-ID
-##
-
-uninstall_contrail_plugin
-
-
-Description
-###########
-
-Uninstall of plugin
-
-
-Complexity
-##########
-
-Core
-
-
-Steps
-#####
-
-    1. Remove plugin: fuel plugins --remove <fuel-plugin-name>==<fuel-plugin-version>
-    2. Check that it was removed successfully: fuel plugins
-
-
-Expected results
-################
-
-Contrail plugin was removed successfully
-
-
 Check that a Compute node can be deleted and added again with CephOSD
 ---------------------------------------------------------------------
 
@@ -628,7 +593,7 @@ contrail_ostf_net_provisioning_disable
 Description
 ###########
 
-Verify that we can deploy environment with disabled OSTF networks provisioning 
+Verify that we can deploy environment with disabled OSTF networks provisioning
 
 
 Complexity
