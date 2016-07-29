@@ -18,7 +18,7 @@
   requires: [deploy_start, primary-contrail-db]
   parameters:
     strategy:
-      type: parallel
+      type: one_by_one
 #
 # Contrail - Config
 - id: primary-contrail-config
