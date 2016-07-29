@@ -59,20 +59,6 @@
     strategy:
       type: parallel
 #
-# Group for post-deployment tasks
-- id: contrail-post-deploy
-  type: group
-  role: [primary-contrail-db, contrail-db,
-    primary-contrail-config,contrail-config,
-    primary-contrail-control,contrail-control]
-  tasks: [configure_default_route, dns-client, ntp-client]
-  required_for: [post_deployment_end]
-  requires: [post_deployment_start]
-  parameters:
-    strategy:
-      type: parallel
-
-#
 # Compute dpdk feature
 - id: dpdk
   type: group
@@ -229,6 +215,48 @@
     puppet_manifest: puppet/manifests/contrail-db-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+
+# Configure default route on contrail nodes
+- id: contrail-default-route
+  type: puppet
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  requires: [post_deployment_start]
+  required_for: [contrail-dns-client]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/configure_default_route.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
+
+# Configure resolver on contrail nodes
+- id: contrail-dns-client
+  type: puppet
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  requires: [contrail-default-route]
+  required_for: [contrail-ntp-client]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/dns/dns-client.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
+
+# Configure ntp client on contrail nodes
+- id: contrail-ntp-client
+  type: puppet
+  role: [primary-contrail-db, contrail-db,
+    primary-contrail-config,contrail-config,
+    primary-contrail-control,contrail-control]
+  requires: [contrail-dns-client]
+  required_for: [post_deployment_end]
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/ntp/ntp-client.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 3600
+    cwd: /
 
 # Create overrides for Hiera on Controllers: empty predefined_nets
 - id: controller-hiera-pre
