@@ -408,7 +408,7 @@
   parameters:
     puppet_manifest: puppet/manifests/contrail-controller-aggregate.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 120
+    timeout: 360
 
 # Create overrides for Hiera on Controllers: contrail-specific predefined_nets
 - id: controller-hiera-post
