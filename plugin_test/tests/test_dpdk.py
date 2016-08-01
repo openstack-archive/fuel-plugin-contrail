@@ -319,6 +319,7 @@ class DPDKTests(TestBasic):
                 node-05: 'controller', 'cinder';
                 node-06: 'controller', 'cinder';
             4. Run OSTF tests
+            5. Run contrail health check tests
             6. Add one node with following configuration:
                 node-dpdk: "compute", "dpdk";
             7. Deploy changes
@@ -337,7 +338,7 @@ class DPDKTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 5)
+        self.show_step(3)
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
@@ -357,10 +358,12 @@ class DPDKTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
+        self.show_step(4)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
-            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
+            self.show_step(5)
+            TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
@@ -393,10 +396,11 @@ class DPDKTests(TestBasic):
                 node-04: 'compute', 'ceph-osd';
                 node-dpdk: 'compute', 'dpdk';
             4. Run OSTF tests
-            5. Delete node "node-dpdk" with "dpdk" and "compute" roles
-            6. Deploy changes
-            7. Run OSTF tests
-            8. Run contrail health check tests
+            5. Run contrail health check tests
+            6. Delete node "node-dpdk" with "dpdk" and "compute" roles
+            7. Deploy changes
+            8. Run OSTF tests
+            9. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -410,7 +414,7 @@ class DPDKTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 4)
+        self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
@@ -432,20 +436,22 @@ class DPDKTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
+        self.show_step(4)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.show_step(5)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
-        self.show_step(5)
+        self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'],
                                     pending_deletion=True,
                                     pending_addition=False)
-        self.show_step(6)
+        self.show_step(7)
         openstack.deploy_cluster(self)
 
-        self.show_step(7)
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity'],
@@ -453,8 +459,8 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            self.show_step(8)
-            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
+            self.show_step(9)
+            TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_controller", "contrail_dpdk_tests"])
