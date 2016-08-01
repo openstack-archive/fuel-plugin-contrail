@@ -179,12 +179,13 @@ Steps
        node-04: 'compute', 'ceph-osd';
        node-05: 'controller', 'cinder';
        node-06: 'controller', 'cinder';
-    4. Run OSTF tests;
-    5. Add one node with following configuration:
+    4. Run OSTF tests
+    5. Run contrail health check tests
+    6. Add one node with following configuration:
        node-dpdk: "compute", "dpdk";
-    6. Deploy changes
-    7. Run OSTF tests
-    8. Run contrail health check tests
+    7. Deploy changes
+    8. Run OSTF tests
+    9. Run contrail health check tests
 
 
 Expected results
@@ -227,11 +228,11 @@ Steps
        node-04: 'compute', 'ceph-osd';
        node-dpdk: 'compute', 'dpdk';
     4. Run OSTF tests
-    5. Delete node "node-dpdk" with "dpdk" and "compute" roles
-    6. Deploy changes
-    7. Run OSTF tests
-    8. Run contrail health check tests
-
+    5. Run contrail health check tests
+    6. Delete node "node-dpdk" with "dpdk" and "compute" roles
+    7. Deploy changes
+    8. Run OSTF tests
+    9. Run contrail health check tests
 
 Expected results
 ################

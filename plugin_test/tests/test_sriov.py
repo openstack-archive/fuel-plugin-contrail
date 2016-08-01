@@ -483,6 +483,7 @@ class SRIOVTests(TestBasic):
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'compute', 'ceph-osd';
             4. Run OSTF tests
+            5. Run contrail health check tests
             6. Add one node with following configuration:
                 node-bm: "compute", "sriov";
             7. Deploy changes
@@ -519,7 +520,7 @@ class SRIOVTests(TestBasic):
         # Run OSTF tests
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
+            TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
@@ -558,10 +559,11 @@ class SRIOVTests(TestBasic):
                 node-08: 'compute';
                 node-bm: 'compute', 'sriov';
             4. Run OSTF tests
-            5. Delete node-bm with "sriov" and "compute" roles
-            6. Deploy changes
-            7. Run OSTF tests
-            8. Run contrail health check tests
+            5. Run contrail health check tests
+            6. Delete node-bm with "sriov" and "compute" roles
+            7. Deploy changes
+            8. Run OSTF tests
+            9. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -609,23 +611,24 @@ class SRIOVTests(TestBasic):
         self.show_step(4)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.show_step(5)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
-        self.show_step(5)
+        self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'sriov'],
                                     pending_deletion=True,
                                     pending_addition=False)
-        self.show_step(6)
+        self.show_step(7)
         openstack.deploy_cluster(self)
 
-        self.show_step(7)
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    should_fail=1,
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            self.show_step(8)
-            TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
+            self.show_step(9)
+            TestContrailCheck(self).cloud_check(['contrail'])
