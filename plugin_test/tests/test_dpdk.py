@@ -360,7 +360,6 @@ class DPDKTests(TestBasic):
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
-            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
@@ -393,10 +392,10 @@ class DPDKTests(TestBasic):
                 node-04: 'compute', 'ceph-osd';
                 node-dpdk: 'compute', 'dpdk';
             4. Run OSTF tests
-            5. Delete node "node-dpdk" with "dpdk" and "compute" roles
-            6. Deploy changes
-            7. Run OSTF tests
-            8. Run contrail health check tests
+            5. Run contrail health check tests
+            6. Delete node "node-dpdk" with "dpdk" and "compute" roles
+            7. Deploy changes
+            8. Run OSTF tests
 
         """
         self.show_step(1)
@@ -453,8 +452,6 @@ class DPDKTests(TestBasic):
                                    failed_test_name=['Check that required '
                                                      'services are running']
                                    )
-            self.show_step(8)
-            TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_add_controller", "contrail_dpdk_tests"])

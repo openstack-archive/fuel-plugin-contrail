@@ -200,11 +200,11 @@ Steps
     2. Enable and configure Contrail plugin
     3. Deploy cluster with some controller, controller+cinder, compute+cinder, compute+sriov and contrail-specified nodes
     4. Run OSTF tests
-    5. Delete a node with compute+sriov roles
-    6. Deploy changes
-    7. Run OSTF tests
-    8. Run contrail check tests
-    9. Run contrail health check tests
+    5. Run contrail health check tests
+    6. Delete a node with compute+sriov roles
+    7. Deploy changes
+    8. Run OSTF tests
+    9. Run contrail check tests
 
 
 Expected results

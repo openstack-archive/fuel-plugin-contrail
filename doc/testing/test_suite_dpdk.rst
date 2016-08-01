@@ -227,10 +227,10 @@ Steps
        node-04: 'compute', 'ceph-osd';
        node-dpdk: 'compute', 'dpdk';
     4. Run OSTF tests
-    5. Delete node "node-dpdk" with "dpdk" and "compute" roles
-    6. Deploy changes
-    7. Run OSTF tests
-    8. Run contrail health check tests
+    5. Run contrail health check tests
+    6. Delete node "node-dpdk" with "dpdk" and "compute" roles
+    7. Deploy changes
+    8. Run OSTF tests
 
 
 Expected results
