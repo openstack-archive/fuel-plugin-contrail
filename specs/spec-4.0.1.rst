@@ -216,6 +216,88 @@ Requirements
 
 None
 
+
+DPDK-based vRouter feature
+==========================
+
+Problem description
+-------------------
+
+DPDK (Data Plane Development Kit) allows access to the hardware directly from
+applications, bypassing the Linux networking stack (binding interface will not be
+seen by the kernel). This reduces latency and allows more packets to be processed.
+Plugin need to support installing of Contrail vRouter in this mode.
+
+Proposed solution
+-----------------
+
+Create a role called 'DPDK' to mark compute nodes which should be configured to
+use DPDK-based vRouter. Hugepages setup must be handled by plug-in, since there's
+no hugepages support in Fuel 8.0. For hugepages there should be 2 settings:
+type and ammount of pages to allocate. Type has 2 options: 2MB and 1GB.
+Ammount should be specified as a percentage from all available memory.
+DPDK-based vRouter should use 'Private' interface, in the same way as kernel-based
+vRouter does.
+
+DPDK-based vRouter requires some patches to nova-compute, which are not available
+in upstream code. Proposed solution is to override Nova packages on Compute nodes
+with packages from Contrail distribution. This override should be optional.
+
+DPDK-based vRouter requires VMs to be backed by hugepages. This feature is available
+starting from QEMU 2.1, so QEMU and libvirt should be installed from
+Contrail distibution. This override should be optional.
+
+UI impact
+---------
+'DPDK' role should be present in list of roles.
+There should be a checkbox that enables DPDK in environment.
+Hugepages should have 2 settings: dropdown menu for type and a textfield for ammount.
+QEMU and Nova overrides should have checkboxes for toggling this overrides.
+
+Performance impact
+------------------
+
+DPDK can be used to increase packet-rate performance on VMs, using DPDK-based
+application. With non-DPDK applications performance should be approximately same
+as with kernel-based vRouter.
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information about usage of this feature.
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+Network card on Computes which are selected to use DPDK, should support DPDK.
+_`List of supported NICs <http://dpdk.org/doc/nics>`
+
+
 Implementation
 ==============
 
@@ -226,6 +308,8 @@ Primary assignee:
 
 - Oleksandr Martsyniuk <omartsyniuk> - tech lead, developer
 - Vitalii Kovalchuk <vkovalchuk> - developer
+- Przemyslaw Szypowicz <pszypowicz> - developer
+- Illia Polliul <ipolliul> - developer
 
 Project manager:
 
@@ -241,6 +325,13 @@ Work items
 
 * Development
 
+ - Add DPDK role to list of plug-in roles
+ - Add checkboxes for DPDK-overrides
+ - Add settings for Hugepages
+ - Write puppet code for DPDK overrides
+ - Write puppet code for Hugepages
+ - Create a task for host aggregates and flavors for DPDK
+ - Update vRouter configuration for DPDK
  - Update the plugins metadata with 'contrail-analytics' role definition
  - Create new deployment tasks
  - Re-factor the contrail module to ensure that all analytics tasks can be executed separately
