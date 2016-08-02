@@ -898,5 +898,14 @@ class FunctionalTests(TestBasic):
         }
 
         plugin.show_range(self, 6, 8)
-        openstack.update_deploy_check(self, conf_nodes,
-                                      is_vsrx=vsrx_setup_result)
+        should_fails = [
+            'Create volume and boot instance from it',
+            'Launch instance, create snapshot, launch instance from snapshot',
+            'Launch instance with file injection',
+            'Launch instance',
+            'Create volume and attach it to instance',
+            'Check network connectivity from instance via floating IP']
+        openstack.update_deploy_check(
+            self, conf_nodes,
+            is_vsrx=vsrx_setup_result,
+            ostf_fail_tests=should_fails)
