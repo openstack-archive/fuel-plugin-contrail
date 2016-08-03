@@ -146,6 +146,23 @@ class contrail::config {
     'DEFAULTS/ttl_short':             value => '1';
     'DNS-SERVER/policy':              value => 'fixed';
   }
+
+  contrail_discovery_ini_config {
+    'program:contrail-discovery/command':         value => '/usr/bin/contrail-discovery --conf_file /etc/contrail/contrail-discovery.conf --worker_id %(process_num)s';
+    'program:contrail-discovery/numprocs':        value => '1';
+    'program:contrail-discovery/process_name':    value => '%(process_num)s';
+    'program:contrail-discovery/redirect_stderr': value => true;
+    'program:contrail-discovery/stdout_logfile':  value => '/var/log/contrail/contrail-discovery-%(process_num)s-stdout.log';
+    'program:contrail-discovery/stderr_logfile':  value => '/dev/null';
+    'program:contrail-discovery/priority':        value => '440';
+    'program:contrail-discovery/autostart':       value => true;
+    'program:contrail-discovery/killasgroup':     value => true;
+    'program:contrail-discovery/stopsignal':      value => 'KILL';
+    'program:contrail-discovery/exitcodes':       value => '123';
+    'program:contrail-discovery/startretries':    value => '10';
+    'program:contrail-discovery/user':            value => 'contrail';
+  }
+
   contrail_keystone_auth_config {
     'KEYSTONE/auth_host':         value => $contrail::keystone_address;
     'KEYSTONE/auth_protocol':     value => $contrail::keystone_protocol;
@@ -260,7 +277,9 @@ class contrail::config {
   }
 
   Package['contrail-config'] ->          Contrail_api_ini_config <||>
+  Package['contrail-config'] ->          Contrail_discovery_ini_config <||>
   Contrail_api_ini_config <||> ~>        Service['supervisor-config']
+  Contrail_discovery_ini_config <||> ~>  Service['supervisor-config']
   Contrail_svc_monitor_config <||> ~>    Service['supervisor-config']
   Contrail_schema_config <||> ~>         Service['supervisor-config']
   Contrail_discovery_config <||> ~>      Service['supervisor-config']
