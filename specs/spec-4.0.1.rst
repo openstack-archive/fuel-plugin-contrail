@@ -217,7 +217,6 @@ Requirements
 
 None
 
-
 DPDK-based vRouter on virtual function (VF)
 ===========================================
 
@@ -284,7 +283,71 @@ Requirements
 
 None
 
+Enable HTTPS for public Contrail endpoints
+==========================================
 
+Problem description
+-------------------
+
+OpenStack and Contrail services receive requests from public networks that are untrusted area.
+As the network path between the end-users and the services is untrusted, encryption is required to ensure confidentiality.
+This can be achieved by implementing Secure Sockets Layer as recommended in the OpenStack security guide.
+
+Proposed solution
+-----------------
+
+Fuel can configure secure access for public-facing OpenStack services such as Nova API and Horizon by configuring
+Haproxy to recieve SSL connections as described in [2].
+However, Contrail configuration API has no encryption enabled, but is exposed on public endpoint.
+Contrail Web UI has SSL enabled, but uses self-signed certificate by default.
+We propose to modify the Fuel Contrail plugin to be able to honor SSL/TLS settings and configure encrypted
+public endpoints for Contrail API and Contrail Web UI using the hostname and cerificate shared with Horizon.
+
+UI impact
+---------
+
+There are no changes in plugin settings tab.
+
+Performance impact
+------------------
+
+The SSL-overhead is generally small. The major cost of HTTPS is the SSL handshaking so depending the typical session length and the caching behavior of clients the overhead may be different. For very short sessions you can see performance issue.
+
+Documentation Impact
+--------------------
+
+None
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+Using encrypted connections to Contrail API via public network and using Horizon certificate for Contrail Web UI
+improve the confidentiality and security.
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
 
 Implementation
 ==============
@@ -317,6 +380,7 @@ Work items
  - Update other manifests to support dedicated analytics nodes
  - Adjust the experimental upgrade scripts to run on contrail-analytics role
  - Add python-memcache package to manifests for 'contrail-config' role and adjust the contrail-keystone configuration with memcached server IPs
+ - Update the manifests to use ssl settings for haproxy
  - Add checkbox to environment config
  - Make network provisioning conditional
  - Add checkbox for DPDK on VF feature
@@ -344,3 +408,4 @@ References
 
 [0] https://github.com/Juniper/contrail-controller/wiki/Roles-Daemons-Ports
 [1] http://www.juniper.net/techpubs/en_US/contrail3.0/topics/task/installation/hardware-reqs-vnc.html
+[2] https://specs.openstack.org/openstack/fuel-specs/specs/7.0/ssl-endpoints.html
