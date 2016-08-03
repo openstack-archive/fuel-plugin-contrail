@@ -64,9 +64,19 @@ class FailoverTests(TestBasic):
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
         plugin.activate_plugin(self)
-        cluster_id = self.fuel_web.get_last_created_cluster()
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db',
+                             'contrail-analytics'],
+                'slave-02': ['controller'],
+                'slave-03': ['compute'],
+            })
 
         self.show_step(2)
+        cluster_id = self.fuel_web.get_last_created_cluster()
         cmd = 'fuel plugins --remove {0}=={1}'.format(
             plugin_name, CONTRAIL_PLUGIN_VERSION)
 
