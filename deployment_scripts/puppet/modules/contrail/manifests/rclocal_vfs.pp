@@ -27,14 +27,14 @@ define contrail::rclocal_vfs (
     $final_vf = min(30, $totalvfs)
   }
 
-  file {"/etc/network/interfaces.d/ifcfg-${network_device}":
-    content => "auto ${network_device}\niface ${network_device} inet manual\n"
-  }
+  $interface_config = join(["auto ${network_device}",
+                            "iface ${network_device} inet manual",
+                            "post-up echo ${final_vf} > /sys/class/net/${network_device}/device/sriov_numvfs"
+                            ],"\n")
 
-  file_line {"sriov ${network_device}":
-    line  => "echo ${final_vf} > /sys/class/net/${network_device}/device/sriov_numvfs",
-    path  => '/etc/rc.local',
-    match => ".* /sys/class/net/${network_device}/device/sriov_numvfs"
+  file {"/etc/network/interfaces.d/ifcfg-${network_device}":
+    ensure  => file,
+    content => $interface_config,
   }
 
 }
