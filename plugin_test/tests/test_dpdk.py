@@ -16,6 +16,7 @@ under the License.
 import os
 
 from proboscis import test
+from proboscis import asserts
 
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
@@ -724,3 +725,56 @@ class DPDKTests(TestBasic):
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
             self.show_step(10)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_dpdk_update_core_repos"])
+    @log_snapshot_after_test
+    def contrail_dpdk_update_core_repos(self):
+        """Check updating core repos with Contrail plugin and DPDK.
+
+        Scenario:
+            1. Deploy cluster with some
+               controller+mongo,
+               compute+ceph-osd,
+               compute+dpdk and contrail-specified nodes
+            2. Run "fuel-createmirror -M" on the master node
+            3. Update repos for all deployed nodes with command
+               "fuel --env <ENV_ID> node --node-id <NODE_ID1>, <NODE_ID2>,
+               <NODE_ID_N> --tasks upload_core_repos" on the master node
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=5,
+                                       options={'images_ceph': True,
+                                                'volumes_ceph': True,
+                                                'ephemeral_ceph': True,
+                                                'objects_ceph': True,
+                                                'volumes_lvm': False})
+        self.bm_drv.host_prepare()
+        plugin.activate_dpdk(self)  # activate plugin with DPDK feature
+        plugin.activate_vsrx()  # activate vSRX image
+        self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
+                                    roles=['compute', 'dpdk', 'sriov'])
+        conf_nodes = {
+            'slave-01': ['controller', 'mongo'],
+            'slave-02': ['compute', 'ceph-osd'],
+            'slave-03': ['contrail-config', 'contrail-control'],
+            'slave-04': ['contrail-db', 'contrail-analytics']
+        }
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            conf_nodes
+        )
+        openstack.deploy_cluster(self)
+
+        plugin.show_range(self, 2, 3)
+        commands = [
+            "fuel-createmirror -M",
+            ('fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10 '
+             '--tasks upload_core_repos')
+        ]
+        for cmd in commands:
+            result = self.env.d_env.get_admin_remote().execute(cmd)
+            asserts.assert_equal(result['exit_code'], 1,
+                                 'Command "{0}" fails.'.format(cmd))
+
