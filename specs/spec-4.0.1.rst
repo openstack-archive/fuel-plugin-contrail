@@ -104,7 +104,8 @@ That can negatively impact the performance of whole environment.
 Proposed solution
 -----------------
 
-Enable caching keystone tokens for Contrail purposes. Similar to `OpenStack approach <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_
+Enable caching keystone tokens for Contrail purposes. Similar to
+`OpenStack approach <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_
 Contrail can cache authentication responses from the keystone in memcache. This feature will be enabled by
 default and doesn't require any additional settings from Fuel UI. Kyestone middleware will use memcache
 servers running on OpenStack controllers.
@@ -217,7 +218,6 @@ Requirements
 
 None
 
-
 DPDK-based vRouter on virtual function (VF)
 ===========================================
 
@@ -227,10 +227,10 @@ Problem description
 DPDK (Data Plane Development Kit) allows access to the hardware directly from
 applications by passing Linux networking stack (binding interface will not be
 seen by the kernel). This reduces latency and allows more packets to be processed.
-However, it has many `limitations <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_ and many features that Linux
-provides are not available with DPDK. Binding interface is not
-seen by the kernel and accordingly - the user can't reuse it. For environment with difficult network schema or on servers with low amount of network interfaces it can be
-significant disadvantage.
+However, it has many `limitations <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_
+and many features that Linux provides are not available with DPDK. Binding interface is not
+seen by the kernel and accordingly - the user can't reuse it. For environment with complex network
+schema or on servers with low amount of network interfaces it can be significant disadvantage.
 
 Proposed solution
 -----------------
@@ -284,7 +284,75 @@ Requirements
 
 None
 
+Enable HTTPS for public Contrail endpoints
+==========================================
 
+Problem description
+-------------------
+
+OpenStack and Contrail services receive requests from public networks that are untrusted area.
+As the network path between the end-users and the services is untrusted, encryption is required to
+ensure confidentiality. This can be achieved by implementing Secure Sockets Layer as recommended in
+the OpenStack security guide.
+
+Proposed solution
+-----------------
+
+Fuel can configure secure access for public-facing OpenStack services such as Nova API and Horizon
+by configuring Haproxy to recieve SSL connections as described in [2].
+However, Contrail configuration API has no encryption enabled, but is exposed on public endpoint.
+Contrail Web UI has SSL enabled, but uses self-signed certificate by default.
+Fuel Contrail plugin should inherit SSL/TLS settings from Fuel UI configuration and configure
+encrypted public endpoints for Contrail API and Contrail Web UI using the hostname and cerificate
+shared with Horizon.
+
+UI impact
+---------
+
+There are no changes in plugin settings tab.
+
+Performance impact
+------------------
+
+The SSL-overhead is generally small. The major cost of HTTPS is the SSL handshaking so depending the
+typical session length and the caching behavior of clients the overhead may be different. For very
+short sessions you can see performance issue.
+
+Documentation Impact
+--------------------
+
+None
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+Using encrypted connections to Contrail API via public network and using Horizon certificate for
+Contrail Web UI improves the confidentiality and security.
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
 
 Implementation
 ==============
@@ -317,6 +385,7 @@ Work items
  - Update other manifests to support dedicated analytics nodes
  - Adjust the experimental upgrade scripts to run on contrail-analytics role
  - Add python-memcache package to manifests for 'contrail-config' role and adjust the contrail-keystone configuration with memcached server IPs
+ - Update the manifests to use ssl settings for haproxy
  - Add checkbox to environment config
  - Make network provisioning conditional
  - Add checkbox for DPDK on VF feature
@@ -344,3 +413,4 @@ References
 
 [0] https://github.com/Juniper/contrail-controller/wiki/Roles-Daemons-Ports
 [1] http://www.juniper.net/techpubs/en_US/contrail3.0/topics/task/installation/hardware-reqs-vnc.html
+[2] https://specs.openstack.org/openstack/fuel-specs/specs/7.0/ssl-endpoints.html
