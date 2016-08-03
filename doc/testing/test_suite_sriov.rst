@@ -241,6 +241,7 @@ Steps
     1. Deploy cluster with some controller, compute+cinder, compute+sriov and contrail-specified nodes
     2. Run “fuel-createmirror -M” on the master node
     3. Update repos for all deployed nodes with command "fuel --env <ENV_ID> node --node-id <NODE_ID1>, <NODE_ID2>, <NODE_ID_N> --tasks upload_core_repos" on the master node
+    4. Run OSTF and check Contrail node status.
 
 
 Expected results

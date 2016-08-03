@@ -652,3 +652,52 @@ class IntegrationTests(TestBasic):
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_update_core_repos"])
+    @log_snapshot_after_test
+    def contrail_update_core_repos(self):
+        """Check updating core repos with Contrail plugin.
+
+        Scenario:
+            1. Deploy cluster with Contrail plugin
+            2. Run 'fuel-mirror create -P ubuntu -G mos ubuntu'
+               on the master node
+            3. Run 'fuel-mirror apply -P ubuntu -G mos ubuntu
+               --env <env_id> --replace' on the master node
+            4. Update repos for all deployed nodes with command
+               "fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10
+               --tasks setup_repositories" on the master node
+            5. Run OSTF and check Contrail node status.
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=5)
+        plugin.activate_plugin(self)
+        vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
+        conf_nodes = {
+            'slave-01': ['controller'],
+            'slave-02': ['compute', 'cinder'],
+            'slave-03': ['contrail-config', 'contrail-control'],
+            'slave-04': ['contrail-db', 'contrail-analytics']
+        }
+        self.fuel_web.update_nodes(self.cluster_id, conf_nodes)
+        openstack.deploy_cluster(self)
+
+        plugin.show_range(self, 2, 4)
+        commands = [
+            'fuel-mirror create -P ubuntu -G mos ubuntu',
+            ('fuel-mirror apply -P ubuntu -G mos ubuntu '
+             '--env <env_id> --replace'),
+            ('fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10 '
+             '--tasks setup_repositories')
+        ]
+        for cmd in commands:
+            result = self.env.d_env.get_admin_remote().execute(cmd)
+            asserts.assert_equal(result['exit_code'], 1,
+                                 'Command "{0}" fails.'.format(cmd))
+
+        if vsrx_setup_result:
+            self.show_step(5)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            TestContrailCheck(self).cloud_check(['contrail'])
