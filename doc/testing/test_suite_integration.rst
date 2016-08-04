@@ -406,6 +406,7 @@ Steps
     2. Run 'fuel-mirror create -P ubuntu -G mos ubuntu' on the master node
     3. Run 'fuel-mirror apply -P ubuntu -G mos ubuntu --env <env_id> --replace' on the master node
     4. Update repos for all deployed nodes with command "fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10 --tasks setup_repositories" on the master node
+    5. Run OSTF and check Contrail node status.
 
 
 Expected results
