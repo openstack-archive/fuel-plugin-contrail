@@ -68,10 +68,9 @@ Steps
 #####
 
     1. Login as admin to Openstack Horizon UI
-    2. Launch a new instance
-    3. Send ping to external IP (example 8.8.8.8)
-    4. Send ping to IP address of lab host in environments public net
-    5. Verify on Contrail controller WebUI that network is there and VMs are attached to it
+    2. Launch an instance using the default image, flavor and security group.
+    3. Check that public IP 8.8.8.8 can be pinged from instance.
+    4. Delete instance.
 
 
 Expected results

@@ -18,7 +18,7 @@ import os
 
 VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH', False)
 
-OSTF_RUN_TIMEOUT = 45 * 60  # 45 minutes
+OSTF_RUN_TIMEOUT = 60 * 60  # 60 minutes
 DEPLOY_CLUSTER_TIMEOUT = 25 * 60  # 25 minutes
 CONTRAIL_PLUGIN_VERSION = os.environ.get('CONTRAIL_PLUGIN_VERSION', '4.0.1')
 VSRX_CONFIG_PATH = os.environ.get(
