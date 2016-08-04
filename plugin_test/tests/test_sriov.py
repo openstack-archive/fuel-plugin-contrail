@@ -18,6 +18,7 @@ import os
 from proboscis import test
 from proboscis import asserts
 
+from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
@@ -656,7 +657,7 @@ class SRIOVTests(TestBasic):
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5)
         self.bm_drv.host_prepare()
-        plugin.activate_dpdk(self)  # activate plugin with DPDK feature
+        plugin.activate_sriov(self)  # activate plugin with SRIOV feature
         vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk', 'sriov'])
@@ -670,15 +671,20 @@ class SRIOVTests(TestBasic):
         openstack.deploy_cluster(self)
 
         plugin.show_range(self, 2, 3)
+        nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
+        node_ids = ','.join([str(node['id']) for node in nodes])
         commands = [
             "fuel-createmirror -M",
-            ('fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10 '
-             '--tasks upload_core_repos')
+            ('fuel --env {0} node --node-id {1} '
+             '--tasks upload_core_repos'.format(self.cluster_id, node_ids))
         ]
         for cmd in commands:
+            logger.info("Execute commmand: '{0}' om master node.".format(cmd))
             result = self.env.d_env.get_admin_remote().execute(cmd)
-            asserts.assert_equal(result['exit_code'], 1,
-                                 'Command "{0}" fails.'.format(cmd))
+            asserts.assert_equal(
+                result['exit_code'], 0,
+                'Command "{0}" fails with message: "{1}".'.format(
+                    cmd, result['stderr']))
         if vsrx_setup_result:
             self.show_step(4)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
