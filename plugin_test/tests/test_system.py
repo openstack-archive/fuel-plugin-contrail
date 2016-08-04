@@ -42,6 +42,7 @@ from helpers.contrail_client import ContrailClient
 from helpers import plugin
 from helpers import openstack
 from helpers.settings import OSTF_RUN_TIMEOUT
+from helpers.ssh import SSH
 from tests.test_contrail_check import TestContrailCheck
 
 
@@ -648,3 +649,74 @@ class SystemTests(TestBasic):
         assert_equal(
             projects, contrail.get_projects(),
             "Can not give info by Contrail API.")
+
+    @test(depends_on=[systest_setup],
+          groups=["contrail_public_connectivity_from_instance_without_fip"])
+    @log_snapshot_after_test
+    def contrail_public_connectivity_from_instance_without_fip(self):
+        """Check network connectivity from instance without floating IP.
+
+        Scenario:
+            1. Setup systest_setup.
+            2. Launch an instance using the default image, flavor and sg.
+            3. Check that public IP 8.8.8.8 can be pinged from instance.
+            4. Delete instance.
+
+        Duration 5 min
+
+        """
+        self.show_step(1)
+        self.env.revert_snapshot('systest_setup')
+        net_name = 'admin_internal_net'
+        cluster_id = self.fuel_web.get_last_created_cluster()
+        os_ip = self.fuel_web.get_public_vip(cluster_id)
+        os_conn = os_actions.OpenStackActions(
+            os_ip, SERVTEST_USERNAME,
+            SERVTEST_PASSWORD,
+            SERVTEST_TENANT)
+
+        self.show_step(2)
+
+        # Launch instance as access point
+        os_conn.goodbye_security()
+        flavor = [
+            f for f in os_conn.nova.flavors.list()
+            if f.name == 'm1.micro'][0]
+        image = os_conn.nova.images.list().pop()
+        network = os_conn.nova.networks.find(label=net_name)
+        access_point = os_conn.nova.servers.create(
+            flavor=flavor, name='test1', image=image,
+            nics=[{'net-id': network.id}]
+        )
+        wait(
+            lambda: os_conn.get_instance_detail(
+                access_point).status == 'ACTIVE',
+            timeout=300)
+        access_point_fip = os_conn.assign_floating_ip(access_point).ip
+        wait(
+            lambda: tcp_ping(access_point_fip, 22), timeout=120, interval=5,
+            timeout_msg="Node {0} is not accessible by SSH.".format(
+                access_point_fip))
+
+        instance = os_conn.nova.servers.create(
+            flavor=flavor, name='test2', image=image,
+            nics=[{'net-id': network.id}]
+        )
+        wait(
+            lambda: os_conn.get_instance_detail(
+                instance).status == 'ACTIVE',
+            timeout=300)
+
+        self.show_step(3)
+        # Get private ip of instance
+        logger.info('{}'.format(os_conn.nova.servers.ips(instance.id)))
+        ip = os_conn.nova.servers.ips(instance.id)[net_name].pop()['addr']
+        with SSH(access_point_fip) as remote:
+            remote.check_connection_through_host({ip: ['8.8.8.8']})
+
+        self.show_step(4)
+        for instance in [access_point, instance]:
+            os_conn.delete_instance(instance)
+            assert_true(
+                os_conn.verify_srv_deleted(instance),
+                "Instance was not deleted.")
