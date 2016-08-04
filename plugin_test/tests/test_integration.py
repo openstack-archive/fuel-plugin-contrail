@@ -685,18 +685,23 @@ class IntegrationTests(TestBasic):
         openstack.deploy_cluster(self)
 
         plugin.show_range(self, 2, 4)
+
+        nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
+        node_ids = ','.join([str(node['id']) for node in nodes])
         commands = [
             'fuel-mirror create -P ubuntu -G mos ubuntu',
             ('fuel-mirror apply -P ubuntu -G mos ubuntu '
-             '--env <env_id> --replace'),
-            ('fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10 '
-             '--tasks setup_repositories')
+             '--env {0} --replace'.format(self.cluster_id)),
+            ('fuel --env {0} node --node-id {1} '
+             '--tasks setup_repositories'.format(self.cluster_id, node_ids))
         ]
         for cmd in commands:
+            logger.info("Execute commmand: '{0}' om master node.".format(cmd))
             result = self.env.d_env.get_admin_remote().execute(cmd)
-            asserts.assert_equal(result['exit_code'], 1,
-                                 'Command "{0}" fails.'.format(cmd))
-
+            stderr = result['stderr'].pop()
+            asserts.assert_equal(
+                result['exit_code'], 0,
+                'Command "{0}" fails with message: "{1}".'.format(cmd, stderr))
         if vsrx_setup_result:
             self.show_step(5)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
