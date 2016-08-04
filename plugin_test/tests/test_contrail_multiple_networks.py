@@ -531,22 +531,13 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.show_step(16)
         conf_control = {'slave-03': [['controller'], nodegroup_custom1]}
 
-        openstack.update_deploy_check(self,
-                                      conf_control, delete=True,
-                                      is_vsrx=vsrx_setup_result)
-
-        self.show_step(17)
-        openstack.deploy_cluster(self)
-        TestContrailCheck(self).cloud_check(['contrail'])
+        openstack.update_deploy_check(
+            self, conf_control, delete=True,
+            is_vsrx=vsrx_setup_result,
+            ostf_fail_tests=['Check that required services are running'])
 
         self.show_step(18)
-        if vsrx_setup_result:
-            self.fuel_web.run_ostf(
-                cluster_id=self.cluster_id,
-                test_sets=['smoke', 'sanity'],
-                should_fail=1,
-                failed_test_name=['Check that required services are running']
-            )
+        TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_release],
           groups=["contrail_multiple_networks_delete_compute"])
@@ -646,22 +637,13 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.show_step(16)
         conf_compute = {'slave-06': [['compute'], nodegroup_custom1], }
 
-        openstack.update_deploy_check(self,
-                                      conf_compute, delete=True,
-                                      is_vsrx=vsrx_setup_result)
-
-        self.show_step(17)
-        openstack.deploy_cluster(self)
-        TestContrailCheck(self).cloud_check(['contrail'])
+        openstack.update_deploy_check(
+            self, conf_compute, delete=True,
+            is_vsrx=vsrx_setup_result,
+            ostf_fail_tests=['Check that required services are running'])
 
         self.show_step(18)
-        if vsrx_setup_result:
-            self.fuel_web.run_ostf(
-                cluster_id=self.cluster_id,
-                test_sets=['smoke', 'sanity', 'ha'],
-                should_fail=1,
-                failed_test_name=['Check that required services are running']
-            )
+        TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_release],
           groups=["contrail_multiple_networks_add_compute"])
