@@ -452,9 +452,7 @@ class TestMultipleNets(TestMultipleClusterNets):
                 * 2 controller
             13. Add following nodes to custom nodegroup:
                 * 1 compute
-                * 1 contrail-config
-                * 1 contrail-control
-                * 1 contrail-db
+                * 1 contrail-config+contrail-control+contrail-db
                 * 1 contrail-analytics
             14. Deploy cluster
             15. Run health checks (OSTF)
@@ -491,7 +489,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.fuel_web.client.delete_nodegroup(custom_group2['id'])
 
         self.show_step(7)
-        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:9])
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:6])
 
         self.show_step(8)
         updated_storage_default, updated_storage_custom, \
@@ -509,11 +507,10 @@ class TestMultipleNets(TestMultipleClusterNets):
                 'slave-02': [['controller'], nodegroup_custom1],
                 'slave-03': [['controller'], nodegroup_custom1],
                 'slave-04': [['compute', 'cinder'], nodegroup_default],
-                'slave-05': [['compute'], nodegroup_default],
-                'slave-06': [['contrail-config'], nodegroup_default],
-                'slave-07': [['contrail-control'], nodegroup_default],
-                'slave-08': [['contrail-db'], nodegroup_default],
-                'slave-09': [['contrail-analytics'], nodegroup_default],
+                'slave-05': [
+                    ['contrail-config', 'contrail-control', 'contrail-db'],
+                    nodegroup_default],
+                'slave-06': [['contrail-analytics'], nodegroup_default],
             }
         )
         self.show_step(14)
