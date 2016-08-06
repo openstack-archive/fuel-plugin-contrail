@@ -96,9 +96,7 @@ Steps
         * 2 controller
     13. Add following nodes to custom nodegroup:
         * 1 compute
-        * 1 contrail-config
-        * 1 contrail-control
-        * 1 contrail-db
+        * 1 contrail-config+contrail-control+contrail-db
         * 1 contrail-analytics
     14. Deploy cluster
     15. Run health checks (OSTF)

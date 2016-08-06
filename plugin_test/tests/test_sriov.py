@@ -172,7 +172,7 @@ class SRIOVTests(TestBasic):
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
         }
-        conf_compute = {'slave-06': ['compute', 'ceph-osd']}
+        conf_compute = {'slave-05': ['compute', 'ceph-osd']}
 
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
