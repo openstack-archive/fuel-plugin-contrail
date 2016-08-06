@@ -132,13 +132,12 @@ class SRIOVTests(TestBasic):
                 node-1: 'controller', 'ceph-osd';
                 node-2: 'contrail-config', 'contrail-control',
                         'contrail-db', 'contrail-analytics';
-                node-3: 'contrail-db';
+                node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
-                node-5: 'compute', 'ceph-osd';
                 node-bm: 'compute', 'sriov';
             4. Run OSTF tests
             5. Add one node with following configuration:
-                node-6: "compute", "ceph-osd";
+                node-5: "compute", "ceph-osd";
             6. Deploy changes
             7. Run OSTF tests
             8. Run contrail health check tests
@@ -172,7 +171,7 @@ class SRIOVTests(TestBasic):
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
         }
-        conf_compute = {'slave-06': ['compute', 'ceph-osd']}
+        conf_compute = {'slave-05': ['compute', 'ceph-osd']}
 
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
