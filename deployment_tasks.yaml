@@ -171,6 +171,7 @@
   groups: [primary-contrail-config]
   required_for: [deploy_end]
   requires: [contrail-utils]
+  reexecute_on: [deploy_changes]
   parameters:
     puppet_manifest: puppet/manifests/contrail-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
