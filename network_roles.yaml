@@ -1,5 +1,5 @@
 # Unique network role name
-- id: "neutron/mesh"
+- id: "contrail/vip"
   # Role mapping to network
   default_mapping: "private"
   properties:
