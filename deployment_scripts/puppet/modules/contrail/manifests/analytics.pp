@@ -105,7 +105,7 @@ class contrail::analytics {
 
   # Cron job for transfer contrail-logs to Fuel master
   # Runs on primary analytics node
-  if $contrail::node_role == 'primary-contrail-analytics' {
+  if roles_include('primary-contrail-analytics') {
     file { 'contrailsyslog.sh':
       ensure  => 'present',
       path    => '/usr/local/sbin/contrailsyslog.sh',
