@@ -76,4 +76,13 @@ attributes:
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
         action: "hide"
+  disable_std_net:
+    value: false
+    label: "Disable standard Fuel networks creation"
+    description: "If set disables standard Fuel networks creation. Standard Fuel networks are required to pass OSTF tests. Can be skipped on a production environment to speed up deployment."
+    weight: 160
+    type: "checkbox"
+    restrictions:
+      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+        action: "hide"
 
