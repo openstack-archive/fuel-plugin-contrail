@@ -756,7 +756,7 @@ class DPDKTests(TestBasic):
         plugin.activate_dpdk(self)  # activate plugin with DPDK feature
         vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk', 'sriov'])
+                                    roles=['compute', 'dpdk'])
         conf_nodes = {
             'slave-01': ['controller', 'mongo'],
             'slave-02': ['compute', 'ceph-osd'],
