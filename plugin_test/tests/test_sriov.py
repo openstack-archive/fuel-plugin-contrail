@@ -660,6 +660,7 @@ class SRIOVTests(TestBasic):
         vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
                                     roles=['compute', 'sriov'])
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
