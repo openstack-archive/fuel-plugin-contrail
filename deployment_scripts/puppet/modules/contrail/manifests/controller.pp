@@ -64,22 +64,25 @@ class contrail::controller {
     'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin';
     'DEFAULT/allow_overlapping_ips': value => 'True';
     'service_providers/service_provider': value => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
-    'keystone_authtoken/auth_host': value => $contrail::keystone_address;
+    'keystone_authtoken/admin_user': value => 'neutron';
+    'keystone_authtoken/admin_password': value => $::contrail::service_token;
+    'keystone_authtoken/auth_host': value => $::contrail::keystone_address;
     'keystone_authtoken/auth_port': value => '35357';
-    'keystone_authtoken/auth_protocol': value => $contrail::keystone_protocol;
+    'keystone_authtoken/auth_protocol': value => $::contrail::keystone_protocol;
+    'keystone_authtoken/identity_uri': value => $::contrail::auth_url;
     'QUOTAS/quota_network': value => '-1';
     'QUOTAS/quota_subnet': value => '-1';
     'QUOTAS/quota_port': value => '-1';
-  } ->
+  }
   file_line {'add_neutron_defaults':
     ensure => 'present',
     line   => '. /etc/default/neutron-server',
     path   => '/etc/init/neutron-server.conf',
     after  => 'neutron_plugin_ini_path',
-  } ->
+  }
   file { '/etc/contrail/vnc_api_lib.ini':
     content => template('contrail/vnc_api_lib.ini.erb')
-  } ->
+  }
   file {'/etc/neutron/plugins/opencontrail/contrailplugin.ini':
     content => template('contrail/contrailplugin.ini.erb'),
   } ->
