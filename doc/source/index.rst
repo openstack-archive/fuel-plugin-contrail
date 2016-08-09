@@ -17,6 +17,7 @@ Guide to the Contrail plugin version 4.0-4.0.0-1 for Fuel 8.0
     enable_sriov
     contrail_tsn
     using_network_templates
+    upgrade
     verification
     contrail_ui_intro
     appendix
