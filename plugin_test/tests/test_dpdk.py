@@ -764,6 +764,7 @@ class DPDKTests(TestBasic):
             'slave-04': ['contrail-db', 'contrail-analytics']
         }
         self.fuel_web.update_nodes(self.cluster_id, conf_nodes)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         openstack.deploy_cluster(self)
 
         plugin.show_range(self, 2, 3)
