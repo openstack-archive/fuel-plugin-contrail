@@ -6,7 +6,6 @@ ifmap_password=api-server
 cassandra_server_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9160" }.join(' ') %>
 listen_ip_addr=0.0.0.0
 listen_port=9100
-multi_tenancy=True
 log_file=/var/log/contrail/contrail-api.log
 log_local=1
 log_level=SYS_NOTICE
@@ -18,6 +17,8 @@ rabbit_server=<%= scope.lookupvar('contrail::contrail_private_vip') %>
 rabbit_port=5673
 list_optimization_enabled=True
 auth = keystone
+aaa_mode=cloud-admin
+cloud_admin_role=admin
 rabbit_user = nova
 rabbit_password = <%= scope.lookupvar('contrail::rabbit_password') %>
 
