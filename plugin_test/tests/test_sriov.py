@@ -646,11 +646,14 @@ class SRIOVTests(TestBasic):
                compute+cinder,
                compute+sriov and
                contrail-specified nodes
-            2. Run "fuel-createmirror -M" on the master node
-            3. Update repos for all deployed nodes with command
-               "fuel --env <ENV_ID> node --node-id <NODE_ID1>, <NODE_ID2>,
-               <NODE_ID_N> --tasks upload_core_repos" on the master node
-            4. Run OSTF and check Contrail node status.
+            2. Run 'fuel-mirror create -P ubuntu -G mos ubuntu'
+               on the master node
+            3. Run 'fuel-mirror apply -P ubuntu -G mos ubuntu
+               --env <env_id> --replace' on the master node
+            4. Update repos for all deployed nodes with command
+               "fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10
+               --tasks setup_repositories" on the master node
+            5. Run OSTF and check Contrail node status.
 
         """
         self.show_step(1)
@@ -670,13 +673,15 @@ class SRIOVTests(TestBasic):
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         openstack.deploy_cluster(self)
 
-        plugin.show_range(self, 2, 3)
+        plugin.show_range(self, 2, 5)
         nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
         node_ids = ','.join([str(node['id']) for node in nodes])
         commands = [
-            "fuel-createmirror -M",
+            'fuel-mirror create -P ubuntu -G mos ubuntu',
+            ('fuel-mirror apply -P ubuntu -G mos ubuntu '
+             '--env {0} --replace'.format(self.cluster_id)),
             ('fuel --env {0} node --node-id {1} '
-             '--tasks upload_core_repos'.format(self.cluster_id, node_ids))
+             '--tasks setup_repositories'.format(self.cluster_id, node_ids))
         ]
         for cmd in commands:
             logger.info("Execute commmand: '{0}' om master node.".format(cmd))
@@ -686,6 +691,6 @@ class SRIOVTests(TestBasic):
                 'Command "{0}" fails with message: "{1}".'.format(
                     cmd, result['stderr']))
         if vsrx_setup_result:
-            self.show_step(4)
+            self.show_step(5)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
             TestContrailCheck(self).cloud_check(['contrail'])

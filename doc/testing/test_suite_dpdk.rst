@@ -267,9 +267,10 @@ Steps
 #####
 
     1. Deploy cluster with some controller+mongo, compute+ceph-osd, compute+dpdk and contrail-specified nodes
-    2. Run “fuel-createmirror -M” on the master node
-    3. Update repos for all deployed nodes with command "fuel --env <ENV_ID> node --node-id <NODE_ID1>, <NODE_ID2>, <NODE_ID_N> --tasks upload_core_repos" on the master node
-    4. Run OSTF and check Contrail node status.
+    2. Run 'fuel-mirror create -P ubuntu -G mos ubuntu' on the master node
+    3. Run 'fuel-mirror apply -P ubuntu -G mos ubuntu --env <env_id> --replace' on the master node
+    4. Update repos for all deployed nodes with command "fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10 --tasks setup_repositories" on the master node
+    5. Run OSTF and check Contrail node status.
 
 
 Expected results
