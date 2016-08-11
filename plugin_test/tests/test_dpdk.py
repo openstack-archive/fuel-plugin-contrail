@@ -754,7 +754,8 @@ class DPDKTests(TestBasic):
                                                 'volumes_ceph': True,
                                                 'ephemeral_ceph': True,
                                                 'objects_ceph': True,
-                                                'volumes_lvm': False})
+                                                'volumes_lvm': False,
+                                                'osd_pool_size': '1'})
         self.bm_drv.host_prepare()
         plugin.activate_dpdk(self)  # activate plugin with DPDK feature
         vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
@@ -789,5 +790,7 @@ class DPDKTests(TestBasic):
                     cmd, result['stderr']))
         if vsrx_setup_result:
             self.show_step(5)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id, should_fail=1,
+                failed_test_name=['Instance live migration'])
             TestContrailCheck(self).cloud_check(['contrail'])
