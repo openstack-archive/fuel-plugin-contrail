@@ -1,0 +1,9 @@
+Code-Review+1: Andrey Kirilochkin <akirilochkin@mirantis.com>
+Code-Review+2: Illia Polliul <ipolliul@mirantis.com>
+Workflow+1: Illia Polliul <ipolliul@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 11 Aug 2016 15:20:22 +0000
+Reviewed-on: https://review.openstack.org/353007
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/fuel9-kilo
