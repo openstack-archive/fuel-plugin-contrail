@@ -39,7 +39,7 @@ To install the Contrail plugin:
        You can obtain the Juniper Contrail installation package from Juniper by subscription.
        More information can be found on the
        `official Juniper Contrail web-site <http://www.juniper.net/us/en/products-services/sdn/contrail/contrail-networking/>`__.
-    
+
     ::
 
         scp contrail-install-packages_3.0.2.0-51~14.04-liberty_all.deb \
@@ -164,10 +164,21 @@ To configure the Contrail plugin, follow the steps below:
     .. image:: images/conf-interfaces2.png
 
     .. warning::
-       Be sure to launch
-       `network verification check <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
-       before starting deployment. Incorrect network configuration will result in
-       non-functioning environment.
+       *  Be sure to launch
+          `network verification check <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
+          before starting deployment. Incorrect network configuration will result in
+          non-functioning environment.
+
+       * Some environemnts may require changes to default networks created during deployment
+         for OSTF tests. As an example, network allocated for floating IP addresses may need
+         some exclusions in address allocation for more-specific routes. This affects the
+         ability to deploy changes to OpenStack environments, with fails on default network
+         creation. For this reason Contrail plugin settings have an option that allow to disable
+         creation of default ostf networks(by default this option is enabled).
+
+         .. image:: images/provision_ostf_network.png
+
+
 
 #.  Press :guilabel:`Deploy changes` to `deploy the environment (page 25)
     <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_.
@@ -177,4 +188,3 @@ To configure the Contrail plugin, follow the steps below:
     can be accessed by the same IP address as OpenStack Dashboard, but using HTTPS protocol and port 8143.
     For example, if you configured public network as described on the screenshot above, then you can
     access Contrail web UI through ``https://<Public-VIP>:8143``.
-
