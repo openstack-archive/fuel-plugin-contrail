@@ -28,6 +28,7 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
 from helpers import openstack
 from helpers.settings import CONTRAIL_PLUGIN_VERSION
+from helpers.settings import OSTF_RUN_TIMEOUT
 from tests.test_contrail_check import TestContrailCheck
 
 
@@ -268,4 +269,5 @@ class ContrailPlugin(TestBasic):
 
         self.show_step(10)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   timeout=OSTF_RUN_TIMEOUT)
