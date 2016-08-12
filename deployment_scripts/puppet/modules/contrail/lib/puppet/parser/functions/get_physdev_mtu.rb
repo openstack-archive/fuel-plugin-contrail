@@ -1,4 +1,8 @@
-require 'puppetx/l23_network_scheme'
+begin
+  require 'puppetx/l23_network_scheme'
+rescue LoadError
+  require '/etc/puppet/modules/l23network/lib/puppetx/l23_network_scheme'
+end
 
 Puppet::Parser::Functions::newfunction(:get_physdev_mtu, :type => :rvalue, :arity => 1, :doc => <<-EOS
     Returns MTU of a physical interface, including cases where it's a bond
