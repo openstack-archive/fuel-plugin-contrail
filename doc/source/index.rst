@@ -19,5 +19,6 @@ Guide to the Contrail plugin version 4.0-4.0.1-1 for Fuel 8.0
     using_network_templates
     upgrade
     verification
+    restoring_failed_contrail_node
     contrail_ui_intro
     appendix
