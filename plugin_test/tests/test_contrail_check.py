@@ -30,6 +30,8 @@ from fuelweb_test.settings import SERVTEST_PASSWORD
 from fuelweb_test.settings import SERVTEST_TENANT
 from fuelweb_test.settings import SERVTEST_USERNAME
 
+from helpers.ssh import SSH
+
 
 class TestContrailCheck(object):
     """Test suite for contrail openstack check."""
@@ -228,7 +230,7 @@ class TestContrailCheck(object):
         logger.info('Remove image.')
         images = [
             image for image in self.os_conn.nova.images.list()
-            if image['name'] == self.image_name]
+            if image.name == self.image_name]
         if images:
             for image in images:
                 try:
@@ -428,11 +430,9 @@ class TestContrailCheck(object):
 
         logger.info(
             "Check that public IP 8.8.8.8 can be pinged from instance.")
-        with self.obj.fuel_web.get_ssh_for_node("slave-01") as remote:
-            assert_true(
-                self.os_conn.execute_through_host(
-                    remote, fip, ping_command)['exit_code'] == 0,
-                'Ping responce is not received.')
+        with SSH(fip) as remote:
+            result = remote.execute(ping_command)
+            assert_true(result['exit_code'] == 0, result['stderr'])
 
         logger.info("Delete instance.")
         self.os_conn.delete_instance(srv)

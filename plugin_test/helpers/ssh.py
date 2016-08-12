@@ -154,3 +154,21 @@ class SSH(object):
         message = "{0} {1} available from {2} to {3}".format(
             command, param, ip_from, ip_to)
         return message
+
+    def execute(self, command):
+        """Execute command on remote host.
+
+        :param ssh_client: SSHClient to instance
+        :param command: type string, command to execute
+        """
+        channel = self.ssh.get_transport().open_session()
+        channel.exec_command(command)
+        result = {
+            'stdout': [],
+            'stderr': [],
+            'exit_code': 0
+        }
+        result['exit_code'] = channel.recv_exit_status()
+        result['stdout'] = channel.recv(1024)
+        result['stderr'] = channel.recv_stderr(1024)
+        return result
