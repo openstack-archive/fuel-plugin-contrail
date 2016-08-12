@@ -21,7 +21,7 @@ from devops.helpers.helpers import tcp_ping
 from devops.helpers.helpers import wait
 
 from fuelweb_test import logger
-from fuelweb_test.helpers import checkers
+from fuelweb_test.helpers import utils
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PATH
 from proboscis.asserts import assert_true
 from settings import VSRX_TEMPLATE_PATH
@@ -79,13 +79,13 @@ def prepare_contrail_plugin(obj, slaves=None, snapshot_name=None, options={}):
     obj.env.revert_snapshot(snapshot_name)
 
     # copy plugin to the master node
-    checkers.upload_tarball(
-        obj.env.d_env.get_admin_remote(),
+    utils.upload_tarball(
+        obj.ssh_manager.admin_ip,
         CONTRAIL_PLUGIN_PATH, '/var')
 
     # install plugin
-    checkers.install_plugin_check_code(
-        obj.env.d_env.get_admin_remote(),
+    utils.install_plugin_check_code(
+        obj.ssh_manager.admin_ip,
         plugin=os.path.basename(CONTRAIL_PLUGIN_PATH))
     # FIXME: when opencontrail is supported
     # FIXME: remove the following line from 'or True'
