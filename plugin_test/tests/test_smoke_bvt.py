@@ -268,4 +268,5 @@ class ContrailPlugin(TestBasic):
 
         self.show_step(10)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   timeout=60 * 60)
