@@ -15,7 +15,8 @@ under the License.
 from fuelweb_test import logwrap
 from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import json_parse
-from fuelweb_test.helpers.http import HTTPClient
+from keystoneauth1.identity.v2 import Password
+from keystoneauth1.session import Session
 from fuelweb_test.settings import KEYSTONE_CREDS
 from fuelweb_test.settings import PATH_TO_CERT
 from fuelweb_test.settings import VERIFY_SSL
@@ -39,9 +40,12 @@ class ContrailClient(object):
             insecure = not VERIFY_SSL
             credentials.update({'ca_cert': PATH_TO_CERT, 'insecure': insecure})
         logger.info('Initiate Contrail client with url %s', url)
-        self._client = HTTPClient(url=url, keystone_url=self.keystone_url,
-                                  credentials=credentials,
-                                  **kwargs)
+        auth = Password(
+                auth_url=self.keystone_url,
+                username=KEYSTONE_CREDS['username'],
+                password=KEYSTONE_CREDS['password'],
+                tenant_name=KEYSTONE_CREDS['tenant_name'])
+        self._client = Session(auth=auth, verify=False)
         super(ContrailClient, self).__init__()
 
     @property
