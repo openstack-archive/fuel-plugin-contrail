@@ -18,13 +18,13 @@ To install the Contrail plugin:
 #.  Copy the rpm package downloaded at the previous step to the Fuel Master node and install the plugin
     ::
 
-        scp contrail-4.0-4.0.0-1.noarch.rpm  <Fuel Master node ip>:/tmp/
+        scp contrail-4.0-4.0.1-1.noarch.rpm  <Fuel Master node ip>:/tmp/
 
 #.  Log into the Fuel Master node and install the plugin
     ::
 
         ssh <the Fuel Master node ip>
-        fuel plugins --install contrail-4.0-4.0.0-1.noarch.rpm
+        fuel plugins --install contrail-4.0-4.0.1-1.noarch.rpm
 
     You should get the following output
     ::
@@ -42,7 +42,7 @@ To install the Contrail plugin:
 
     ::
 
-        scp contrail-install-packages_3.0.2.0-51~14.04-liberty_all.deb \
+        scp contrail-install-packages_3.0.2.1-4~liberty_all.deb \
         <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-4.0/
         ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-4.0/install.sh
 
@@ -97,7 +97,7 @@ To configure the Contrail plugin, follow the steps below:
 
     *   At least 1 Compute
 
-    *   At least 1 node with Contrail-Control, Contrail-Config, Contrail-DB roles selected
+    *   At least 1 node with Contrail-Control, Contrail-Config, Contrail-Analytics and Contrail-DB roles selected
 
         .. note::
 
@@ -106,7 +106,7 @@ To configure the Contrail plugin, follow the steps below:
     *   If you plan to use Heat with autoscaling, in addition to Ceilometer you need to add node with MongoDB role
 
     These three roles are not necessary need to be on the same node.
-    You can place them on different nodes if needed.
+    You can place them on different nodes if needed, for example, Database and Analytics can be placed on dedicated nodes to improve performance.
 
     .. image:: images/contrail-roles.png
 
