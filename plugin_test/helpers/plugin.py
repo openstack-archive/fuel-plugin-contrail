@@ -15,16 +15,11 @@ under the License.
 
 import os
 import time
-import subprocess
-
-from devops.helpers.helpers import tcp_ping
-from devops.helpers.helpers import wait
 
 from fuelweb_test import logger
 from fuelweb_test.helpers import utils
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PATH
 from proboscis.asserts import assert_true
-from settings import VSRX_TEMPLATE_PATH
 from settings import CONTRAIL_PLUGIN_VERSION
 import openstack
 
@@ -120,54 +115,6 @@ def activate_plugin(obj, **kwargs):
         cluster_id, plugin_name, CONTRAIL_PLUGIN_VERSION, options)
 
 
-def activate_vsrx():
-    """Activate vSRX1 image."""
-    logger.info("#" * 10 + 'Configure iptables and route...' + "#" * 10)
-    command = 'sudo /sbin/iptables -F'
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-    command = 'sudo /sbin/iptables -t nat -F'
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-    command = 'sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE'
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-
-    if not VSRX_TEMPLATE_PATH:
-        logger.info("#" * 10 + 'VSRX_TEMPLATE_PATH is not defined, '
-                    'OSTF will not be running' + "#" * 10)
-        return False
-
-    logger.info(
-        "#" * 10 + 'Delete previous installation of vSRX...' + "#" * 10)
-    command = 'virsh destroy vSRX1'
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-    command = 'virsh undefine vSRX1'
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-    command = 'sed -r "s/ENV_NAME/$ENV_NAME/g" {0} > logs/vSRX1.xml'.\
-        format(VSRX_TEMPLATE_PATH)
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-    command = 'sed -i -r "s/vSRX1.img/vSRX.400.img/g" logs/vSRX1.xml'
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-    command = 'virsh create logs/vSRX1.xml'
-    logger.info("#" * 10 + 'Create vSRX...' + "#" * 10)
-    if subprocess.call(command, shell=True):
-        logger.info("#" * 10 + 'VSRX could not be established, '
-                    'OSTF will not be running' + "#" * 10)
-        return False
-    command = 'sudo ip route del 10.100.1.0/24'
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-    command = 'sudo ip route add 10.100.1.0/24 via 10.109.3.250'
-    logger.info('The command is %s', command)
-    subprocess.call(command, shell=True)
-    return True
-
-
 def net_group_preparation(obj):
     """Prepare network group for network template."""
     node_ssh = obj.env.d_env.get_admin_remote()
@@ -192,55 +139,6 @@ def net_group_preparation(obj):
     for i in commands:
         node_ssh.execute_async(i)
         time.sleep(40)
-
-
-def vsrx_multiple_networks(obj, vsrx_ip='10.109.4.250', net_name='private2'):
-    """Configure routing on vsrx to no default private network.
-
-    :param obj: Test case object
-    :param vsrx_ip: ip of vSRX router
-    :param net_name: name of no default private network
-
-    """
-    ip_private_net = obj.env.d_env.get_network(name=net_name).ip_network
-
-    ip_private_net_default = obj.env.d_env.get_network(
-        name='private').ip_network
-
-    commands = [
-        'cli',
-        'configure',
-        'set protocols bgp group Contrail_Controller allow {0}'.format(
-            ip_private_net),
-        'set routing-options static route {0} next-hop {1}'.format(
-            ip_private_net, ip_private_net_default.split('0/').pop(0) + '1'),
-        'delete routing-options static route {0} '.format(
-            ip_private_net_default) + 'next-table public.inet.0',
-        'set routing-options dynamic-tunnels dynamic_overlay_tunnels'
-        ' destination-networks {0}'.format(ip_private_net),
-        'commit']
-
-    wait(
-        lambda: tcp_ping(vsrx_ip, 22), timeout=60 * 2, interval=10,
-        timeout_msg="Node {0} is not accessible by SSH.".format(vsrx_ip))
-    with obj.env.d_env.get_ssh_to_remote(vsrx_ip) as remote:
-        for command in commands:
-            remote.execute_async(command)
-
-
-def upload_vsrx_config(obj, config_path, vsrx_ip='10.109.4.250'):
-    """Upload and commit configuration for VSRX."""
-    commands = [
-        'cli', 'configure',
-        'load override {0}'.format(config_path.split('/').pop()),
-        'commit']
-    wait(
-        lambda: tcp_ping(vsrx_ip, 22), timeout=60 * 2, interval=10,
-        timeout_msg="Node {0} is not accessible by SSH.".format(vsrx_ip))
-    with obj.env.d_env.get_ssh_to_remote(vsrx_ip) as remote:
-        remote.upload(config_path, '/cf/root')
-        for command in commands:
-            remote.execute_async(command)
 
 
 def show_range(obj, start_value, end_value):

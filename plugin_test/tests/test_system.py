@@ -39,6 +39,7 @@ from proboscis.asserts import assert_equal
 from proboscis import SkipTest
 
 from helpers.contrail_client import ContrailClient
+from helpers import vsrx
 from helpers import plugin
 from helpers import openstack
 from helpers.settings import OSTF_RUN_TIMEOUT
@@ -133,7 +134,7 @@ class SystemTests(TestBasic):
             self, slaves=5, options={'ceilometer': True})
 
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx.activate()
 
         self.show_step(2)
         plugin.activate_plugin(self)
