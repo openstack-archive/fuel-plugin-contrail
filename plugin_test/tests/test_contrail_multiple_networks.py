@@ -38,6 +38,7 @@ from fuelweb_test.tests.test_multiple_networks import TestMultipleClusterNets
 from helpers import plugin
 from helpers import openstack
 from helpers import settings
+from helpers import vsrx
 from tests.test_contrail_check import TestContrailCheck
 
 
@@ -202,8 +203,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
-        plugin.vsrx_multiple_networks(self)
+        vsrx_setup_result = vsrx.vsrx_activate(self, multi_nets=True)
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -361,8 +361,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
-        plugin.vsrx_multiple_networks(self)
+        vsrx_setup_result = vsrx.vsrx_activate(self, multi_nets=True)
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -475,8 +474,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
-        plugin.vsrx_multiple_networks(self)
+        vsrx_setup_result = vsrx.vsrx_activate(self, multi_nets=True)
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -582,8 +580,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
-        plugin.vsrx_multiple_networks(self)
+        vsrx_setup_result = vsrx.vsrx_activate(self, multi_nets=True)
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -696,8 +693,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
-        plugin.vsrx_multiple_networks(self)
+        vsrx_setup_result = vsrx.vsrx_activate(self, multi_nets=True)
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -802,11 +798,8 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
-        plugin.vsrx_multiple_networks(self)
-        if settings.VSRX_CONFIG_PATH:
-            plugin.upload_vsrx_config(
-                self, config_path=settings.VSRX_CONFIG_PATH)
+        vsrx_setup_result = vsrx.vsrx_activate(self, multi_nets=True,
+                                               upload_config=True)
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)

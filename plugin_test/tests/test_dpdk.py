@@ -27,6 +27,7 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
 from helpers import openstack
 from helpers import baremetal
+from helpers import vsrx
 from tests.test_contrail_check import TestContrailCheck
 
 
@@ -83,7 +84,7 @@ class DPDKTests(TestBasic):
         # activate plugin with DPDK feature
         plugin.activate_dpdk(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
@@ -158,7 +159,7 @@ class DPDKTests(TestBasic):
         # activate plugin with DPDK feature
         plugin.activate_dpdk(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
@@ -247,7 +248,7 @@ class DPDKTests(TestBasic):
         # activate plugin with DPDK feature
         plugin.activate_dpdk(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
@@ -338,7 +339,7 @@ class DPDKTests(TestBasic):
         # activate plugin with DPDK feature
         plugin.activate_dpdk(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         self.show_step(3)
         conf_nodes = {
@@ -414,7 +415,7 @@ class DPDKTests(TestBasic):
         # activate plugin with DPDK feature
         plugin.activate_dpdk(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
@@ -501,7 +502,7 @@ class DPDKTests(TestBasic):
         # activate plugin with DPDK feature
         plugin.activate_dpdk(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
@@ -588,7 +589,7 @@ class DPDKTests(TestBasic):
         # activate plugin with DPDK feature
         plugin.activate_dpdk(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         plugin.show_range(self, 3, 4)
         self.bm_drv.setup_fuel_node(self,
@@ -677,7 +678,7 @@ class DPDKTests(TestBasic):
         # enable plugin and ativate SR-IOV in contrail settings
         plugin.activate_sriov(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
@@ -758,7 +759,7 @@ class DPDKTests(TestBasic):
                                                 'osd_pool_size': '1'})
         self.bm_drv.host_prepare()
         plugin.activate_dpdk(self)  # activate plugin with DPDK feature
-        vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
+        vsrx_setup_result = vsrx.vsrx_activate()
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
         conf_nodes = {

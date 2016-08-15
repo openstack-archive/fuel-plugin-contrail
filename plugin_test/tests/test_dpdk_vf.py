@@ -22,6 +22,7 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import plugin
 from helpers import openstack
 from helpers import baremetal
+from helpers import vsrx
 from tests.test_contrail_check import TestContrailCheck
 
 
@@ -81,7 +82,7 @@ class DPDKVFTests(TestBasic):
         # activate DPDK feature
         plugin.activate_dpdk_vf(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.vsrx_activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
