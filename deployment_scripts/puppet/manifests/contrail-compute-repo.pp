@@ -23,14 +23,6 @@ apt::pin { 'contrail-main':
 }
 
 if $contrail::compute_dpdk_enabled {
-  # Temporary dirty hack. In case when we use contrail dpdk repositorise
-  # we don't have nova-compute-kvm package there [FIXME]
-  exec { 'remove_nova_compute_kvm_dependency':
-    path    => '/usr/local/bin:/bin:/usr/bin/',
-    cwd     => '/etc/puppet/modules/nova/manifests/compute/',
-    command => 'sed -i "/nova-compute-.{libvirt_virt_type}/,+5d" libvirt.pp',
-  }
-
   $configure_default_route = '/etc/puppet/modules/osnailyfacter/modular/netconfig/configure_default_route.pp'
   $netconfig = '/etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp'
 
@@ -43,5 +35,4 @@ if $contrail::compute_dpdk_enabled {
     command => "/bin/echo '#NOOP here. Modified by contrail plugin' > ${netconfig}",
     onlyif  => 'dpkg -l | grep contrail-vrouter-dpdk-init'
   }
-
 }
