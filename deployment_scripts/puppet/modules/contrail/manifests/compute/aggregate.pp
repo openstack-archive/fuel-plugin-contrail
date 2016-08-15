@@ -17,7 +17,7 @@ class contrail::compute::aggregate {
   if $contrail::compute_dpdk_enabled {
 
     $nodes_hash          = hiera('nodes')
-    $dpdk_compute_nodes  = nodes_with_roles($contrail::nodes, ['dpdk'], 'fqdn')
+    $dpdk_compute_nodes  = nodes_with_roles(['dpdk'], 'fqdn')
     $dpdk_hosts          = join($dpdk_compute_nodes, ',')
     $nova_hash           = hiera_hash('nova', {})
     $keystone_tenant     = pick($nova_hash['tenant'], 'services')
