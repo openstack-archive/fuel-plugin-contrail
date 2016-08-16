@@ -6,7 +6,7 @@ log_local = 1
 log_level = SYS_NOTICE
 #log_category =
 log_file = /var/log/contrail/contrail-alarm-gen.log
-kafka_broker_list = <%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9092" }.join(' ')  %>
+kafka_broker_list = <%= scope.lookupvar('contrail::analytics_db_ips').map{ |ip| "#{ip}:9092" }.join(' ')  %>
 zk_list = <%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
 
 [DISCOVERY]
