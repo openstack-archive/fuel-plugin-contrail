@@ -19,3 +19,6 @@ Limitations
 *   Changing the default OpenStack project name is not supported. Default project name should be ``admin``.
 
 *   The password of OpenStack ``admin`` user should not contain following characters: ``$``, `````, ``\\`` and ``!``
+
+*   Authorization in Contrail WebUI with non-default keystone domain may not work with memcache enabled in contrail-keystone config
+    For more details, refer to this `bug<https://bugs.launchpad.net/fuel-plugin-contrail/+bug/1612788>`_.
