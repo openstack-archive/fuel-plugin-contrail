@@ -56,13 +56,12 @@ Configure Contrail Plugin
 
 To configure the Contrail plugin, follow the steps below:
 
-#.  First, you need to
-    `create environment <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
+#.  `Create environment <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
     in Fuel web UI.
 
     .. image:: images/name_and_release.png
 
-#.  Please select KVM or QEMU hypervisor type for your environment
+#.  Select KVM or QEMU hypervisor type for your environment
 
     .. image:: images/compute.png
 
@@ -75,7 +74,7 @@ To configure the Contrail plugin, follow the steps below:
     .. image:: images/networking_setup.png
 
 
-#.  If you plan to use Heat orchestration with autoscaling, you need to install Ceilometer too.
+#.  If you plan to use Heat orchestration with autoscaling, install Ceilometer.
 
     .. image:: images/additional_services.png
 
@@ -105,13 +104,14 @@ To configure the Contrail plugin, follow the steps below:
 
     *   If you plan to use Heat with autoscaling, in addition to Ceilometer you need to add node with MongoDB role
 
-    These three roles are not necessary need to be on the same node.
-    You can place them on different nodes if needed, for example, Database and Analytics can be placed on dedicated nodes to improve performance.
+    You do not need to have these three roles on the same node.
+    You can place them on different nodes if needed. For example, place Database and Analytics
+    on dedicated nodes to improve performance.
 
     .. image:: images/contrail-roles.png
 
 
-    Sample node configuration is provided on a picture below.
+    The figure below shows sample node configuration.
 
     .. image:: images/node-roles.png
 
@@ -170,11 +170,11 @@ To configure the Contrail plugin, follow the steps below:
           non-functioning environment.
 
        * Some environemnts may require changes to default networks created during deployment
-         for OSTF tests. As an example, network allocated for floating IP addresses may need
-         some exclusions in address allocation for more-specific routes. This affects the
-         ability to deploy changes to OpenStack environments, with fails on default network
-         creation. For this reason Contrail plugin settings have an option that allow to disable
-         creation of default ostf networks(by default this option is enabled).
+         for OSTF tests. For example, the network allocated for floating IP addresses may need
+         some exclusions in address allocation for more specific routes. This affects the
+         ability to deploy changes to OpenStack environments with fails on default network
+         creation. For this reason Contrail plugin settings have an option that disables
+         creation of default ostf networks. By default, this option is enabled.
 
          .. image:: images/provision_ostf_network.png
 
@@ -183,8 +183,8 @@ To configure the Contrail plugin, follow the steps below:
 #.  Press :guilabel:`Deploy changes` to `deploy the environment (page 25)
     <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_.
 
-    After installation is finished,
+    After installation is finished, you can access
     `Contrail web UI <http://www.juniper.net/techpubs/en_US/contrail2.0/topics/task/configuration/monitor-dashboard-vnc.html>`_
-    can be accessed by the same IP address as OpenStack Dashboard, but using HTTPS protocol and port 8143.
+    using the same IP address as OpenStack Dashboard and port 8143 through HTTPS protocol.
     For example, if you configured public network as described on the screenshot above, then you can
     access Contrail web UI through ``https://<Public-VIP>:8143``.
