@@ -156,24 +156,42 @@ class contrail {
   # Memcache nodes list
   $memcache_roles = hiera('memcache_roles', ['primary-controller', 'controller'])
   $memcache_nodes_hash = get_nodes_hash_by_roles($network_metadata, $memcache_roles)
-  $memcache_ips = sort(values(get_node_to_ipaddr_map_by_network_role($memcache_nodes_hash, 'mgmt/memcache')))
+  $memcache_ips = ipsort(values(get_node_to_ipaddr_map_by_network_role($memcache_nodes_hash, 'mgmt/memcache')))
 
   # Contrail DB nodes Private IP list
   $primary_contrail_db_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-db'])
-  $primary_contrail_db_ip         = sort(values(get_node_to_ipaddr_map_by_network_role($primary_contrail_db_nodes_hash, 'neutron/mesh')))
+  $primary_contrail_db_ip         = ipsort(values(get_node_to_ipaddr_map_by_network_role($primary_contrail_db_nodes_hash, 'neutron/mesh')))
 
-  $contrail_db_nodes_hash         = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-db', 'contrail-db'])
-  $contrail_db_ips                = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_db_nodes_hash, 'neutron/mesh')))
+  $contrail_db_roles              = hiera('contrail_db_roles', ['primary-contrail-db', 'contrail-db'])
+  $contrail_db_nodes_hash         = get_nodes_hash_by_roles($network_metadata, $contrail_db_roles)
+  $contrail_db_ips                = ipsort(values(get_node_to_ipaddr_map_by_network_role($contrail_db_nodes_hash, 'neutron/mesh')))
+
+  # Dedicated Analytics DB
+  $dedicated_analytics_db = pick($settings['dedicated_analytics_db'], false)
+
+  if $dedicated_analytics_db {
+    $primary_analytics_db_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-analytics-db'])
+    $primary_analytics_db_ip         = ipsort(values(get_node_to_ipaddr_map_by_network_role($primary_analytics_db_nodes_hash, 'neutron/mesh')))
+
+    $analytics_db_roles              = hiera('contrail_analytics_db_roles', ['primary-contrail-analytics-db', 'contrail-analytics-db'])
+    $analytics_db_nodes_hash         = get_nodes_hash_by_roles($network_metadata, $analytics_db_roles)
+    $analytics_db_ips                = ipsort(values(get_node_to_ipaddr_map_by_network_role($contrail_db_nodes_hash, 'neutron/mesh')))
+  } else {
+    $analytics_db_ips                = $contrail_db_ips
+  }
 
   # Contrail Control nodes Private IP list
-  $contrail_control_nodes_hash    = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-control', 'contrail-control'])
-  $contrail_control_ips           = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_control_nodes_hash, 'neutron/mesh')))
+  $contrail_control_roles         = hiera('contrail_control_roles', ['primary-contrail-control', 'contrail-control'])
+  $contrail_control_nodes_hash    = get_nodes_hash_by_roles($network_metadata, $contrail_control_roles)
+  $contrail_control_ips           = ipsort(values(get_node_to_ipaddr_map_by_network_role($contrail_control_nodes_hash, 'neutron/mesh')))
 
   # Contrail Config nodes Private IP list
-  $contrail_config_nodes_hash     = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-config', 'contrail-config'])
-  $contrail_config_ips            = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
+  $contrail_config_roles          = hiera('contrail_config_roles', ['primary-contrail-config', 'contrail-config'])
+  $contrail_config_nodes_hash     = get_nodes_hash_by_roles($network_metadata, $contrail_config_roles)
+  $contrail_config_ips            = ipsort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
 
   # Contrail Analytics nodes Private IP list
-  $contrail_analytics_nodes_hash     = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-analytics', 'contrail-analytics'])
-  $contrail_analytics_ips            = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_analytics_nodes_hash, 'neutron/mesh')))
+  $contrail_analytics_roles       = hiera('contrail_analytics_roles', ['primary-contrail-analytics', 'contrail-analytics'])
+  $contrail_analytics_nodes_hash  = get_nodes_hash_by_roles($network_metadata, $contrail_analytics_roles)
+  $contrail_analytics_ips         = ipsort(values(get_node_to_ipaddr_map_by_network_role($contrail_analytics_nodes_hash, 'neutron/mesh')))
 }
