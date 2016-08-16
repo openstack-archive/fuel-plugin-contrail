@@ -1,44 +1,54 @@
-Restoring failed Contrail node
-==============================
+Restore failed Contrail node
+============================
 
-This guide describes how to replace failed Contrail all-in-one node (with all
-Contrail roles assigned) in multi-node environment.
+This guide describes how to replace the failed Contrail all-in-one node (with all
+Contrail roles assigned) in a multi-node environment.
 
-After contrail node crash you have to the following steps:
+If your Contrail node has been crashed, follow the steps to fix the issue:
 
-#. Remove failed node from cassandra cluster (on working contrail node)
+#. Remove failed node from Cassandra cluster (on working contrail node)
 
-   #. Obtain Host-ID of failed Cassandra node:
+   #. Obtain Host-ID of the failed Cassandra node:
 
       .. code-block:: console
 
        nodetool status
 
-   #. Remove node:
+   #. Remove the failed node:
 
       .. code-block:: console
 
        nodetool removenode <Host-ID>
 
-#. Deprovision analytics, control, database and config components of failed node
+#. Deprovision analytics, control, database, and config components of the failed node
    from contrail db.
 
-   #. Obtain Contrail API (Managment VIP) address:
+   #. Obtain IP address of Contrail API endpoint (Managment VIP):
 
       .. code-block:: console
 
-       # hiera management_vip
-       10.109.1.3
+         hiera management_vip
+
+      Example of system response:
+
+      .. code-block:: console
+
+         10.109.1.3
 
    #. Obtain Neutron service password:
 
       .. code-block:: console
 
-       # hiera neutron_config | grep admin_password
+         hiera neutron_config | grep admin_password
+
+      Example of system response:
+
+      .. code-block:: console
+
          "keystone"=>{"admin_password"=>"VerySecurePassword!"},
 
 
-   #. Deprovision contail-config:
+   #. Deprovision ``contrail-config``:
 
       .. code-block:: console
 
@@ -52,7 +62,7 @@ After contrail node crash you have to the following steps:
        --admin_tenant_name services \
        --admin_password <Neutron password>
 
-   #. Deprovision contail-analytics:
+   #. Deprovision ``contrail-analytics``:
 
       .. code-block:: console
 
@@ -66,7 +76,7 @@ After contrail node crash you have to the following steps:
        --admin_tenant_name services \
        --admin_password <Neutron password>
 
-   #. Deprovision contail-contol:
+   #. Deprovision ``contrail-control``:
 
       .. code-block:: console
 
@@ -81,7 +91,7 @@ After contrail node crash you have to the following steps:
        --admin_tenant_name services \
        --admin_password <Neutron password>
 
-   #. Deprovision contail-database:
+   #. Deprovision ``contrail-database``:
 
       .. code-block:: console
 
@@ -95,4 +105,4 @@ After contrail node crash you have to the following steps:
        --admin_tenant_name services \
        --admin_password <Neutron password>
 
-#. Add new node with Contrail roles and deploy it by Fuel
+#. Add a new node with Contrail roles and deploy it with Fuel
