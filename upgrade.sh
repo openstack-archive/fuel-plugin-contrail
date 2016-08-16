@@ -40,7 +40,9 @@ get_nodes_list () {
   if [ -z "$_role" ]; then
     _nodes=$(fuel node 2>/dev/null | grep 'ready' | cut -d "|" -f 1,7 | awk '{printf $1 ","}' | sed -e 's|,$||')
   elif [ "$_role" == "compute" ]; then
-    _nodes=$(fuel node 2>/dev/null | grep 'ready' | cut -d "|" -f 1,7 | grep "$_role" | grep -v vmware | awk '{printf $1 ","}' | sed -e 's|,$||')
+    _nodes=$(fuel node 2>/dev/null | grep 'ready' | cut -d "|" -f 1,7 | grep "$_role" | grep -v compute-vmware | awk '{printf $1 ","}' | sed -e 's|,$||')
+  elif [ "$_role" == "analytics"]; then
+      _nodes=$(fuel node 2>/dev/null | grep 'ready' | cut -d "|" -f 1,7 | grep "$_role" | grep -v contrail-analytics-db | awk '{printf $1 ","}' | sed -e 's|,$||')
   else
     _nodes=$(fuel node 2>/dev/null | grep 'ready' | cut -d "|" -f 1,7 | grep "$_role" | awk '{printf $1 ","}' | sed -e 's|,$||')
   fi
@@ -122,6 +124,11 @@ controllers*)
     # Start the upgrade tasks on config nodes
     nodes=$(get_nodes_list contrail-config)
     start_task_on_node "$nodes" upgrade-contrail-config
+    wait_for_tasks
+
+    # Start the upgrade tasks on analytics database nodes
+    nodes=$(get_nodes_list contrail-analytics-db)
+    start_task_on_node "$nodes" upgrade-contrail-db
     wait_for_tasks
 
     # Start the upgrade tasks on collector nodes

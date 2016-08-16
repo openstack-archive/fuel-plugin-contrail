@@ -3,7 +3,7 @@ volumes:
     type: "vg"
     min_size:
       generator: "calc_gb_to_mb"
-      generator_args: [256]
+      generator_args: [10]
     label: "Contrail Database"
     volumes:
       - mount: "/var/lib/contrail_db"
@@ -13,8 +13,27 @@ volumes:
         size:
           generator: "calc_total_vg"
           generator_args: ["contrail-db"]
+  - id: "contrail-analytics-db"
+    type: "vg"
+    min_size:
+      generator: "calc_gb_to_mb"
+      generator_args: [256]
+    label: "Contrail Analytics Database"
+    volumes:
+      - mount: "/var/lib/contrail_db"
+        type: "lv"
+        name: "cassandra"
+        file_system: "ext4"
+        size:
+          generator: "calc_total_vg"
+          generator_args: ["contrail-analytics-db"]
 volumes_roles_mapping:
   contrail-db:
     - {allocate_size: "min", id: "os"}
     - {allocate_size: "all", id: "contrail-db"}
+  contrail-analytics-db:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "all", id: "contrail-analytics-db"}
+
+
 
