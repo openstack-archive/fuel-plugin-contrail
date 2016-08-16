@@ -16,5 +16,16 @@ volumes:
 volumes_roles_mapping:
   contrail-db:
     - {allocate_size: "min", id: "os"}
-    - {allocate_size: "all", id: "contrail-db"}
+    - {allocate_size: "min", id: "contrail-db"}
+    - {allocate_size: "all", id: "logs"}
 
+# NOTE(gomarivera): It might be needed to specify the partitions
+# since the roles could be used in stand alone nodes.
+# Furthermore, there is a lot of unallocated space left over.
+
+  contrail-config:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "all", id: "logs"}
+  contrail-control:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "all", id: "logs"}
