@@ -2,7 +2,7 @@
 # Contrail - DB
 - id: primary-contrail-db
   type: group
-  role: [primary-contrail-db]
+  role: [primary-contrail-db,primary-contrail-analytics-db]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
   requires: [deploy_start]
@@ -12,7 +12,7 @@
 
 - id: contrail-db
   type: group
-  role: [contrail-db]
+  role: [contrail-db,contrail-analytics-db]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
   requires: [deploy_start, primary-contrail-db]
