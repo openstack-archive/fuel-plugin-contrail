@@ -46,6 +46,27 @@ contrail-analytics:
     - ceph-osd
     - cinder
 
+contrail-analytics-db:
+  name: Contrail - Analytics DB
+  description: >
+    Contrail analytics DB role. Provides dedicated Cassandra for Analytics component.
+  has_primary: true
+  limits:
+    recommended: 3
+  public_ip_required: false
+  weight: 100
+  conflicts:
+    - controller
+    - compute
+    - ceph-osd
+    - cinder
+    - contrail-db
+    - contrail-config
+    - contrail-control
+  restrictions:
+    - condition: condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.dedicated_analytics_db == true)"
+      action: "hide"
+
 contrail-control:
   name: Contrail - Control
   description: >
