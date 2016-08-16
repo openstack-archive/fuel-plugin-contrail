@@ -1,6 +1,6 @@
 [DEFAULT]
 # analytics_data_ttl=48
-  cassandra_server_list=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:9042" }.join(' ') %>
+  cassandra_server_list=<%= scope.lookupvar('contrail::analytics_db_ips').map{ |ip| "#{ip}:9042" }.join(' ') %>
   collectors=127.0.0.1:8086
   hostip=$__contrail_host_ip__ # Resolved IP of `hostname`
 # hostname= # Retrieved as `hostname`

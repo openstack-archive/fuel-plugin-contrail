@@ -7,7 +7,7 @@
 
 # The name of the cluster. This is mainly used to prevent machines in
 # one logical cluster from joining another.
-cluster_name: 'Contrail'
+cluster_name: '<%= @cluster_name %>'
 
 # This defines the number of tokens randomly assigned to this node on the ring
 # The more tokens, relative to other nodes, the larger the proportion of data
@@ -270,7 +270,7 @@ seed_provider:
       parameters:
           # seeds is actually a comma-delimited list of addresses.
           # Ex: "<ip1>,<ip2>,<ip3>"
-          - seeds: "<%= scope.lookupvar('contrail::primary_contrail_db_ip').join(',') %>"
+          - seeds: "<%= @cassandra_seeds.join(',') %>"
 
 # For workloads with more data than can fit in memory, Cassandra's
 # bottleneck will be reads that need to fetch data from
