@@ -36,6 +36,13 @@ class contrail::config {
     package_name => 'contrail-config',
   }
 
+# Memcache
+  class { '::memcached':
+    listen_ip  => '127.0.0.1',
+    max_memory => '10%',
+    item_size  => '10m',
+  }
+
 # Packages
   package { 'openjdk-7-jre-headless': }->
   package { 'ifmap-server': }->
@@ -141,7 +148,8 @@ class contrail::config {
                   File['/etc/contrail/contrail-device-manager.conf'],
                   File['/etc/contrail/contrail-config-nodemgr.conf'],
                   File['/etc/contrail/supervisord_config.conf'],
-                  File['/etc/ifmap-server/basicauthusers.properties']],
+                  File['/etc/ifmap-server/basicauthusers.properties'],
+                  Class['::memcached']],
   }
 
 }
