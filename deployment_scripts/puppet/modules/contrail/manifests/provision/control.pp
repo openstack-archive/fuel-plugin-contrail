@@ -76,7 +76,7 @@ then exit 1; fi'",
     require  => Exec['wait_for_api'],
   }
 
-  if $contrail::node_role == 'primary-contrail-control' {
+  if roles_include('primary-contrail-control') {
     contrail::provision::prov_ext_bgp { $contrail::gateways:
       require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
     }
