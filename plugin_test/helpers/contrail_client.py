@@ -40,11 +40,10 @@ class ContrailClient(object):
             insecure = not VERIFY_SSL
             credentials.update({'ca_cert': PATH_TO_CERT, 'insecure': insecure})
         logger.info('Initiate Contrail client with url %s', url)
-        auth = Password(
-                auth_url=self.keystone_url,
-                username=KEYSTONE_CREDS['username'],
-                password=KEYSTONE_CREDS['password'],
-                tenant_name=KEYSTONE_CREDS['tenant_name'])
+        auth = Password(auth_url=self.keystone_url,
+                        username=KEYSTONE_CREDS['username'],
+                        password=KEYSTONE_CREDS['password'],
+                        tenant_name=KEYSTONE_CREDS['tenant_name'])
         self._client = Session(auth=auth, verify=False)
         super(ContrailClient, self).__init__()
 
