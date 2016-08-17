@@ -8,4 +8,4 @@ admin_password=<%= scope.lookupvar('contrail::service_token') %>
 admin_token=<%= scope.lookupvar('contrail::admin_token') %>
 admin_tenant_name=<%= scope.lookupvar('contrail::service_tenant') %>
 insecure=True
-memcache_servers=<%= scope.lookupvar('contrail::memcache_ips').map{ |ip| "#{ip}:11211" }.join(',') %>
+memcache_servers=127.0.0.1:11211
