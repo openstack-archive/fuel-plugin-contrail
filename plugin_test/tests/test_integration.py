@@ -60,7 +60,8 @@ class IntegrationTests(TestBasic):
             5. Add a node with contrail-config, contrail-control,
                 contrail-db and contrail-analytics roles
             6. Deploy cluster with plugin
-            7. Run OSTF tests
+            7. Run contrail health check tests
+            8. Run OSTF tests
 
         Duration 120 min
 
@@ -78,7 +79,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 8)
+        plugin.show_range(self, 3, 6)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -94,10 +95,11 @@ class IntegrationTests(TestBasic):
                              'contrail-analytics'],
             })
 
-        self.show_step(8)
+        self.show_step(6)
         openstack.deploy_cluster(self)
+        self.show_step(7)
         TestContrailCheck(self).cloud_check(['contrail'])
-        self.show_step(9)
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
@@ -118,7 +120,8 @@ class IntegrationTests(TestBasic):
             6. Add 3 nodes with "contrail-config", "contrail-control",
                 "contrail-db" and "contrail-analytics" roles
             7. Deploy cluster with plugin
-            8. Run OSTF tests
+            8. Run contrail health check tests
+            9. Run OSTF tests
 
         Duration 120 min
 
@@ -155,8 +158,9 @@ class IntegrationTests(TestBasic):
 
         self.show_step(7)
         openstack.deploy_cluster(self)
-        TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(8)
+        TestContrailCheck(self).cloud_check(['contrail'])
+        self.show_step(9)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
@@ -179,7 +183,8 @@ class IntegrationTests(TestBasic):
             9. Add a node with "contrail-config", "contrail-control",
                 "contrail-db" and "contrail-analytics" roles
             10. Deploy cluster with plugin
-            11. Run OSTF tests
+            11. Run contrail health check tests
+            12. Run OSTF tests
 
         Duration 120 min
 
@@ -196,7 +201,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 9)
+        plugin.show_range(self, 3, 10)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -211,10 +216,11 @@ class IntegrationTests(TestBasic):
                              'contrail-db',
                              'contrail-analytics'],
             })
-        self.show_step(9)
-        openstack.deploy_cluster(self)
-        TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(10)
+        openstack.deploy_cluster(self)
+        self.show_step(11)
+        TestContrailCheck(self).cloud_check(['contrail'])
+        self.show_step(12)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
@@ -238,7 +244,8 @@ class IntegrationTests(TestBasic):
             6. Add 2 nodes with "contrail-config", "contrail-control" roles
             7. Configure MTU on network interfaces (Jumbo-frames)
             8. Deploy cluster with plugin
-            9. Run OSTF tests
+            9. Run contrail health check tests
+            10. Run OSTF tests
 
         Duration 120 min
 
@@ -317,8 +324,9 @@ class IntegrationTests(TestBasic):
 
         self.show_step(8)
         openstack.deploy_cluster(self)
-        TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(9)
+        TestContrailCheck(self).cloud_check(['contrail'])
+        self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
@@ -348,7 +356,8 @@ class IntegrationTests(TestBasic):
                 "contrail-db" and "contrail-analytics" roles
             6. Bond network interfaces with balance-rr mode
             7. Deploy cluster with plugin
-            8. Run OSTF tests
+            8. Run contrail health check tests
+            9. Run OSTF tests
 
         Duration 120 min
 
@@ -398,6 +407,7 @@ class IntegrationTests(TestBasic):
 
         self.show_step(7)
         openstack.deploy_cluster(self)
+        self.show_step(8)
         TestContrailCheck(self).cloud_check(['contrail'])
 
         # TODO(unknown)
@@ -408,7 +418,7 @@ class IntegrationTests(TestBasic):
         # When it will be done 'should_fail=2' and
         # 'failed_test_name' parameter should be removed.
 
-        self.show_step(8)
+        self.show_step(9)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
@@ -436,7 +446,8 @@ class IntegrationTests(TestBasic):
             7. Add a node with "contrail-db", "contrail-analytics" roles
             8. Configure VLAN on network interfaces
             9. Deploy cluster with plugin
-            10. Run OSTF tests
+            10. Run contrail health check tests
+            11. Run OSTF tests
 
         Duration 120 min
 
@@ -469,9 +480,10 @@ class IntegrationTests(TestBasic):
 
         self.show_step(9)
         openstack.deploy_cluster(self)
+        self.show_step(10)
         TestContrailCheck(self).cloud_check(['contrail'])
 
-        self.show_step(10)
+        self.show_step(11)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
@@ -492,7 +504,8 @@ class IntegrationTests(TestBasic):
             5. Add 1 node with "contrail-config", "contrail-control",
                 "contrail-db" and "contrail-analytics" roles
             6. Deploy cluster with plugin
-            7. Run OSTF tests
+            7. Run contrail health check tests
+            8. Run OSTF tests
 
         """
         self.show_step(1)
@@ -529,9 +542,10 @@ class IntegrationTests(TestBasic):
 
         self.show_step(6)
         openstack.deploy_cluster(self)
+        self.show_step(7)
         TestContrailCheck(self).cloud_check(['contrail'])
 
-        self.show_step(7)
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
@@ -551,6 +565,7 @@ class IntegrationTests(TestBasic):
             5. Add 1 node with "contrail-config", "contrail-control",
                 "contrail-db" and "contrail-analytics" roles
             6. Deploy cluster with plugin
+            7. Run contrail health check tests
             8. Run OSTF tests
 
         """
@@ -580,9 +595,10 @@ class IntegrationTests(TestBasic):
 
         self.show_step(6)
         openstack.deploy_cluster(self)
+        self.show_step(7)
         TestContrailCheck(self).cloud_check(['contrail'])
 
-        self.show_step(7)
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
@@ -607,7 +623,8 @@ class IntegrationTests(TestBasic):
             7. Add 3 nodes with "contrail-config", "contrail-control",
                 "contrail-db"  and "contrail-analytics" roles
             8. Deploy cluster with plugin
-            9. Run OSTF tests
+            9. Run contrail health check tests
+            10. Run OSTF tests
 
         """
         self.show_step(1)
@@ -621,7 +638,7 @@ class IntegrationTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = plugin.activate_vsrx()
 
-        plugin.show_range(self, 3, 7)
+        plugin.show_range(self, 3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -644,11 +661,12 @@ class IntegrationTests(TestBasic):
                              'contrail-analytics'],
             })
 
-        self.show_step(7)
+        self.show_step(8)
         openstack.deploy_cluster(self)
+        self.show_step(9)
         TestContrailCheck(self).cloud_check(['contrail'])
 
-        self.show_step(8)
+        self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
@@ -684,7 +702,7 @@ class IntegrationTests(TestBasic):
         self.fuel_web.update_nodes(self.cluster_id, conf_nodes)
         openstack.deploy_cluster(self)
 
-        plugin.show_range(self, 2, 4)
+        plugin.show_range(self, 2, 5)
 
         nodes = self.fuel_web.client.list_cluster_nodes(self.cluster_id)
         node_ids = ','.join([str(node['id']) for node in nodes])
