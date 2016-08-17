@@ -34,7 +34,8 @@ Steps
     4. Add 3 nodes with "compute" and "Ceph-OSD" roles
     5. Add a node with contrail-config, contrail-control, contrail-db and contrail-analytics roles
     6. Deploy cluster with plugin
-    7. Run OSTF tests
+    7. Run contrail health check tests
+    8. Run OSTF tests
 
 
 Expected results
@@ -75,7 +76,8 @@ Steps
     5. Add a node with Base-OS role
     6. Add 3 nodes with "contrail-config", "contrail-control", "contrail-db" and "contrail-analytics" roles
     7. Deploy cluster with plugin
-    8. Run OSTF tests
+    8. Run contrail health check tests
+    9. Run OSTF tests
 
 
 Expected results
@@ -119,6 +121,7 @@ Steps
     8. Add a node with "MongoDB" role
     9. Add a node with "contrail-config", "contrail-control", "contrail-db" and "contrail-analytics" roles
     10. Deploy cluster with plugin
+    10. Run contrail health check tests
     11. Run OSTF tests
 
 
@@ -161,7 +164,8 @@ Steps
     6. Add 2 nodes with "contrail-config", "contrail-control" roles
     7. Configure MTU on network interfaces (Jumbo-frames)
     8. Deploy cluster with plugin
-    9. Run OSTF tests
+    9. Run contrail health check tests
+    10. Run OSTF tests
 
 
 Expected results
@@ -204,7 +208,8 @@ Steps
     7. Add a node with "contrail-db", "contrail-analytics" roles
     8. Configure VLAN on network interfaces
     9. Deploy cluster with plugin
-    10. Run OSTF tests
+    9. Run contrail health check tests
+    11. Run OSTF tests
 
 
 Expected results
@@ -245,7 +250,8 @@ Steps
     5. Add 3 nodes with "contrail-config", "contrail-control", "contrail-db" and "contrail-analytics" roles
     6. Bond network interfaces with balance-rr mode
     7. Deploy cluster with plugin
-    8. Run OSTF tests
+    8. Run contrail health check tests
+    9. Run OSTF tests
 
 
 Expected results
@@ -285,7 +291,8 @@ Steps
     4. Add 2 nodes with "compute" role
     5. Add 1 node with "contrail-config", "contrail-control", "contrail-db" and "contrail-analytics" roles
     6. Deploy cluster with plugin
-    7. Run OSTF tests
+    7. Run contrail health check tests
+    8. Run OSTF tests
 
 
 Expected results
@@ -325,7 +332,8 @@ Steps
     4. Add 2 nodes with "compute" role
     5. Add 1 node with "contrail-config", "contrail-control", "contrail-db" and "contrail-analytics" roles
     6. Deploy cluster with plugin
-    7. Run OSTF tests
+    7. Run contrail health check tests
+    8. Run OSTF tests
 
 
 Expected results
@@ -368,7 +376,8 @@ Steps
     6. Add 1 nodes with "compute" role
     7. Add 3 nodes with "contrail-config", "contrail-control", "contrail-db"  and "contrail-analytics" roles
     8. Deploy cluster with plugin
-    9. Run OSTF tests
+    9. Run contrail health check tests
+    10. Run OSTF tests
 
 
 Expected results
