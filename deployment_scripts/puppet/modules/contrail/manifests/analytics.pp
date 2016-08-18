@@ -137,7 +137,34 @@ class contrail::analytics {
     require => Package['contrail-analytics'],
   }
 
-  # Services
+  ini_setting { 'contrail-analytics-api-keystone':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_analytics_files/contrail-analytics-api.ini',
+    section => 'program:contrail-analytics-api',
+    setting => 'command',
+    value   => '/usr/bin/contrail-analytics-api --conf_file /etc/contrail/contrail-analytics-api.conf --conf_file /etc/contrail/contrail-keystone-auth.conf',
+    require => Package['contrail-analytics'],
+  }
+
+  ini_setting { 'contrail-alarm-gen-keystone':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_analytics_files/contrail-alarm-gen.ini',
+    section => 'program:contrail-alarm-gen',
+    setting => 'command',
+    value   => '/usr/bin/contrail-alarm-gen --conf_file /etc/contrail/contrail-alarm-gen.conf --conf_file /etc/contrail/contrail-keystone-auth.conf',
+    require => Package['contrail-analytics'],
+  }
+
+  ini_setting { 'contrail-collector-keystone':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_analytics_files/contrail-collector.ini',
+    section => 'program:contrail-collector',
+    setting => 'command',
+    value   => '/usr/bin/contrail-collector --conf_file /etc/contrail/contrail-keystone-auth.conf',
+    require => Package['contrail-analytics'],
+  }
+
+# Services
   service { 'redis-server':
     ensure    => running,
     enable    => true,
