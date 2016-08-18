@@ -58,8 +58,9 @@ class FailoverTests(TestBasic):
         """
         # constants
         plugin_name = 'contrail'
-        message = "400 Client Error: Bad Request (Can't delete plugin" + \
-            " which is enabled for some environment.)"
+        message = "400 Client Error: Bad Request for url: " + \
+            "http://10.109.0.2:8000/api/v1/plugins/1 " + \
+            "(Can't delete plugin which is enabled for some environment.)"
 
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=3)
