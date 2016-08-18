@@ -109,8 +109,7 @@ class contrail::compute::vrouter {
     if $sriov_in_kernel {
       class { 'contrail::compute::dpdk_on_vf':
         require => [Package[$install_packages],Exec['remove-ovs-modules'],
-                    File['/etc/contrail/agent_param',
-                    '/etc/contrail/contrail-vrouter-nodemgr.conf']],
+                    File['/etc/contrail/agent_param']],
       }
     } else {
       file_line {'apply_dpdk_on_vf_after_reboot':
@@ -165,8 +164,7 @@ echo 3 > /proc/sys/vm/drop_caches && \
 echo 1 > /proc/sys/vm/compact_memory && \
 service supervisor-vrouter start',
       subscribe  => [Package[$install_packages],Exec['remove-ovs-modules'],
-                    File['/etc/contrail/agent_param','/etc/contrail/contrail-vrouter-agent.conf',
-                    '/etc/contrail/contrail-vrouter-nodemgr.conf']
+                    File['/etc/contrail/agent_param']
                     ],
     }
   # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
