@@ -128,6 +128,17 @@ class contrail::analytics {
     'DISCOVERY/disc_server_port': value => '5998';
   }
 
+  contrail_keystone_auth_config {
+    'KEYSTONE/auth_host':         value => $contrail::keystone_address;
+    'KEYSTONE/auth_protocol':     value => $contrail::keystone_protocol;
+    'KEYSTONE/auth_port':         value => '35357';
+    'KEYSTONE/admin_user':        value => $contrail::neutron_user;
+    'KEYSTONE/admin_password':    value => $contrail::service_token;
+    'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
+    'KEYSTONE/insecure':          value => true;
+    'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
+  }
+
   ini_setting { 'analytics-fdlimit':
     ensure  => present,
     path    => '/etc/contrail/supervisord_analytics.conf',
@@ -137,7 +148,38 @@ class contrail::analytics {
     require => Package['contrail-analytics'],
   }
 
-  # Services
+  $keystone_auth_conf = '--conf_file /etc/contrail/contrail-keystone-auth.conf'
+  $analytics_api_conf = '--conf_file /etc/contrail/contrail-analytics-api.conf'
+  $alarm_gen_conf     = '--conf_file /etc/contrail/contrail-alarm-gen.conf'
+
+  ini_setting { 'supervisor-analytics-api':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_analytics_files/contrail-analytics-api.ini',
+    section => 'program:contrail-analytics-api',
+    setting => 'command',
+    value   => "/usr/bin/contrail-analytics-api ${analytics_api_conf} ${keystone_auth_conf}",
+    require => Package['contrail-analytics'],
+  }
+
+  ini_setting { 'supervisor-alarm-gen':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_analytics_files/contrail-alarm-gen.ini',
+    section => 'program:contrail-alarm-gen',
+    setting => 'command',
+    value   => "/usr/bin/contrail-alarm-gen ${alarm_gen_conf} ${keystone_auth_conf}",
+    require => Package['contrail-analytics'],
+  }
+
+  ini_setting { 'supervisor-collector':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_analytics_files/contrail-collector.ini',
+    section => 'program:contrail-collector',
+    setting => 'command',
+    value   => "/usr/bin/contrail-collector ${keystone_auth_conf}",
+    require => Package['contrail-analytics'],
+  }
+
+# Services
   service { 'redis-server':
     ensure    => running,
     enable    => true,
@@ -151,7 +193,10 @@ class contrail::analytics {
     require   => [
       Package['contrail-openstack-analytics'],
       Service['redis-server'],
-      Ini_setting['analytics-fdlimit']
+      Ini_setting['analytics-fdlimit'],
+      Ini_setting['supervisor-analytics-api'],
+      Ini_setting['supervisor-alarm-gen'],
+      Ini_setting['supervisor-collector'],
     ],
   }
 
