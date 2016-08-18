@@ -3,7 +3,7 @@
 ;WEB_PORT = 9696  ; connection through quantum plugin
 
 WEB_SERVER = <%= scope.lookupvar('contrail::contrail_private_vip') %>
-WEB_PORT = 8082 ; connection to api-server directly
+WEB_PORT = <%= scope.lookupvar('contrail::api_server_port') %> ; connection to api-server directly
 BASE_URL = /
 ;BASE_URL = /tenants/infra ; common-prefix for all URLs
 

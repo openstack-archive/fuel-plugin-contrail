@@ -46,7 +46,7 @@ class contrail::vip {
 
   openstack::ha::haproxy_service { 'contrail-configuration-api':
     order                  => '202',
-    listen_port            => 8082,
+    listen_port            => $contrail::api_server_port,
     balancermember_port    => 9100,
     server_names           => $contrail::contrail_config_ips,
     ipaddresses            => $contrail::contrail_config_ips,

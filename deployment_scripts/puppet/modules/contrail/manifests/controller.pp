@@ -197,7 +197,7 @@ class contrail::controller {
   } ->
   contrailplugin_ini_config {
     'APISERVER/api_server_ip':       value => $contrail::contrail_mgmt_vip;
-    'APISERVER/api_server_port':     value => '8082';
+    'APISERVER/api_server_port':     value => $contrail::api_server_port;
     'APISERVER/multi_tenancy':       value => 'True';
     'APISERVER/contrail_extensions': value => 'ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None';
     'COLLECTOR/analytics_api_ip':    value => $contrail::contrail_mgmt_vip;

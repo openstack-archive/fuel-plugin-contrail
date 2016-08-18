@@ -130,7 +130,7 @@ config.storageManager.ca = '';
 // VNConfig API server and port.
 config.cnfg = {};
 config.cnfg.server_ip = '<%= scope.lookupvar('contrail::contrail_private_vip') %>';
-config.cnfg.server_port = '8082';
+config.cnfg.server_port = '<%= scope.lookupvar('contrail::api_server_port')%>';
 config.cnfg.authProtocol = 'http';
 config.cnfg.strictSSL = false;
 config.cnfg.ca = '';

@@ -53,6 +53,9 @@ class contrail {
   $headless_mode     = pick($settings['headless_mode'], true)
   $multi_tenancy     = pick($settings['multi_tenancy'], true)
 
+  # Contrail-API port
+  $api_server_port   = pick($settings['api_server_port'], '8082')
+
   # VIPs
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
   $mos_public_vip = $network_metadata['vips']['public']['ipaddr']

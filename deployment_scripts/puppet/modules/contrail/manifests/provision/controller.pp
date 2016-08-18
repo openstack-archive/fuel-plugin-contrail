@@ -47,7 +47,7 @@ class contrail::provision::controller {
       command  => "python /usr/share/contrail-utils/add_route_target.py \
     --routing_instance_name default-domain:${contrail::admin_tenant}:${contrail::floating_net}:${contrail::floating_net} \
     --route_target_number ${contrail::route_target} --router_asn ${contrail::asnum} \
-    --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+    --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} \
     --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
     && touch /etc/contrail/prov_route_target-DONE",
       creates  => '/etc/contrail/prov_route_target-DONE',

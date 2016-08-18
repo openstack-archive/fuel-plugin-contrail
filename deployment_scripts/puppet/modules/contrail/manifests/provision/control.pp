@@ -22,7 +22,7 @@ class contrail::provision::control {
   define contrail::provision::prov_ext_bgp {
     exec { "prov_external_bgp_${name}":
       command => "python /opt/contrail/utils/provision_mx.py  \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} \
 --oper add --router_name ${name} --router_ip ${name} --router_asn ${contrail::asnum} \
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_external_bgp_${name}-DONE",
@@ -32,7 +32,7 @@ class contrail::provision::control {
 
   if !defined(Exec['wait_for_api']) {
     exec {'wait_for_api':
-      command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:8082` -lt 401 ];\
+      command   => "if [ `curl --silent --output /dev/null --write-out \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:${contrail::api_server_port}` -lt 401 ];\
 then exit 1; fi",
       tries     => 10,
       try_sleep => 10,
@@ -42,7 +42,7 @@ then exit 1; fi",
   if roles_include(['primary-contrail-control']) {
     exec { 'prov_control_asn':
       command => "python /opt/contrail/utils/provision_control.py \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} \
 --router_asn ${contrail::asnum} \
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_control_asn-DONE",
@@ -54,7 +54,7 @@ then exit 1; fi",
 
   exec { 'prov_control_bgp':
     command => "python /opt/contrail/utils/provision_control.py \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} \
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} --router_asn ${contrail::asnum} \
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_control_bgp-DONE",

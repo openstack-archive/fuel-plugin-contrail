@@ -181,7 +181,7 @@ class contrail::config {
     'DEFAULTS/ifmap_username':        value => 'schema-transformer';
     'DEFAULTS/ifmap_password':        value => 'schema-transformer';
     'DEFAULTS/api_server_ip':         value => $contrail::contrail_mgmt_vip;
-    'DEFAULTS/api_server_port':       value => '8082';
+    'DEFAULTS/api_server_port':       value => $contrail::api_server_port;
     'DEFAULTS/zk_server_ip':          value => $contrail::zk_server_ip;
     'DEFAULTS/log_file':              value => '/var/log/contrail/contrail-schema.log';
     'DEFAULTS/cassandra_server_list': value => $contrail::cassandra_server_list_9160;
@@ -205,7 +205,7 @@ class contrail::config {
     'DEFAULTS/ifmap_username':         value => 'svc-monitor';
     'DEFAULTS/ifmap_password':         value => 'svc-monitor';
     'DEFAULTS/api_server_ip':          value => $contrail::contrail_mgmt_vip;
-    'DEFAULTS/api_server_port':        value => '8082';
+    'DEFAULTS/api_server_port':        value => $contrail::api_server_port;
     'DEFAULTS/zk_server_ip':           value => $contrail::zk_server_ip;
     'DEFAULTS/log_file':               value => '/var/log/contrail/contrail-svc-monitor.log';
     'DEFAULTS/cassandra_server_list':  value => $contrail::cassandra_server_list_9160;
@@ -228,7 +228,7 @@ class contrail::config {
 
   contrail_device_manager_config {
     'DEFAULTS/api_server_ip':         value => $contrail::contrail_mgmt_vip;
-    'DEFAULTS/api_server_port':       value => '8082';
+    'DEFAULTS/api_server_port':       value => $contrail::api_server_port;
     'DEFAULTS/zk_server_ip':          value => $contrail::zk_server_ip;
     'DEFAULTS/log_file':              value => '/var/log/contrail/contrail-device-manager.log';
     'DEFAULTS/cassandra_server_list': value => $contrail::cassandra_server_list_9160;
