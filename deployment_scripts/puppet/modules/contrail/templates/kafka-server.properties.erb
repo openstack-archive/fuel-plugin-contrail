@@ -130,7 +130,7 @@ default.replication.factor=1
 # server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002".
 # You can also append an optional chroot string to the urls to specify the
 # root directory for all kafka znodes.
-zookeeper.connect=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
+zookeeper.connect=<%= scope.lookupvar('contrail::zk_server_ip') %>
 
 # Timeout in ms for connecting to zookeeper
 zookeeper.connection.timeout.ms=6000
