@@ -246,6 +246,12 @@ class contrail::config {
     enable  => false,
     require => Package['contrail-openstack-config'],
   }
+# Haproxy service disabled LP#1614863
+  service {'haproxy':
+    ensure  => stopped,
+    enable  => false,
+    require => Package['contrail-openstack-config'],
+  }
 
   service { 'supervisor-config':
     ensure    => $contrail::service_ensure,
