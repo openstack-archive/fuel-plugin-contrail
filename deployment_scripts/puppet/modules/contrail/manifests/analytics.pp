@@ -150,6 +150,7 @@ class contrail::analytics {
   $keystone_auth_conf = '--conf_file /etc/contrail/contrail-keystone-auth.conf'
   $analytics_api_conf = '--conf_file /etc/contrail/contrail-analytics-api.conf'
   $alarm_gen_conf     = '--conf_file /etc/contrail/contrail-alarm-gen.conf'
+  $collector_conf     = '--conf_file /etc/contrail/contrail-collector.conf'
 
   ini_setting { 'supervisor-analytics-api':
     ensure  => present,
@@ -174,7 +175,7 @@ class contrail::analytics {
     path    => '/etc/contrail/supervisord_analytics_files/contrail-collector.ini',
     section => 'program:contrail-collector',
     setting => 'command',
-    value   => "/usr/bin/contrail-collector ${keystone_auth_conf}",
+    value   => "/usr/bin/contrail-collector ${collector_conf} ${keystone_auth_conf}",
     require => Package['contrail-analytics'],
   }
 
