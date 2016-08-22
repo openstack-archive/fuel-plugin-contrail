@@ -101,7 +101,7 @@ def assign_vlan(obj, **interface_tags):
 
 
 def update_deploy_check(obj, nodes, delete=False, is_vsrx=True,
-                        ostf_timeout=0, ostf_suites=[], ostf_fail_tests=[]):
+                        ostf_timeout=OSTF_RUN_TIMEOUT, ostf_suites=[], ostf_fail_tests=[]):
     """Update, deploy and check cluster.
 
     :param obj: Test case object
