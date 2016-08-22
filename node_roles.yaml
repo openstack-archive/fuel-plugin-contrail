@@ -78,6 +78,9 @@ contrail-tsn:
     - compute
     - ceph-osd
     - cinder
+  restrictions:
+    - condition: "settings:contrail.enable_tor_agents.value == false"
+      message: "Contrail TSN should be enabled and configured in plugin settings"
 
 dpdk:
   name: DPDK compute
