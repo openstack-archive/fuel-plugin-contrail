@@ -560,7 +560,7 @@ class FunctionalTests(TestBasic):
         vsrx_setup_result = plugin.activate_vsrx()
 
         plugin.show_range(self, 3, 6)
-        conf_no_db = {
+        conf_no_compute = {
             'slave-01': ['controller', 'mongo'],
             'slave-02': ['compute', 'ceph-osd'],
             'slave-03': ['compute', 'ceph-osd'],
@@ -571,19 +571,18 @@ class FunctionalTests(TestBasic):
                          'contrail-analytics'],
             # Here slave-6
         }
-        conf_db = {'slave-06': ['compute']}
+        conf_compute = {'slave-06': ['compute']}
 
         self.show_step(6)
-        openstack.update_deploy_check(self, conf_no_db,
+        openstack.update_deploy_check(self, conf_no_compute,
                                       is_vsrx=vsrx_setup_result)
         plugin.show_range(self, 7, 9)
-        openstack.update_deploy_check(self, conf_db,
+        openstack.update_deploy_check(self, conf_compute,
                                       is_vsrx=vsrx_setup_result)
         plugin.show_range(self, 9, 12)
         openstack.update_deploy_check(
-            self, conf_db, delete=True,
-            is_vsrx=vsrx_setup_result,
-            ostf_fail_tests=['Check that required services are running'])
+            self, conf_compute, delete=True,
+            is_vsrx=vsrx_setup_result)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
           groups=["contrail_no_default"])
