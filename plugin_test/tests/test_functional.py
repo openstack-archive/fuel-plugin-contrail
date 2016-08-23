@@ -103,27 +103,14 @@ class FunctionalTests(TestBasic):
         openstack.update_deploy_check(self,
                                       dict(conf_no_controller, **conf_ctrl),
                                       is_vsrx=vsrx_setup_result)
-        self.show_step(7)
+        plugin.show_range(self, 7, 9)
         openstack.update_deploy_check(self,
                                       conf_ctrl, delete=True,
-                                      is_vsrx=False)
-        self.show_step(8)
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            test_sets=['smoke', 'sanity', 'ha'],
-            timeout=settings.OSTF_RUN_TIMEOUT,
-            should_fail=1,
-            failed_test_name=['Check that required services are running']
-        )
-        self.show_step(9)
+                                      is_vsrx=vsrx_setup_result)
+        plugin.show_range(self, 9, 11)
         openstack.update_deploy_check(self,
                                       conf_ctrl,
-                                      is_vsrx=False)
-        self.show_step(10)
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            test_sets=['smoke', 'ha'],
-            timeout=settings.OSTF_RUN_TIMEOUT)
+                                      is_vsrx=vsrx_setup_result)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_plugin_add_delete_compute_node"])
