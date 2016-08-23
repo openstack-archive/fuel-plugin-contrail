@@ -66,8 +66,8 @@ class contrail::control {
     'DEFAULT/log_local': value => '1';
     'DISCOVERY/server':  value => $contrail::contrail_private_vip;
     'IFMAP/certs_store': value => ' ';
-    'IFMAP/password':    value => $contrail::address;
-    'IFMAP/user':        value => $contrail::address;
+    'IFMAP/password':    value => "${contrail::address}.dns";
+    'IFMAP/user':        value => "${contrail::address}.dns";
   }
 
   file { '/etc/contrail/dns/contrail-named.conf':
