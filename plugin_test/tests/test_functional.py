@@ -30,6 +30,7 @@ from fuelweb_test.settings import SERVTEST_TENANT
 from fuelweb_test.settings import SERVTEST_USERNAME
 
 from helpers.contrail_client import ContrailClient
+from helpers import vsrx
 from helpers import plugin
 from helpers import openstack
 from helpers import settings
@@ -75,7 +76,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 5)
         conf_no_controller = {
@@ -139,7 +140,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 5)
         conf_no_controller = {
@@ -205,7 +206,7 @@ class FunctionalTests(TestBasic):
         plugin.prepare_contrail_plugin(self, slaves=9)
         self.show_step(2)
         plugin.activate_plugin(self)
-        vsrx_setup_result = plugin.activate_vsrx()  # activate vSRX image
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 5)
         conf_no_contrail = {
@@ -299,7 +300,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_nodes = {
@@ -346,7 +347,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_nodes = {
@@ -393,7 +394,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_no_control = {
@@ -442,7 +443,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_no_config = {
@@ -489,7 +490,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 5)
         conf_no_db = {
@@ -544,7 +545,7 @@ class FunctionalTests(TestBasic):
         self.show_step(2)
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_no_compute = {
@@ -610,7 +611,7 @@ class FunctionalTests(TestBasic):
         plugin.prepare_contrail_plugin(self, slaves=3)
 
         # activate vSRX image
-        plugin.activate_vsrx()
+        vsrx.activate()
 
         self.show_step(3)
         plugin.activate_plugin(
@@ -716,7 +717,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_nodes = {
@@ -763,7 +764,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_no_config = {
@@ -814,7 +815,7 @@ class FunctionalTests(TestBasic):
         self.show_step(2)
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_no_ha_contrail = {
@@ -871,7 +872,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self, **opts)
 
         # activate vSRX image
-        vsrx_setup_result = plugin.activate_vsrx()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 6)
         conf_nodes = {
