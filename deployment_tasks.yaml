@@ -399,6 +399,22 @@
     strategy:
       type: parallel
 
+################
+#15. Provision Contrail Web UI
+################
+
+- id: contrail-webui-provision-primary
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-config]
+  required_for: [deploy_end]
+  requires: [contrail-control-provision-all]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-webui.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+
 ##############################################################
 #  Openstack Controller tasks section
 ##############################################################
