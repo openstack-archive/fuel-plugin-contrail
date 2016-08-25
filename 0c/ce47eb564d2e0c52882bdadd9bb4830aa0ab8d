@@ -1,0 +1,11 @@
+Code-Review+1: Pavel Basov <pbasov@mirantis.com>
+Code-Review+1: Andrey Kirilochkin <akirilochkin@mirantis.com>
+Code-Review+2: Illia Polliul <ipolliul@mirantis.com>
+Code-Review+1: Fuel TPI CI <pi-ci@mirantis.com>
+Workflow+1: Illia Polliul <ipolliul@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 25 Aug 2016 10:55:49 +0000
+Reviewed-on: https://review.openstack.org/359374
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/master
