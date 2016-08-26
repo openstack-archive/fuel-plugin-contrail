@@ -14,9 +14,9 @@
 
 class contrail::compute::vrouter {
 
-# facter uses underscore instead of dot as a separator for interface name with vlan
-$phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-$dev_mac         = getvar("::macaddress_${phys_dev_facter}")
+  # facter uses underscore instead of dot as a separator for interface name with vlan
+  $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
+  $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
 
   if $contrail::compute_dpdk_enabled {
     $dpdk_mac = $::mac_from_vrouter
@@ -76,7 +76,7 @@ $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
   } ->
   exec { 'remove-ovs-modules':
     command => '/sbin/modprobe -r openvswitch',
-    onlyif  => '/sbin/lsmod | grep -q openvswitch',
+    onlyif  => '/sbin/lsmod | grep -q ^openvswitch',
   } ->
   file {'/etc/contrail/agent_param':
     ensure  => present,

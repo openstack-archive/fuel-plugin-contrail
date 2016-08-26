@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/contrail-compute-nova.pp')
 
 include contrail
-class { 'contrail::compute::nova': }
+include contrail::compute::nova

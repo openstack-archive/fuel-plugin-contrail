@@ -14,4 +14,4 @@
 
 notice('MODULAR: contrail/compute-hiera.pp')
 
-class { 'contrail::compute::hiera': }
+include contrail::compute::hiera

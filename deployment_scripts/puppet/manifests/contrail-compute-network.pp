@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/contrail-compute-network.pp')
 
 include contrail
-class { 'contrail::compute::network': }
+include contrail::compute::network

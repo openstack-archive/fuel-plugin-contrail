@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/contrail-db.pp')
 
 include contrail
-class { 'contrail::database': }
+include contrail::database

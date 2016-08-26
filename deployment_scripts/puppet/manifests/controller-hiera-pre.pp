@@ -14,4 +14,4 @@
 
 notice('MODULAR: contrail/controller-hiera-pre.pp')
 
-class { 'contrail::controller::hiera_pre':}
+include contrail::controller::hiera_pre

@@ -87,10 +87,95 @@
     strategy:
       type: parallel
 
+#
+# Contrail VMware vRouter role
+- id: contrail-vmware
+  type: group
+  role: [contrail-vmware]
+  tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start, dns-client, ntp-client]
+  required_for: [deploy_end, primary-contrail-control, primary-contrail-db, primary-controller]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: parallel
+
+##########################################################
 # Tasks
+##########################################################
+
+##############
+#1. Copy ssh keys to vmware
+##############
+
+- id: vmware_copy_keys
+  type: copy_files
+  version: 2.0.0
+  groups: ['/.*/']
+  required_for: [pre_deployment_end]
+  requires: [vmware_generate_keys]
+  cross-depends:
+    - name: vmware_generate_keys
+      role: master
+  parameters:
+    files:
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware
+        dst: /var/lib/astute/vmware/vmware
+      - src: /var/lib/fuel/keys/{CLUSTER_ID}/vmware/vmware.pub
+        dst: /var/lib/astute/vmware/vmware.pub
+    permissions: '0600'
+    dir_permissions: '0700'
+    cwd: /
+
+- id: copy_vmware_data
+  type: copy_files
+  version: 2.0.0
+  groups: ['/.*/']
+  required_for: [pre_deployment_end]
+  requires: [gather_vmware_data]
+  cross-depends:
+    - name: gather_vmware_data
+      role: master
+  parameters:
+    files:
+      - src: /var/lib/fuel/contrail/{CLUSTER_ID}.yaml
+        dst: /etc/hiera/override/plugins.yaml
+    permissions: '0600'
+    dir_permissions: '0700'
+    cwd: /
+  condition:
+    yaql_exp: &use_vcenter '$.use_vcenter and changed($.use_vcenter)'
+
+- id: gather_vmware_data
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [pre_deployment_start]
+  required_for: [copy_vmware_data]
+  parameters:
+    cmd: /usr/bin/python /var/www/nailgun/plugins/contrail-3.0/deployment_scripts/get_vmware_settings.py {CLUSTER_ID}
+    timeout: 180
+    cwd: /
+  condition:
+    yaql_exp: *use_vcenter
+
 #############
-#1. Install Contrail utils, java
+#2. Generate keys
 #############
+
+- id: vmware_generate_keys
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [pre_deployment_start]
+  required_for: [vmware_copy_keys]
+  parameters:
+    cmd: sh /etc/puppet/modules/osnailyfacter/modular/astute/generate_keys.sh -p /var/lib/fuel/keys/ -i {CLUSTER_ID} -s 'vmware'
+    timeout: 180
+    cwd: /
+
+#############
+#3. Install Contrail utils, java
+##############
 
 - id: contrail-utils
   type: puppet
@@ -104,7 +189,7 @@
     timeout: 720
 
 #############
-#2. Install Cassandra and wait cluster to bootstrap
+#4. Install Cassandra and wait cluster to bootstrap
 #############
 
 - id: contrail-db-primary
@@ -118,7 +203,11 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
 
-# This task is a anchor for make dependency between fuel keystone tasks and contrail db setup
+##############
+#5. This task is an anchor to create a dependency between fuel keystone
+# tasks and contrail db setup
+#############
+
 - id: contrail-keystone
   type: skipped
   version: 2.0.0
@@ -129,7 +218,7 @@
     - name: contrail-db-primary
 
 ################
-#3. Deploy other Cassandra servers
+#6. Deploy other Cassandra servers
 ################
 
 - id: contrail-db-all
@@ -139,14 +228,14 @@
   required_for: [deploy_end]
   requires: [contrail-utils]
   cross-depends:
-  - name: contrail-db-primary
+    - name: contrail-db-primary
   parameters:
     puppet_manifest: puppet/manifests/contrail-db.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
 
 ###############
-#4. Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
+#7. Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
 #   this task is performed on one node initially to allow discovery service to start up
 ###############
 
@@ -157,16 +246,16 @@
   required_for: [deploy_end]
   requires: [contrail-utils, deploy_start]
   cross-depends:
-  - name: /contrail-db(-primary|-all)/
-  - name: openstack-haproxy-contrail
-  - name: primary-keystone
+    - name: /contrail-db(-primary|-all)/
+    - name: openstack-haproxy-contrail
+    - name: primary-keystone
   parameters:
     puppet_manifest: puppet/manifests/contrail-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
 ################
-#5. Provision Primary Control config
+#8. Provision Primary Control config
 ################
 
 - id: contrail-config-provision-primary
@@ -181,7 +270,7 @@
     timeout: 1440
 
 ################
-#6. Perform same actions on other contrail-config nodes
+#9. Perform same actions on other contrail-config nodes
 ################
 
 - id: contrail-config-all
@@ -191,8 +280,8 @@
   required_for: [deploy_end]
   requires: [contrail-utils]
   cross-depends:
-   - name: contrail-config-primary
-   - name: contrail-config-provision-primary
+    - name: contrail-config-primary
+    - name: contrail-config-provision-primary
   parameters:
     puppet_manifest: puppet/manifests/contrail-config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -201,7 +290,7 @@
       type: parallel
 
 ###############
-#7. Provision Contrail Config
+#10. Provision Contrail Config
 ###############
 
 - id: contrail-config-provision-all
@@ -218,7 +307,7 @@
       type: parallel
 
 ################
-#8. Install and configure Contrail Control Node
+#11. Install and configure Contrail Control Node
 ################
 
 - id: contrail-control-primary
@@ -237,7 +326,7 @@
     timeout: 1440
 
 ################
-#9. Provision Primary Contrail control
+#12. Provision Primary Contrail control
 ################
 
 - id: contrail-control-provision-primary
@@ -252,7 +341,7 @@
     timeout: 1440
 
 ##############
-#10. Install other Contrail Control Nodes
+#13. Install other Contrail Control Nodes
 ##############
 
 - id: contrail-control-all
@@ -273,7 +362,7 @@
 
 
 ################
-#11. Provision Contrail control
+#14. Provision Contrail control
 ################
 
 - id: contrail-control-provision-all
@@ -292,7 +381,7 @@
       type: parallel
 
 ###############
-# Provision Control db
+#15. Provision Control db
 ###############
 
 - id: contrail-db-provision-all
@@ -475,6 +564,20 @@
     timeout: 120
 
 #################
+# Configure vmware integration
+#################
+
+- id: primary-controller-vmware
+  type: puppet
+  groups: [primary-controller]
+  required_for: [post_deployment_end]
+  requires: [controller-hiera-post]
+  parameters:
+    puppet_manifest: puppet/manifests/controller-vmware.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+
+#################
 # Create networks for ostf-tests and provision route target
 #################
 
@@ -495,14 +598,50 @@
       role: self
     - name: contrail-config-all
       policy: all
-    - name: contrail-config-primary
-      policy: all
-    - name: openstack-controller-contrail
+    - name: openstack-controller-provision
+      role: primary-controller
       policy: all
   strategy:
     type: one-by-one
   parameters:
     puppet_manifest: puppet/manifests/controller-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+##############################################################
+#  Compute vmware tasks section
+##############################################################
+
+
+# Set proper apt pin for Contrail repository
+- id: contrail-compute-vmware-repo
+  type: puppet
+  groups: [compute-vmware]
+  required_for: [tools]
+  requires: [deploy_start, globals]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware-repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+- id: contrail-compute-vmware-pkg
+  type: puppet
+  groups: [compute-vmware]
+  required_for: [top-role-compute-vmware]
+  requires: [deploy_start, globals, contrail-compute-vmware-repo, contrail-override-repository]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware-pkg.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Deploy contrail vCenter plugin
+- id: contrail-compute-vmware
+  type: puppet
+  groups: [compute-vmware]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
@@ -531,7 +670,7 @@
 - id: compute-hiera
   type: puppet
   version: 2.0.0
-  groups: [compute]
+  groups: [compute, compute-vmware]
   required_for: [netconfig]
   requires: [deploy_start, globals]
   parameters:
@@ -544,7 +683,6 @@
   groups: [compute]
   type: skipped
   version: 2.0.0
-  #
 
 # Overrides bridges settings to make netconfig idempotent with DPDK
 - id: contrail-compute-netconfig-override
@@ -564,7 +702,7 @@
 - id: contrail-override-repository
   type: puppet
   version: 2.0.0
-  groups: [compute]
+  groups: [compute, compute-vmware]
   required_for: [deploy_end]
   requires: [top-role-compute, enable_nova_compute_service, openstack-network-end, compute-hiera]
   parameters:
@@ -576,7 +714,7 @@
 - id: contrail-compute-hugepages
   type: puppet
   version: 2.0.0
-  groups: [compute]
+  groups: [compute, compute-vmware]
   required_for: [deploy_end]
   requires: [top-role-compute, enable_nova_compute_service, openstack-network-end, contrail-override-repository]
   parameters:
@@ -658,3 +796,40 @@
     puppet_manifest: puppet/manifests/contrail-compute-aggregate.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
+
+- id: contrail-vmware-task
+  type: puppet
+  version: 2.0.0
+  groups: [contrail-vmware]
+  required_for: [contrail-vmware-network]
+  requires: [hosts, ssl-dns-setup]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-vmware.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+  cross-depends:
+    - name: contrail-db-provision-all
+
+- id: contrail-vmware-network
+  type: puppet
+  version: 2.0.0
+  groups: [contrail-vmware]
+  required_for: [contrail-vmware-reboot]
+  requires: [contrail-vmware-task]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-network.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Reboot contrail-wmware nodes, if it need.
+- id: contrail-vmware-reboot
+  type: shell
+  version: 2.0.0
+  groups: [contrail-vmware]
+  required_for: [deploy_end]
+  requires: [contrail-vmware-task]
+  parameters:
+    cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
+    timeout: 720
+
+

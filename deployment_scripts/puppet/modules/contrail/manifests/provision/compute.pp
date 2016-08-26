@@ -32,7 +32,7 @@ class contrail::provision::compute {
   if $contrail::compute_dpdk_enabled {
     exec { 'provision-vrouter':
       command => "contrail-provision-vrouter \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port}--openstack_ip ${contrail::keystone_address} \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} --openstack_ip ${contrail::keystone_address} \
 --oper add --host_name ${::fqdn} --host_ip ${contrail::address} \
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 --dpdk_enabled \

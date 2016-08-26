@@ -14,4 +14,4 @@
 
 notice('MODULAR: contrail/contrail-compute-repo.pp')
 
-class { 'contrail::compute::compute_repo':}
+include contrail::compute::compute_repo

@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/contrail-compute-vrouter.pp')
 
 include contrail
-class { 'contrail::compute::vrouter': }
+include contrail::compute::vrouter
