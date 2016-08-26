@@ -65,16 +65,20 @@ advanced
 Steps
 #####
 
-    1. Login as admin to Openstack Horizon UI
-    2. Launch 2 new instances
-    3. Connect to the first instance via VNC (Horizon) and ping the second instance
-    4. With a pause of 5-10 minutes turn off and turn on each of Contrail Nodes
+    1. Deploy openstack with HA (at lest 3 controllers and 3 nodes with contrail`s roles) and Ceph
+    2. Run OSTF tests
+    2. Disable first contrail node via libvirt.
+    3. Run OSTF tests
+    4. Enable first contrail node, vait 5-10 minutes and enanble second cotrail node
+    5. Run OSTF test
+    6. Enable second contrail node, vait 5-10 minutes and enanble third cotrail node
+    7. Run OSTF tests
 
 
 Expected results
 ################
 
-Ping should get a response.
+All steps must be completed successfully, without any errors.
 
 
 Uninstall of plugin with environment
