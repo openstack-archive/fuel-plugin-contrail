@@ -35,16 +35,28 @@ class contrail::compute::vmware {
   file {'/etc/contrail/ESXiToVRouterIp.map':
     content => template('contrail/ESXiToVRouterIp.map.erb')
   }
-  file {'/etc/contrail/contrail-vcenter-plugin.conf':
-    ensure  => present,
-    content => template('contrail/contrail-vcenter-plugin.conf.erb'),
-  }~>
-  # Enable and start service
+  contrail_vcenter_plugin_config {
+    'DEFAULT/vcenter.url':          value => "https://${contrail::vcenter_server_ip}/sdk";
+    'DEFAULT/vcenter.username':     value => $contrail::vcenter_server_user;
+    'DEFAULT/vcenter.password':     value => $contrail::vcenter_server_pass;
+    'DEFAULT/vcenter.datacenter':   value => $contrail::contrail_vcenter_datacenter;
+    'DEFAULT/vcenter.dvswitch':     value => $contrail::contrail_vcenter_dvswitch;
+    'DEFAULT/vcenter.ipfabricpg':   value => $contrail::contrail_vcenter_prv_vswitchpg;
+    'DEFAULT/mode':                 value => 'vcenter-as-compute';
+    'DEFAULT/auth_url':             value => "${contrail::internal_auth_protocol}://${contrail::internal_auth_address}:35357/v2.0";
+    'DEFAULT/admin_user':           value => $contrail::neutron_user;
+    'DEFAULT/admin_password':       value => $contrail::service_token;
+    'DEFAULT/admin_tenant_name':    value => $contrail::service_tenant;
+    'DEFAULT/api.hostname':         value => $contrail::contrail_private_vip;
+    'DEFAULT/api.port':             value => $contrail::api_server_port;
+    'DEFAULT/zookeeper.serverlist': value => $contrail::zk_server_ip;
+    'DEFAULT/introspect.port':      value => '8234';
+  }
+  Contrail_vcenter_plugin_config <||> ~>
   service { 'contrail-vcenter-plugin':
     ensure => running,
     enable => true,
   }
-
   Nova_Config <||> ~>
   service { 'nova-compute':
     ensure => running,
