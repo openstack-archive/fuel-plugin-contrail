@@ -27,19 +27,28 @@ class contrail::compute::vmware_pkg {
 
   #Create a pinning
   $vcenter_compute_pkgs = [
-    'python-bitstring', 'python-novaclient',
-    'tzdata', 'tzdata-java', 'openjdk-7-jre-headless']
+    'python-bitstring', 'python-novaclient', 'tzdata',
+    'tzdata-java', 'openjdk-7-jre-headless', 'python-pyvmomi']
 
+  apt::pin { 'python-urllib3-pin':
+    explanation => 'Set override for packages from contrail repository',
+    priority    => 1400,
+    label       => 'contrail',
+    packages    => python-urllib3,
+  } ->
   apt::pin { 'vcenter_compute_pkgs_pin':
     explanation => 'Set override for packages from contrail repository',
     priority    => 1400,
     label       => 'contrail',
     packages    => $vcenter_compute_pkgs,
   } ->
-  group { 'libvirtd':
-    ensure => 'present',
+  group { 'libvirtd' :
+    ensure => present,
   } ->
   package { $vcenter_compute_pkgs: } ->
+  package {'python-urllib3':
+    ensure => latest,
+  } ->
 
   package {['nova-compute', 'nova-compute-kvm', 'nova-common', 'python-nova']:}
 

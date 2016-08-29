@@ -30,7 +30,7 @@ class contrail::utils {
       $pkgs = [
         'contrail-nodemgr', 'contrail-setup', 'contrail-utils', 'ifenslave-2.6',
         'openjdk-7-jre-headless', 'patch', 'python-contrail', 'python-crypto',
-        'python-netaddr', 'python-paramiko', 'supervisor', 'tzdata'
+        'python-netaddr', 'python-paramiko', 'supervisor', 'tzdata', 'python-urllib3',
       ]
       Package<| (title == 'tzdata') |> {
         require => Apt::Pin['contrail-pin-100'],

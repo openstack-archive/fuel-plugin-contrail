@@ -14,15 +14,12 @@
 
 class contrail::contrail_vmware {
 
-  if $contrail::use_vcenter and $contrail::provision_vmware_type == 'fuel'{
+  if $contrail::use_vcenter {
 
-    $self_ip = $contrail::address
-    $cfgm_ip = $contrail::contrail_private_vip
-
+    $cfgm_ip                 = $contrail::contrail_private_vip
     $ncontrols               = size($contrail::contrail_control_ips)
     $amqp_server_ip          = $contrail::contrail_private_vip
     $service_token           = $contrail::admin_token
-    $orchestrator            = $contrail::orchestrator
     $hypervisor              = $contrail::hypervisor
     $keystone_ip             = $contrail::mos_mgmt_vip
     $keystone_admin_user     = $contrail::neutron_user
@@ -34,25 +31,14 @@ class contrail::contrail_vmware {
     $mgmt_self_ip            = $::ipaddress_br_mgmt
 
     # Fetching the esxi data from hash
-    $esxi_data               = fetch_esxi_data("root@${self_ip}")
-    $vmware                  = $esxi_data['ip']
-    $vmware_username         = $esxi_data['username']
-    $vmware_passwd           = $esxi_data['password']
-    $vmware_iface_name       = $esxi_data['contrail_vm']['vmware_iface_name']
-    $vmware_vmpg_vswitch     = $esxi_data['fabric_vswitch']
-    $vmware_vmpg_vswitch_mtu = '9000'
-    $mode                    = $contrail::mode
-    $contrailvm_ntp          = $contrail::contrailvm_ntp
+    $mapping_data            = loadyaml('/etc/hiera/plugins/contrail-esxi-vrouter-map.yaml')
+    $host                    = pick($mapping_data['esxi_mapping'][$contrail::address], '')
+    $esxi_data               = fetch_esxi_data($host)
+    $vmware                  = pick($esxi_data['ip'], '10.0.0.0')
+    $vmware_iface_name       = pick($esxi_data['contrail_vm']['vmware_iface_name'], 'ens161')
 
     $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
     $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
-
-    $delete_packages  = ['openvswitch-common', 'openvswitch-datapath-dkms',
-      'openvswitch-datapath-lts-saucy-dkms', 'openvswitch-switch', 'nova-network',
-      'nova-api']
-    $install_packages = ['contrail-install-packages', 'contrail-fabric-utils',
-      'contrail-setup', 'contrail-vrouter-dkms', 'contrail-vrouter-common',
-      'contrail-nova-vif', 'open-vm-tools', 'iproute2']
 
     l23network::l3::ifconfig { $vmware_iface_name: ipaddr => 'none' }
 
@@ -83,19 +69,11 @@ class contrail::contrail_vmware {
       line  => 'crashkernel=384M-2G:64M,2G-16G:128M,16G-:256M\1',
     }
 
-    if !is_pkg_installed('contrail-openstack-vrouter') {
-      file { 'create_supervisor_vrouter_override':
-        ensure  => present,
-        path    => '/etc/init/supervisor-vrouter.override',
-        content => 'manual',
-        before  => Class['contrail::package'],
-      }
+    file { 'create_supervisor_vrouter_override':
+      ensure  => present,
+      path    => '/etc/init/supervisor-vrouter.override',
+      content => 'manual',
     }
-
-    class { 'contrail::package':
-      install => [$install_packages],
-      remove  => [$delete_packages],
-    } ->
 
     file {'/var/crashes':
       ensure => directory,
@@ -116,7 +94,6 @@ class contrail::contrail_vmware {
     file {'/etc/contrail/agent_param':
       ensure  => present,
       content => template('contrail/agent_param.erb'),
-      require => Class[Contrail::Package],
     } ->
     contrail_vrouter_agent_config {
       'DEFAULT/platform'                          : value => 'default';
@@ -150,20 +127,18 @@ class contrail::contrail_vmware {
     exec { 'remove_supervisor_override':
       command => '/bin/rm /etc/init/supervisor-vrouter.override',
       onlyif  => '/usr/bin/test -f /etc/init/supervisor-vrouter.override',
-      require => Class['Contrail::Package'],
     }
 
     service {'supervisor-vrouter':
       ensure    => running,
       enable    => true,
-      subscribe => [Class[Contrail::Package],
-                    Exec['remove-ovs-modules'],
+      subscribe => [Exec['remove-ovs-modules'],
                     File['/etc/contrail/agent_param']],
     } ->
     exec { 'register_contrailvm_vrouter':
       path    => '/usr/local/bin:/bin:/usr/bin/',
       cwd     => '/opt/contrail/utils',
-      command => "python provision_vrouter.py --host_name ${::fqdn} --host_ip ${self_ip} \
+      command => "python provision_vrouter.py --host_name ${::fqdn} --host_ip ${contrail::address} \
 --api_server_ip ${contrail_internal_vip} --api_server_port ${contrail::api_server_port} \
 --oper add --admin_user ${keystone_admin_user} --admin_password ${keystone_admin_password} \
 --admin_tenant_name ${service_tenant_name} --openstack_ip ${internal_vip} \
