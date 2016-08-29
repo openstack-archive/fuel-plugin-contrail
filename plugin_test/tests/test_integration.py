@@ -725,3 +725,188 @@ class IntegrationTests(TestBasic):
             self.show_step(5)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
             TestContrailCheck(self).cloud_check(['contrail'])
+
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_sahara", "contrail_integration_tests"])
+    @log_snapshot_after_test
+    def contrail_sahara(self):
+        """Check Contrail deploy with sahara.
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration and CEPH storage
+            2. Enable sahara
+            3. Enable and configure Contrail plugin
+            4. Add a node with controller role
+            5. Add 3 nodes with "compute" and "Ceph-OSD" roles
+            6. Add a node with contrail-config, contrail-control,
+                contrail-db and contrail-analytics roles
+            7. Deploy cluster with plugin
+            8. Run contrail health check tests
+            9. Run OSTF tests
+
+        Duration 120 min
+
+        """
+        plugin.show_range(self, 1, 3)
+        plugin.prepare_contrail_plugin(self, slaves=5,
+                                       options={'images_ceph': True,
+                                                'volumes_ceph': True,
+                                                'ephemeral_ceph': True,
+                                                'objects_ceph': True,
+                                                'volumes_lvm': False,
+                                                'sahara': True})
+
+        self.show_step(3)
+        plugin.activate_plugin(self)
+        # activate vSRX image
+        vsrx_setup_result = vsrx.activate()
+
+        plugin.show_range(self, 4, 7)
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller'],
+                'slave-02': ['compute', 'ceph-osd'],
+                'slave-03': ['compute', 'ceph-osd'],
+                'slave-04': ['compute', 'ceph-osd'],
+                'slave-05': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db',
+                             'contrail-analytics'],
+            })
+
+        self.show_step(7)
+        openstack.deploy_cluster(self)
+        self.show_step(8)
+        TestContrailCheck(self).cloud_check(['contrail'])
+        self.show_step(9)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+          groups=["contrail_murano", "contrail_integration_tests"])
+    @log_snapshot_after_test
+    def contrail_murano(self):
+        """Check deploy contrail with murano.
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration
+            2. Enable murano
+            3. Enable and configure Contrail plugin
+            4. Add a node with controller role
+            5. Add a node with "compute" and "Storage-cinder" roles
+            6. Add a node with "contrail-config" and "contrail-db" roles
+            7. Add a node with "contrail-db", "contrail-control" roles
+            8. Add a node with "contrail-db", "contrail-analytics" roles
+            9. Deploy cluster with plugin
+            10. Run contrail health check tests
+            11. Run OSTF tests
+
+        Duration 120 min
+
+        """
+        plugin.show_range(self, 1, 3)
+        plugin.prepare_contrail_plugin(self, slaves=5,
+                                       options={'murano': True})
+
+        self.show_step(3)
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = vsrx.activate()
+
+        plugin.show_range(self, 4, 9)
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller'],
+                'slave-02': ['compute', 'cinder'],
+                'slave-03': ['contrail-config', 'contrail-db'],
+                'slave-04': ['contrail-control', 'contrail-db'],
+                'slave-05': ['contrail-db', 'contrail-analytics'],
+            })
+
+        self.show_step(9)
+        openstack.deploy_cluster(self)
+        self.show_step(10)
+        TestContrailCheck(self).cloud_check(['contrail'])
+
+        self.show_step(11)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_sahara_murano", "contrail_integration_tests"])
+    @log_snapshot_after_test
+    def contrail_sahara(self):
+        """Check Contrail deploy with sahara and murano
+
+        Scenario:
+            1. Create an environment with "Neutron with tunneling
+               segmentation" as a network configuration and CEPH storage
+            2. Enable sahara and murano
+            3. Enable and configure Contrail plugin
+            4. Add 3 nodes with controller role
+            5. Add 3 nodes with "compute" and "Ceph-OSD" roles
+            6. Add 3 nodes with contrail-config, contrail-control,
+                contrail-db and contrail-analytics roles
+            7. Deploy cluster with plugin
+            8. Run contrail health check tests
+            9. Run OSTF tests
+
+        Duration 120 min
+
+        """
+        plugin.show_range(self, 1, 3)
+        plugin.prepare_contrail_plugin(self, slaves=9,
+                                       options={'images_ceph': True,
+                                                'volumes_ceph': True,
+                                                'ephemeral_ceph': True,
+                                                'objects_ceph': True,
+                                                'volumes_lvm': False,
+                                                'sahara': True,
+                                                'murano': True})
+
+        self.show_step(3)
+        plugin.activate_plugin(self)
+        # activate vSRX image
+        vsrx_setup_result = vsrx.activate()
+
+        plugin.show_range(self, 4, 7)
+        self.fuel_web.update_nodes(
+            self.cluster_id,
+            {
+                'slave-01': ['controller'],
+                'slave-02': ['controller'],
+                'slave-03': ['controller'],
+                'slave-04': ['compute', 'ceph-osd'],
+                'slave-05': ['compute', 'ceph-osd'],
+                'slave-06': ['compute', 'ceph-osd'],
+                'slave-07': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db',
+                             'contrail-analytics'],
+                'slave-08': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db',
+                             'contrail-analytics'],
+                'slave-09': ['contrail-config',
+                             'contrail-control',
+                             'contrail-db',
+                             'contrail-analytics'],
+            })
+
+        self.show_step(7)
+        openstack.deploy_cluster(self)
+        self.show_step(8)
+        TestContrailCheck(self).cloud_check(['contrail'])
+        self.show_step(9)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'])

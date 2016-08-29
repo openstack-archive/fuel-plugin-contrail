@@ -36,6 +36,8 @@ def assign_net_provider(obj, **options):
         "objects_ceph": False,
         "volumes_lvm": True,
         "ceilometer": False,
+        "sahara": False,
+        "murano": False,
         "osd_pool_size": '3'
     }
 
