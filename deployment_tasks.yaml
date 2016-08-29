@@ -564,20 +564,6 @@
     timeout: 120
 
 #################
-# Configure vmware integration
-#################
-
-- id: primary-controller-vmware
-  type: puppet
-  groups: [primary-controller]
-  required_for: [post_deployment_end]
-  requires: [controller-hiera-post]
-  parameters:
-    puppet_manifest: puppet/manifests/controller-vmware.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 3600
-
-#################
 # Create networks for ostf-tests and provision route target
 #################
 
@@ -644,6 +630,11 @@
     puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+  cross-depends:
+    - name: contrail-vmware-pre-task
+      role: contrail-vmware
+    - name: contrail-vmware-task
+      role: contrail-vmware
 
 ##############################################################
 #  Compute tasks section
@@ -797,12 +788,25 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 120
 
+- id: contrail-vmware-pre-task
+  type: puppet
+  version: 2.0.0
+  groups: [contrail-vmware]
+  required_for: [contrail-vmware-network, contrail-vmware-task]
+  requires: [hosts, ssl-dns-setup]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-vmware-pre.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+  cross-depends:
+    - name: contrail-db-provision-all
+
 - id: contrail-vmware-task
   type: puppet
   version: 2.0.0
   groups: [contrail-vmware]
   required_for: [contrail-vmware-network]
-  requires: [hosts, ssl-dns-setup]
+  requires: [contrail-vmware-pre-task]
   parameters:
     puppet_manifest: puppet/manifests/contrail-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules

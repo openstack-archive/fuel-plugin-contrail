@@ -12,8 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/controller-vmware.pp')
+notice('MODULAR: contrail/contrail-vmware-pre.pp')
 
 include contrail
-include contrail::controller::vmware
+include contrail::contrail_vmware_pre
 

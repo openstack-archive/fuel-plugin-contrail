@@ -20,8 +20,8 @@ newfunction(:get_contrailvm_ips, :type => :rvalue, :doc => <<-EOS
   ) do |args|
      vm_ips = []
      hiera = function_hiera_hash(["contrail", {}])
-     fail 'There is no section "contrail_vcenter_esxi_for_fabric" in the "contrail" data!' unless hiera["contrail_vcenter_esxi_for_fabric"]
-     user_fab = YAML.load hiera["contrail_vcenter_esxi_for_fabric"]
+     fail 'There is no section "contrail_vcenter_esxi_yaml" in the "contrail" data!' unless hiera["contrail_vcenter_esxi_yaml"]
+     user_fab = YAML.load hiera["contrail_vcenter_esxi_yaml"]
      user_fab.each do |_, v|
        if v.key?("contrail_vm")
          vm_ips << v["contrail_vm"]["host"]
