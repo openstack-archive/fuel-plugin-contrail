@@ -14,7 +14,7 @@
 
 class contrail::contrail_vmware {
 
-  if $contrail::use_vcenter and $contrail::provision_vmware_type == 'fuel'{
+  if $contrail::use_vcenter {
 
     $self_ip = $contrail::address
     $cfgm_ip = $contrail::contrail_private_vip

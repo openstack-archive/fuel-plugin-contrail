@@ -72,8 +72,8 @@ class contrail {
   $public_ssl_path    = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'path', [''])
 
   #NOTE(AKirilochkin): Modern way to get the ssl values with understandable variables names
-  $public_horizon_endpoint = get_ssl_property($ssl_hash, {}, 'horizon', 'public', 'hostname', [$mos_public_vip])
-  $public_horizon_protocol = get_ssl_property($ssl_hash, {}, 'horizon', 'public', 'protocol', 'http')
+  $public_horizon_endpoint   = get_ssl_property($ssl_hash, {}, 'horizon', 'public', 'hostname', [$mos_public_vip])
+  $public_horizon_protocol   = get_ssl_property($ssl_hash, {}, 'horizon', 'public', 'protocol', 'http')
 
   $internal_neutron_endpoint = get_ssl_property($ssl_hash, {}, 'neutron', 'internal', 'hostname', [$mos_mgmt_vip])
   $internal_neutron_protocol = get_ssl_property($ssl_hash, {}, 'neutron', 'internal', 'protocol', 'http')
@@ -161,7 +161,6 @@ class contrail {
     $mode                                       = 'vcenter'
     $orchestrator                               = 'openstack'
     $hypervisor                                 = 'libvirt'
-    $vmdk_vm_image                              = pick($settings['vmdk_vm_image'], "http://${::contrail::master_ip}:8080/plugins/contrail-3.0/ContrailVM-disk1.vmdk")
     $vcenter_server_ip                          = pick($vcenter_hash['computes'][0]['vc_host'], '192.168.0.1')
     $vcenter_server_user                        = pick($vcenter_hash['computes'][0]['vc_user'], 'admin')
     $vcenter_server_pass                        = pick($vcenter_hash['computes'][0]['vc_password'], 'admin')
@@ -169,19 +168,11 @@ class contrail {
     $contrail_vcenter_datacenter                = pick($settings['contrail_vcenter_datacenter'], 'datacenter')
     $contrail_vcenter_dvswitch                  = pick($settings['contrail_vcenter_dvswitch'], 'Contrail_dvSwitch')
     $contrail_vcenter_dvportgroup               = pick($settings['contrail_vcenter_dvportgroup'], 'Contrail_DVPG')
-    $contrail_vcenter_dvportgroup_numberofports = pick($settings['contrail_vcenter_dvportgroup_numberofports'], '3')
     $contrail_vcenter_prv_vswitchpg             = pick($settings['fabric_vswitch_pg'], 'contrail-fab-pg')
     $contrail_vcenter_esxi_for_fabric           = pick($settings['contrail_vcenter_esxi_for_fabric'], '')
-    $provision_vmware                           = pick($settings['provision_vmware'], '')
-    $contrailvm_ntp                             = pick($settings['contrailvm_ntp'], '192.168.1.1')
-    $provision_vmware_type                      = pick($settings['provision_vmware_type'], '')
     $contrail_vcenter_vm_ips                    = get_contrailvm_ips()
     $contrail_compute_vmware_nodes_hash         = get_nodes_hash_by_roles($network_metadata, ['compute-vmware'])
     $contrail_compute_vmware_ips                = values(get_node_to_ipaddr_map_by_network_role($contrail_compute_vmware_nodes_hash, 'neutron/mesh'))
-    $primary_controller_role                    = hiera('primary_controller_role', ['primary-controller'])
-    $contrail_fab_build_node_hash               = get_nodes_hash_by_roles($network_metadata, $primary_controller_role)
-    $contrail_fab_build_ip                      = values(get_node_to_ipaddr_map_by_network_role($contrail_fab_build_node_hash, 'neutron/mesh'))
-    $contrail_fab_default                       = {'vmdk' => '/opt/contrail/ContrailVM-disk1.vmdk', 'vcenter_server' => 'vcenter1', 'mode' => $mode }
   }
 
   # Settings for RabbitMQ on contrail controllers
@@ -190,23 +181,22 @@ class contrail {
   $rabbit_hosts_ports = hiera('amqp_hosts')
 
   # RabbitMQ nodes Mgmt IP list
-  $rabbit_ips            = split(inline_template("<%= @rabbit_hosts_ports.split(',').map {|c| c.strip.gsub(/:[0-9]*$/,'')}.join(',') %>"),',')
+  $rabbit_ips = split(inline_template("<%= @rabbit_hosts_ports.split(',').map {|c| c.strip.gsub(/:[0-9]*$/,'')}.join(',') %>"),',')
 
   # Contrail DB nodes Private IP list
   $primary_contrail_db_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-db'])
   $primary_contrail_db_ip         = sort(values(get_node_to_ipaddr_map_by_network_role($primary_contrail_db_nodes_hash, 'neutron/mesh')))
-
   $contrail_db_nodes_hash         = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-db', 'contrail-db'])
   $contrail_db_ips                = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_db_nodes_hash, 'neutron/mesh')))
 
   # Contrail Control nodes Private IP list
-  $contrail_control_nodes_hash    = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-control', 'contrail-control'])
-  $contrail_control_ips           = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_control_nodes_hash, 'neutron/mesh')))
+  $contrail_control_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-control', 'contrail-control'])
+  $contrail_control_ips        = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_control_nodes_hash, 'neutron/mesh')))
 
   # Contrail Config nodes Private IP list
-  $contrail_config_nodes_hash     = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-config', 'contrail-config'])
-  $contrail_config_ips            = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
-  $contrail_config_ips_adm        = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'fw-admin')))
+  $contrail_config_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-config', 'contrail-config'])
+  $contrail_config_ips        = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
+  $contrail_config_ips_adm    = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'fw-admin')))
 
   # Cassandra, Kafka & Zookeeper servers list
   $cassandra_server_list      = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:9042\" }.join(' ') %>")
