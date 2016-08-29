@@ -20,8 +20,10 @@ newfunction(:fetch_esxi_data, :type => :rvalue, :doc => <<-EOS
   ) do |args|
     host = args[0]
     hiera = function_hiera_hash(["contrail", {}])
-    fail 'There is no section "contrail_vcenter_esxi_for_fabric" in the "contrail" data!' unless hiera["contrail_vcenter_esxi_for_fabric"]
-    user_fab = YAML.load hiera["contrail_vcenter_esxi_for_fabric"]
-    user_fab.map{ |k, v| v if v["contrail_vm"]["host"] == host}[0]
+    fail 'There is no section "contrail_vcenter_esxi_yaml" in the "contrail" data!' unless hiera["contrail_vcenter_esxi_yaml"]
+    user_fab = YAML.load hiera["contrail_vcenter_esxi_yaml"]
+    user_fab.each do |k, v|
+        return v if v["ip"] == host
     end
+end
 end
