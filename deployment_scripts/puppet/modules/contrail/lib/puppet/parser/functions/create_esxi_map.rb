@@ -23,7 +23,7 @@ newfunction(:create_esxi_map, :type => :rvalue, :doc => <<-EOS
     compute_vmware_clusters = vcenter_hash['computes'][0]['vc_cluster'].split(',')
 
     contrail_hash = function_hiera_hash(["contrail", {}])
-    esxi_hash = YAML.load contrail_hash['contrail_vcenter_esxi_for_fabric']
+    esxi_hash = YAML.load contrail_hash['contrail_vcenter_esxi_yaml']
     map_elements = Array.new
 
     esxi_hash.each do |esxi_name, esxi_values|

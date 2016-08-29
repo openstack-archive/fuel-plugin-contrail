@@ -564,20 +564,6 @@
     timeout: 120
 
 #################
-# Configure vmware integration
-#################
-
-- id: primary-controller-vmware
-  type: puppet
-  groups: [primary-controller]
-  required_for: [post_deployment_end]
-  requires: [controller-hiera-post]
-  parameters:
-    puppet_manifest: puppet/manifests/controller-vmware.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 3600
-
-#################
 # Create networks for ostf-tests and provision route target
 #################
 
