@@ -164,8 +164,8 @@ class contrail::contrail_vmware {
       path    => '/usr/local/bin:/bin:/usr/bin/',
       cwd     => '/opt/contrail/utils',
       command => "python provision_vrouter.py --host_name ${::fqdn} --host_ip ${self_ip} \
---api_server_ip ${contrail_internal_vip} --api_server_port ${contrail::api_server_port} \
---oper add --admin_user ${keystone_admin_user} --admin_password ${keystone_admin_password} \
+--api_server_ip ${contrail_internal_vip} --api_server_port ${contrail::api_server_port} --oper add \
+--admin_user ${keystone_admin_user} --admin_password ${keystone_admin_password} \
 --admin_tenant_name ${service_tenant_name} --openstack_ip ${internal_vip} \
 && touch /opt/contrail/register_contrailvm_vrouter-DONE",
       creates => '/opt/contrail/register_contrailvm_vrouter-DONE',

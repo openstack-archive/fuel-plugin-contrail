@@ -16,7 +16,7 @@ vcenter.password=<%= scope.lookupvar('contrail::vcenter_server_pass') %>
 
 vcenter.datacenter=<%= scope.lookupvar('contrail::contrail_vcenter_datacenter') %>
 vcenter.dvswitch=<%= scope.lookupvar('contrail::contrail_vcenter_dvswitch') %>
-vcenter.ipfabricpg=contrail-fab-pg
+vcenter.ipfabricpg=<%= scope.lookupvar('contrail::contrail_vcenter_vswitchpg') %>
 
 mode=vcenter-as-compute
 

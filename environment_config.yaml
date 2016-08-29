@@ -121,6 +121,18 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
+  fabric_vswitch_pg:
+    value: "contrail-fab-pg"
+    label: "vCenter DV Port Group"
+    description: "Contrail vSwitch Port Group name"
+    weight: 180
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid vSwitch Port Group name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
   contrail_vcenter_dvportgroup_numberofports:
     value: "3"
     label: "vCenter DV Port Group number of ports"
