@@ -118,6 +118,9 @@ dpdk:
     - contrail-analytics
     - ceph-osd
     - cinder
+  restrictions:
+    - condition: "settings:contrail.contrail_global_dpdk.value == false"
+      action: hide
 
 sriov:
   name: SRIOV compute
