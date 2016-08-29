@@ -27,6 +27,7 @@ from fuelweb_test.tests.test_jumbo_frames import TestJumboFrames
 from helpers import vsrx
 from helpers import plugin
 from helpers import openstack
+from helpers import settings
 from tests.test_contrail_check import TestContrailCheck
 
 
@@ -783,8 +784,11 @@ class IntegrationTests(TestBasic):
         TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(9)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'])
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'tests_platform'],
+                timeout=settings.OSTF_RUN_TIMEOUT
+                )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_murano", "contrail_integration_tests"])
@@ -839,4 +843,6 @@ class IntegrationTests(TestBasic):
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
-                test_sets=['smoke', 'sanity', 'ha'])
+                test_sets=['smoke', 'sanity', 'tests_platform'],
+                timeout=settings.OSTF_RUN_TIMEOUT
+                )
