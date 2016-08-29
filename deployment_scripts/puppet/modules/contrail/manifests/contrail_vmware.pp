@@ -14,7 +14,7 @@
 
 class contrail::contrail_vmware {
 
-  if $contrail::use_vcenter and $contrail::provision_vmware_type == 'fuel'{
+  if $contrail::use_vcenter {
 
     $self_ip = $contrail::address
     $cfgm_ip = $contrail::contrail_private_vip
@@ -22,7 +22,6 @@ class contrail::contrail_vmware {
     $ncontrols               = size($contrail::contrail_control_ips)
     $amqp_server_ip          = $contrail::contrail_private_vip
     $service_token           = $contrail::admin_token
-    $orchestrator            = $contrail::orchestrator
     $hypervisor              = $contrail::hypervisor
     $keystone_ip             = $contrail::mos_mgmt_vip
     $keystone_admin_user     = $contrail::neutron_user
