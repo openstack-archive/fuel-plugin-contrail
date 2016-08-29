@@ -422,3 +422,92 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Check deploy contrail with sahara
+---------------------------------
+
+
+ID
+##
+
+contrail_sahara
+
+
+Description
+###########
+
+Check deploy contrail with sahara
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+1. Create an environment with "Neutron with tunneling
+   segmentation" as a network configuration and CEPH storage
+2. Enable sahara
+3. Enable and configure Contrail plugin
+4. Add a node with controller role
+5. Add 3 nodes with "compute" and "Ceph-OSD" roles
+6. Add a node with contrail-config, contrail-control,
+   contrail-db and contrail-analytics roles
+7. Deploy cluster with plugin
+8. Run contrail health check tests
+9. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Check deploy contrail with murano
+---------------------------------
+
+
+ID
+##
+
+contrail_murano
+
+
+Description
+###########
+
+Check deploy contrail with murano
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+1. Create an environment with "Neutron with tunneling
+   segmentation" as a network configuration
+2. Enable murano
+3. Enable and configure Contrail plugin
+4. Add a node with controller role
+5. Add a node with "compute" and "Storage-cinder" roles
+6. Add a node with "contrail-config" and "contrail-db" roles
+7. Add a node with "contrail-db", "contrail-control" roles
+8. Add a node with "contrail-db", "contrail-analytics" roles
+9. Deploy cluster with plugin
+10. Run contrail health check tests
+11. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
