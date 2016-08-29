@@ -60,7 +60,7 @@ attributes:
         action: "hide"
   patch_nova:
     value: true
-    label: "Patch Nova"
+    label: "Patch Nova for DPDK support"
     description: "Patch Nova packages for dpdk-vrouter"
     weight: 140
     type: "checkbox"
@@ -121,27 +121,15 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
-  fabric_vswitch_pg:
-    value: "contrail-fab-pg"
-    label: "vCenter DV Port Group"
+  private_vswitch_pg:
+    value: "contrail_pg"
+    label: "vCenter Private Port Group"
     description: "Contrail vSwitch Port Group name"
     weight: 180
     type: "text"
     regex:
       source: '^[\w-]{1,63}$'
       error: "Invalid vSwitch Port Group name"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-  contrail_vcenter_dvportgroup_numberofports:
-    value: "3"
-    label: "vCenter DV Port Group number of ports"
-    description: "vCenter number of ports DV Port Group for Contrail"
-    weight: 190
-    type: "text"
-    regex:
-      source: '^[1-9]\d*$'
-      error: "Invalid vCenter DV Port Group number of ports"
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
@@ -156,40 +144,10 @@ attributes:
         condition: "settings:contrail.metadata.enabled == false"
       - action: "hide"
         condition: "settings:common.use_vcenter.value == false"
-  provision_vmware:
-    value: true
-    label: "Provision VMware hosts"
-    description: >
-      Enable this option to allow the plugin to provision ContrailVMs to ESXi hosts
-      and create Contrail_dvSwitch.
-      Can be disabled, if VMs are already created or this must be done manually.
-    weight: 192
-    type: "checkbox"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-  provision_vmware_type:
-    value: "fuel"
-    label: "Select the type of ContrailVM provision."
-    description: "Fabric - Creates the network topology, bootstraps the VM and configures it. Fuel - uses precreated VM bootstrap it by PXE. You still have to configure ESXi network topology by-hand."
-    weight: 194
-    type: "radio"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-      - condition: "settings:contrail.metadata.enabled == false"
-        action: "hide"
-      - condition: "not (settings:contrail.provision_vmware.value == true)"
-        action: "hide"
-    values:
-      - data: "fuel"
-        label: "Fuel"
-      - data: "fabric"
-        label: "Fabric"
-  contrail_vcenter_esxi_for_fabric:
+  contrail_vcenter_esxi_yaml:
     value: |
       'esxi1':
-         # The username of VMware ESXi ssh-access [Scope: Fabric]
+         # The username of VMware ESXi ssh-access [Scope: Fabric]i
          'username': 'root'
          # The ip-address of ESXi [Scope: Fabric and Fuel]
          'ip': 'e.s.x.i'
@@ -220,50 +178,4 @@ attributes:
       error: "Invalid vCenter ESXi data"
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-      - condition: "not (settings:contrail.provision_vmware.value == true)"
-        action: "hide"
-  vmdk_vm_image:
-    value: ""
-    label: "ContrailVM image for ESXi"
-    description: "URL to download ContrailVM image. Keep empty if you have it on FUEL-master in contrail-plugin folder at /var/www/nailgun/plugins/contrail-3.0/ContrailVM-disk1.vmdk"
-    weight: 196
-    type: "text"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-      - condition: "not (settings:contrail.provision_vmware.value == true)"
-        action: "hide"
-      - condition: "settings:contrail.provision_vmware_type.value == 'fuel'"
-        action: "hide"
-  contrailvm_ntp:
-    value: "10.109.3.1"
-    label: "NTP server for ContrailVM"
-    description: "NTP server address for ContrailVM, reachable from Private network. Should be deployed by-hands. [Scope: Fabric]"
-    weight: 205
-    type: "text"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-      - condition: "not (settings:contrail.provision_vmware.value == true)"
-        action: "hide"
-      - condition: "settings:contrail.provision_vmware_type.value == 'fuel'"
-        action: "hide"
-  contrail_environment:
-    type: "select"
-    weight: 210
-    value: "prod"
-    label: "ContrailVM flavor"
-    description: "Choose the flavor for ContrailVM. Flavor with less RAM may be used for development/test environments."
-    values:
-      - data: "dev"
-        label: "development"
-      - data: "prod"
-        label: "production"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-      - condition: "not (settings:contrail.provision_vmware.value == true)"
-        action: "hide"
-      - condition: "settings:contrail.provision_vmware_type.value == 'fuel'"
         action: "hide"

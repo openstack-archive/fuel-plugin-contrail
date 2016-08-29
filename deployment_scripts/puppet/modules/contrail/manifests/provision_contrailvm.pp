@@ -23,7 +23,6 @@ define contrail::provision_contrailvm (
   $ncontrols = size($contrail::contrail_control_ips)
   $amqp_server_ip = $contrail::contrail_private_vip
   $service_token = $contrail::admin_token
-  $orchestrator = 'openstack'
   $hypervisor = 'libvirt'
   $keystone_ip = $contrail::mos_mgmt_vip
   #$openstack_mgmt_ip
@@ -56,7 +55,7 @@ define contrail::provision_contrailvm (
   --ncontrols ${ncontrols} \
   --amqp_server_ip ${amqp_server_ip} \
   --service_token ${service_token} \
-  --orchestrator ${orchestrator}  \
+  --orchestrator ${contrail:orchestrator}  \
   --hypervisor ${hypervisor} \
   --keystone_ip ${keystone_ip} \
   --keystone_auth_protocol ${keystone_auth_protocol} \
