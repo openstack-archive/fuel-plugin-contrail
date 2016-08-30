@@ -16,15 +16,9 @@ class contrail::contrail_webui(
   $deployment_id = hiera('deployment_id'),
   $master_ip     = hiera('master_ip'),
   $vip           = $::contrail::mos_public_vip,
-  $tls_enabled   = $::contrail::public_ssl,
+  $link          = "https://${vip}:8143/"
   )
 {
-
-  if $tls_enabled {
-    $link = "https://${vip}:8143/"
-  } else {
-    $link = "http://${vip}:8143/"
-  }
 
   $text = "Dashboard for Contrail Web UI: ${link}"
   $contrail_link_data = "{\"title\":\"ContrailUI\",\
