@@ -147,5 +147,6 @@ class contrail::database {
     try_sleep => 30,
     require   => Service['supervisor-database'],
   }
+  Package['contrail-openstack-database'] -> Contrail_database_nodemgr_config <||>
   Contrail_database_nodemgr_config <||> ~> Service['supervisor-database']
 }
