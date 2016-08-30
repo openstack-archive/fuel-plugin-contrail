@@ -233,6 +233,9 @@
     puppet_manifest: puppet/manifests/contrail-db.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 3600
+    strategy:
+      type: parallel
+      amount: 1
 
 ###############
 #7. Install and configure Contrail Config, Contrail Analytics, Contrail WebUI
