@@ -18,13 +18,13 @@ and TSN are not supported yet.
 Prequisites
 -----------
 
-This guide assumes that you have installed Fuel 8.0 with the Fuel Contrail plugin,
+This guide assumes that you have installed Fuel 9.0 with the Fuel Contrail plugin,
 and successfully deployed the environment according to :doc:`/install_guide`.
 
 Package versions supported:
 
-* Fuel Contrail plugin  >= 4.0.0
-* Juniper Contrail >= 3.0.0
+* Fuel Contrail plugin  >= 5.0.0
+* Juniper Contrail >= 3.1.0
 
 Update the packages on Fuel Master node
 ---------------------------------------
@@ -35,14 +35,14 @@ Update the packages on Fuel Master node
 
    .. code-block:: console
 
-      scp contrail-4.0-4.0.1-1.noarch.rpm <Fuel Master node ip>:/tmp/
+      scp contrail-5.0-5.0.0-1.noarch.rpm <Fuel Master node ip>:/tmp/
 
 #. Log in to the Fuel Master node and upgrade the plugin:
 
    .. code-block:: console
 
       ssh <the Fuel Master node ip>
-      fuel plugins --update /tmp/contrail-4.0-4.0.1-1.noarch.rpm
+      fuel plugins --update /tmp/contrail-5.0-5.0.0-1.noarch.rpm
 
 #. Copy the latest Juniper Contrail installation package to the Fuel Master node and run the installation
    script to unpack the vendor package and populate the plugin repository with up-to-date packages:
@@ -50,8 +50,8 @@ Update the packages on Fuel Master node
    .. code-block:: console
 
       scp contrail-install-packages_3.0.2.1-4~liberty_all.deb \
-          <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-4.0/
-      ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-4.0/install.sh
+          <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-5.0/
+      ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-5.0/install.sh
 
 .. raw:: latex
 
@@ -73,7 +73,7 @@ starts. The Neutron service will be restarted in case if contrail core plugin wi
    .. code-block:: console
 
       ssh <the Fuel Master node ip>
-      cd /var/www/nailgun/plugins/contrail-4.0/
+      cd /var/www/nailgun/plugins/contrail-5.0/
 
 #. Start the upgrade of control plane:
 
@@ -101,7 +101,7 @@ during the vRouter upgrade, this can take up to 5 min.
    .. code-block:: console
 
       ssh <the Fuel Master node ip>
-      cd /var/www/nailgun/plugins/contrail-4.0/
+      cd /var/www/nailgun/plugins/contrail-5.0/
 
 #. Start the upgrade of control plane:
 

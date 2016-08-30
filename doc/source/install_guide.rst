@@ -18,13 +18,13 @@ To install the Contrail plugin:
 #.  Copy the rpm package downloaded at the previous step to the Fuel Master node and install the plugin
     ::
 
-        scp contrail-4.0-4.0.1-1.noarch.rpm  <Fuel Master node ip>:/tmp/
+        scp contrail-5.0-5.0.0-1.noarch.rpm  <Fuel Master node ip>:/tmp/
 
 #.  Log into the Fuel Master node and install the plugin
     ::
 
         ssh <the Fuel Master node ip>
-        fuel plugins --install contrail-4.0-4.0.1-1.noarch.rpm
+        fuel plugins --install contrail-5.0-5.0.0-1.noarch.rpm
 
     You should get the following output
     ::
@@ -43,8 +43,8 @@ To install the Contrail plugin:
     ::
 
         scp contrail-install-packages_3.0.2.1-4~liberty_all.deb \
-        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-4.0/
-        ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-4.0/install.sh
+        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-5.0/
+        ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-5.0/install.sh
 
 .. raw:: latex
 

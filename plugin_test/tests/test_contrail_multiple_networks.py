@@ -46,9 +46,9 @@ from tests.test_contrail_check import TestContrailCheck
 class TestMultipleNets(TestMultipleClusterNets):
     """TestMultipleNets."""
 
-    pack_copy_path = '/var/www/nailgun/plugins/contrail-4.0'
+    pack_copy_path = '/var/www/nailgun/plugins/contrail-5.0'
     add_package = \
-        '/var/www/nailgun/plugins/contrail-4.0/' \
+        '/var/www/nailgun/plugins/contrail-5.0/' \
         'repositories/ubuntu/contrail-setup*'
     ostf_msg = 'OSTF tests passed successfully.'
 
