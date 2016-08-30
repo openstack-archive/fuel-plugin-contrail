@@ -128,7 +128,7 @@ attributes:
     weight: 180
     type: "text"
     regex:
-      source: '^\w+$'
+      source: '^[\w-]{1,63}$'
       error: "Invalid vSwitch Port Group name"
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
