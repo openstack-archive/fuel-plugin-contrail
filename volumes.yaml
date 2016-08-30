@@ -16,7 +16,7 @@ volumes:
 volumes_roles_mapping:
   contrail-db:
     - {allocate_size: "min", id: "os"}
-    - {allocate_size: "min", id: "contrail-db"}
+    - {allocate_size: "all", id: "contrail-db"}
   contrail-analytics-db:
     - {allocate_size: "min", id: "os"}
     - {allocate_size: "all", id: "contrail-db"}
