@@ -99,9 +99,13 @@ class contrail::database {
   } ->
   file { '/etc/cassandra/cassandra.yaml':
     content => template('contrail/cassandra.yaml.erb'),
+    owner   => 'cassandra',
+    group   => 'cassandra',
   } ->
-  file { '/etc/cassandra/cassandra-env.sh':
-    source  => 'puppet:///modules/contrail/cassandra-env.sh',
+  file_line { 'JVM_stack_size':
+    path => '/etc/cassandra/cassandra-env.sh',
+    line => 'JVM_OPTS="$JVM_OPTS -Xss512k"',
+    match   => 'JVM_OPTS=\"\$JVM_OPTS -Xss.*\"',
   }
 
 # Supervisor-database
@@ -118,7 +122,7 @@ class contrail::database {
     require   => File[$contrail::cassandra_path],
     subscribe => [Package['contrail-openstack-database'],
       File['/etc/cassandra/cassandra.yaml'],
-      File['/etc/cassandra/cassandra-env.sh'],
+      File_line['JVM_stack_size'],
     ],
   }
 
@@ -130,7 +134,6 @@ class contrail::database {
   }
 
   $cassandra_seed = $cassandra_seeds[0]
-  notify{ 'Waiting for cassandra seed node': } ->
   exec { 'wait_for_cassandra_seed':
     provider  => 'shell',
     command   => "nodetool status|grep ^UN|grep ${cassandra_seed}",
@@ -139,13 +142,12 @@ class contrail::database {
     require   => Service['supervisor-database'],
   }
 
-  notify{ 'Waiting for cassandra': } ->
   exec { 'wait_for_cassandra':
     provider  => 'shell',
     command   => "nodetool status|grep ^UN|grep ${contrail::address}",
     tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
     try_sleep => 30,
-    require   => Service['supervisor-database'],
+    require   => [Service['supervisor-database'],Exec['wait_for_cassandra_seed']]
   }
   Package['contrail-openstack-database'] -> Contrail_database_nodemgr_config <||>
   Contrail_database_nodemgr_config <||> ~> Service['supervisor-database']
