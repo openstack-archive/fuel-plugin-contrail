@@ -55,6 +55,9 @@ dpdk:
     - ceph-osd
     - cinder
     - contrail-vmware
+  restrictions:
+    - condition: "settings:contrail.contrail_global_dpdk.value == false"
+      action: hide
 
 contrail-vmware:
   name: Contrail - VMware
