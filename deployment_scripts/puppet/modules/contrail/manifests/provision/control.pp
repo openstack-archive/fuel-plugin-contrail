@@ -27,7 +27,6 @@ class contrail::provision::control {
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_external_bgp_${name}-DONE",
       creates => "/opt/contrail/prov_external_bgp_${name}-DONE",
-      before  => Exec['prov_control_bgp'],
     }
   }
 
