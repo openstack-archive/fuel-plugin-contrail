@@ -223,11 +223,15 @@ class IntegrationTests(TestBasic):
         self.show_step(11)
         TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(12)
+        # https://bugs.launchpad.net/fuel/newton/+bug/1584190
+        # remove should fail, when bug will be fixed
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
                 test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],
-                timeout=60 * 60)
+                timeout=60 * 60,
+                should_fail=1,
+                failed_test_name=['Check stack autoscaling'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_jumbo", "contrail_integration_tests"])
