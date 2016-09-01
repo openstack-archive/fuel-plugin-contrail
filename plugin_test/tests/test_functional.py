@@ -896,3 +896,132 @@ class FunctionalTests(TestBasic):
             self, conf_nodes,
             is_vsrx=vsrx_setup_result,
             ostf_fail_tests=should_fails)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_add_analytics_db"])
+    @log_snapshot_after_test
+    def contrail_add_analytics_db(self):
+        """Verify that Analytics DB node can be added after deploying.
+
+        Scenario:
+            1. Create an environment
+            2. Enable and configure Contrail plugin
+            3. Add 3 nodes with "controller" + "ceph-osd" roles
+            4. Add 2 nodes with "compute" + "cinder" roles
+            5. Add a node with contrail-config, contrail-control
+               and contrail-db roles
+            6. Add a node with contrail-analytics role
+            7. Deploy cluster
+            8. Run OSTF tests
+            9. Run contrail health check tests
+            10. Enable dedicated analytics DB
+            11. Add a node with contrail-analytics-db role
+            12. Deploy cluster
+            13. Run OSTF tests
+            14. Run contrail health check tests
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=9,
+                                       options={'images_ceph': True})
+
+        self.show_step(2)
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = vsrx.activate()
+
+        plugin.show_range(self, 3, 7)
+        conf_no_analytics_db = {
+            'slave-01': ['controller', 'ceph-osd'],
+            'slave-02': ['controller', 'ceph-osd'],
+            'slave-03': ['controller', 'ceph-osd'],
+            'slave-04': ['compute', 'cinder'],
+            'slave-05': ['compute', 'cinder'],
+            'slave-06': ['contrail-db',
+                         'contrail-config',
+                         'contrail-control'],
+            'slave-07': ['contrail-analytics'],
+        }
+        conf_analytics_db = {'slave-08': ['contrail-analytics-db']}
+        conf_contrail={"dedicated_analytics_db": True}
+
+        plugin.show_range(self, 7, 9)
+        openstack.update_deploy_check(self, no_analytics_db,
+                                      is_vsrx=vsrx_setup_result)
+
+        self.show_step(9)
+        TestContrailCheck(self).cloud_check(['contrail'])
+
+        self.show_step(10)
+        plugin.activate_plugin(self, **conf_contrail)
+
+        plugin.show_range(self, 10, 14)
+        openstack.update_deploy_check(self, danalytics_db,
+                                      is_vsrx=vsrx_setup_result)
+
+        self.show_step(14)
+        TestContrailCheck(self).cloud_check(['contrail'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_add_ha_analytics_db"])
+    @log_snapshot_after_test
+    def contrail_add_ha_analytics_db(self):
+        """Verify that two Analytics DB nodes can be added to exist Analytics DB.
+
+        Scenario:
+            1. Create an environment
+            2. Enable and configure Contrail plugin
+            3. Enable dedicated analytics DB
+            4. Add a node with controller and cinder role
+            5. Add 2 nodes with compute role
+            6. Add 3 nodes with contrail-config, contrail-control,
+               contrail-db and contrail-analytics roles
+            7. Add a node with contrail-analytics-db role
+            8. Deploy cluster
+            9. Run OSTF tests
+            10. Run contrail health check tests
+            11. Add 2 nodes contrail-analytics-db role
+            12. Deploy cluster
+            13. Run OSTF tests
+            14. Run contrail health check tests
+
+        """
+        conf_contrail={"dedicated_analytics_db": True}
+        conf_env = {
+            'slave-01': ['controller', 'cinder'],
+            'slave-02': ['compute'],
+            'slave-03': ['compute'],
+            'slave-04': ['contrail-config', 'contrail-control',
+                        'contrail-db', 'contrail-analytics'],
+            'slave-05': ['contrail-config', 'contrail-control',
+                        'contrail-db', 'contrail-analytics'],
+            'slave-06': ['contrail-config', 'contrail-control',
+                        'contrail-db', 'contrail-analytics'], 
+            'slave-07': ['contrail-analytics-db']
+        }
+        add_analytics_db = {
+            'slave-08': ['contrail-analytics-db'],
+            'slave-09': ['contrail-analytics-db']
+        }
+
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=9)
+
+        plugin.show_range(self, 2, 4)
+        plugin.activate_plugin(self, **conf_contrail)
+        vsrx_setup_result = vsrx.activate()
+
+        plugin.show_range(self, 4, 10)
+        openstack.update_deploy_check(self, conf_env,
+                                      is_vsrx=vsrx_setup_result)
+
+        self.show_step(10)
+        TestContrailCheck(self).cloud_check(['contrail'])
+
+        plugin.show_range(self, 11, 14)
+        openstack.update_deploy_check(self, add_analytics_db,
+                                      is_vsrx=vsrx_setup_result)
+
+        self.show_step(14)
+        TestContrailCheck(self).cloud_check(['contrail'])
