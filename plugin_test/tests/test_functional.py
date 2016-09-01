@@ -896,3 +896,61 @@ class FunctionalTests(TestBasic):
             self, conf_nodes,
             is_vsrx=vsrx_setup_result,
             ostf_fail_tests=should_fails)
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_add_analytics_db"])
+    @log_snapshot_after_test
+    def contrail_plugin_add_delete_controller_node(self):
+        """Verify that Analytics DB node can be added after deploying.
+
+        Scenario:
+            1. Create an environment
+            2. Enable and configure Contrail plugin
+            3. Add 3 nodes with "controller" + "ceph-osd" roles
+            4. Add 2 nodes with "compute" + "ceph-osd" roles
+            5. Add a node with contrail-config, contrail-control
+               and contrail-db roles
+            6. Add a node with contrail-analytics role
+            7. Deploy cluster
+            8. Run OSTF tests
+            9. Enable dedicated analytics DB
+            10. Add a npde with contrail-analytics-db role
+            11. Deploy cluster
+            12. Run OSTF tests
+
+        """
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=9,
+                                       options={'images_ceph': True})
+
+        self.show_step(2)
+        plugin.activate_plugin(self)
+
+        # activate vSRX image
+        vsrx_setup_result = vsrx.activate()
+
+        plugin.show_range(self, 3, 7)
+        conf_no_analytics_db = {
+            'slave-01': ['controller', 'ceph-osd'],
+            'slave-02': ['controller', 'ceph-osd'],
+            'slave-03': ['controller', 'ceph-osd'],
+            'slave-04': ['compute', 'cinder'],
+            'slave-05': ['compute', 'cinder'],
+            'slave-06': ['contrail-db',
+                         'contrail-config',
+                         'contrail-control']
+            'slave-07': ['contrail-analytics'],
+        }
+        conf_analytics_db = {'slave-08': ['contrail-analytics-db']}
+        conf_contrail={"dedicated_analytics_db": True}
+
+        plugin.show_range(self, 7, 9)
+        openstack.update_deploy_check(self, no_analytics_db,
+                                      is_vsrx=vsrx_setup_result)
+
+        plugin.show_step(9)
+        plugin.activate_plugin(self, conf_contrail)
+
+        plugin.show_range(self, 9, 13)
+        openstack.update_deploy_check(self, danalytics_db, 
+                                      is_vsrx=vsrx_setup_result)
