@@ -32,10 +32,11 @@ Steps
     2. Enable and configure Contrail plugin
     3. Add 3 nodes with controller role
     4. Add 3 nodes with "compute" and "Ceph-OSD" roles
-    5. Add a node with contrail-config, contrail-control, contrail-db and contrail-analytics roles
-    6. Deploy cluster with plugin
-    7. Run contrail health check tests
-    8. Run OSTF tests
+    5. Add a node with contrail-config, contrail-control and contrail-db roles
+    6. Add a node with contrail-analytics-db and contrail-analytics roles
+    7. Deploy cluster with plugin
+    8. Run contrail health check tests
+    9. Run OSTF tests
 
 
 Expected results
