@@ -15,8 +15,7 @@
 class contrail::contrail_webui(
   $deployment_id = hiera('deployment_id'),
   $master_ip     = hiera('master_ip'),
-  $vip           = $::contrail::mos_public_vip,
-  $link          = "https://${vip}:8143/"
+  $link          = "https://${::contrail::mos_public_vip}:8143/"
   )
 {
 
