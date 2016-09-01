@@ -163,6 +163,18 @@
     strategy:
       type: parallel
 
+#
+# Contrail VMware vRouter role
+- id: contrail-vmware
+  type: group
+  role: [contrail-vmware]
+  tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start, dns-client, ntp-client]
+  required_for: [deploy_end, primary-contrail-control, primary-contrail-db, primary-controller]
+  requires: [deploy_start]
+  parameters:
+    strategy:
+      type: parallel
+
 # Tasks
 #############
 #1. Install Contrail utils, java
@@ -941,3 +953,16 @@
     puppet_manifest: puppet/manifests/contrail-compute-vmware.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
+
+- id: contrail-vmware-task
+  type: puppet
+  version: 2.0.0
+  groups: [contrail-vmware]
+  required_for: [contrail-vmware-network]
+  requires: [hosts, ssl-dns-setup]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-vmware.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+  cross-depends:
+    - name: contrail-db-provision-all
