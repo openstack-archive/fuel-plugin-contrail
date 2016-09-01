@@ -197,4 +197,18 @@ class contrail {
   $analytics_db_list_9160     = inline_template("<%= scope.lookupvar('contrail::analytics_db_ips').map{ |ip| \"#{ip}:9160\" }.join(' ') %>")
   $kafka_broker_list          = inline_template("<%= scope.lookupvar('contrail::analytics_db_ips').map{ |ip| \"#{ip}:9092\" }.join(' ') %>")
   $zk_server_ip               = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:2181\" }.join(',') %>")
+
+  # vCenter settings
+  $vcenter_hash                               = hiera_hash('vcenter', false)
+  if $vcenter_hash {
+    $vcenter_server_ip                          = $vcenter_hash['computes'][0]['vc_host']
+    $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']
+    $vcenter_server_pass                        = $vcenter_hash['computes'][0]['vc_password']
+    $vcenter_server_cluster                     = $vcenter_hash['computes'][0]['vc_cluster']
+    $vcenter_server_name                        = $vcenter_hash['computes'][0]['availability_zone_name']
+    $contrail_vcenter_datacenter                = pick($settings['contrail_vcenter_datacenter'], 'Datacenter')
+    $dvs_external                               = 'Contrail-DVS-Ext'
+    $dvs_internal                               = 'Contrail-DVS-Int'
+  }
+
 }
