@@ -619,3 +619,99 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Verify that Analytics DB node can be added after deploying
+----------------------------------------------------------
+
+
+ID
+##
+
+contrail_add_analytics_db
+
+
+Description
+###########
+
+Verify that Analytics DB node can be added after deploying
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Create an environment
+    2. Enable and configure Contrail plugin
+    3. Add 3 nodes with "controller" + "ceph-osd" roles
+    4. Add 2 nodes with "compute" + "cinder" roles
+    5. Add a node with contrail-config, contrail-control
+       and contrail-db roles
+    6. Add a node with contrail-analytics role
+    7. Deploy cluster
+    8. Run OSTF tests
+    9. Run contrail health check tests
+    10. Enable dedicated analytics DB
+    11. Add a node with contrail-analytics-db role
+    12. Deploy cluster
+    13. Run OSTF tests
+    14. Run contrail health check tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
+
+
+Verify that two Analytics DB nodes can be added to exist Analytics DB
+---------------------------------------------------------------------
+
+
+ID
+##
+
+contrail_add_ha_analytics_db
+
+
+Description
+###########
+
+Verify that two Analytics DB nodes can be added to exist Analytics DB
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Create an environment
+    2. Enable and configure Contrail plugin
+    3. Enable dedicated analytics DB
+    4. Add a node with controller and cinder role
+    5. Add 2 nodes with compute role
+    6. Add 3 nodes with contrail-config, contrail-control,
+       contrail-db and contrail-analytics roles
+    7. Add a node with contrail-analytics-db role
+    8. Deploy cluster
+    9. Run OSTF tests
+    10. Run contrail health check tests
+    11. Add 2 nodes contrail-analytics-db role
+    12. Deploy cluster
+    13. Run OSTF tests
+    14. Run contrail health check tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
