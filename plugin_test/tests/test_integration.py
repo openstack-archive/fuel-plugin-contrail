@@ -59,8 +59,9 @@ class IntegrationTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Add 3 nodes with controller role
             4. Add 3 nodes with "compute" and "Ceph-OSD" roles
-            5. Add a node with contrail-config, contrail-control,
-                contrail-db and contrail-analytics roles
+            5. Add a node with contrail-config, contrail-control 
+               and contrail-db roles
+            6. Add a node with contrail-analytics-db and contrail-analytics roles
             6. Deploy cluster with plugin
             7. Run contrail health check tests
             8. Run OSTF tests
@@ -68,6 +69,8 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
+        conf_contrail={"dedicated_analytics_db": True}
+
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True,
@@ -77,7 +80,7 @@ class IntegrationTests(TestBasic):
                                                 'volumes_lvm': False})
 
         self.show_step(2)
-        plugin.activate_plugin(self)
+        plugin.activate_plugin(self, conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
@@ -95,6 +98,8 @@ class IntegrationTests(TestBasic):
                              'contrail-control',
                              'contrail-db',
                              'contrail-analytics'],
+                'slave-08': ['contrail-analytics',
+                             'contrail-analytics-db']
             })
 
         self.show_step(6)

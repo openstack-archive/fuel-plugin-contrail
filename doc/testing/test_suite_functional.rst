@@ -619,3 +619,49 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Verify that Analytics DB node can be added after deploying
+----------------------------------------------------------
+
+
+ID
+##
+
+contrail_add_analytics_db
+
+
+Description
+###########
+
+Verify that Analytics DB node can be added after deploying
+
+
+Complexity
+##########
+
+Core
+
+
+Steps
+#####
+
+    1. Create an environment
+    2. Enable and configure Contrail plugin
+    3. Add 3 nodes with "controller" + "ceph-osd" roles
+    4. Add 2 nodes with "compute" + "ceph-osd" roles
+    5. Add a node with contrail-config, contrail-control
+       and contrail-db roles
+    6. Add a node with contrail-analytics role
+    7. Deploy cluster
+    8. Run OSTF tests
+    9. Enable dedicated analytics DB
+    10. Add a npde with contrail-analytics-db role
+    11. Deploy cluster
+    12. Run OSTF tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
