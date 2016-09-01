@@ -30,7 +30,9 @@ class contrail::database {
     package_name => 'contrail-database-common',
     service_name => 'contrail-database',
   }
-
+  sysctl::value { 'vm.swappiness':
+    value => '10'
+  }
   if roles_include($contrail::contrail_db_roles) {
     $cassandra_seeds = $contrail::primary_contrail_db_ip
     $cluster_name    = 'Contrail'
