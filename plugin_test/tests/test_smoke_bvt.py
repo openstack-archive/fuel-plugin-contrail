@@ -242,11 +242,13 @@ class ContrailPlugin(TestBasic):
         Duration 110 min
 
         """
+        conf_contrail={"dedicated_analytics_db": True}
+
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
         self.show_step(2)
-        plugin.activate_plugin(self)
+        plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
@@ -257,11 +259,12 @@ class ContrailPlugin(TestBasic):
                 'slave-01': ['contrail-config'],
                 'slave-02': ['contrail-control'],
                 'slave-03': ['contrail-analytics'],
-                'slave-04': ['contrail-db'],
+                'slave-04': ['contrail-analytics-db'],
                 'slave-05': ['contrail-db'],
                 'slave-06': ['contrail-db'],
-                'slave-07': ['controller'],
-                'slave-08': ['compute', 'cinder'],
+                'slave-07': ['contrail-db'],
+                'slave-08': ['controller'],
+                'slave-09': ['compute', 'cinder']
             })
 
         self.show_step(9)
