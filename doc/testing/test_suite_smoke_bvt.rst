@@ -67,20 +67,22 @@ core
 Steps
 #####
 
-    1. Create environment with "Neutron with tunneling segmentation" as a network configuration.
-    2. Add a node with contrail-config role.
-    3. Add a node with contrail-control role.
-    4. Add 3 nodes with contrail-db role.
-    5. Add a node with controller role.
-    6. Add a node with "compute" and "cinder" roles.
-    7. Activate and configure the Contrail plugin.
-    8. Deploy cluster with plugin.
-    9. Run OSTF tests.
-
+    1. Create an environment with "Neutron with tunneling
+       segmentation" as a network configuration
+    2. Enable Contrail plugin
+    3. Enable dedicated analytics DB
+    4. Add a node with contrail-config role
+    5. Add a node with contrail-control role
+    6. Add 3 nodes with contrail-db role
+    7. Add a node with contrail-analytics-db role.
+    8. Add a node with contrail-analytics role
+    9. Add a node with with controller role
+    10. Add a node with compute + cinder role
+    11. Deploy cluster with plugin
+    12. Run contrail health check tests
+    13. Run OSTF tests
 
 Expected results
 ################
 
 All steps must be completed successfully, without any errors.
-
-

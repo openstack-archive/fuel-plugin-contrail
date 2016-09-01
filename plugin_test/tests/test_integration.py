@@ -57,17 +57,21 @@ class IntegrationTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
-            3. Add 3 nodes with controller role
-            4. Add 3 nodes with "compute" and "Ceph-OSD" roles
-            5. Add a node with contrail-config, contrail-control,
-                contrail-db and contrail-analytics roles
-            6. Deploy cluster with plugin
-            7. Run contrail health check tests
-            8. Run OSTF tests
+            3. Enable dedicated analytics DB
+            4. Add 3 nodes with controller role
+            5. Add 3 nodes with "compute" and "Ceph-OSD" roles
+            6. Add a node with contrail-config, contrail-control 
+               and contrail-db roles
+            7. Add a node with contrail-analytics-db and contrail-analytics roles
+            8. Deploy cluster with plugin
+            9. Run contrail health check tests
+            10. Run OSTF tests
 
         Duration 120 min
 
         """
+        conf_contrail={"dedicated_analytics_db": True}
+
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True,
@@ -76,12 +80,12 @@ class IntegrationTests(TestBasic):
                                                 'objects_ceph': True,
                                                 'volumes_lvm': False})
 
-        self.show_step(2)
-        plugin.activate_plugin(self)
+        plugin.show_range(self, 2, 4)
+        plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 3, 6)
+        plugin.show_range(self, 4, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
@@ -95,13 +99,15 @@ class IntegrationTests(TestBasic):
                              'contrail-control',
                              'contrail-db',
                              'contrail-analytics'],
+                'slave-08': ['contrail-analytics',
+                             'contrail-analytics-db']
             })
 
-        self.show_step(6)
-        openstack.deploy_cluster(self)
-        self.show_step(7)
-        TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(8)
+        openstack.deploy_cluster(self)
+        self.show_step(9)
+        TestContrailCheck(self).cloud_check(['contrail'])
+        self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
