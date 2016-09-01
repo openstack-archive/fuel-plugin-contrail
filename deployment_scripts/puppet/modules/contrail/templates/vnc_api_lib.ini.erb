@@ -13,4 +13,8 @@ AUTHN_TYPE = keystone
 AUTHN_PROTOCOL = <%= scope.lookupvar('contrail::keystone_protocol') %>
 AUTHN_SERVER = <%= scope.lookupvar('contrail::keystone_address') %>
 AUTHN_PORT = 35357
+<% if ( scope.lookupvar('contrail::keystone_version') = 'v3' ) %>
+AUTHN_URL = /v3/auth/tokens
+<% else %>
 AUTHN_URL = /v2.0/tokens
+<% end %>

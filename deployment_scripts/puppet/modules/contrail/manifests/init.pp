@@ -72,7 +72,8 @@ class contrail {
   $keystone_ssl       = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'usage', false)
   $keystone_protocol  = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'protocol', 'http')
   $keystone_address   = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'hostname', [$mos_mgmt_vip])
-  $auth_url           = "${keystone_protocol}://${keystone_address}:35357/v2.0"
+  $keystone_version   = 'v3'
+  $auth_url           = "${keystone_protocol}://${keystone_address}:35357/${keystone_version}"
 
   $neutron_ssl      = get_ssl_property($ssl_hash, {}, 'neutron', 'admin', 'usage', false)
   $neutron_protocol = get_ssl_property($ssl_hash, {}, 'neutron', 'admin', 'protocol', 'http')
