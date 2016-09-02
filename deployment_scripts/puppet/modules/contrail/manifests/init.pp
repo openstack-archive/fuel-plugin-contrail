@@ -119,9 +119,8 @@ class contrail {
   $dpdk_vf_number        = 0
 
 
-  # ToR agent settings
+  # ToR/TSN agent settings
   $enable_tor_agents  = $settings['enable_tor_agents']
-  $tor_agents_ssl  = $settings['tor_agents_ssl']
   if $enable_tor_agents == true {
     $tor_agents_configurations = parseyaml($settings['tor_agents_configurations'])
   }
