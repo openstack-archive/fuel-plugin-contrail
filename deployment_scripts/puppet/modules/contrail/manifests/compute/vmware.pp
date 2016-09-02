@@ -36,9 +36,9 @@ class contrail::compute::vmware {
     ensure => directory,
     mode   => '0750',
   }->
-#  file {'/etc/contrail/ESXiToVRouterIp.map':
-#    content => template('contrail/ESXiToVRouterIp.map.erb')
-#  }->
+  file {'/etc/contrail/ESXiToVRouterIp.map':
+    content => template('contrail/ESXiToVRouterIp.map.erb')
+  }->
   file {'/etc/contrail/contrail-vcenter-plugin.conf':
     ensure  => present,
     content => template('contrail/contrail-vcenter-plugin.conf.erb'),

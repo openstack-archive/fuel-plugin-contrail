@@ -899,6 +899,19 @@
 #  Compute vmware tasks section
 ##############################################################
 
+- id: gather_vmware_data
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [pre_deployment_start]
+  required_for: [pre_deployment_end]
+  parameters:
+    cmd: /usr/bin/python spawner.py --map-ips
+    timeout: 180
+    cwd: /var/www/nailgun/plugins/contrail-5.0/deployment_scripts/
+  condition:
+    yaql_exp: &use_vcenter '$.use_vcenter and changed($.use_vcenter)'
+
 # Set proper apt pin for Contrail repository
 - id: contrail-compute-vmware-repo
   type: puppet
@@ -906,6 +919,9 @@
   groups: [compute-vmware]
   required_for: [tools]
   requires: [deploy_start, globals]
+  cross-depends:
+    - name: gather_vmware_data
+      role: master
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-vmware-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -957,3 +973,4 @@
     timeout: 720
   cross-depends:
     - name: contrail-db-provision-all
+

@@ -30,6 +30,11 @@ package {'libnl-3-200':
   ensure => '3.2.21-1ubuntu3',
 }
 
+file { '/etc/hiera/override/plugins.yaml':
+  source => 'puppet:///modules/contrail/vcenter_data.yaml',
+}
+
+# TODO rewrite to provider
 $overide_libvirt_type = add_data_to_yaml('/etc/hiera/plugins/contrail.yaml', 'libvirt_type', 'kvm')
 
 # Temporary dirty hack. Fix execution of core manifests compute.pp and compute-vmware.pp.
