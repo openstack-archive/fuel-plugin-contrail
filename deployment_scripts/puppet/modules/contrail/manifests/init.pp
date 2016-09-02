@@ -119,11 +119,12 @@ class contrail {
   $dpdk_vf_number        = 0
 
 
-  # ToR agent settings
-  $enable_tor_agents  = $settings['enable_tor_agents']
-  $tor_agents_ssl  = $settings['tor_agents_ssl']
+  # ToR/TSN agent settings
+  $enable_tor_agents = $settings['enable_tor_agents']
   if $enable_tor_agents == true {
     $tor_agents_configurations = parseyaml($settings['tor_agents_configurations'])
+    $tor_nodes_hash            = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-tsn', 'contrail-tsn'])
+    $tor_ips                   = ipsort(values(get_node_to_ipaddr_map_by_network_role($tor_nodes_hash, 'neutron/mesh')))
   }
 
   # Custom mount point for contrail-db
