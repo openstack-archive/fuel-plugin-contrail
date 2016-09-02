@@ -625,66 +625,131 @@
 ##############################################################
 
 # Set proper apt pin for Contrail repository
-- id: contrail-repository-tsn
+- id: contrail_repository_tsn
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-tsn]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  requires: [setup_repositories, globals]
   required_for: [tools]
-  requires: [deploy_start, globals]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+- id: install_openvswitch
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [deploy_start]
+  required_for: [generate_tsn_certificates]
+  parameters:
+    cmd: /usr/bin/yum install openvswitch -y
+    timeout: 180
+    cwd: /
+  condition:
+    yaql_exp: '$.contrail.enable_tor_agents'
 
-- id: contrail-tsn-network
+- id: generate_tsn_certificates
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [install_openvswitch]
+  required_for: [generate_tsn_certificates_tgz]
+  parameters:
+    cmd: /usr/bin/python /var/www/nailgun/plugins/contrail-5.0/deployment_scripts/generate_tsn_certificates.py {CLUSTER_ID}
+    timeout: 180
+    cwd: /
+  condition:
+    yaql_exp: '$.contrail.enable_tor_agents'
+
+- id: generate_tsn_certificates_tgz
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [generate_tsn_certificates]
+  required_for: [copy_tsn_certificates]
+  parameters:
+    cmd: bash -c "/usr/bin/tar -czf /var/lib/fuel/certificates/{CLUSTER_ID}/certs.tgz certs"
+    timeout: 180
+    cwd: /var/lib/fuel/certificates/{CLUSTER_ID}/
+  condition:
+    yaql_exp: '$.contrail.enable_tor_agents'
+
+- id: copy_tsn_certificates
+  type: copy_files
+  version: 2.0.0
+  groups: [primary-contrail-tsn,contrail-tsn]
+  requires: [generate_tsn_certificates_tgz]
+  required_for: [unpack_tsn_certificates]
+  cross-depends:
+    - name: generate_tsn_certificates_tgz
+      role: master
+  parameters:
+    files:
+      - src: /var/lib/fuel/certificates/{CLUSTER_ID}/certs.tgz
+        dst: /var/lib/astute/tsn_certificates/certs.tgz
+      - src: /var/lib/fuel/certificates/{CLUSTER_ID}/switchca/cacert.pem
+        dst: /var/lib/astute/tsn_certificates/cacert.pem
+    permissions: '0600'
+    dir_permissions: '0700'
+    cwd: /
+
+- id: unpack_tsn_certificates
+  type: shell
+  version: 2.0.0
+  groups: [primary-contrail-tsn,contrail-tsn]
+  requires: [copy_tsn_certificates]
+  required_for: [contrail_tsn_network]
+  parameters:
+    cmd: bash -c "/bin/tar -xzf certs.tgz"
+    timeout: 180
+    cwd: /var/lib/astute/tsn_certificates/
+
+- id: contrail_tsn_network
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
-  required_for: [post_deployment_end, contrail-tsn-vrouter]
-  requires: [post_deployment_start]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  requires: [netconfig,unpack_tsn_certificates]
+  required_for: [contrail_tsn_vrouter]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-network.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-- id: contrail-tsn-vrouter
+- id: contrail_tsn_vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
-  requires: [post_deployment_start, contrail-tsn-network]
-  required_for: [reconfigure-contrail-tsn-vrouter]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  requires: [contrail_tsn_network]
+  required_for: [reconfigure_contrail_tsn_vrouter]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-- id: reconfigure-contrail-tsn-vrouter
+- id: reconfigure_contrail_tsn_vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
-  requires: [contrail-tsn-vrouter]
-  required_for: [provision-tsn-vrouter]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  requires: [contrail_tsn_vrouter]
+  required_for: [provision_tsn_vrouter]
   parameters:
     puppet_manifest: puppet/manifests/reconfigure-contrail-tsn-vrouter.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-
-- id: provision-tsn-vrouter
+- id: provision_tsn_vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
-  required_for: [post_deployment_end]
-  requires: [reconfigure-contrail-tsn-vrouter]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  requires: [reconfigure_contrail_tsn_vrouter]
+  required_for: [deploy_end]
   cross-depends:
     - name: /contrail-config-provision(-all|-primary)/
   parameters:
     puppet_manifest: puppet/manifests/contrail-tsn-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-
-
 
 ##############################################################
 #  Compute tasks section
