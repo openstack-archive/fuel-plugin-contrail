@@ -628,7 +628,7 @@
 - id: contrail-repository-tsn
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-tsn]
+  groups: [primary-contrail-tsn,contrail-tsn]
   required_for: [tools]
   requires: [deploy_start, globals]
   parameters:
@@ -640,7 +640,7 @@
 - id: contrail-tsn-network
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
+  groups: [primary-contrail-tsn,contrail-tsn]
   required_for: [post_deployment_end, contrail-tsn-vrouter]
   requires: [post_deployment_start]
   parameters:
@@ -651,7 +651,7 @@
 - id: contrail-tsn-vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
+  groups: [primary-contrail-tsn,contrail-tsn]
   requires: [post_deployment_start, contrail-tsn-network]
   required_for: [reconfigure-contrail-tsn-vrouter]
   parameters:
@@ -662,7 +662,7 @@
 - id: reconfigure-contrail-tsn-vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
+  groups: [primary-contrail-tsn,contrail-tsn]
   requires: [contrail-tsn-vrouter]
   required_for: [provision-tsn-vrouter]
   parameters:
@@ -674,7 +674,7 @@
 - id: provision-tsn-vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
+  groups: [primary-contrail-tsn,contrail-tsn]
   required_for: [post_deployment_end]
   requires: [reconfigure-contrail-tsn-vrouter]
   cross-depends:

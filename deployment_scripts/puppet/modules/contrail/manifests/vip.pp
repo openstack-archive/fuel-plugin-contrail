@@ -139,4 +139,8 @@ class contrail::vip {
     balancermember_options => 'check inter 10s fastinter 2s downinter 3s rise 3 fall 3',
   }
 
+  if $::contrail::enable_tor_agents {
+
+  }
+
 }

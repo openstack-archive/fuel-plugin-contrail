@@ -32,6 +32,17 @@ if $::contrail::enable_tor_agents == true {
     require  => Package['openvswitch-common'],
   }
 
+  if $::contrail::tor_agents_ssl {
+    exec { "generate_tor-agent_cert":
+      provider => 'shell',
+      path     => '/usr/bin:/bin:/sbin',
+      cwd      => '/etc/contrail/',
+      command  => "ovs-pki req+sign tor-${name}",
+      creates  => "/etc/contrail/tor-${name}-cert.pem",
+      require  => Exec['generate_ca_cert'],
+    }
+  }
+
   service {'nova-compute':
     ensure => stopped
   } ->
