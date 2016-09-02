@@ -133,7 +133,7 @@ class contrail::compute::vrouter {
       'DEFAULT/log_flow':                          value => '1';
       'DEFAULT/use_syslog':                        value => '1';
       'DEFAULT/syslog_facility':                   value => 'LOG_LOCAL0';
-      'DEFUALT/headless_mode':                     value => true;
+      'DEFAULT/headless_mode':                     value => $contrail::headless_mode;
       'DISCOVERY/server':                          value => $contrail::contrail_private_vip;
       'DISCOVERY/max_control_nodes':               value => '2';
       'HYPERVISOR/type':                           value => 'kvm';
