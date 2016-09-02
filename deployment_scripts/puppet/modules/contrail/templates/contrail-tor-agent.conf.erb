@@ -102,13 +102,13 @@ tor_ovs_protocol=<%=@ovs_protocol%>
 
 <% if @ovs_protocol == 'pssl' -%>
 # Path to ssl certificate for tor-agent, needed for pssl
-ssl_cert=/etc/contrail/tor-<%= @tor_id -%>-cert.pem
+ssl_cert= /var/lib/astute/tsn_certificates/certs/tor_agent_<%= @tor_id -%>/tor_agent_<%= @tor_id -%>-cert.pem
 
 # Path to ssl private-key for tor-agent, needed for pssl
-ssl_privkey=/etc/contrail/tor-<%= @tor_id -%>-privkey.pem
+ssl_privkey=/var/lib/astute/tsn_certificates/certs/tor_agent_<%= @tor_id -%>/tor_agent_<%= @tor_id -%>-privkey.pem
 
 # Path to ssl cacert for tor-agent, needed for pssl
-ssl_cacert=/var/lib/openvswitch/pki/switchca/cacert.pem
+ssl_cacert=/var/lib/astute/tsn_certificates/cacert.pem
 <% end -%>
 
 tsn_ip=<%= @tsn_vip_ip %>
