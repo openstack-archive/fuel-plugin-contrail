@@ -12,15 +12,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 define contrail::tor_agent (
-  $ovs_port,
-  $ovs_protocol,
   $tor_device_name,
   $tor_vendor_name,
   $tor_mgmt_ip,
   $tor_tun_ip,
+  $tor_id                    = $title,
+  $ovs_port                  = $title + 9000,
+  $ovs_protocol              = $::contrail::tsn::ovs_protocol,
   $contrail_dev_ip           = $::contrail::address,
   $tsn_vip_ip                = $::contrail::address,
-  $tor_id                    = $name,
   $contrail_discovery_server = $::contrail::contrail_private_vip,
 )
 {
@@ -33,14 +33,4 @@ define contrail::tor_agent (
     content => template('contrail/contrail-tor-agent.ini.erb')
   }
 
-  if $ovs_protocol == 'pssl' {
-    exec { "generate_tor-${name}_cert":
-      provider => 'shell',
-      path     => '/usr/bin:/bin:/sbin',
-      cwd      => '/etc/contrail/',
-      command  => "ovs-pki req+sign tor-${name}",
-      creates  => "/etc/contrail/tor-${name}-cert.pem",
-      require  => Exec['generate_ca_cert'],
-    }
-  }
 }
