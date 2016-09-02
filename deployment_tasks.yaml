@@ -624,13 +624,60 @@
 #  TSN tasks section
 ##############################################################
 
+- id: install_openvswitch
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [deploy_start]
+  required_for: [generate_tsn_certificates]
+  parameters:
+    cmd: /usr/bin/yum install openvswitch -y
+    timeout: 180
+    cwd: /
+  condition:
+    yaql_exp: '$.contrail.enable_tor_agents'
+
+- id: generate_tsn_certificates
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [install_openvswitch]
+  required_for: [copy_tsn_certificates]
+  parameters:
+    cmd: /usr/bin/python /var/www/nailgun/plugins/contrail-4.0/deployment_scripts/generate_tsn_certificates.py {CLUSTER_ID}
+    timeout: 180
+    cwd: /
+  condition:
+    yaql_exp: '$.contrail.enable_tor_agents'
+
+- id: copy_tsn_certificates
+  type: copy_files
+  version: 2.0.0
+  groups: [primary-contrail-tsn,contrail-tsn]
+  required_for: [contrail-repository-tsn]
+  requires: [generate_tsn_certificates]
+  cross-depends:
+    - name: generate_tsn_certificates
+      role: master
+  parameters:
+    files:
+      - src: /var/lib/fuel/certificates/{CLUSTER_ID}/certs
+        dst: /var/lib/astute/tsn_certificates/certs
+      - src: /var/lib/fuel/certificates/{CLUSTER_ID}/switchca/cacert.pem
+        dst: /var/lib/astute/tsn_certificates/cacert.pem
+    permissions: '0600'
+    dir_permissions: '0700'
+    cwd: /
+  condition:
+    yaql_exp: '$.contrail.enable_tor_agents'
+
 # Set proper apt pin for Contrail repository
 - id: contrail-repository-tsn
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-tsn]
-  required_for: [tools]
-  requires: [deploy_start, globals]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  required_for: [contrail-tsn-network,tools]
+  requires: [deploy_start, setup_repositories, globals]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-repo.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -640,9 +687,9 @@
 - id: contrail-tsn-network
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
-  required_for: [post_deployment_end, contrail-tsn-vrouter]
-  requires: [post_deployment_start]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  required_for: [contrail-tsn-vrouter]
+  requires: [contrail-repository-tsn]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-network.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -651,8 +698,8 @@
 - id: contrail-tsn-vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
-  requires: [post_deployment_start, contrail-tsn-network]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  requires: [contrail-tsn-network]
   required_for: [reconfigure-contrail-tsn-vrouter]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-vrouter.pp
@@ -662,7 +709,7 @@
 - id: reconfigure-contrail-tsn-vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
+  groups: [primary-contrail-tsn,contrail-tsn]
   requires: [contrail-tsn-vrouter]
   required_for: [provision-tsn-vrouter]
   parameters:
@@ -674,8 +721,8 @@
 - id: provision-tsn-vrouter
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-tsn]
-  required_for: [post_deployment_end]
+  groups: [primary-contrail-tsn,contrail-tsn]
+  required_for: [deploy_end]
   requires: [reconfigure-contrail-tsn-vrouter]
   cross-depends:
     - name: /contrail-config-provision(-all|-primary)/
