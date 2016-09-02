@@ -496,8 +496,6 @@
   roles: '*'
   type: skipped
   version: 2.0.0
-- id: openstack-network-agents-sriov
-  type: skipped
 # Skip default fuel networks and routers
 - id: openstack-network-networks
   roles: '*'
