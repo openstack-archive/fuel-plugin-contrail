@@ -11,25 +11,14 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-class contrail::tsn () {
+class contrail::tsn (
+  $ovs_protocol = 'pssl'
+  ) {
 
 if $::contrail::enable_tor_agents == true {
 
-  if $::contrail::tor_agents_ssl == false {
-    $default_ovs_protocol = 'tcp'
-  } else {
-    $default_ovs_protocol = 'pssl'
-  }
   package {'openvswitch-common':
       ensure => present
-  }
-
-  exec { 'generate_ca_cert':
-    provider => 'shell',
-    path     => '/usr/bin:/bin:/sbin',
-    command  => 'ovs-pki init --force',
-    creates  => '/var/lib/openvswitch/pki/switchca/cacert.pem',
-    require  => Package['openvswitch-common'],
   }
 
   service {'nova-compute':
@@ -49,8 +38,7 @@ if $::contrail::enable_tor_agents == true {
   }
 
   $tor_agents_defaults = {
-    'notify'       => 'Service[supervisor-vrouter]',
-    'ovs_protocol' => $default_ovs_protocol,
+    'notify'       => 'Service[supervisor-vrouter]'
   }
 
   create_resources(::contrail::tor_agent, $::contrail::tor_agents_configurations, $tor_agents_defaults)
