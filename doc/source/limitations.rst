@@ -19,3 +19,6 @@ Limitations
 *   Changing the default OpenStack project name is not supported. Default project name should be ``admin``.
 
 *   The password of OpenStack ``admin`` user should not contain following characters: ``$``, `````, ``\\`` and ``!``
+
+*   Upgrade procedure based on custom deployment graphs does not support upgrading nodes with roles dpdk, tsn and vmware.
+    Contrail packages upgrades should be done manually on these nodes.
