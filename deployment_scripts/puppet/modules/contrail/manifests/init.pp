@@ -54,6 +54,8 @@ class contrail {
   $phys_dev_pci      = get_dev_pci_addr($phys_dev, $network_scheme)
   $phys_dev_mtu      = get_physdev_mtu(regsubst($phys_dev, '\..*' , ''))
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+  $vr_flow_entries   = pick($settings['vr_flow_entries'], '524288')
+  $vr_mpls_labels    = pick($settings['vr_mpls_labels'], '5120')
 
   # VIPs
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
