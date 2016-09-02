@@ -48,6 +48,20 @@ To configure TSN in your network, you need TOR switch.
 
     \clearpage
 
+HA implementation details
+-------------------------
+
+Contrail TSN in HA mode is implemented for default SSL mode.
+
+All required certificates will be located on CONTRAIL-TSN node in location:
+::
+
+  /var/lib/astute/tsn_certificates/certs
+
+There will be two folders per TOR service. Folder named tor_agent_<@id> contain certs
+for tor agent service. Folder named vtep_<@id> contain certificates which should be delivered
+to ToR Switch.
+
 Configure TSN
 -------------
 
@@ -55,24 +69,27 @@ Configure TSN
 
     .. image:: images/tsn_settings.png
 
-#.  Enable tor agent SSL certifications creation (optional)
-
 #.  Provide Tor Agents configuration in YAML format, based on example
     ::
 
       01:
-        ovs_port: 6286
-        ovs_protocol: tcp
         tor_mgmt_ip: 10.109.4.150
         tor_tun_ip: 10.109.4.150
         tor_device_name: ovs1
         tor_vendor_name: ovs
       02:
-        ovs_port: 6286
-        ovs_protocol: pssl
         tor_mgmt_ip: 10.109.4.151
         tor_tun_ip: 10.109.4.151
         tor_device_name: ovs2
         tor_vendor_name: ovs
+
+#.  Deploy additional node/nodes with CONTRAIL-TSN role
+
+    .. image:: images/contrail-tsn-nodes.png
+
+#.  Configure ToR Switches with SSL certificates located on TSN node in:
+    ::
+
+      /var/lib/astute/tsn_certificates/certs
 
 #.  Verify working TSN by going to Contrail web UI

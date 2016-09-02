@@ -132,15 +132,6 @@ attributes:
     description: "Enable this option to unlock the Tor Agent configuration feature."
     weight: 230
     type: "checkbox"
-  tor_agents_ssl:
-    value: false
-    label: "Enable ToR agents ssl mode"
-    description: "Enable this option to generate ssl certificates and configure them for tor agents."
-    weight: 240
-    type: "checkbox"
-    restrictions:
-      - condition: "settings:contrail.enable_tor_agents.value == false"
-        action: "hide"
   tor_agents_configurations:
     value: ""
     label: "Configuration for TOR agents"
