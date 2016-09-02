@@ -945,10 +945,8 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 3, 7)
-
-        plugin.show_range(self, 7, 9)
-        openstack.update_deploy_check(self, no_analytics_db,
+        plugin.show_range(self, 3, 9)
+        openstack.update_deploy_check(self, conf_no_analytics_db,
                                       is_vsrx=vsrx_setup_result)
 
         self.show_step(9)
@@ -958,7 +956,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self, **conf_contrail)
 
         plugin.show_range(self, 10, 14)
-        openstack.update_deploy_check(self, danalytics_db,
+        openstack.update_deploy_check(self, conf_analytics_db,
                                       is_vsrx=vsrx_setup_result)
 
         self.show_step(14)
