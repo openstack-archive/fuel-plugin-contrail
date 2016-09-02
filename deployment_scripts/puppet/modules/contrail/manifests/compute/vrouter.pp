@@ -42,7 +42,8 @@ class contrail::compute::vrouter {
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
 
     contrail_vrouter_dpdk_ini_config {
-      'program:contrail-vrouter-dpdk/command':                 value => "taskset ${contrail::vrouter_core_mask} /usr/bin/contrail-vrouter-dpdk --no-daemon ${::supervisor_params}";
+      'program:contrail-vrouter-dpdk/command':                 value => "taskset ${contrail::vrouter_core_mask} /usr/bin/contrail-vrouter-dpdk --no-daemon \
+                                                                         --vr_mpls_labels ${contrail::vr_mpls_labels} ${::supervisor_params}";
       'program:contrail-vrouter-dpdk/priority':                value => '410';
       'program:contrail-vrouter-dpdk/loglevel':                value => 'debug';
       'program:contrail-vrouter-dpdk/autostart':               value => true;
@@ -59,6 +60,18 @@ class contrail::compute::vrouter {
   } else {
     $install_packages = ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1']
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
+
+    file {'/etc/modprobe.d/vrouter.conf':
+      ensure  => present,
+    }
+
+    augeas { 'vrouter':
+      context => '/files/etc/modprobe.d/vrouter.conf',
+      lens    => 'modprobe.lns',
+      incl    => '/etc/modprobe.d/vrouter.conf',
+      changes => ["set options[. = 'vrouter'] vrouter",
+                  "set options[. = 'vrouter']/vr_flow_entries ${contrail::vr_flow_entries}"],
+    }
   }
 
   if !is_pkg_installed('contrail-openstack-vrouter') {
