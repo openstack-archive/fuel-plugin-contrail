@@ -46,24 +46,4 @@ define contrail::provision::tor_agent(
 && touch /opt/contrail/provision-tor-agent-${name}-DONE",
     creates => "/opt/contrail/provision-tor-agent-${name}-DONE",
   }
-
-  exec { "provision-tor-${name}":
-    command => "python /opt/contrail/utils/provision_physical_device.py \
---device_name ${tor_device_name} \
---vendor_name ${tor_vendor_name} \
---device_mgmt_ip ${tor_mgmt_ip} \
---device_tunnel_ip ${tor_tun_ip} \
---device_tor_agent ${::fqdn}-${tor_id} \
---device_tsn ${::fqdn} \
---oper add \
---admin_user '${::contrail::neutron_user}' \
---admin_tenant_name '${::contrail::service_tenant}' \
---admin_password '${::contrail::service_token}' \
---api_server_ip ${::contrail::contrail_mgmt_vip} \
---api_server_port 8082 \
---openstack_ip ${::contrail::keystone_address} \
-&& touch /opt/contrail/provision-tor-${name}-DONE",
-    creates => "/opt/contrail/provision-tor-${name}-DONE",
-    require => Exec["provision-tor-agent-${name}"],
-  }
 }

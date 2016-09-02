@@ -55,21 +55,15 @@ Configure TSN
 
     .. image:: images/tsn_settings.png
 
-#.  Enable tor agent SSL certifications creation (optional)
-
 #.  Provide Tor Agents configuration in YAML format, based on example
     ::
 
       01:
-        ovs_port: 6286
-        ovs_protocol: tcp
         tor_mgmt_ip: 10.109.4.150
         tor_tun_ip: 10.109.4.150
         tor_device_name: ovs1
         tor_vendor_name: ovs
       02:
-        ovs_port: 6286
-        ovs_protocol: pssl
         tor_mgmt_ip: 10.109.4.151
         tor_tun_ip: 10.109.4.151
         tor_device_name: ovs2
