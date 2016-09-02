@@ -12,6 +12,7 @@ contrail-db:
     - compute
     - ceph-osd
     - cinder
+    - base-os
 
 contrail-config:
   name: Contrail - Config
@@ -29,6 +30,7 @@ contrail-config:
     - compute
     - ceph-osd
     - cinder
+    - base-os
 
 contrail-analytics:
   name: Contrail - Analytics
@@ -45,6 +47,7 @@ contrail-analytics:
     - compute
     - ceph-osd
     - cinder
+    - base-os
 
 contrail-analytics-db:
   name: Contrail - Analytics DB
@@ -63,6 +66,7 @@ contrail-analytics-db:
     - contrail-db
     - contrail-config
     - contrail-control
+    - base-os
   restrictions:
     - condition: "settings:contrail.dedicated_analytics_db.value == false"
       message: "Dedicated Analytics DB should be enabled in plugin settings"
@@ -82,6 +86,7 @@ contrail-control:
     - compute
     - ceph-osd
     - cinder
+    - base-os
 
 contrail-tsn:
   name: Contrail - TSN node
@@ -99,6 +104,7 @@ contrail-tsn:
     - compute
     - ceph-osd
     - cinder
+    - base-os
   restrictions:
     - condition: "settings:contrail.enable_tor_agents.value == false"
       message: "Contrail TSN should be enabled and configured in plugin settings"
@@ -118,6 +124,7 @@ dpdk:
     - contrail-analytics
     - ceph-osd
     - cinder
+    - base-os
   restrictions:
     - condition: "settings:contrail.contrail_global_dpdk.value == false"
       action: hide
