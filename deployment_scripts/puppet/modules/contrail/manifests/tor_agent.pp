@@ -12,12 +12,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 define contrail::tor_agent (
-  $ovs_port,
   $ovs_protocol,
   $tor_device_name,
   $tor_vendor_name,
   $tor_mgmt_ip,
   $tor_tun_ip,
+  $ovs_port                  = 9900 + $title
   $contrail_dev_ip           = $::contrail::address,
   $tsn_vip_ip                = $::contrail::address,
   $tor_id                    = $name,
