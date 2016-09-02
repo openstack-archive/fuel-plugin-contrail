@@ -30,6 +30,8 @@ class contrail {
   $nodes            = hiera('nodes')
   $region           = hiera('region', 'RegionOne')
   $dpdk_hash        = hiera_hash('dpdk', {})
+  $cluster          = hiera('cluster')
+  $cluster_id       = $cluster['id']
 
   # Network configuration
   prepare_network_config($network_scheme)
@@ -207,6 +209,7 @@ class contrail {
     $vcenter_server_cluster                     = $vcenter_hash['computes'][0]['vc_cluster']
     $vcenter_server_name                        = $vcenter_hash['computes'][0]['availability_zone_name']
     $contrail_vcenter_datacenter                = pick($settings['contrail_vcenter_datacenter'], 'Datacenter')
+    $contrail_esxi_info                         = hiera_array('contrail_esxi_info', [])
     $dvs_external                               = 'Contrail-DVS-Ext'
     $dvs_internal                               = 'Contrail-DVS-Int'
   }
