@@ -24,14 +24,6 @@ if $::contrail::enable_tor_agents == true {
       ensure => present
   }
 
-  exec { 'generate_ca_cert':
-    provider => 'shell',
-    path     => '/usr/bin:/bin:/sbin',
-    command  => 'ovs-pki init --force',
-    creates  => '/var/lib/openvswitch/pki/switchca/cacert.pem',
-    require  => Package['openvswitch-common'],
-  }
-
   service {'nova-compute':
     ensure => stopped
   } ->
