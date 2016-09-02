@@ -139,4 +139,9 @@ class contrail::vip {
     balancermember_options => 'check inter 10s fastinter 2s downinter 3s rise 3 fall 3',
   }
 
+  if $::contrail::enable_tor_agents {
+    $default_vip_hash = { 'order' => '208' }
+    create_resources(::contrail::vip::tor_agent, $::contrail::tor_agents_configurations, $default_vip_hash)
+  }
+
 }
