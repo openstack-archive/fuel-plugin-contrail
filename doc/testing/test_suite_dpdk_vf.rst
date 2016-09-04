@@ -34,12 +34,13 @@ Steps
        * enable dpdk
        * enable sriov
        * enable DPDK on VF
+       * enable dedicated analytics DB
     3. Add following nodes:
        * 3 controller + mongo
        * 1 compute + ceph
        * 1 contrail-config+contrail-control+contrail-db
        * 1 compute+sriov+dpdk
-       * 1 contrail-db+contrail-analytics
+       * 1 contrail-db+contrail-analytics+contrail-analytics-db
        * 1 contrail-db
     4. Deploy cluster.
     5. Run OSTF tests.
@@ -50,7 +51,3 @@ Expected results
 ################
 
 All steps should pass
-
-
-NOOP
-----

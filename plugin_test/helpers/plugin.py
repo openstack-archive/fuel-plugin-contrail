@@ -147,7 +147,7 @@ def show_range(obj, start_value, end_value):
         obj.show_step(i)
 
 
-def activate_dpdk(obj):
+def activate_dpdk(obj, **kwargs):
     """Activate DPDK functionality."""
     openstack.assign_vlan(obj, storage=102, management=101)
 
@@ -155,20 +155,24 @@ def activate_dpdk(obj):
         'contrail_global_dpdk': True,
         'hugepages_amount': '60',
     }
+    if kwargs:
+        opts.update(kwargs)
     activate_plugin(obj, **opts)
 
 
-def activate_sriov(obj):
+def activate_sriov(obj, **kwargs):
     """Activate SRiOV functionality."""
     openstack.assign_vlan(obj, storage=102, management=101)
 
     opts = {
         'contrail_global_sriov': True,
     }
+    if kwargs:
+        opts.update(kwargs)
     activate_plugin(obj, **opts)
 
 
-def activate_dpdk_vf(obj):
+def activate_dpdk_vf(obj, **kwargs):
     """Activate DPDK on VF functionality."""
     openstack.assign_vlan(obj, storage=102, management=101)
 
@@ -178,4 +182,6 @@ def activate_dpdk_vf(obj):
         'dpdk_on_vf': True,
         'hugepages_amount': '60',
     }
+    if kwargs:
+        opts.update(kwargs)
     activate_plugin(obj, **opts)
