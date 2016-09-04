@@ -250,7 +250,7 @@ class ContrailPlugin(TestBasic):
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        self.show_range(self, 2, 4)
+        plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
