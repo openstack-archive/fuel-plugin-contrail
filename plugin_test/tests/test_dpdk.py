@@ -54,23 +54,25 @@ class DPDKTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin
-            3. Deploy cluster with following node configuration:
+            3. Enable dedicated analytics DB
+            4. Deploy cluster with following node configuration:
                 node-01: 'controller';
                 node-02: 'controller';
                 node-03: 'controller', 'ceph-osd';
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'compute', 'ceph-osd';
-                node-06: 'contrail-db';
+                node-06: 'contrail-db', 'contrail-analytics-db';
                 node-07: 'contrail-config';
                 node-08: 'contrail-control';
                 node-09: 'contrail-analytics';
                 node-dpdk: 'compute', dpdk';
-            4. Run OSTF tests
-            5. Run contrail health check tests
+            5. Run OSTF tests
+            6. Run contrail health check tests
 
         Duration 120 min
 
         """
+        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True,
@@ -80,13 +82,13 @@ class DPDKTests(TestBasic):
                                                 'volumes_lvm': False})
         self.bm_drv.host_prepare()
 
-        self.show_step(2)
+        plugin.show_range(self, 2, 4)
         # activate plugin with DPDK feature
-        plugin.activate_dpdk(self)
+        plugin.activate_dpdk(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        self.show_step(3)
+        self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
@@ -97,7 +99,7 @@ class DPDKTests(TestBasic):
             'slave-03': ['controller', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
-            'slave-06': ['contrail-db'],
+            'slave-06': ['contrail-db', 'contrail-analytics-db'],
             'slave-07': ['contrail-config'],
             'slave-08': ['contrail-control'],
             'slave-09': ['contrail-analytics'],
@@ -112,13 +114,13 @@ class DPDKTests(TestBasic):
         # Run OSTF tests
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
-            self.show_step(4)
+            self.show_step(5)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'],
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            self.show_step(5)
+            self.show_step(6)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -131,21 +133,24 @@ class DPDKTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Deploy cluster with following node configuration:
+            3. Enable dedicated analytics DB
+            4. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
                 node-2: 'contrail-config', 'contrail-control',
-                    'contrail-db', 'contrail-analytics';
+                    'contrail-db', 'contrail-analytics',
+                    'contrail-analytics-db';
                 node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
                 node-dpdk: 'compute', 'dpdk';
-            4. Run OSTF tests
-            5. Add one node with following configuration:
+            5. Run OSTF tests
+            6. Add one node with following configuration:
                 node-5: "compute", "ceph-osd";
-            6. Deploy changes
-            7. Run OSTF tests
-            8. Run contrail health check tests
+            7. Deploy changes
+            8. Run OSTF tests
+            9. Run contrail health check tests
 
         """
+        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True,
@@ -155,13 +160,13 @@ class DPDKTests(TestBasic):
                                                 'volumes_lvm': False})
         self.bm_drv.host_prepare()
 
-        self.show_step(2)
+        plugin.show_range(self, 2, 4)
         # activate plugin with DPDK feature
-        plugin.activate_dpdk(self)
+        plugin.activate_dpdk(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        self.show_step(3)
+        self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
@@ -170,7 +175,8 @@ class DPDKTests(TestBasic):
             'slave-02': ['contrail-config',
                          'contrail-control',
                          'contrail-db',
-                         'contrail-analytics'],
+                         'contrail-analytics',
+                         'contrail-analytics-db'],
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
@@ -185,7 +191,7 @@ class DPDKTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(4)
+        self.show_step(5)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
@@ -195,24 +201,24 @@ class DPDKTests(TestBasic):
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Add Compute node and check again
-        self.show_step(5)
+        self.show_step(6)
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
                                    nodes_dict=conf_compute,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         # Deploy cluster
-        self.show_step(6)
+        self.show_step(7)
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(7)
+        self.show_step(8)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            self.show_step(8)
+            self.show_step(9)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -313,41 +319,45 @@ class DPDKTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Deploy cluster with following node configuration:
+            3. Enable dedicated analytics DB
+            4. Deploy cluster with following node configuration:
                 node-01: 'controller', 'ceph-osd';
                 node-02: 'contrail-config', 'contrail-control',
-                    'contrail-db', 'contrail-analytics';
+                    'contrail-db', 'contrail-analytics',
+                    'contrail-analytics-db';
                 node-03: 'compute', 'ceph-osd';
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'controller', 'cinder';
                 node-06: 'controller', 'cinder';
-            4. Run OSTF tests
-            5. Run contrail health check tests
-            6. Add one node with following configuration:
+            5. Run OSTF tests
+            6. Run contrail health check tests
+            7. Add one node with following configuration:
                 node-dpdk: "compute", "dpdk";
-            7. Deploy changes
-            8. Run OSTF tests
-            9. Run contrail health check tests
+            8. Deploy changes
+            9. Run OSTF tests
+            10. Run contrail health check tests
 
         """
+        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True})
         self.bm_drv.host_prepare()
 
-        self.show_step(2)
+        plugin.show_range(self, 2, 4)
         # activate plugin with DPDK feature
-        plugin.activate_dpdk(self)
+        plugin.activate_dpdk(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        self.show_step(3)
+        self.show_step(4)
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control',
                          'contrail-db',
-                         'contrail-analytics'],
+                         'contrail-analytics',
+                         'contrail-analytics-db'],
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['controller', 'cinder'],
@@ -361,24 +371,24 @@ class DPDKTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(4)
+        self.show_step(5)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity', 'ha'])
-            self.show_step(5)
+            self.show_step(6)
             TestContrailCheck(self).cloud_check(['contrail'])
 
-        self.show_step(6)
+        self.show_step(7)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
-        self.show_step(7)
+        self.show_step(8)
         openstack.deploy_cluster(self)
 
-        self.show_step(8)
+        self.show_step(9)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
-            self.show_step(9)
+            self.show_step(10)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -475,20 +485,23 @@ class DPDKTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Deploy cluster with following node configuration:
+            3. Enable dedicated analytics DB
+            4. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
                 node-2: 'contrail-config', 'contrail-control',
-                    'contrail-db', 'contrail-analytics';
+                    'contrail-db', 'contrail-analytics',
+                    'contrail-analytics-db';
                 node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
-            4. Run OSTF tests
-            5. Add one node with following configuration:
+            5. Run OSTF tests
+            6. Add one node with following configuration:
                 node-5: 'controller', 'ceph-osd';
-            6. Deploy changes
-            7. Run OSTF tests
-            8. Run contrail health check tests
+            7. Deploy changes
+            8. Run OSTF tests
+            9. Run contrail health check tests
 
         """
+        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5,
                                        options={'images_ceph': True,
@@ -498,13 +511,13 @@ class DPDKTests(TestBasic):
                                                 'volumes_lvm': False})
         self.bm_drv.host_prepare()
 
-        self.show_step(2)
+        plugin.show_range(self, 2, 4)
         # activate plugin with DPDK feature
-        plugin.activate_dpdk(self)
+        plugin.activate_dpdk(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        self.show_step(3)
+        self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
@@ -513,7 +526,8 @@ class DPDKTests(TestBasic):
             'slave-02': ['contrail-config',
                          'contrail-control',
                          'contrail-db',
-                         'contrail-analytics'],
+                         'contrail-analytics',
+                         'contrail-analytics-db'],
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
         }
@@ -527,7 +541,7 @@ class DPDKTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(4)
+        self.show_step(5)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
@@ -537,24 +551,24 @@ class DPDKTests(TestBasic):
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Add Compute node and check again
-        self.show_step(5)
+        self.show_step(6)
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
                                    nodes_dict=conf_controller,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         # Deploy cluster
-        self.show_step(6)
+        self.show_step(7)
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(7)
+        self.show_step(8)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            self.show_step(8)
+            self.show_step(9)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -650,37 +664,40 @@ class DPDKTests(TestBasic):
             1. Create an environment with "Neutron with tunneling segmentation"
                 as a network configuration
             2. Enable and configure Contrail plugin
-            3. Add dpdk and sriov nodes
-            4. Deploy cluster with following node configuration:
+            3. Enable dedicated analytics DB
+            4. Add dpdk and sriov nodes
+            5. Deploy cluster with following node configuration:
                node-1: 'controller';
                node-2: 'contrail-config', 'contrail-control',
-                       'contrail-db', 'contrail-analytics';
+                       'contrail-db', 'contrail-analytics',
+                       'contrail-analytics-db';
                node-3: 'compute', 'cinder',
-            5. Deploy cluster
-            6. Run OSTF
-            7. Add nodes with configurations:
+            6. Deploy cluster
+            7. Run OSTF
+            8. Add nodes with configurations:
                node-4: 'contrail-config', 'contrail-control',
                        'contrail-db', 'contrail-analytics';
                node-5: 'contrail-config', 'contrail-control',
                        'contrail-db', 'contrail-analytics';
-            8. Deploy changes
-            9. Run OSTF
-            10. Run contrail health check tests
+            9. Deploy changes
+            10. Run OSTF
+            11. Run contrail health check tests
 
         """
-        plugin.show_range(self, 1, 3)
+        conf_contrail = {"dedicated_analytics_db": True}
+        plugin.show_range(self, 1, 2)
         plugin.prepare_contrail_plugin(self, slaves=5)
         self.bm_drv.host_prepare()
 
-        self.show_step(3)
+        plugin.show_range(self, 2, 4)
         # activate plugin with DPDK feature
-        plugin.activate_dpdk(self)
+        plugin.activate_dpdk(self, **conf_contrail)
         # enable plugin and ativate SR-IOV in contrail settings
         plugin.activate_sriov(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        self.show_step(4)
+        self.show_step(5)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk', 'sriov'])
@@ -692,7 +709,8 @@ class DPDKTests(TestBasic):
         }
         conf_controller = {
             'slave-04': ['contrail-config', 'contrail-control',
-                         'contrail-db', 'contrail-analytics'],
+                         'contrail-db', 'contrail-analytics',
+                         'contrail-analytics-db'],
             'slave-05': ['contrail-config', 'contrail-control',
                          'contrail-db', 'contrail-analytics'],
         }
@@ -703,29 +721,29 @@ class DPDKTests(TestBasic):
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         # Deploy cluster
-        self.show_step(5)
+        self.show_step(6)
         openstack.deploy_cluster(self)
         # Run OSTF tests
         if vsrx_setup_result:
-            self.show_step(6)
+            self.show_step(7)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Add Contrail node and check again
-        self.show_step(7)
+        self.show_step(8)
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
                                    nodes_dict=conf_controller,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         # Deploy cluster
-        self.show_step(8)
+        self.show_step(9)
         openstack.deploy_cluster(self)
         # Run OSTF tests
         if vsrx_setup_result:
-            self.show_step(9)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
             self.show_step(10)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.show_step(11)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -749,6 +767,7 @@ class DPDKTests(TestBasic):
             5. Run OSTF and check Contrail node status.
 
         """
+        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5,
                                        options={'images_ceph': True,
@@ -758,7 +777,7 @@ class DPDKTests(TestBasic):
                                                 'volumes_lvm': False,
                                                 'osd_pool_size': '1'})
         self.bm_drv.host_prepare()
-        plugin.activate_dpdk(self)  # activate plugin with DPDK feature
+        plugin.activate_dpdk(self, **conf_contrail)
         vsrx_setup_result = vsrx.activate()
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
@@ -766,7 +785,8 @@ class DPDKTests(TestBasic):
             'slave-01': ['controller', 'mongo'],
             'slave-02': ['compute', 'ceph-osd'],
             'slave-03': ['contrail-config', 'contrail-control'],
-            'slave-04': ['contrail-db', 'contrail-analytics']
+            'slave-04': ['contrail-db', 'contrail-analytics'],
+            'slave-05': ['contrail-analytics-db']
         }
         self.fuel_web.update_nodes(self.cluster_id, conf_nodes)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)

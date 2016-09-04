@@ -52,12 +52,13 @@ class DPDKVFTests(TestBasic):
                 * enable dpdk
                 * enable sriov
                 * enable DPDK on VF
+                * enable dedicated analytics DB
             3. Add following nodes:
                 * 3 controller + mongo
                 * 3 compute + ceph
                 * 1 contrail-config+contrail-control+contrail-db
                 * 1 compute+sriov+dpdk
-                * 1 contrail-db+contrail-analytics
+                * 1 contrail-db+contrail-analytics+contrail-analytics-db
                 * 1 contrail-db
             4. Deploy cluster.
             5. Run OSTF tests.
@@ -66,6 +67,7 @@ class DPDKVFTests(TestBasic):
         Duration 120 min
 
         """
+        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True,
@@ -77,11 +79,8 @@ class DPDKVFTests(TestBasic):
         self.bm_drv.host_prepare()
 
         self.show_step(2)
-        # enable plugin in contrail settings
-        plugin.activate_plugin(self)
-        # activate DPDK feature
-        plugin.activate_dpdk_vf(self)
-        # activate vSRX image
+        # activate DPDK feature and
+        plugin.activate_dpdk_vf(self, **conf_contrail)
         vsrx_setup_result = vsrx.activate()
 
         self.show_step(3)
@@ -97,7 +96,8 @@ class DPDKVFTests(TestBasic):
             'slave-05': ['compute', 'ceph-osd'],
             'slave-06': ['compute', 'ceph-osd'],
             'slave-07': ['contrail-db', 'contrail-config', 'contrail-control'],
-            'slave-08': ['contrail-db', 'contrail-analytics'],
+            'slave-08': ['contrail-db', 'contrail-analytics',
+                         'contrail-analytics-db'],
             'slave-09': ['contrail-db'],
         }
         # Cluster configuration
