@@ -61,14 +61,15 @@ class FunctionalTests(TestBasic):
             3. Enable dedicated analytics DB
             4. Add 3 controllers, a compute and a storage nodes
             5. Add 3 nodes with "contrail-db", "contrail-config",
-               "contrail-analytics", "contrail-analytics-db"
+               "contrail-analytics",
                and "contrail-control" roles on all nodes
-            6. Deploy cluster
-            7. Run OSTF tests
-            8. Delete a Controller node and deploy changes
-            9. Run OSTF tests
-            10. Add a node with "Controller" role and deploy changes
-            11. Run OSTF tests. All steps must be completed successfully,
+            6. Add a node with "contrail-analytics-db" role
+            7. Deploy cluster
+            8. Run OSTF tests
+            9. Delete a Controller node and deploy changes
+            10. Run OSTF tests
+            11. Add a node with "Controller" role and deploy changes
+            12. Run OSTF tests. All steps must be completed successfully,
                 without any errors.
         """
         conf_contrail = {"dedicated_analytics_db": True}
@@ -91,18 +92,16 @@ class FunctionalTests(TestBasic):
             'slave-06': ['contrail-db',
                          'contrail-config',
                          'contrail-control',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
             'slave-07': ['contrail-db',
                          'contrail-config',
                          'contrail-control',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
             'slave-08': ['contrail-db',
                          'contrail-config',
                          'contrail-control',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
+            'slave-09': ['contrail-analytics-db'],
         }
         conf_ctrl = {'slave-03': ['controller']}
 
@@ -119,7 +118,7 @@ class FunctionalTests(TestBasic):
                                       conf_ctrl,
                                       is_vsrx=vsrx_setup_result)
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_plugin_add_delete_compute_node"])
     @log_snapshot_after_test
     def contrail_plugin_add_delete_compute_node(self):
@@ -131,19 +130,19 @@ class FunctionalTests(TestBasic):
             3. Enable dedicated analytics DB
             4. Add a controller and 3 compute + storage nodes
             5. Add a node with "contrail-db", "contarail-config",
-               "contrail-analytics", "contrail-analytics-db"
-               and "contrail-control" roles
-            6. Deploy cluster
-            7. Run OSTF tests
-            8. Delete a compute node and deploy changes
-            9. Run OSTF tests
-            10. Add a node with "compute" role and deploy changes
-            11. Run OSTF tests
+               "contrail-analytics" and "contrail-control" roles
+            6. Add a node with "contrail-analytics-db" role
+            7. Deploy cluster
+            8. Run OSTF tests
+            9. Delete a compute node and deploy changes
+            10. Run OSTF tests
+            11. Add a node with "compute" role and deploy changes
+            12. Run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=5)
+        plugin.prepare_contrail_plugin(self, slaves=9)
 
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)
@@ -151,7 +150,7 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 6)
+        plugin.show_range(self, 4, 7)
         conf_no_controller = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
@@ -160,21 +159,21 @@ class FunctionalTests(TestBasic):
             'slave-05': ['contrail-db',
                          'contrail-config',
                          'contrail-control',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
+            'slave-06': ['contrail-analytics-db'],
 
         }
         conf_compute = {'slave-04': ['compute', 'cinder']}
 
-        plugin.show_range(self, 6, 8)
+        plugin.show_range(self, 7, 9)
         openstack.update_deploy_check(self,
                                       dict(conf_no_controller, **conf_compute),
                                       is_vsrx=vsrx_setup_result)
-        self.show_step(8)
+        self.show_step(9)
         openstack.update_deploy_check(self,
                                       conf_compute, delete=True,
                                       is_vsrx=False)
-        self.show_step(9)
+        self.show_step(10)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'ha'],
@@ -182,10 +181,10 @@ class FunctionalTests(TestBasic):
             should_fail=1,
             failed_test_name=['Check that required services are running']
         )
-        self.show_step(10)
+        self.show_step(11)
         openstack.update_deploy_check(self, conf_compute,
                                       is_vsrx=False)
-        self.show_step(11)
+        self.show_step(12)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'ha'],
@@ -203,15 +202,15 @@ class FunctionalTests(TestBasic):
             3. Enable dedicated analytics DB
             4. Add some controller, compute and storage nodes
             5. Add 3 nodes with "contrail-db", "contarail-config"
-               "contrail-analytics", "contrail-analytics-db"
-               and "contrail-control" roles
-            6. Deploy cluster
-            7. Run OSTF tests
-            8. Check Controller and Contrail nodes status
-            9. Shutdown node with 'contrail-db', "contarail-config" and
+               "contrail-analytics" and "contrail-control" roles
+            6. Add a node with "contrail-analytics-db" role
+            7. Deploy cluster
+            8. Run OSTF tests
+            9. Check Controller and Contrail nodes status
+            10. Shutdown node with 'contrail-db', "contarail-config" and
                "contrail-control" roles
-            10. Run OSTF tests
-            11. Check Controller and Contrail nodes status
+            11. Run OSTF tests
+            12. Check Controller and Contrail nodes status
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
@@ -221,7 +220,7 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self, **conf_contrail)
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 6)
+        plugin.show_range(self, 4, 7)
         conf_no_contrail = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
@@ -232,20 +231,18 @@ class FunctionalTests(TestBasic):
             'slave-07': ['contrail-db',
                          'contrail-config',
                          'contrail-control',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
             'slave-08': ['contrail-db',
                          'contrail-config',
                          'contrail-control',
-                         'contrail-analytics',
-                         'contrail-analytics-db']
+                         'contrail-analytics'],
+            'slave-09': ['contrail-analytics-db'],
         }
         conf_contrail = {
             'slave-06': ['contrail-db',
                          'contrail-config',
                          'contrail-control',
-                         'contrail-analytics',
-                         'contrail-analytics-db']
+                         'contrail-analytics']
         }
 
         def check_node_state(cluster_id, node_name, node_state):
@@ -256,18 +253,18 @@ class FunctionalTests(TestBasic):
                                  'Nailgun node status is not %s but %s' % (
                                      node_state, node['status']))
 
-        plugin.show_range(self, 6, 8)
+        plugin.show_range(self, 7, 9)
         openstack.update_deploy_check(self,
                                       dict(conf_no_contrail,
                                            **conf_contrail),
                                       is_vsrx=vsrx_setup_result,
                                       ostf_suites=['smoke', 'sanity', 'ha'])
 
-        self.show_step(8)
+        self.show_step(9)
         for node_name in dict(conf_no_contrail, **conf_contrail):
             check_node_state(self.cluster_id, node_name, 'ready')
 
-        self.show_step(9)
+        self.show_step(10)
         for node in self.fuel_web.client.list_cluster_nodes(self.cluster_id):
             if 'slave-06' in node['name']:
                 logger.info('Shutdown node "%s"' % node['name'])
@@ -275,7 +272,7 @@ class FunctionalTests(TestBasic):
                     self.fuel_web.get_devops_nodes_by_nailgun_nodes([node]))
                 break
 
-        self.show_step(10)
+        self.show_step(11)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
@@ -284,13 +281,13 @@ class FunctionalTests(TestBasic):
                 failed_test_name=[
                     'Check state of haproxy backends on controllers'])
 
-        self.show_step(11)
+        self.show_step(12)
         node_roles = {'controller', 'contrail-config'}
         for node_name, roles in conf_no_contrail.items():
             if node_roles & set(roles):
                 check_node_state(self.cluster_id, node_name, 'ready')
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_add_control"])
     @log_snapshot_after_test
     def contrail_add_control(self):
@@ -302,19 +299,20 @@ class FunctionalTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Enable dedicated analytics DB
             4. Add a controller and a compute+cinder nodes
-            5. Add a node with "contrail-control", "contrail-analytics-db"
+            5. Add a node with "contrail-control",
                and "contrail-db" roles
             6. Add a node with "contrail-config" and "contrail-analytics" roles
-            7. Deploy cluster
-            8. Run OSTF tests
-            9. Add one node with "contrail-control" role
-            10. Deploy changes
-            11. Run OSTF tests
+            7. Add a node with "contrail-analytics-db" role
+            8. Deploy cluster
+            9. Run OSTF tests
+            10. Add one node with "contrail-control" role
+            11. Deploy changes
+            12. Run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=5)
+        plugin.prepare_contrail_plugin(self, slaves=9)
 
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)
@@ -322,23 +320,23 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 7)
+        plugin.show_range(self, 4, 8)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-control',
-                         'contrail-db',
-                         'contrail-analytics-db'],
+                         'contrail-db'],
             'slave-04': ['contrail-config',
-                         'contrail-analytics']
+                         'contrail-analytics'],
+            'slave-06': ['contrail-analytics-db']
         }
         conf_control = {'slave-05': ['contrail-control']}
 
-        plugin.show_range(self, 7, 9)
+        plugin.show_range(self, 8, 10)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
-        plugin.show_range(self, 9, 12)
+        plugin.show_range(self, 10, 13)
         openstack.update_deploy_check(self, conf_control,
                                       is_vsrx=vsrx_setup_result)
 
@@ -355,13 +353,13 @@ class FunctionalTests(TestBasic):
             3. Enable dedicated analytics DB
             4. Add a controller and a compute+cinder nodes
             5. Add a node with "contrail-config" and "contrail-db" roles
-            6. Add a "contrail-control"+"contrail-analytics"
-               +"contrail-analytics-db" node
-            7. Deploy cluster
-            8. Run OSTF tests
-            9. Add one node with "contrail-config" role
-            10. Deploy changes
-            11. Run OSTF tests
+            6. Add a "contrail-control"+"contrail-analytics" node
+            7. Add a "contrail-analytics-db" node
+            8. Deploy cluster
+            9. Run OSTF tests
+            10. Add one node with "contrail-config" role
+            11. Deploy changes
+            12. Run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
@@ -374,23 +372,23 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 7)
+        plugin.show_range(self, 4, 8)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute'],
             'slave-03': ['contrail-config',
                          'contrail-db'],
             'slave-04': ['contrail-control',
-                         'contrail-analytics',
-                         'contrail-analytics-db']
+                         'contrail-analytics'],
+            'slave-05': ['contrail-analytics-db']
         }
         conf_config = {'slave-05': ['contrail-config']}
 
-        plugin.show_range(self, 7, 9)
+        plugin.show_range(self, 8, 10)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
-        plugin.show_range(self, 9, 12)
+        plugin.show_range(self, 10, 13)
         openstack.update_deploy_check(self, conf_config,
                                       is_vsrx=vsrx_setup_result)
 
@@ -406,13 +404,16 @@ class FunctionalTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Enable dedicated analytics DB
             4. Add a controller and a compute+cinder nodes
-            5. Add a node with all contrail roles
-            6. Add a node with "contrail-control" role
-            7. Deploy cluster
-            8. Run OSTF tests
-            9. Delete one "contrail-control" role
-            10. Deploy changes
-            11. Run OSTF tests
+            5. Add a node with 'contrail-control'+'contrail-config'
+               +'contrail-db' roles
+            6. Add a node with 'contrail-analytics'+'contrail-analytics-db'
+              roles
+            7. Add a node with "contrail-control" role
+            8. Deploy cluster
+            9. Run OSTF tests
+            10. Delete one "contrail-control" role
+            11. Deploy changes
+            12. Run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
@@ -425,24 +426,24 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 7)
+        plugin.show_range(self, 4, 8)
         conf_no_control = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-control',
                          'contrail-config',
-                         'contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-db'],
             # Here slave-4
+            'slave-05': ['contrail-analytics',
+                         'contrail-analytics-db'],
         }
         conf_control = {'slave-04': ['contrail-control']}
 
-        plugin.show_range(self, 7, 9)
+        plugin.show_range(self, 8, 10)
         openstack.update_deploy_check(self,
                                       dict(conf_no_control, **conf_control),
                                       is_vsrx=vsrx_setup_result)
-        plugin.show_range(self, 9, 12)
+        plugin.show_range(self, 10, 13)
         openstack.update_deploy_check(self,
                                       conf_control, delete=True,
                                       is_vsrx=vsrx_setup_result)
@@ -459,13 +460,14 @@ class FunctionalTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Enable dedicated analytics DB
             4. Add a controller and a compute+cinder nodes
-            5. Add a node with all contrail roles
-            6. Add a node with "contrail-config" role
-            7. Deploy cluster
-            8. Run OSTF tests
-            9. Delete one "contrail-config" role
-            10. Deploy changes
-            11. Run OSTF tests
+            5. Add a node with all compatible contrail roles
+            6.Add a node with "contrail-config" role
+            7. Add a node with "contrail-analytics-db" role
+            8. Deploy cluster
+            9. Run OSTF tests
+            10. Delete one "contrail-config" role
+            11. Deploy changes
+            12. Run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
@@ -478,24 +480,24 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 7)
+        plugin.show_range(self, 4, 8)
         conf_no_config = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-control',
                          'contrail-config',
                          'contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
             # Here slave-4
+        'slave-05': ['contrail-analytics-db'],
         }
         conf_config = {'slave-04': ['contrail-config']}
 
-        plugin.show_range(self, 8, 9)
+        plugin.show_range(self, 9, 10)
         openstack.update_deploy_check(self,
                                       dict(conf_no_config, **conf_config),
                                       is_vsrx=vsrx_setup_result)
-        plugin.show_range(self, 9, 12)
+        plugin.show_range(self, 10, 13)
         openstack.update_deploy_check(self,
                                       conf_config, delete=True,
                                       is_vsrx=vsrx_setup_result)
@@ -512,11 +514,12 @@ class FunctionalTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Enable dedicated analytics DB
             4. Add a controller and a compute+cinder nodes
-            5. Add a node with all contrail roles
-            6. Deploy cluster
-            7. Add one node with "contrail-db" role
-            8. Deploy changes
-            9. Run OSTF tests
+            5. Add a node with all compatible contrail roles
+            6. Add a node with 'contrail-analytics-db' role
+            7. Deploy cluster
+            8. Add one node with "contrail-db" role
+            9. Deploy changes
+            10. Run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
@@ -529,24 +532,24 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 6)
+        plugin.show_range(self, 4, 7)
         conf_no_db = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-control',
                          'contrail-config',
                          'contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
             # Here slave-4
+            'slave-05': ['contrail-analytics-db'],
         }
         conf_db = {'slave-04': ['contrail-db']}
 
-        self.show_step(6)
+        self.show_step(7)
         openstack.update_deploy_check(self,
                                       conf_no_db,
                                       is_vsrx=vsrx_setup_result)
-        plugin.show_range(self, 7, 10)
+        plugin.show_range(self, 8, 11)
         openstack.update_deploy_check(self,
                                       conf_db,
                                       is_vsrx=vsrx_setup_result)
@@ -730,7 +733,7 @@ class FunctionalTests(TestBasic):
             contrail_gateways in bgp_ips,
             message.format(contrail_gateways, bgp_ips))
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_add_analytics"])
     @log_snapshot_after_test
     def contrail_add_analytics(self):
@@ -743,18 +746,18 @@ class FunctionalTests(TestBasic):
             3. Enable dedicated analytics DB
             4. Add a controller and a compute+cinder nodes
             5. Add a node with "contrail-config" and "contrail-control" roles
-            6. Add a "contrail-db"+"contrail-analytics"
-               +"contrail-analytics-db" node
-            7. Deploy cluster
-            8. Run OSTF tests
-            9. Add one node with "contrail-analytics" role
-            10. Deploy changes
-            11. Run OSTF tests
+            6. Add a "contrail-db"  node
+            7. Add a "contrail-analytics-db"+"contrail-analytics" node
+            8. Deploy cluster
+            9. Run OSTF tests
+            10. Add one node with "contrail-analytics" role
+            11. Deploy changes
+            12. Run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=5)
+        plugin.prepare_contrail_plugin(self, slaves=9)
 
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)
@@ -762,23 +765,23 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 7)
+        plugin.show_range(self, 4, 8)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
             'slave-03': ['contrail-config',
                          'contrail-control'],
-            'slave-04': ['contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db']
+            'slave-04': ['contrail-db'],
+            'slave-06': ['contrail-analytics-db',
+                         'contrail-analytics'],
         }
         conf_config = {'slave-05': ['contrail-analytics']}
 
-        plugin.show_range(self, 7, 9)
+        plugin.show_range(self, 8, 10)
         openstack.update_deploy_check(self, conf_nodes,
                                       is_vsrx=vsrx_setup_result)
 
-        plugin.show_range(self, 9, 12)
+        plugin.show_range(self, 10, 13)
         openstack.update_deploy_check(self, conf_config,
                                       is_vsrx=vsrx_setup_result)
 
@@ -794,13 +797,14 @@ class FunctionalTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Enable dedicated analytics DB
             4. Add a controller and a compute+cinder nodes
-            5. Add a node with all contrail roles
-            6. Add a node with "contrail-analytics" role
-            7. Deploy cluster
-            8. Run OSTF tests
-            9. Delete one "contrail-analytics" role
-            10. Deploy changes
-            11. Run OSTF tests
+            5. Add a node with all compatible contrail roles
+            6. Add a node with 'contrail-analytics-db' roles
+            7. Add a node with "contrail-analytics" role
+            8. Deploy cluster
+            9. Run OSTF tests
+            10. Delete one "contrail-analytics" role
+            11. Deploy changes
+            12. Run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
@@ -813,7 +817,7 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 5, 7)
+        plugin.show_range(self, 5, 8)
         conf_no_config = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
@@ -823,14 +827,15 @@ class FunctionalTests(TestBasic):
                          'contrail-analytics',
                          'contrail-analytics-db'],
             # Here slave-4
+            'slave-05': ['contrail-analytics-db'],
         }
         conf_config = {'slave-04': ['contrail-analytics']}
 
-        plugin.show_range(self, 7, 9)
+        plugin.show_range(self, 8, 10)
         openstack.update_deploy_check(self,
                                       dict(conf_no_config, **conf_config),
                                       is_vsrx=vsrx_setup_result)
-        plugin.show_range(self, 9, 12)
+        plugin.show_range(self, 11, 13)
         openstack.update_deploy_check(self,
                                       conf_config, delete=True,
                                       is_vsrx=vsrx_setup_result)
@@ -848,10 +853,13 @@ class FunctionalTests(TestBasic):
             3. Enable dedicated analytics DB
             4. Add 3 nodes with "controller" + "ceph-osd" roles
             5. Add 2 nodes with "compute" + "ceph-osd" roles
-            6. Add a node with all contrail roles
-            7. Deploy cluster and run OSTF tests
-            8. Add a node with all contrail roles
-            9. Deploy changes and run OSTF tests
+            6. Add a node with 'contrail-control'+'contrail-config'+
+               'contrail-db' roles
+            7. Add a node with 'contrail-analytics'+'contrail-analytics-db'
+               roles
+            8. Deploy cluster and run OSTF tests
+            9. Add a node with all compatible contrail roles
+            10. Deploy changes and run OSTF tests
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
@@ -868,7 +876,7 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 7)
+        plugin.show_range(self, 4, 8)
         conf_no_ha_contrail = {
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['controller', 'ceph-osd'],
@@ -877,21 +885,20 @@ class FunctionalTests(TestBasic):
             'slave-05': ['compute', 'ceph-osd'],
             'slave-06': ['contrail-control',
                          'contrail-config',
-                         'contrail-db',
-                         'contrail-analytics',
+                         'contrail-db'],
+            # Here slave-7
+            'slave-08': ['contrail-analytics',
                          'contrail-analytics-db'],
-            # Here slave-6
         }
         conf_ha_contrail = {'slave-07': ['contrail-control',
                                          'contrail-config',
                                          'contrail-db',
-                                         'contrail-analytics',
-                                         'contrail-analytics-db']}
+                                         'contrail-analytics']}
 
-        self.show_step(7)
+        plugin.show_range(self, 8, 10)
         openstack.update_deploy_check(self, conf_no_ha_contrail,
                                       is_vsrx=vsrx_setup_result)
-        plugin.show_range(self, 8, 10)
+        self.show_step(10)
         openstack.update_deploy_check(self, conf_ha_contrail,
                                       is_vsrx=vsrx_setup_result)
 
