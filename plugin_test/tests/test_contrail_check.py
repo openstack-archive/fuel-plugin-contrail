@@ -623,6 +623,7 @@ class TestContrailCheck(object):
             'contrail-control',
             'contrail-db',
             'contrail-analytics'
+            'contrail-analytics-db'
         }
 
         def check_status(host_name):
