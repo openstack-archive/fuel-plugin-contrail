@@ -58,7 +58,7 @@ class DPDKVFTests(TestBasic):
                 * 3 compute + ceph
                 * 1 contrail-config+contrail-control+contrail-db
                 * 1 compute+sriov+dpdk
-                * 1 contrail-db+contrail-analytics+contrail-analytics-db
+                * 1 contrail-analytics+contrail-analytics-db
                 * 1 contrail-db
             4. Deploy cluster.
             5. Run OSTF tests.
@@ -96,8 +96,7 @@ class DPDKVFTests(TestBasic):
             'slave-05': ['compute', 'ceph-osd'],
             'slave-06': ['compute', 'ceph-osd'],
             'slave-07': ['contrail-db', 'contrail-config', 'contrail-control'],
-            'slave-08': ['contrail-db', 'contrail-analytics',
-                         'contrail-analytics-db'],
+            'slave-08': ['contrail-analytics', 'contrail-analytics-db'],
             'slave-09': ['contrail-db'],
         }
         # Cluster configuration
