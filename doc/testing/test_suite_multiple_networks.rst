@@ -46,6 +46,7 @@ Steps
         * 1 compute
         * 1 contrail-config+contrail-control+contrail-db+
           contrail-analytics+contrail-analytics-db
+        * 1 contrail-analytics+contrail-analytics-db
     15. Deploy cluster
     16. Run network verification
     17. Verify that excluded ip is not used for nodes or VIP
@@ -153,7 +154,8 @@ Steps
     14. Add following nodes to default nodegroup:
         * 1 compute
         * 1 contrail-config+contrail-control+contrail-db+
-          contrail-analytics+contrail-analytics-db
+          contrail-analytics
+        * 1 contrail-analytics-db
         * 1 cinder
     15. Deploy cluster
     16. Run health checks (OSTF)
@@ -262,7 +264,8 @@ Steps
     14. Add following nodes to custom nodegroup:
         * 1 compute+ceph-osd
         * 1 contrail-config+contrail-control+contrail-db+
-          contrail-analytics+contrail-analytics-db
+          contrail-analytics
+        * 1 contrail-analytics-db
     15. Deploy cluster
     16. Run health checks (OSTF)
     17. Add 1 compute node
@@ -319,6 +322,7 @@ Steps
         * 1 cinder
         * 1 contrail-config+contrail-control+contrail-db+
           contrail-analytics+contrail-analytics-db
+        * 1 contrail-analytics-db
     15. Deploy cluster
     16. Run health checks (OSTF)
 

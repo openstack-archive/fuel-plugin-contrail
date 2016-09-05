@@ -39,7 +39,7 @@ Steps
        node-06: 'contrail-db';
        node-07: 'contrail-config';
        node-08: 'contrail-control';
-       node-09: 'contrail-analytics';
+       node-09: 'contrail-analytics', 'contrail-analytics-db';
        node-dpdk: 'compute', dpdk';
     4. Run OSTF tests
     5. Run contrail health check tests
@@ -83,11 +83,12 @@ Steps
     4. Deploy cluster with following node configuration:
         node-1: 'controller', 'ceph-osd';
         node-2: 'contrail-config', 'contrail-control',
-            'contrail-db', 'contrail-analytics',
-            'contrail-analytics-db';
+            'contrail-db';
         node-3: 'compute', 'ceph-osd';
         node-4: 'compute', 'ceph-osd';
+        node-5: 'compute', 'ceph-osd';
         node-dpdk: 'compute', 'dpdk';
+        node-7: 'contrail-analytics', 'contrail-analytics-db';
     5. Run OSTF tests
     6. Add one node with following configuration:
         node-5: "compute", "ceph-osd";
@@ -187,6 +188,7 @@ Steps
         node-04: 'compute', 'ceph-osd';
         node-05: 'controller', 'cinder';
         node-06: 'controller', 'cinder';
+        node-07: 'contrail-analytics-db';
     5. Run OSTF tests
     6. Run contrail health check tests
     7. Add one node with following configuration:
@@ -323,6 +325,7 @@ Steps
             'contrail-analytics-db';
         node-3: 'compute', 'ceph-osd';
         node-4: 'compute', 'ceph-osd';
+        node-6: 'contrail-analytics', 'contrail-analytics-db';
     5. Run OSTF tests
     6. Add one node with following configuration:
         node-5: 'controller', 'ceph-osd';
@@ -416,8 +419,7 @@ Steps
     5. Deploy cluster with following node configuration:
        node-1: 'controller';
        node-2: 'contrail-config', 'contrail-control',
-               'contrail-db', 'contrail-analytics',
-               'contrail-analytics-db';
+               'contrail-db', 'contrail-analytics';
        node-3: 'compute', 'cinder',
     6. Deploy cluster
     7. Run OSTF
@@ -426,10 +428,10 @@ Steps
                'contrail-db', 'contrail-analytics';
        node-5: 'contrail-config', 'contrail-control',
                'contrail-db', 'contrail-analytics';
+       node-6: 'contrail-analytics-db';
     9. Deploy changes
     10. Run OSTF
     11. Run contrail health check tests
-
 
 Expected results
 ################
