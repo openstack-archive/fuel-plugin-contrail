@@ -955,7 +955,7 @@ class FunctionalTests(TestBasic):
         self.show_step(10)
         plugin.activate_plugin(self, **conf_contrail)
 
-        plugin.show_range(self, 10, 14)
+        plugin.show_range(self, 11, 14)
         openstack.update_deploy_check(self, conf_analytics_db,
                                       is_vsrx=vsrx_setup_result)
 
