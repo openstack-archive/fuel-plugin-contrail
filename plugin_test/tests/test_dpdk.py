@@ -61,10 +61,10 @@ class DPDKTests(TestBasic):
                 node-03: 'controller', 'ceph-osd';
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'compute', 'ceph-osd';
-                node-06: 'contrail-db', 'contrail-analytics-db';
+                node-06: 'contrail-db';
                 node-07: 'contrail-config';
                 node-08: 'contrail-control';
-                node-09: 'contrail-analytics';
+                node-09: 'contrail-analytics', 'contrail-analytics-db';
                 node-dpdk: 'compute', dpdk';
             5. Run OSTF tests
             6. Run contrail health check tests
@@ -99,10 +99,10 @@ class DPDKTests(TestBasic):
             'slave-03': ['controller', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
-            'slave-06': ['contrail-db', 'contrail-analytics-db'],
+            'slave-06': ['contrail-db'],
             'slave-07': ['contrail-config'],
             'slave-08': ['contrail-control'],
-            'slave-09': ['contrail-analytics'],
+            'slave-09': ['contrail-analytics', 'contrail-analytics-db'],
         }
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
@@ -137,11 +137,12 @@ class DPDKTests(TestBasic):
             4. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
                 node-2: 'contrail-config', 'contrail-control',
-                    'contrail-db', 'contrail-analytics',
-                    'contrail-analytics-db';
+                    'contrail-db';
                 node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
+                node-5: 'compute', 'ceph-osd';
                 node-dpdk: 'compute', 'dpdk';
+                node-7: 'contrail-analytics', 'contrail-analytics-db';
             5. Run OSTF tests
             6. Add one node with following configuration:
                 node-5: "compute", "ceph-osd";
@@ -174,12 +175,12 @@ class DPDKTests(TestBasic):
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control',
-                         'contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-db'],
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
+            'slave-07': ['contrail-analytics',
+                         'contrail-analytics-db'],
         }
         conf_compute = {'slave-06': ['compute', 'ceph-osd']}
 
@@ -329,6 +330,7 @@ class DPDKTests(TestBasic):
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'controller', 'cinder';
                 node-06: 'controller', 'cinder';
+                node-07: 'contrail-analytics-db';
             5. Run OSTF tests
             6. Run contrail health check tests
             7. Add one node with following configuration:
@@ -356,12 +358,12 @@ class DPDKTests(TestBasic):
             'slave-02': ['contrail-config',
                          'contrail-control',
                          'contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['controller', 'cinder'],
             'slave-06': ['controller', 'cinder'],
+            'slave-07': ['contrail-analytics-db'],
         }
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -493,6 +495,7 @@ class DPDKTests(TestBasic):
                     'contrail-analytics-db';
                 node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
+                node-6: 'contrail-analytics', 'contrail-analytics-db';
             5. Run OSTF tests
             6. Add one node with following configuration:
                 node-5: 'controller', 'ceph-osd';
@@ -503,7 +506,7 @@ class DPDKTests(TestBasic):
         """
         conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=5,
+        plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True,
                                                 'volumes_ceph': True,
                                                 'ephemeral_ceph': True,
@@ -525,11 +528,11 @@ class DPDKTests(TestBasic):
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
                          'contrail-control',
-                         'contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-db'],
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
+            'slave-06': ['contrail-analytics',
+                         'contrail-analytics-db'],
         }
         conf_controller = {'slave-05': ['controller', 'ceph-osd']}
 
@@ -571,7 +574,7 @@ class DPDKTests(TestBasic):
             self.show_step(9)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_dpdk_delete_controller", "contrail_dpdk_tests"])
     @log_snapshot_after_test
     def contrail_dpdk_delete_controller(self):
@@ -654,7 +657,7 @@ class DPDKTests(TestBasic):
             self.show_step(8)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_add_to_dpdk_sriov", "contrail_dpdk_tests"])
     @log_snapshot_after_test
     def contrail_add_to_dpdk_sriov(self):
@@ -669,8 +672,7 @@ class DPDKTests(TestBasic):
             5. Deploy cluster with following node configuration:
                node-1: 'controller';
                node-2: 'contrail-config', 'contrail-control',
-                       'contrail-db', 'contrail-analytics',
-                       'contrail-analytics-db';
+                       'contrail-db', 'contrail-analytics';
                node-3: 'compute', 'cinder',
             6. Deploy cluster
             7. Run OSTF
@@ -679,6 +681,7 @@ class DPDKTests(TestBasic):
                        'contrail-db', 'contrail-analytics';
                node-5: 'contrail-config', 'contrail-control',
                        'contrail-db', 'contrail-analytics';
+               node-6: 'contrail-analytics-db';
             9. Deploy changes
             10. Run OSTF
             11. Run contrail health check tests
@@ -686,7 +689,7 @@ class DPDKTests(TestBasic):
         """
         conf_contrail = {"dedicated_analytics_db": True}
         plugin.show_range(self, 1, 2)
-        plugin.prepare_contrail_plugin(self, slaves=5)
+        plugin.prepare_contrail_plugin(self, slaves=9)
         self.bm_drv.host_prepare()
 
         plugin.show_range(self, 2, 4)
@@ -709,10 +712,10 @@ class DPDKTests(TestBasic):
         }
         conf_controller = {
             'slave-04': ['contrail-config', 'contrail-control',
-                         'contrail-db', 'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-db', 'contrail-analytics'],
             'slave-05': ['contrail-config', 'contrail-control',
                          'contrail-db', 'contrail-analytics'],
+            'slave-06': ['contrail-analytics-db'],
         }
 
         # Cluster configuration
