@@ -119,16 +119,20 @@ class SystemTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable Contrail plugin
-            3. Add 1 node with contrail-config, contrail-control,
-               contrail-analytics and contrail-db roles
-            4. Add a node with controller, mongo roles
-            5. Add a node with compute role
-            6. Deploy cluster with plugin
-            7. Run OSTF.
+            3. Enable dedicated analytics DB
+            4. Add 1 node with contrail-config, contrail-control,
+               and contrail-db roles
+            5. Add a node with controller, mongo roles
+            6. Add a node with compute role
+            7. Add a node with contrail-analytics and contrail-analytics-db
+               roles
+            8. Deploy cluster with plugin
+            9. Run OSTF.
 
         Duration 90 min
 
         """
+        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(
             self, slaves=5, options={'ceilometer': True})
@@ -136,25 +140,25 @@ class SystemTests(TestBasic):
         # activate vSRX image
         vsrx.activate()
 
-        self.show_step(2)
-        plugin.activate_plugin(self)
+        plugin.show_range(self, 2, 4)
+        plugin.activate_plugin(self, **conf_contrail)
 
-        plugin.show_range(self, 3, 6)
+        plugin.show_range(self, 4, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
                 'slave-01': ['contrail-config',
                              'contrail-control',
-                             'contrail-db',
-                             'contrail-analytics'],
+                             'contrail-db'],
                 'slave-02': ['controller', 'mongo'],
                 'slave-03': ['compute'],
                 'slave-04': ['compute'],
+                'slave-05': ['contrail-analytics', 'contrail-analytics-db'],
             })
 
-        self.show_step(6)
+        self.show_step(8)
         openstack.deploy_cluster(self)
-        self.show_step(7)
+        self.show_step(9)
         self.fuel_web.run_ostf(
             cluster_id=self.cluster_id,
             test_sets=['smoke', 'sanity', 'tests_platform'],
