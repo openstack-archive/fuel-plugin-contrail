@@ -63,7 +63,7 @@ class contrail::compute::override {
       } ->
       #TODO rewrite using package
       exec { 'override-nova':
-        command => "apt-get install --yes --force-yes ${keep_config_files} ${force_overwrite} nova-compute",
+        command => "apt-get install --yes --force-yes ${keep_config_files} ${force_overwrite} nova-compute nova-compute-kvm",
         unless  => 'dpkg -l | grep nova-compute | grep contrail',
       }
     }
@@ -103,7 +103,7 @@ class contrail::compute::override {
         require => Apt::Source['dpdk-depends-repo'],
       } ->
       exec { 'install-nova':
-        command => "apt-get install --yes --force-yes ${keep_config_files} ${force_overwrite} nova-compute",
+        command => "apt-get install --yes --force-yes ${keep_config_files} ${force_overwrite} nova-compute nova-compute-kvm",
       } ->
       # With a new libvirt packages this init script must be stopped
       service { 'libvirtd':
