@@ -168,3 +168,25 @@ def wait_for_cluster_status(obj, cluster_id,
     logger.info('Wait cluster id:"{}" deploy done in {}sec.'.format(cluster_id,
                                                                     wtime))
     return wtime
+
+
+def activate_sriov(obj):
+    """Activate SRiOV interface on baremetal node.
+
+    :param obj: Test case object, usually it is 'self'
+
+    """
+    assign_vlan(obj, storage=102, management=101)
+    node_mac = obj.bm_drv.conf['target_macs']
+    nailgun_node = obj.bm_drv.get_bm_node(obj, node_mac)
+    node_assighned_interfaces = [
+        intr['dev'] for intr in nailgun_node['network_data']]
+    node_networks = obj.fuel_web.client.get_node_interfaces(
+        nailgun_node['id'])
+    for interface in node_networks:
+        if interface['name'] not in node_assighned_interfaces:
+            interface['interface_properties']['sriov']['enabled'] = True
+            interface['interface_properties']['sriov']['sriov_numvfs'] = \
+                interface['interface_properties']['sriov']['sriov_totalvfs']
+    obj.fuel_web.client.put_node_interfaces(
+        [{'id': nailgun_node['id'], 'interfaces': node_networks}])

@@ -666,15 +666,16 @@ class DPDKTests(TestBasic):
                 as a network configuration
             2. Enable and configure Contrail plugin
             3. Enable dedicated analytics DB
-            4. Add dpdk and sriov nodes
+            4. Add dpdk+compute node
             5. Deploy cluster with following node configuration:
                node-1: 'controller';
                node-2: 'contrail-config', 'contrail-control',
                        'contrail-db', 'contrail-analytics';
                node-3: 'compute', 'cinder',
-            6. Deploy cluster
-            7. Run OSTF
-            8. Add nodes with configurations:
+            6. Enable sriov on interfaces of dpdk+compute node.
+            7. Deploy cluster
+            8. Run OSTF
+            9. Add nodes with configurations:
                node-4: 'contrail-config', 'contrail-control',
                        'contrail-db', 'contrail-analytics';
                node-5: 'contrail-config', 'contrail-control',
@@ -693,15 +694,13 @@ class DPDKTests(TestBasic):
         plugin.show_range(self, 2, 4)
         # activate plugin with DPDK feature
         plugin.activate_dpdk(self, **conf_contrail)
-        # enable plugin and ativate SR-IOV in contrail settings
-        plugin.activate_sriov(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
         self.show_step(5)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk', 'sriov'])
+                                    roles=['compute', 'dpdk'])
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['contrail-config', 'contrail-control',
@@ -721,30 +720,33 @@ class DPDKTests(TestBasic):
                                    nodes_dict=conf_nodes,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
-        # Deploy cluster
         self.show_step(6)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
+        # Deploy cluster
+        self.show_step(7)
         openstack.deploy_cluster(self)
         # Run OSTF tests
         if vsrx_setup_result:
-            self.show_step(7)
+            self.show_step(8)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
         # Add Contrail node and check again
-        self.show_step(8)
+        self.show_step(9)
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
                                    nodes_dict=conf_controller,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         # Deploy cluster
-        self.show_step(9)
+        self.show_step(10)
         openstack.deploy_cluster(self)
         # Run OSTF tests
         if vsrx_setup_result:
-            self.show_step(10)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
             self.show_step(11)
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.show_step(12)
             TestContrailCheck(self).cloud_check(['dpdk', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],

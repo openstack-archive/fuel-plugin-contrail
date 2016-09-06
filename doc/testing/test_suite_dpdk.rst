@@ -413,23 +413,25 @@ Steps
         as a network configuration
     2. Enable and configure Contrail plugin
     3. Enable dedicated analytics DB
-    4. Add dpdk and sriov nodes
+    4. Add dpdk+compute node
     5. Deploy cluster with following node configuration:
        node-1: 'controller';
        node-2: 'contrail-config', 'contrail-control',
                'contrail-db', 'contrail-analytics';
        node-3: 'compute', 'cinder',
-    6. Deploy cluster
-    7. Run OSTF
-    8. Add nodes with configurations:
+    6. Enable sriov on interfaces of dpdk+compute node
+    7. Deploy cluster
+    8. Run OSTF
+    9. Add nodes with configurations:
        node-4: 'contrail-config', 'contrail-control',
                'contrail-db', 'contrail-analytics';
        node-5: 'contrail-config', 'contrail-control',
                'contrail-db', 'contrail-analytics';
        node-6: 'contrail-analytics-db';
-    9. Deploy changes
-    10. Run OSTF
-    11. Run contrail health check tests
+    10. Deploy changes
+    11. Run OSTF
+    12. Run contrail health check tests
+
 
 Expected results
 ################
