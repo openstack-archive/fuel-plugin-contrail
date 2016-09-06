@@ -975,3 +975,18 @@
   cross-depends:
     - name: contrail-db-provision-all
 
+- id: contrail-vmware-provision
+  type: puppet
+  version: 2.0.0
+  groups: [contrail-vmware]
+  required_for: [deploy_end]
+  requires: [contrail-vmware-task]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-compute-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+  cross-depends:
+    - name: openstack-controller-provision
+      role: primary-controller
+
+

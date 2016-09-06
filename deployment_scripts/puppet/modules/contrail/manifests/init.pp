@@ -212,6 +212,7 @@ class contrail {
     $contrail_esxi_info                         = hiera_array('contrail_esxi_info', [])
     $dvs_external                               = 'Contrail-DVS-Ext'
     $dvs_internal                               = 'Contrail-DVS-Int'
+    $vmware_iface_name                          = 'ens192'
   }
 
 }
