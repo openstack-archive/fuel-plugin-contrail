@@ -15,4 +15,4 @@
 notice('MODULAR: contrail/contrail-vmware.pp')
 
 include contrail
-#class { 'contrail::contrail_vmware': }
+class { 'contrail::contrail_vmware': }
