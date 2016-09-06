@@ -32,19 +32,19 @@ Steps
         as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin:
         * enable dpdk
-        * enable sriov
         * enable DPDK on VF
         * enable dedicated analytics DB
     3. Add following nodes:
         * 3 controller + mongo
         * 3 compute + ceph
         * 1 contrail-config+contrail-control+contrail-db
-        * 1 compute+sriov+dpdk
+        * 1 compute+dpdk
         * 1 contrail-analytics+contrail-analytics-db
         * 1 contrail-db
-    4. Deploy cluster.
-    5. Run OSTF tests.
-    6. Run contrail health check tests
+    4. Enable sriov on interfaces.
+    5. Deploy cluster.
+    6. Run OSTF tests.
+    7. Run contrail health check tests
 
 
 Expected results

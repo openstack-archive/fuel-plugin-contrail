@@ -110,7 +110,6 @@ def activate_plugin(obj, **kwargs):
         for option in kwargs:
             options.update(
                 {'{0}/value'.format(option): kwargs[option]})
-
     obj.fuel_web.update_plugin_settings(
         cluster_id, plugin_name, CONTRAIL_PLUGIN_VERSION, options)
 
@@ -153,33 +152,6 @@ def activate_dpdk(obj, **kwargs):
 
     opts = {
         'contrail_global_dpdk': True,
-        'hugepages_amount': '60',
-    }
-    if kwargs:
-        opts.update(kwargs)
-    activate_plugin(obj, **opts)
-
-
-def activate_sriov(obj, **kwargs):
-    """Activate SRiOV functionality."""
-    openstack.assign_vlan(obj, storage=102, management=101)
-
-    opts = {
-        'contrail_global_sriov': True,
-    }
-    if kwargs:
-        opts.update(kwargs)
-    activate_plugin(obj, **opts)
-
-
-def activate_dpdk_vf(obj, **kwargs):
-    """Activate DPDK on VF functionality."""
-    openstack.assign_vlan(obj, storage=102, management=101)
-
-    opts = {
-        'contrail_global_dpdk': True,
-        'contrail_global_sriov': True,
-        'dpdk_on_vf': True,
         'hugepages_amount': '60',
     }
     if kwargs:

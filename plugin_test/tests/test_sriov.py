@@ -64,7 +64,7 @@ class SRIOVTests(TestBasic):
                 node-07: 'contrail-config';
                 node-08: 'contrail-control';
                 node-09: 'contrail-analytics';
-                node-sriov: 'compute', sriov';
+                node-sriov: 'compute';
             4. Run OSTF tests
             5. Run contrail health check tests
 
@@ -81,15 +81,15 @@ class SRIOVTests(TestBasic):
         self.bm_drv.host_prepare()
 
         self.show_step(2)
-        # enable plugin and ativate SR-IOV in contrail settings
-        plugin.activate_sriov(self)
+        # enable plugin
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'])
+                                    roles=['compute'])
 
         conf_nodes = {
             'slave-01': ['controller'],
@@ -107,6 +107,8 @@ class SRIOVTests(TestBasic):
                                    nodes_dict=conf_nodes,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -135,7 +137,7 @@ class SRIOVTests(TestBasic):
                         'contrail-db', 'contrail-analytics';
                 node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
-                node-bm: 'compute', 'sriov';
+                node-bm: 'compute'(sriov);
             4. Run OSTF tests
             5. Add one node with following configuration:
                 node-5: "compute", "ceph-osd";
@@ -154,15 +156,15 @@ class SRIOVTests(TestBasic):
         self.bm_drv.host_prepare()
 
         self.show_step(2)
-        # enable plugin and enable SR-IOV in contrail settings
-        plugin.activate_sriov(self)
+        # enable plugin
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'])
+                                    roles=['compute'])
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
@@ -179,6 +181,8 @@ class SRIOVTests(TestBasic):
                                    nodes_dict=conf_nodes,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -197,6 +201,7 @@ class SRIOVTests(TestBasic):
                                    nodes_dict=conf_compute,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        openstack.enable_sriov(self)
         # Deploy cluster
         self.show_step(6)
         openstack.deploy_cluster(self)
@@ -226,7 +231,7 @@ class SRIOVTests(TestBasic):
                          'contrail-db', 'contrail-analytics';
                 node-03: 'compute', 'cinder';
                 node-04: 'compute';
-                node-bm: 'compute', 'sriov';
+                node-bm: 'compute'(sriov);
             4. Run OSTF tests
             5. Delete node-04 with "compute" role
             6. Deploy changes
@@ -239,15 +244,15 @@ class SRIOVTests(TestBasic):
         self.bm_drv.host_prepare()
 
         self.show_step(2)
-        # activate plugin with SRIOV feature
-        plugin.activate_sriov(self)
+        # enable plugin
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'])
+                                    roles=['compute'])
         conf_no_compute = {
             'slave-01': ['controller'],
             'slave-02': ['contrail-control',
@@ -263,6 +268,8 @@ class SRIOVTests(TestBasic):
             nodes_dict=dict(conf_no_compute, **conf_compute),
             update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -310,7 +317,7 @@ class SRIOVTests(TestBasic):
                         'contrail-db', 'contrail-analytics';
                 node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
-                node-bm: 'compute', 'sriov';
+                node-bm: 'compute'(sriov);
             4. Run OSTF tests
             5. Add one node with following configuration:
                 node-5: "controller", "ceph-osd";
@@ -329,15 +336,15 @@ class SRIOVTests(TestBasic):
         self.bm_drv.host_prepare()
 
         self.show_step(2)
-        # activate plugin with SRIOV feature
-        plugin.activate_sriov(self)
+        # enable plugin
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'])
+                                    roles=['compute'])
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-config',
@@ -354,6 +361,8 @@ class SRIOVTests(TestBasic):
                                    nodes_dict=conf_nodes,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -403,7 +412,7 @@ class SRIOVTests(TestBasic):
                         'contrail-db', 'contrail-analytics';
                node-03: 'compute', 'cinder';
                node-04: 'controller';
-               node-bm: 'compute', 'sriov';
+               node-bm: 'compute'(sriov);
             4. Run OSTF tests
             5. Delete node-04 with "controller" role
             6. Deploy changes
@@ -416,15 +425,15 @@ class SRIOVTests(TestBasic):
         self.bm_drv.host_prepare()
 
         self.show_step(2)
-        # activate plugin with SRIOV feature
-        plugin.activate_sriov(self)
+        # enable plugin
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'])
+                                    roles=['compute'])
         conf_no_compute = {
             'slave-01': ['controller'],
             'slave-02': ['contrail-control',
@@ -440,6 +449,8 @@ class SRIOVTests(TestBasic):
             nodes_dict=dict(conf_no_compute, **conf_controller),
             update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -499,8 +510,8 @@ class SRIOVTests(TestBasic):
         self.bm_drv.host_prepare()
 
         self.show_step(2)
-        # activate plugin with SRiOV feature
-        plugin.activate_sriov(self)
+        # enable plugin
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
@@ -517,6 +528,8 @@ class SRIOVTests(TestBasic):
             nodes_dict=conf_nodes,
             update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -527,7 +540,7 @@ class SRIOVTests(TestBasic):
         self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'])
+                                    roles=['compute'])
         self.show_step(7)
         openstack.deploy_cluster(self)
 
@@ -559,7 +572,7 @@ class SRIOVTests(TestBasic):
                          'contrail-db', 'contrail-analytics';
                 node-07: 'compute';
                 node-08: 'compute';
-                node-bm: 'compute', 'sriov';
+                node-bm: 'compute'(sriov);
             4. Run OSTF tests
             5. Run contrail health check tests
             6. Delete node-bm with "sriov" and "compute" roles
@@ -573,15 +586,15 @@ class SRIOVTests(TestBasic):
         self.bm_drv.host_prepare()
 
         self.show_step(2)
-        # activate plugin with SRiOV feature
-        plugin.activate_sriov(self)
+        # enable plugin
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'])
+                                    roles=['compute'])
         conf_no_dpdk = {
             'slave-01': ['controller'],
             'slave-02': ['controller'],
@@ -607,6 +620,8 @@ class SRIOVTests(TestBasic):
             nodes_dict=conf_no_dpdk,
             update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -619,7 +634,7 @@ class SRIOVTests(TestBasic):
         self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'],
+                                    roles=['compute'],
                                     pending_deletion=True,
                                     pending_addition=False)
         self.show_step(7)
@@ -660,10 +675,11 @@ class SRIOVTests(TestBasic):
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5)
         self.bm_drv.host_prepare()
-        plugin.activate_sriov(self)  # activate plugin with SRIOV feature
+        # enable plugin
+        plugin.activate_plugin(self)
         vsrx_setup_result = vsrx.activate()
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
-                                    roles=['compute', 'sriov'])
+                                    roles=['compute'])
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
@@ -672,6 +688,8 @@ class SRIOVTests(TestBasic):
         }
         self.fuel_web.update_nodes(self.cluster_id, conf_nodes)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         openstack.deploy_cluster(self)
 
         plugin.show_range(self, 2, 5)

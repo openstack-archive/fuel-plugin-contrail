@@ -28,9 +28,11 @@ advanced
 Steps
 #####
 
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin
-    3. Add some controller (at least 3), compute and storage nodes
+    3. Add some controller (at least 3), compute,
+       compute with sriov and storage nodes
     4. And contrail-control, contrail-config, contrail-db and contrail-analytics nodes
     5. Deploy cluster
     6. Run OSTF tests
@@ -69,9 +71,11 @@ advanced
 Steps
 #####
 
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin
-    3. Deploy cluster with some controller, compute+ceph, compute+sriov and contrail-specified nodes
+    3. Deploy cluster with some controller, compute+ceph, compute,
+       compute with sriov and contrail-specified nodes
     4. Run OSTF tests
     5. Add a node with compute+ceph roles
     6. Deploy changes
@@ -111,9 +115,11 @@ advanced
 Steps
 #####
 
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and Cinder storage
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and Cinder storage
     2. Enable and configure Contrail plugin
-    3. Deploy cluster with some controller, compute, compute+cinder, compute+sriov and contrail-specified nodes
+    3. Deploy cluster with some controller, compute, compute+cinder,
+       compute, compute with sriov and contrail-specified nodes
     4. Run OSTF tests
     5. Delete a node with compute role
     6. Deploy changes
@@ -154,12 +160,14 @@ advanced
 Steps
 #####
 
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH+Cinder storage
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and CEPH+Cinder storage
     2. Enable and configure Contrail plugin
-    3. Deploy cluster with some controller+ceph, compute+ceph, compute+sriov and contrail-specified nodes
+    3. Deploy cluster with some controller+ceph, compute+ceph, compute,
+       compute with sriov and contrail-specified nodes
     4. Run OSTF tests
     5. Run contrail health check tests
-    6. Add a node with compute+sriov role
+    6. Add a node with compute role
     7. Deploy changes
     8. Run OSTF tests
     9. Run contrail health check tests
@@ -196,12 +204,14 @@ advanced
 Steps
 #####
 
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and Cinder storage
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and Cinder storage
     2. Enable and configure Contrail plugin
-    3. Deploy cluster with some controller, controller+cinder, compute+cinder, compute+sriov and contrail-specified nodes
+    3. Deploy cluster with some controller, controller+cinder, compute+cinder,
+       compute, compute with sriov and contrail-specified nodes
     4. Run OSTF tests
     5. Run contrail health check tests
-    6. Delete a node with compute+sriov roles
+    6. Delete a node with compute roles
     7. Deploy changes
     8. Run OSTF tests
     9. Run contrail health check tests
@@ -238,10 +248,12 @@ advanced
 Steps
 #####
 
-    1. Deploy cluster with some controller, compute+cinder, compute+sriov and contrail-specified nodes
+    1. Deploy cluster with some controller, compute+cinder,
+       compute, compute with sriov and contrail-specified nodes
     2. Run 'fuel-mirror create -P ubuntu -G mos ubuntu' on the master node
     3. Run 'fuel-mirror apply -P ubuntu -G mos ubuntu --env <env_id> --replace' on the master node
-    4. Update repos for all deployed nodes with command "fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10 --tasks setup_repositories" on the master node
+    4. Update repos for all deployed nodes with command
+       "fuel --env <env_id> node --node-id 1,2,3,4,5,6,7,9,10 --tasks setup_repositories" on the master node
     5. Run OSTF and check Contrail node status.
 
 
@@ -276,9 +288,11 @@ advanced
 Steps
 #####
 
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and CEPH storage
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin
-    3. Deploy cluster with some controller, compute+ceph, compute+sriov and contrail-specified nodes
+    3. Deploy cluster with some controller, compute+ceph,
+       compute, compute with sriov and contrail-specified nodes
     4. Run OSTF tests
     5. Add a node with controller+ceph role
     6. Deploy changes
@@ -317,9 +331,11 @@ advanced
 Steps
 #####
 
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration and Cinder storage
+    1. Create an environment with "Neutron with tunneling segmentation"
+       as a network configuration and Cinder storage
     2. Enable and configure Contrail plugin
-    3. Deploy cluster with some controller, compute+cinder, compute+sriov and contrail-specified nodes
+    3. Deploy cluster with some controller, compute+cinder, compute,
+       compute with sriov and contrail-specified nodes
     4. Run OSTF tests
     5. Delete a node with "controller" role
     6. Deploy changes

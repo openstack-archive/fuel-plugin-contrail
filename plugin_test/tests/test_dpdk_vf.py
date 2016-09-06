@@ -50,19 +50,19 @@ class DPDKVFTests(TestBasic):
                 as a network configuration and CEPH storage
             2. Enable and configure Contrail plugin:
                 * enable dpdk
-                * enable sriov
                 * enable DPDK on VF
                 * enable dedicated analytics DB
             3. Add following nodes:
                 * 3 controller + mongo
                 * 3 compute + ceph
                 * 1 contrail-config+contrail-control+contrail-db
-                * 1 compute+sriov+dpdk
-                * 1 contrail-analytics+contrail-analytics-db
+                * 1 compute+dpdk
+                * 1 contrail-db+contrail-analytics+contrail-analytics-db
                 * 1 contrail-db
-            4. Deploy cluster.
-            5. Run OSTF tests.
-            6. Run contrail health check tests
+            4. Enable sriov on interfaces of compute+dpdk node.
+            5. Deploy cluster.
+            6. Run OSTF tests.
+            7. Run contrail health check tests
 
         Duration 120 min
 
@@ -80,7 +80,7 @@ class DPDKVFTests(TestBasic):
 
         self.show_step(2)
         # activate DPDK feature and
-        plugin.activate_dpdk_vf(self, **conf_contrail)
+        plugin.activate_dpdk(self, **conf_contrail)
         vsrx_setup_result = vsrx.activate()
 
         self.show_step(3)
@@ -96,7 +96,8 @@ class DPDKVFTests(TestBasic):
             'slave-05': ['compute', 'ceph-osd'],
             'slave-06': ['compute', 'ceph-osd'],
             'slave-07': ['contrail-db', 'contrail-config', 'contrail-control'],
-            'slave-08': ['contrail-analytics', 'contrail-analytics-db'],
+            'slave-08': ['contrail-db', 'contrail-analytics',
+                         'contrail-analytics-db'],
             'slave-09': ['contrail-db'],
         }
         # Cluster configuration
@@ -104,13 +105,16 @@ class DPDKVFTests(TestBasic):
                                    nodes_dict=conf_nodes,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
-        # Deploy cluster
         self.show_step(4)
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
+        # Deploy cluster
+        self.show_step(5)
         openstack.deploy_cluster(self)
         # Run OSTF tests
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
-            self.show_step(5)
+            self.show_step(6)
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    test_sets=['smoke', 'sanity',
                                               'ha', 'tests_platform'],
@@ -118,7 +122,7 @@ class DPDKVFTests(TestBasic):
                                    should_fail=1,
                                    failed_test_name=['Instance live migration']
                                    )
-            self.show_step(6)
+            self.show_step(7)
             TestContrailCheck(self).cloud_check(
                 ['dpdk', 'contrail'],
                 should_fail=[
