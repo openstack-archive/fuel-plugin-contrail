@@ -13,8 +13,6 @@ License for the specific language governing permissions and limitations
 under the License.
 """
 from fuelweb_test import logwrap
-from fuelweb_test import logger
-from fuelweb_test.helpers.decorators import json_parse
 from keystoneauth1.identity.v2 import Password
 from keystoneauth1.session import Session
 from fuelweb_test.settings import KEYSTONE_CREDS
@@ -30,30 +28,47 @@ class ContrailClient(object):
                  credentials=KEYSTONE_CREDS, **kwargs):
         """Create ContrailClient object."""
         if DISABLE_SSL:
-            url = "http://{0}:{1}".format(controller_node_ip, contrail_port)
+            self.url = "http://{0}:{1}".format(
+                controller_node_ip, contrail_port)
             self.keystone_url = "http://{0}:5000/v2.0".format(
                 controller_node_ip)
         else:
-            url = "https://{0}:{1}".format(controller_node_ip, contrail_port)
+            self.url = "https://{0}:{1}".format(
+                controller_node_ip, contrail_port)
             self.keystone_url = 'https://{0}:5000/v2.0/'.format(
                 controller_node_ip)
             insecure = not VERIFY_SSL
             credentials.update({'ca_cert': PATH_TO_CERT, 'insecure': insecure})
-        logger.info('Initiate Contrail client with url %s', url)
         auth = Password(auth_url=self.keystone_url,
                         username=KEYSTONE_CREDS['username'],
                         password=KEYSTONE_CREDS['password'],
                         tenant_name=KEYSTONE_CREDS['tenant_name'])
         self._client = Session(auth=auth, verify=False)
-        super(ContrailClient, self).__init__()
 
     @property
     def client(self):
         """Client property."""
         return self._client
 
+    def _get(self, data_path):
+        """Get method."""
+        return self.client.get(url=self.url + data_path).json()
+
+    def _delete(self, data_path):
+        """Delete method."""
+        return self.client.delete(url=self.url + data_path).json()
+
+    def _post(self, data_path, **kwargs):
+        """Post method."""
+        return self.client.post(
+            url=self.url + data_path, connect_retries=1, **kwargs).json()
+
+    def _put(self, data_path, **kwargs):
+        """Put method."""
+        return self.client.put(
+            url=self.url + data_path, connect_retries=1, **kwargs).json()
+
     @logwrap
-    @json_parse
     def create_network(self, net_name, net_attr):
         """Create virtual-network.
 
@@ -65,10 +80,8 @@ class ContrailClient(object):
                 "parent_type": "project",
                 "fq_name": net_name,
                 "network_ipam_refs": net_attr}}
-        return self.client.post(
-            '/virtual-networks', data=data)
+        return self._post('/virtual-networks', data)
 
-    @json_parse
     def add_router_interface(self, network, route_table, attr=None):
         """Add router interface to network.
 
@@ -79,18 +92,15 @@ class ContrailClient(object):
         data = {"virtual-network": {'fq_name': network['fq_name'],
                 'route_table_refs': [{
                     'to': route_table['fq_name'], "attr":attr}]}}
-        return self.client.put(
-            '/virtual-network/{0}'.format(network['uuid']), data=data)
+        return self._put('/virtual-network/{0}'.format(network['uuid']), data)
 
-    @json_parse
     def get_route_tables(self):
         """Get router."""
-        return self.client.get('/route-tables')
+        return self._get('/route-tables')
 
-    @json_parse
     def get_networks(self):
         """Get networks."""
-        return self.client.get('/virtual-networks')
+        return self._get('/virtual-networks')
 
     def get_router_by_name(self, name):
         """Get router by name.
@@ -104,10 +114,9 @@ class ContrailClient(object):
             if name in route['fq_name']]
         return route_table.pop()
 
-    @json_parse
     def get_projects(self):
         """Get router."""
-        return self.client.get('/projects')
+        return self._get('/projects')
 
     def get_project_by_name(self, name):
         """Get project by name.
@@ -119,36 +128,30 @@ class ContrailClient(object):
         project = [p for p in projects if name in p['fq_name']]
         return project.pop()
 
-    @json_parse
     def get_instance_by_id(self, instance_id):
         """Get instance by id.
 
         :param instance_id: type string, instance id.
         :return dictionary
         """
-        return self.client.get(
-            '/virtual-machine/{0}'.format(instance_id))
+        return self._get('/virtual-machine/{0}'.format(instance_id))
 
-    @json_parse
     def get_net_by_id(self, net_id):
         """Get network by id.
 
         :param net_id: type string, instance id.
         :return dictionary
         """
-        return self.client.get(
-            '/virtual-network/{0}'.format(net_id))
+        return self._get('/virtual-network/{0}'.format(net_id))
 
-    @json_parse
     def get_bgp_routers(self):
         """Get bgp routers."""
-        return self.client.get('/bgp-routers')
+        return self._get('/bgp-routers')
 
-    @json_parse
     def get_bgp_by_id(self, bgp_id):
         """Get bgp router by id.
 
         :param bgp_id: type string, bgp router id.
         :return dictionary
         """
-        return self.client.get('/bgp-router/{0}'.format(bgp_id))
+        return self._get('/bgp-router/{0}'.format(bgp_id))
