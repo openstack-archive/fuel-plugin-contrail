@@ -1,4 +1,4 @@
-from distutils.version import LooseVersion
+from distutils import version
 from sphinx import __version__ as sphinx_version
 
 mypreamble=ur'''
@@ -52,7 +52,7 @@ latex_elements = {
     'fontpkg': '\usepackage[T1]{fontenc}'
 }
 
-if LooseVersion(sphinx_version) >= LooseVersion('1.3.1'):
+if version.LooseVersion(sphinx_version) >= version.LooseVersion('1.3.1'):
     html_theme = "sphinx_rtd_theme"
 
 html_add_permalinks = ""
