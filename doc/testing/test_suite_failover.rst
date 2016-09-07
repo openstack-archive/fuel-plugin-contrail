@@ -67,18 +67,24 @@ advanced
 Steps
 #####
 
-    1. Deploy openstack with HA (at lest 3 controllers and 3 nodes with contrail`s roles) and Ceph
+    1. Deploy openstack with HA (at lest 3 controllers
+       and 3 nodes with contrail`s roles) and Ceph
     2. Run OSTF tests
     3. Run contrail health check tests
     4. Disable first contrail node via libvirt
     5. Run OSTF tests
     6. Run contrail health check tests
-    7. Enable first contrail node, vait 5-10 minutes and disable second cotrail node
-    8. Run OSTF test
-    9. Run contrail health check tests
-    10. Enable second contrail node, vait 5-10 minutes and disable third cotrail node
-    11. Run OSTF tests
-    12. Run contrail health check tests
+    7. Enable first contrail node and wait 6 minutes
+    8. Disable second cotrail node
+    9. Run OSTF test
+    10. Run contrail health check tests
+    11. Enable second contrail node and wait 6 minutes
+    12. Disable third cotrail node
+    13. Run OSTF tests
+    14. Run contrail health check test
+    15. Enable third node
+    16. Run OSTF tests
+    17. Run contrail health check test
 
 
 Expected results
