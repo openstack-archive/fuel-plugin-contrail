@@ -14,15 +14,22 @@ under the License.
 """
 
 import os
+import subprocess
+import time
+import libvirt
 
 from proboscis import test
 from proboscis.asserts import assert_true
+from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+from helpers import vsrx
 from helpers import plugin
+from helpers import openstack
 from helpers.settings import CONTRAIL_PLUGIN_VERSION
+from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["plugins"])
@@ -38,7 +45,7 @@ class FailoverTests(TestBasic):
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_3],
-          groups=["contrail_uninstall"])
+          groups=["contrail_uninstall", "contrail_failover"])
     @log_snapshot_after_test
     def contrail_uninstall(self):
         """Check that plugin can be removed.
@@ -98,3 +105,118 @@ class FailoverTests(TestBasic):
             plugin_name not in output,
             "Plugin is not removed {}".format(plugin_name)
         )
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_ha_with_node_problems", "contrail_failover"])
+    @log_snapshot_after_test
+    def contrail_ha_with_node_problems(self):
+        """Check Contrail HA using node problems
+
+        Scenario:
+            1. Deploy openstack with HA (at lest 3 controllers
+               and 3 nodes with contrail`s roles) and Ceph
+            2. Run OSTF tests
+            3. Run contrail health check tests
+            4. Disable first contrail node via libvirt
+            5. Run OSTF tests
+            6. Run contrail health check tests
+            7. Enable first contrail node and wait 6 minutes
+            8. Disable second cotrail node
+            9. Run OSTF test
+            10. Run contrail health check tests
+            11. Enable second contrail node and wait 6 minutes
+            12. Disable third cotrail node
+            13. Run OSTF tests
+            14. Run contrail health check test
+            15. Enable third node
+            16. Run OSTF tests
+            17. Run contrail health check test
+        """
+
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=9,
+                                       options={'images_ceph': True,
+                                                'volumes_ceph': True,
+                                                'ephemeral_ceph': True,
+                                                'objects_ceph': True,
+                                                'volumes_lvm': False})
+
+        plugin.activate_plugin(self)
+        # activate vSRX image
+        vsrx_setup_result = vsrx.activate()
+
+
+        conf_env = {
+            'slave-01': ['controller'],
+            'slave-02': ['controller'],
+            'slave-03': ['controller'],
+            'slave-04': ['compute', 'ceph-osd'],
+            'slave-05': ['compute', 'ceph-osd'],
+            'slave-06': ['compute', 'ceph-osd'],
+            'slave-07': ['contrail-config',
+                         'contrail-control',
+                         'contrail-db',
+                         'contrail-analytics'],
+            'slave-08': ['contrail-config',
+                         'contrail-control',
+                         'contrail-db',
+                         'contrail-analytics',],
+            'slave-09': ['contrail-config',
+                         'contrail-control',
+                         'contrail-db',
+                         'contrail-analytics'],
+                    }
+
+        self.show_step(2)
+        openstack.update_deploy_check(self, conf_env,
+                                      is_vsrx=vsrx_setup_result)
+        
+        self.show_step(3)
+        TestContrailCheck(self).cloud_check(['contrail'])
+
+        #open connection to qemu
+        conn = libvirt.open('qemu:///system')
+        if conn == None:
+            raise ValueError("Failed to open connection to qemu:///system")
+        else:
+          logger.info("open connection to qemu:///system")
+        #get list of domains
+        node_list =conn.listAllDomains(0)
+
+        for i in (0,3):
+            m = 7
+            n = str(m + i)
+            steps  = [4, 5, 6, 7]
+
+            for index, step in enumerate(steps):
+                steps[index] = step + (4 * i)
+            
+            for node in node_list:
+                #find node with contrail
+                if n in node.name():
+
+                    self.show_step(steps[0])
+                    node.destroy() # stop node
+                    logger.info("Node {0} was stopped".format(n))
+
+                    self.show_step(steps[1])
+                    self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                           test_sets=['smoke', 'sanity', 'ha'])
+                    self.show_step(steps[2])
+                    TestContrailCheck(self).cloud_check(['contrail'],
+                                       ['test_contrail_node_status'])
+
+                    self.show_step(steps[3])
+                    node.create() # start node
+                    logger.info("Node {0} was run".format(n))
+                    break
+            logger.info("Waiting for node {0}".format(n))
+            time.sleep(6 * 60)
+        conn.close()
+
+        self.show_step(16)
+        openstack.update_deploy_check(self, conf_env,
+                                      is_vsrx=vsrx_setup_result)
+
+        self.show_step(17)
+        TestContrailCheck(self).cloud_check(['contrail'])
