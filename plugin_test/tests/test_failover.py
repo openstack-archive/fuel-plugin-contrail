@@ -19,14 +19,13 @@ from proboscis import test
 from proboscis.asserts import assert_true
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
-from fuelweb_test.tests.base_test_case import SetupEnvironment
-from fuelweb_test.tests.base_test_case import TestBasic
+from fuelweb_test.tests import base_test_case
 from helpers import plugin
 from helpers.settings import CONTRAIL_PLUGIN_VERSION
 
 
 @test(groups=["plugins"])
-class FailoverTests(TestBasic):
+class FailoverTests(base_test_case.TestBasic):
     """FailoverTests."""
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-5.0'
@@ -37,7 +36,7 @@ class FailoverTests(TestBasic):
     pack_path = CONTRAIL_PLUGIN_PACK_UB_PATH
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+    @test(depends_on=[base_test_case.SetupEnvironment.prepare_slaves_3],
           groups=["contrail_uninstall"])
     @log_snapshot_after_test
     def contrail_uninstall(self):
