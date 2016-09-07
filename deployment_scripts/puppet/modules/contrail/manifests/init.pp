@@ -133,6 +133,7 @@ class contrail {
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
+  $cassandra_compaction_throughput = pick($settings['cassandra_compaction_throughput'], '16')
 
   # Control of automatic services startup
   $service_ensure = hiera('upgrade',false) ? {
