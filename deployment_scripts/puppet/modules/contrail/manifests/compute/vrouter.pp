@@ -67,6 +67,7 @@ class contrail::compute::vrouter {
     $install_packages = ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1']
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
   }
+
   file { 'create_supervisor_vrouter_override':
     ensure  => present,
     path    => '/etc/init/supervisor-vrouter.override',
@@ -175,6 +176,6 @@ service supervisor-vrouter start',
     }
 
   }
-  Contrail_vrouter_nodemgr_config <||> ~> Service['supervisor-vrouter']
-  Contrail_vrouter_agent_config <||>   ~> Service['supervisor-vrouter']
+  Package[$install_packages] -> Contrail_vrouter_nodemgr_config <||> ~> Service['supervisor-vrouter']
+  Package[$install_packages] -> Contrail_vrouter_agent_config <||>   ~> Service['supervisor-vrouter']
 }
