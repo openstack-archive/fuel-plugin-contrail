@@ -1005,22 +1005,16 @@ class FunctionalTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 3, 9)
+        plugin.show_range(self, 3, 10)
         openstack.update_deploy_check(self, conf_no_analytics_db,
                                       is_vsrx=vsrx_setup_result)
-
-        self.show_step(9)
-        TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(10)
         plugin.activate_plugin(self, **conf_contrail)
 
-        plugin.show_range(self, 11, 14)
+        plugin.show_range(self, 11, 15)
         openstack.update_deploy_check(self, conf_analytics_db,
                                       is_vsrx=vsrx_setup_result)
-
-        self.show_step(14)
-        TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_add_ha_analytics_db"])
@@ -1071,16 +1065,10 @@ class FunctionalTests(TestBasic):
         plugin.activate_plugin(self, **conf_contrail)
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 10)
+        plugin.show_range(self, 4, 11)
         openstack.update_deploy_check(self, conf_env,
                                       is_vsrx=vsrx_setup_result)
 
-        self.show_step(10)
-        TestContrailCheck(self).cloud_check(['contrail'])
-
-        plugin.show_range(self, 11, 14)
+        plugin.show_range(self, 11, 15)
         openstack.update_deploy_check(self, add_analytics_db,
                                       is_vsrx=vsrx_setup_result)
-
-        self.show_step(14)
-        TestContrailCheck(self).cloud_check(['contrail'])
