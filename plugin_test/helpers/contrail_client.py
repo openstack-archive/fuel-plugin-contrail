@@ -13,8 +13,8 @@ License for the specific language governing permissions and limitations
 under the License.
 """
 from fuelweb_test import logwrap
-from keystoneauth1.identity.v2 import Password  # TODO(otsvigun) v3
-from keystoneauth1.session import Session
+from keystoneauth1.identity import v2  # TODO(otsvigun) v3
+from keystoneauth1 import session
 from fuelweb_test.settings import KEYSTONE_CREDS
 from fuelweb_test.settings import PATH_TO_CERT
 from fuelweb_test.settings import VERIFY_SSL
@@ -39,11 +39,11 @@ class ContrailClient(object):
                 controller_node_ip)
             insecure = not VERIFY_SSL
             credentials.update({'ca_cert': PATH_TO_CERT, 'insecure': insecure})
-        auth = Password(auth_url=self.keystone_url,
-                        username=KEYSTONE_CREDS['username'],
-                        password=KEYSTONE_CREDS['password'],
-                        tenant_name=KEYSTONE_CREDS['tenant_name'])
-        self._client = Session(auth=auth, verify=False)
+        auth = v2.Password(auth_url=self.keystone_url,
+                           username=KEYSTONE_CREDS['username'],
+                           password=KEYSTONE_CREDS['password'],
+                           tenant_name=KEYSTONE_CREDS['tenant_name'])
+        self._client = session.Session(auth=auth, verify=False)
 
     @property
     def client(self):
