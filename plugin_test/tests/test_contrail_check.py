@@ -462,7 +462,7 @@ class TestContrailCheck(object):
         body = {
             'network': {
                 'name': self.net_name,
-                'provider:physical_network': 'physnet1',
+                'provider:physical_network': 'physnet2',
                 'provider:segmentation_id': '5'}}
         network = self.os_conn.neutron.create_network(body)['network']
 
@@ -544,7 +544,7 @@ class TestContrailCheck(object):
             body = {
                 'network': {
                     'name': self.net_name,
-                    'provider:physical_network': 'physnet1',
+                    'provider:physical_network': 'physnet2',
                     'provider:segmentation_id': '5'}}
             network = self.os_conn.neutron.create_network(body)['network']
 
