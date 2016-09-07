@@ -170,7 +170,7 @@ def wait_for_cluster_status(obj, cluster_id,
     return wtime
 
 
-def activate_sriov(obj):
+def enable_sriov(obj):
     """Activate SRiOV interface on baremetal node.
 
     :param obj: Test case object, usually it is 'self'
