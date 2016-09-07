@@ -22,8 +22,7 @@ from proboscis.asserts import assert_true
 from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
-from fuelweb_test.tests.base_test_case import SetupEnvironment
-from fuelweb_test.tests.base_test_case import TestBasic
+from fuelweb_test.tests import base_test_case
 from helpers import vsrx
 from helpers import plugin
 from helpers import openstack
@@ -33,7 +32,7 @@ from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["plugins"])
-class FailoverTests(TestBasic):
+class FailoverTests(base_test_case.TestBasic):
     """FailoverTests."""
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-5.0'
@@ -44,7 +43,7 @@ class FailoverTests(TestBasic):
     pack_path = CONTRAIL_PLUGIN_PACK_UB_PATH
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+    @test(depends_on=[base_test_case.SetupEnvironment.prepare_slaves_3],
           groups=["contrail_uninstall", "contrail_failover"])
     @log_snapshot_after_test
     def contrail_uninstall(self):
@@ -106,7 +105,7 @@ class FailoverTests(TestBasic):
             "Plugin is not removed {}".format(plugin_name)
         )
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+    @test(depends_on=[base_test_case.SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha_with_node_problems", "contrail_failover"])
     @log_snapshot_after_test
     def contrail_ha_with_node_problems(self):
