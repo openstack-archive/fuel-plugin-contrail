@@ -190,9 +190,9 @@ class TestContrailCheck(object):
             for instance in instances:
                 try:
                     self.os_conn.delete_instance(instance)
-                    assert_true(
-                        self.os_conn.verify_srv_deleted(instance),
-                        "Instance was not deleted.")
+                    wait(
+                        lambda: self.os_conn.is_srv_deleted(instance),
+                        timeout=200, timeout_msg="Instance was not deleted.")
                 except Exception as exc:
                     logger.info('Instance was not deleted. {0}'.format(exc))
 
@@ -285,9 +285,9 @@ class TestContrailCheck(object):
 
         logger.info('Delete the last created instance.')
         self.os_conn.delete_instance(srv_1)
-        assert_true(
-            self.os_conn.verify_srv_deleted(srv_1),
-            "Instance was not deleted.")
+        wait(
+            lambda: self.os_conn.is_srv_deleted(srv_1), timeout=200,
+            timeout_msg="Instance was not deleted.")
 
         logger.info("""Launch another instance from the snapshot created
             in step 4 and flavor with hpgs in the hpgs availability zone.""")
@@ -298,9 +298,9 @@ class TestContrailCheck(object):
 
         logger.info('Delete the last created instance.')
         self.os_conn.delete_instance(srv_2)
-        assert_true(
-            self.os_conn.verify_srv_deleted(srv_2),
-            "Instance was not deleted.")
+        wait(
+            lambda: self.os_conn.is_srv_deleted(srv_2), timeout=200,
+            timeout_msg="Instance was not deleted.")
 
     def test_dpdk_volume(self):
         """Create volume and boot instance from it.
@@ -355,9 +355,9 @@ class TestContrailCheck(object):
 
             logger.info('Delete the last created instance.')
             self.os_conn.delete_instance(srv_1)
-            assert_true(
-                self.os_conn.verify_srv_deleted(srv_1),
-                "Instance was not deleted.")
+            wait(
+                lambda: self.os_conn.is_srv_deleted(srv_1), timeout=200,
+                timeout_msg="Instance was not deleted.")
 
             logger.info('Delete volume and verify that volume deleted.')
             self.os_conn.delete_volume_and_wait(volume)
@@ -436,9 +436,9 @@ class TestContrailCheck(object):
 
         logger.info("Delete instance.")
         self.os_conn.delete_instance(srv)
-        assert_true(
-            self.os_conn.verify_srv_deleted(srv),
-            "Instance was not deleted.")
+        wait(
+            lambda: self.os_conn.is_srv_deleted(srv), timeout=200,
+            timeout_msg="Instance was not deleted.")
 
     def test_sriov_boot_snapshot_vm(self):
         """Launch instance, create snapshot, launch instance from snapshot.
@@ -497,7 +497,8 @@ class TestContrailCheck(object):
 
         logger.info('Delete the instance created in step 5.')
         self.os_conn.delete_instance(srv_1)
-        wait(lambda: self.os_conn.is_srv_deleted(srv_1), timeout=200,
+        wait(
+            lambda: self.os_conn.is_srv_deleted(srv_1), timeout=200,
             timeout_msg="Instance was not deleted.")
 
         logger.info('Launch instance from snapshot.')
@@ -513,7 +514,8 @@ class TestContrailCheck(object):
 
         logger.info('Delete the instance created in step 7.')
         self.os_conn.delete_instance(srv_2)
-        wait(lambda: self.os_conn.is_srv_deleted(srv_1), timeout=200,
+        wait(
+            lambda: self.os_conn.is_srv_deleted(srv_2), timeout=200,
             timeout_msg="Instance was not deleted.")
 
     def test_sriov_volume(self):
@@ -580,8 +582,9 @@ class TestContrailCheck(object):
 
             logger.info('Delete instance.')
             self.os_conn.delete_instance(srv_1)
-            assert_true(self.os_conn.verify_srv_deleted(srv_1, timeout=200),
-                        "Instance was not deleted.")
+            wait(
+                lambda: self.os_conn.is_srv_deleted(srv_1), timeout=200,
+                timeout_msg="Instance was not deleted.")
 
             logger.info('Delete volume and verify that volume deleted.')
             self.os_conn.delete_volume_and_wait(volume)
