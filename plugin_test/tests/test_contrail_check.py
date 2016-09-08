@@ -462,7 +462,7 @@ class TestContrailCheck(object):
         body = {
             'network': {
                 'name': self.net_name,
-                'provider:physical_network': 'physnet1',
+                'provider:physical_network': 'physnet2',
                 'provider:segmentation_id': '5'}}
         network = self.os_conn.neutron.create_network(body)['network']
 
@@ -497,9 +497,8 @@ class TestContrailCheck(object):
 
         logger.info('Delete the instance created in step 5.')
         self.os_conn.delete_instance(srv_1)
-        assert_true(
-            self.os_conn.verify_srv_deleted(srv_1),
-            "Instance was not deleted.")
+        wait(lambda: self.os_conn.is_srv_deleted(srv_1), timeout=200,
+            timeout_msg="Instance was not deleted.")
 
         logger.info('Launch instance from snapshot.')
         port = self.os_conn.neutron.create_port(
@@ -514,9 +513,8 @@ class TestContrailCheck(object):
 
         logger.info('Delete the instance created in step 7.')
         self.os_conn.delete_instance(srv_2)
-        assert_true(
-            self.os_conn.verify_srv_deleted(srv_2),
-            "Instance was not deleted.")
+        wait(lambda: self.os_conn.is_srv_deleted(srv_1), timeout=200,
+            timeout_msg="Instance was not deleted.")
 
     def test_sriov_volume(self):
         """Create volume and boot instance from it.
@@ -544,7 +542,7 @@ class TestContrailCheck(object):
             body = {
                 'network': {
                     'name': self.net_name,
-                    'provider:physical_network': 'physnet1',
+                    'provider:physical_network': 'physnet2',
                     'provider:segmentation_id': '5'}}
             network = self.os_conn.neutron.create_network(body)['network']
 
@@ -582,7 +580,7 @@ class TestContrailCheck(object):
 
             logger.info('Delete instance.')
             self.os_conn.delete_instance(srv_1)
-            assert_true(self.os_conn.verify_srv_deleted(srv_1),
+            assert_true(self.os_conn.verify_srv_deleted(srv_1, timeout=200),
                         "Instance was not deleted.")
 
             logger.info('Delete volume and verify that volume deleted.')
