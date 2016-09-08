@@ -9,9 +9,9 @@ Provide dedicated DB node for Contrail Analytics
 Problem description
 -------------------
 
-Contrail plugin 4.0.1 implements deployment of Contrail analytics services to dedicated nodes with
+Contrail plugin 5.0 implements deployment of Contrail analytics services to dedicated nodes with
 role 'contrail-analytcics'. In highly scaled environments under load a high amount of analytics data
-can be continiously generated, written to and retrieved from Cassandra database, which is shared
+can be continuously generated, written to and retrieved from Cassandra database, which is shared
 with Config and Analytics. That can negatively impact the performance of contrail-config services
 the same database. The recommended best practice [0] from Juniper for production deployment of
 Contrail is to separate database for Contrail Config and Contrail Analytics. The Contrail Analytics
@@ -28,7 +28,7 @@ contain multiple nodes with 'contrail-analytics-db' role, odd number is recommen
 The 'contrail-analytics-db' role can be co-located with 'contrail-analytics', but not compatible
 with other OpenStack and Contrail roles on the same node. It should be possible to add
 contrail-analytics-db nodes after environment has been deployed. Removing of such nodes without
-their manual decomission is not supported, for more details refer to Cassandra documentation [2].
+their manual decommission is not supported, for more details refer to Cassandra documentation [2].
 In case if one of Cassandra servers (contrail-analytics-db, contrail-db) become non-operational and
 you are planning a replacement, refer to plugin user guide, section 'Restore failed Contrail node'
 [3]
@@ -81,6 +81,71 @@ Requirements
 Server requirements are described in [1]. There are disk space requirements for this role, at least
 256 Gb, as analytics services store the data in Cassandra database.
 
+Contrail with VMware vCenter
+============================
+
+Problem description
+-------------------
+For consolidation under a single administrative control and integration with current VMware vSphere
+environment plugin must have possibility to deploy hybrid KVM&VMware OpenStack cloud.
+
+Proposed solution
+-----------------
+Integration with vCenter include two main roles: compute-vmware and contrail-vmware. As the basis for
+compute-vmware role will use default Fuel compute-vmware role. Compute-vmware will be located on the
+openstack side of hybrid environment and will include nova-compute with Contrail Nova vCenter driver. One
+compute-vmware will serve one vCenter. In the current release work with multiple vCenter instances is not
+supported. Compute-vmware role will be not compatible with any other role. Contrail-vmware will be
+located on vmware side of hybrid environment and will include Contrail vRouter. One contrail-vmware must
+to be installed on each ESXi node. Contrail-vmware role will not be compatible with any other role.
+Integration assumes that vmware part of the environment already exists - datacenter and clusters are
+created. Deployment of the environment will include 2 stages. During the 1st stage user will run script
+that prepares vmware part for deployment (creates few Distributed Switches and spawns virtual machine on
+each ESXi node). The rest of management will provided by the Fuel master, more details will be given in
+documentation.
+
+UI impact
+---------
+
+User must provide credential for vCenter, default Fuel vmware tab will be used for this purpose.
+Additionally a few settings need to be added into the Fuel contrail tab. Description of settings
+will be given in documentation.
+
+Performance impact
+------------------
+
+None
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information about this feature.
+
+Upgrade impact
+--------------
+
+Upgrade of compute-vmware and contrail-vmware will not be supported in current release.
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
 Implementation
 ==============
 
@@ -112,7 +177,10 @@ Work items
  - Add Contrail Analytics DB role to list of plug-in roles
  - Adjust restrictions for 'contrail-analytics-db' role
  - Refactor contrail-db deployment task to support dedicated DB
-
+ - Add 'contrail-vmware' role
+ - Add manifests that implements 'contrail-vmware' role
+ - Add manifests that modify 'compute-vmware' role
+ - Write script that will manage vmware environment
 
 * Testing
 
