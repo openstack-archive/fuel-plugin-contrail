@@ -21,8 +21,16 @@ from devops.helpers.helpers import tcp_ping
 from helpers import settings
 
 
-def activate(obj=None, multi_nets=False, upload_config=False):
-    """Activate vSRX1 image."""
+def activate(
+    obj=None, add_network=None, upload_config=False, vsrx_ip='10.109.4.250'):
+    """Activate vSRX1 image.
+
+    :param obj: Test case object
+    :param vsrx_ip: ip of vSRX router
+    :param add_network: name of no default private network which add to
+                       vsrx configuration
+
+    """
     def call_cmd(cmd):
         logger.info('The command is %s', cmd)
         subprocess.call(cmd, shell=True)
@@ -56,16 +64,16 @@ def activate(obj=None, multi_nets=False, upload_config=False):
         'sudo ip route del 10.100.1.0/24',
         'sudo ip route add 10.100.1.0/24 via 10.109.3.250'])
 
-    if multi_nets:
+    if add_network:
         assert obj, "obj is None"
-        multiple_networks(multi_nets)
+        multiple_networks(obj, vsrx_ip, add_network)
     if upload_config and settings.VSRX_CONFIG_PATH:
         assert obj, "obj is None"
-        upload_config(obj, config_path=settings.VSRX_CONFIG_PATH)
+        upload_config(obj, settings.VSRX_CONFIG_PATH, vsrx_ip)
     return True
 
 
-def multiple_networks(obj, vsrx_ip='10.109.4.250', net_name='private2'):
+def multiple_networks(obj, vsrx_ip, net_name):
     """Configure routing on vsrx to no default private network.
 
     :param obj: Test case object
@@ -99,7 +107,7 @@ def multiple_networks(obj, vsrx_ip='10.109.4.250', net_name='private2'):
             remote.execute_async(command)
 
 
-def upload_config(obj, config_path, vsrx_ip='10.109.4.250'):
+def upload_config(obj, config_path, vsrx_ip):
     """Upload and commit configuration for VSRX."""
     commands = [
         'cli', 'configure',
