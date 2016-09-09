@@ -13,7 +13,7 @@ License for the specific language governing permissions and limitations
 under the License.
 """
 from fuelweb_test import logwrap
-from keystoneauth1.identity.v2 import Password  # TODO v3
+from keystoneauth1.identity.v2 import Password  # TODO(otsvigun) v3
 from keystoneauth1.session import Session
 from fuelweb_test.settings import KEYSTONE_CREDS
 from fuelweb_test.settings import PATH_TO_CERT

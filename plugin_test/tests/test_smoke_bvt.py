@@ -253,7 +253,7 @@ class ContrailPlugin(TestBasic):
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 4, 11)
         self.fuel_web.update_nodes(

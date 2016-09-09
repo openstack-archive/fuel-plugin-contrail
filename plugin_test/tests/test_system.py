@@ -138,7 +138,7 @@ class SystemTests(TestBasic):
             self, slaves=5, options={'ceilometer': True})
 
         # activate vSRX image
-        vsrx.activate()
+        vsrx.activate(self)
 
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)

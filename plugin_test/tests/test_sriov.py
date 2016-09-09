@@ -84,7 +84,7 @@ class SRIOVTests(TestBasic):
         # enable plugin
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 3, 4)
         self.bm_drv.setup_fuel_node(self,
@@ -164,7 +164,7 @@ class SRIOVTests(TestBasic):
         # enable plugin
         plugin.activate_plugin(self, dedicated_analytics_db=True)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
@@ -257,7 +257,7 @@ class SRIOVTests(TestBasic):
         # enable plugin
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
@@ -356,7 +356,7 @@ class SRIOVTests(TestBasic):
         # enable plugin
         plugin.activate_plugin(self, dedicated_analytics_db=True)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
@@ -449,7 +449,7 @@ class SRIOVTests(TestBasic):
         # enable plugin
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 3, 4)
         self.bm_drv.setup_fuel_node(self,
@@ -541,7 +541,7 @@ class SRIOVTests(TestBasic):
         # enable plugin
         plugin.activate_plugin(self, dedicated_analytics_db=True)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 4, 6)
         conf_nodes = {
@@ -624,7 +624,7 @@ class SRIOVTests(TestBasic):
         # enable plugin
         plugin.activate_plugin(self, dedicated_analytics_db=True)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
@@ -716,7 +716,7 @@ class SRIOVTests(TestBasic):
         self.bm_drv.host_prepare()
         # enable plugin
         plugin.activate_plugin(self, dedicated_analytics_db=True)
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
                                     roles=['compute'])
         conf_nodes = {

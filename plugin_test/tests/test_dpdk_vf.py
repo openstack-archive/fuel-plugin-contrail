@@ -81,7 +81,7 @@ class DPDKVFTests(TestBasic):
         self.show_step(2)
         # activate DPDK feature and
         plugin.activate_dpdk(self, **conf_contrail)
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,

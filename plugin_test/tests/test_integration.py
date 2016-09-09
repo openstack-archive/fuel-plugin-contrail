@@ -84,7 +84,7 @@ class IntegrationTests(TestBasic):
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 4, 8)
         self.fuel_web.update_nodes(
@@ -144,7 +144,7 @@ class IntegrationTests(TestBasic):
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 4, 9)
         self.fuel_web.update_nodes(
@@ -215,7 +215,7 @@ class IntegrationTests(TestBasic):
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 4, 12)
         self.fuel_web.update_nodes(
@@ -320,7 +320,7 @@ class IntegrationTests(TestBasic):
         }]
 
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 4, 9)
         self.fuel_web.update_nodes(
@@ -496,7 +496,7 @@ class IntegrationTests(TestBasic):
         openstack.assign_vlan(self, storage=101, management=102)
 
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 5, 10)
         self.fuel_web.update_nodes(
@@ -560,7 +560,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 3, 6)
         self.fuel_web.update_nodes(
@@ -613,7 +613,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self)
 
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 3, 6)
         self.fuel_web.update_nodes(
@@ -676,7 +676,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self, **conf_contrail)
 
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 4, 10)
         self.fuel_web.update_nodes(
@@ -734,7 +734,7 @@ class IntegrationTests(TestBasic):
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5)
         plugin.activate_plugin(self, **conf_contrail)
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
@@ -807,7 +807,7 @@ class IntegrationTests(TestBasic):
         plugin.show_range(self, 3, 5)
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 5, 9)
         self.fuel_web.update_nodes(
@@ -871,7 +871,7 @@ class IntegrationTests(TestBasic):
         plugin.activate_plugin(self, **conf_contrail)
 
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+        vsrx_setup_result = vsrx.activate(self)
 
         plugin.show_range(self, 5, 10)
         self.fuel_web.update_nodes(
