@@ -207,11 +207,10 @@ class contrail {
     $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']
     $vcenter_server_pass                        = $vcenter_hash['computes'][0]['vc_password']
     $vcenter_server_cluster                     = $vcenter_hash['computes'][0]['vc_cluster']
-    $vcenter_server_name                        = $vcenter_hash['computes'][0]['availability_zone_name']
-    $contrail_vcenter_datacenter                = pick($settings['contrail_vcenter_datacenter'], 'Datacenter')
+    $contrail_vcenter_datacenter                = $settings['dc_name']
+    $dvs_internal                               = $settings['dvs_internal']
+    $dvs_external                               = $settings['dvs_external']
     $contrail_esxi_info                         = hiera_array('contrail_esxi_info', [])
-    $dvs_external                               = 'Contrail-DVS-Ext'
-    $dvs_internal                               = 'Contrail-DVS-Int'
     $vmware_iface_name                          = get_vmware_devices()
   }
 
