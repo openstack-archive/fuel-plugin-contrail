@@ -28,7 +28,6 @@ from fuelweb_test.helpers.checkers import check_get_network_data_over_cli
 from fuelweb_test.helpers.checkers import check_update_network_data_over_cli
 from fuelweb_test.helpers.decorators import check_fuel_statistics
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
-from fuelweb_test.helpers import utils
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.settings import MULTIPLE_NETWORKS
 from fuelweb_test.settings import NODEGROUPS
@@ -60,8 +59,8 @@ class TestMultipleNets(TestMultipleClusterNets):
 
     def update_network_config(self, cluster_id):
         """Update network configuration."""
-        with self.env.d_env.get_admin_remote() as remote:
-            check_get_network_data_over_cli(remote, cluster_id, '/var/log/')
+        check_get_network_data_over_cli(
+            self.ssh_manager.admin_ip, cluster_id, '/var/log/')
         management_ranges_default = []
         management_ranges_custom = []
         storage_ranges_default = []
@@ -105,15 +104,16 @@ class TestMultipleNets(TestMultipleClusterNets):
                                          management_ranges_custom))
 
             self.show_step(10)
-            utils.put_json_on_remote_from_dict(
-                remote, updated_network, cluster_id)
+            with remote.open(
+                    '/var/log/network_{0}.json'.format(cluster_id),
+                    mode='w') as file_obj:
+                json.dump(updated_network, file_obj)
+            check_update_network_data_over_cli(
+                self.ssh_manager.admin_ip, cluster_id, '/var/log/')
 
-            check_update_network_data_over_cli(remote, cluster_id,
-                                               '/var/log/')
-
-        self.show_step(11)
-        with self.env.d_env.get_admin_remote() as remote:
-            check_get_network_data_over_cli(remote, cluster_id, '/var/log/')
+            self.show_step(11)
+            check_get_network_data_over_cli(
+                self.ssh_manager.admin_ip, cluster_id, '/var/log/')
             latest_net = json.loads(remote.open(
                 '/var/log/network_1.json').read())
             updated_storage_default = self.get_ranges(latest_net, 'storage',
@@ -206,7 +206,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate(self, multi_nets=True)
+        vsrx_setup_result = vsrx.activate(self, add_network='private2')
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -370,7 +370,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate(self, multi_nets=True)
+        vsrx_setup_result = vsrx.activate(self, add_network='private2')
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -484,7 +484,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate(self, multi_nets=True)
+        vsrx_setup_result = vsrx.activate(self, add_network='private2')
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -590,7 +590,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate(self, multi_nets=True)
+        vsrx_setup_result = vsrx.activate(self, add_network='private2')
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -706,7 +706,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate(self, multi_nets=True)
+        vsrx_setup_result = vsrx.activate(self, add_network='private2')
 
         self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
@@ -815,7 +815,7 @@ class TestMultipleNets(TestMultipleClusterNets):
 
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
-        vsrx_setup_result = vsrx.activate(self, multi_nets=True,
+        vsrx_setup_result = vsrx.activate(self, add_network='private2',
                                                upload_config=True)
 
         self.show_step(7)
