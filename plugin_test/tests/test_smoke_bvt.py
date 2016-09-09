@@ -195,7 +195,7 @@ class ContrailPlugin(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=3)
+        plugin.prepare_contrail_plugin(slaves=3)
 
         self.show_step(2)
         plugin.activate_plugin(self)
@@ -254,7 +254,7 @@ class ContrailPlugin(TestBasic):
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
-
+        """
         plugin.show_range(self, 4, 11)
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -280,3 +280,4 @@ class ContrailPlugin(TestBasic):
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    timeout=OSTF_RUN_TIMEOUT)
+        """
