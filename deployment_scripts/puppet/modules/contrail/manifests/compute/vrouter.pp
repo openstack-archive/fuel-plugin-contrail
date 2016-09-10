@@ -115,6 +115,15 @@ class contrail::compute::vrouter {
     'VIRTUAL-HOST-INTERFACE/physical_interface': value => $contrail::phys_dev;
     'VIRTUAL-HOST-INTERFACE/gateway':            value => pick($contrail::gateway, false);
     'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
+  } ->
+
+  ini_setting { 'vrouter-threadcount':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_vrouter.conf',
+    section => 'supervisord',
+    setting => 'environment',
+    value   => 'TBB_THREAD_COUNT=8',
+    notify  => Service['supervisor-vrouter'],
   }
 
   if $contrail::compute_dpdk_enabled == true {
