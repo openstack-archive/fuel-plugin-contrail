@@ -30,6 +30,20 @@ class contrail::provision::control {
     }
   }
 
+  define contrail::provision::add_route_to_mx {
+    if $contrail::gateway {
+      file_line {"route_to_gw_${name}":
+        ensure    => 'present',
+        line      => "post-up ip route add ${name}/32 via ${contrail::gateway} dev ${contrail::interface}",
+        path      => "/etc/network/interfaces.d/ifcfg-${contrail::interface}",
+      }
+      exec {"route_to_gw_${name}":
+        command => "ip route add ${name}/32 via ${contrail::gateway} dev ${contrail::interface}",
+        unless  => "ip route | grep ${name}"
+      }
+    }
+  }
+
   if !defined(Exec['wait_for_api']) {
     exec {'wait_for_api':
       command   => "bash -c 'if ! [[ $(curl -s -o /dev/null -w \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:${contrail::api_server_port}) =~ ^(200|401)$ ]];\
@@ -66,5 +80,9 @@ then exit 1; fi'",
     contrail::provision::prov_ext_bgp { $contrail::gateways:
       require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
     }
+  }
+
+  contrail::provision::add_route_to_mx { $contrail::gateways:
+      require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
   }
 }
