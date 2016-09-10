@@ -74,6 +74,7 @@ class contrail::controller {
     'QUOTAS/quota_network': value                 => '-1';
     'QUOTAS/quota_subnet': value                  => '-1';
     'QUOTAS/quota_port': value                    => '-1';
+    'QUOTAS/quota_driver': value                  => 'neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDriver';
   }
   file_line {'add_neutron_defaults':
     ensure => 'present',
