@@ -159,3 +159,87 @@ attributes:
     description: "Disable this option to disable provisioning ostf networks"
     weight: 260
     type: "checkbox"
+  esxi_datastore_name:
+    value: "nfs"
+    label: "ESXi datastore name"
+    description: "Name of datastore where ContrailVM will be spawned"
+    weight: 270
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid datastore name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  esxi_uplink_ext:
+    value: "vmnic1"
+    label: "ESXi uplink admin"
+    description: "Name of interface that provide connection between ESXi node and Fuel admin network"
+    weight: 280
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid ESXi uplink name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  esxi_uplink_priv:
+    value: "vmnic2"
+    label: "ESXi uplink private"
+    description: "Name of interface that provide connection between ESXi node and Fuel private network"
+    weight: 290
+    type: "text"
+    regex:
+      source: '^\w+$'
+      error: "Invalid ESXi uplink name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  dc_name:
+    value: "Datacenter"
+    label: "vCenter Datacenter name"
+    description: "Name of vCenter Datacenter"
+    weight: 300
+    type: "text"
+    regex:
+      source: '^[A-Za-z0-9_-]+$'
+      error: "Invalid Datacenter name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  dvs_external:
+    value: "Contrail-DVS-Ext"
+    label: "External DVS name"
+    description: "Name of DVS that provide connection between ESXi nodes and Fuel admin network"
+    weight: 310
+    type: "text"
+    regex:
+      source: '^[A-Za-z0-9_-]+$'
+      error: "Invalid DVS name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  dvs_private:
+    value: "Contrail-DVS-Priv"
+    label: "Private DVS name"
+    description: "Name of DVS that provide connection between ESXi nodes and Fuel private network"
+    weight: 320
+    type: "text"
+    regex:
+      source: '^[A-Za-z0-9_-]+$'
+      error: "Invalid DVS name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+  dvs_internal:
+    value: "Contrail-DVS-Int"
+    label: "Private DVS name"
+    description: "Name of DVS that need for internal contrail traffic"
+    weight: 330
+    type: "text"
+    regex:
+      source: '^[A-Za-z0-9_-]+$'
+      error: "Invalid DVS name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"

@@ -23,14 +23,6 @@ class contrail::compute::vmware {
     'neutron/url':          value => "http://${contrail::mos_mgmt_vip}:9696";
   }
 
-  ini_setting { 'vmware-int-dvs':
-    ensure  => present,
-    path    => '/etc/nova/nova-compute.conf',
-    section => 'vmware',
-    setting => 'vcenter_dvswitch',
-    value   => $contrail::dvs_internal,
-  }
-
   # Config file
   file { '/etc/contrail':
     ensure => directory,
@@ -53,7 +45,6 @@ class contrail::compute::vmware {
     enable => true,
   }
 
-  Ini_setting['vmware-int-dvs'] ->
   Nova_Config <||> ~>
   service { 'nova-compute':
     ensure => running,
