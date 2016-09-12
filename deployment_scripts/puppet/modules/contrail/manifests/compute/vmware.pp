@@ -15,16 +15,20 @@
 class contrail::compute::vmware {
 
   nova_config {
-    'DEFAULT/network_api_class':                 value => 'nova.network.neutronv2.api.API';
-    'DEFAULT/security_group_api':                value => 'neutron';
-    'DEFAULT/firewall_driver':                   value => 'nova.virt.firewall.NoopFirewallDriver';
-    'DEFAULT/heal_instance_info_cache_interval': value => '0';
-    'neutron/url':                               value => "http://${contrail::mos_mgmt_vip}:9696";
-    'neutron/url_timeout':                       value => '300';
-    'neutron/admin_auth_url':                    value => "http://${contrail::mos_mgmt_vip}:35357/v2.0/";
-    'neutron/admin_tenant_name':                 value => 'services';
-    'neutron/admin_username':                    value => 'neutron';
-    'neutron/admin_password':                    value => $contrail::service_token;
+    'neutron/auth_type':    value => 'password';
+    'neutron/auth_url':     value => "http://${contrail::mos_mgmt_vip}:35357/";
+    'neutron/username':     value => 'neutron';
+    'neutron/password':     value => $contrail::service_token;
+    'neutron/project_name': value => 'services';
+    'neutron/url':          value => "http://${contrail::mos_mgmt_vip}:9696";
+  }
+
+  ini_setting { 'vmware-int-dvs':
+    ensure  => present,
+    path    => '/etc/nova/nova-compute.conf',
+    section => 'vmware',
+    setting => 'vcenter_dvswitch',
+    value   => $contrail::dvs_internal,
   }
 
   # Config file
@@ -49,6 +53,7 @@ class contrail::compute::vmware {
     enable => true,
   }
 
+  Ini_setting['vmware-int-dvs'] ->
   Nova_Config <||> ~>
   service { 'nova-compute':
     ensure => running,
