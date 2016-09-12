@@ -31,13 +31,17 @@ class contrail::contrail_vmware {
     $mgmt_self_ip            = $::ipaddress_br_mgmt
 
     # Fetching the esxi data from hash
-
-    #NOTE(AKirilochkin): Workaround until hiera could merge files in folder
     $mapping_data            = loadyaml('/etc/hiera/plugins/contrail-esxi-vrouter-map.yaml')
+    $host_to_mac_bind        = loadyaml('/etc/hiera/override/host_to_mac_bind.yaml')
     $host                    = pick($mapping_data['esxi_mapping'][$contrail::address], '')
-    $esxi_data               = fetch_esxi_data($host)
-    $vmware                  = pick($esxi_data['ip'], '10.0.0.0')
-    $vmware_iface_name       = pick($esxi_data['contrail_vm']['vmware_iface_name'], 'ens161')
+    $esxi_dvs_mac_list       = pick($host_to_mac_bind[$host], '')
+    $if_names                = interface_name_by_mac($esxi_dvs_mac_list)
+    $vmware_iface_name       = pick($if_names['0'], 'ens162')
+    #NOTE(AKirilochkin): Obsolete, please keep it for future use,
+    # like per-host override configuration
+    #$esxi_data               = fetch_esxi_data($host)
+    #$vmware                  = pick($esxi_data['ip'], '10.0.0.0')
+    #$vmware_iface_name       = pick($esxi_data['contrail_vm']['vmware_iface_name'], 'ens161')
 
     $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
     $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
@@ -112,7 +116,6 @@ class contrail::contrail_vmware {
       'DISCOVERY/max_control_nodes'               : value => '2';
       'HYPERVISOR/type'                           : value => 'vmware';
       'HYPERVISOR/vmware_mode'                    : value => 'vcenter';
-      'HYPERVISOR/vmware_physical_interface'      : value => $vmware_iface_name;
       'METADATA/metadata_proxy_secret'            : value => $contrail::metadata_secret;
       'NETWORKS/control_network_ip'               : value => $contrail::address;
       'VIRTUAL-HOST-INTERFACE/name'               : value => 'vhost0';
@@ -130,7 +133,13 @@ class contrail::contrail_vmware {
       command => '/bin/rm /etc/init/supervisor-vrouter.override',
       onlyif  => '/usr/bin/test -f /etc/init/supervisor-vrouter.override',
     }
-
+    #NOTE(AKirilochkin): This configuration will be passed until "interface_name_by_mac"
+    # function could not get the data from hash. We do not need LCM rewrite this empty data.
+    if $if_names['0'] {
+      contrail_vrouter_agent_config {
+        'HYPERVISOR/vmware_physical_interface'      : value => $vmware_iface_name;
+      }
+    }
     service {'supervisor-vrouter':
       ensure    => running,
       enable    => true,
