@@ -340,7 +340,7 @@ class FunctionalTests(TestBasic):
         openstack.update_deploy_check(self, conf_control,
                                       is_vsrx=vsrx_setup_result)
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_6],
           groups=["contrail_add_config"])
     @log_snapshot_after_test
     def contrail_add_config(self):
@@ -382,7 +382,7 @@ class FunctionalTests(TestBasic):
                          'contrail-analytics'],
             'slave-05': ['contrail-analytics-db']
         }
-        conf_config = {'slave-05': ['contrail-config']}
+        conf_config = {'slave-06': ['contrail-config']}
 
         plugin.show_range(self, 8, 10)
         openstack.update_deploy_check(self, conf_nodes,
@@ -824,8 +824,7 @@ class FunctionalTests(TestBasic):
             'slave-03': ['contrail-control',
                          'contrail-config',
                          'contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
             # Here slave-4
             'slave-05': ['contrail-analytics-db'],
         }
