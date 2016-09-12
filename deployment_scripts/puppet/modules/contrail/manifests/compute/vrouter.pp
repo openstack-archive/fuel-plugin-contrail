@@ -113,8 +113,11 @@ class contrail::compute::vrouter {
     'VIRTUAL-HOST-INTERFACE/name':               value => 'vhost0';
     'VIRTUAL-HOST-INTERFACE/ip':                 value => "${contrail::address}/${contrail::netmask_short}";
     'VIRTUAL-HOST-INTERFACE/physical_interface': value => $contrail::phys_dev;
-    'VIRTUAL-HOST-INTERFACE/gateway':            value => pick($contrail::gateway, false);
     'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
+  }
+
+  if $contrail::gateway {
+    contrail_vrouter_agent_config { 'VIRTUAL-HOST-INTERFACE/gateway': value => $contrail::gateway; }
   }
 
   if $contrail::compute_dpdk_enabled == true {
