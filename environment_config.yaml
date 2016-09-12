@@ -146,12 +146,9 @@ attributes:
         condition: "settings:common.use_vcenter.value == false"
   contrail_vcenter_esxi_yaml:
     value: |
-      'esxi1':
-         # The ip-address of ESXi that has the following parameters
-         'ip': 'e.s.x.i'
-         'contrail_vm':
-           # The interface name, connected to Contrail_DVSwitch
-           "vmware_iface_name": "ens161"
+      '---'
+      # This field no more used anywhere,
+      # and saved only for feature use such like Overrides
     label: "vCenter ESXi data"
     description: "vCenter ESXi data in YAML format"
     weight: 200
