@@ -824,8 +824,7 @@ class FunctionalTests(TestBasic):
             'slave-03': ['contrail-control',
                          'contrail-config',
                          'contrail-db',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+                         'contrail-analytics'],
             # Here slave-4
             'slave-05': ['contrail-analytics-db'],
         }
