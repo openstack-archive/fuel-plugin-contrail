@@ -80,7 +80,7 @@ class ContrailClient(object):
                 "parent_type": "project",
                 "fq_name": net_name,
                 "network_ipam_refs": net_attr}}
-        return self._post('/virtual-networks', data)
+        return self._post('/virtual-networks', json=data)
 
     def add_router_interface(self, network, route_table, attr=None):
         """Add router interface to network.
@@ -92,7 +92,8 @@ class ContrailClient(object):
         data = {"virtual-network": {'fq_name': network['fq_name'],
                 'route_table_refs': [{
                     'to': route_table['fq_name'], "attr":attr}]}}
-        return self._put('/virtual-network/{0}'.format(network['uuid']), data)
+        return self._put(
+            '/virtual-network/{0}'.format(network['uuid']), json=data)
 
     def get_route_tables(self):
         """Get router."""
