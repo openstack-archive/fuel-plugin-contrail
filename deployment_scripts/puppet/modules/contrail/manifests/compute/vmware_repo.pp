@@ -30,7 +30,14 @@ package {'libnl-3-200':
   ensure => '3.2.21-1ubuntu3',
 }
 
-$overide_libvirt_type = add_data_to_yaml('/etc/hiera/plugins/contrail.yaml', 'libvirt_type', 'kvm')
+file { '/etc/hiera/override/plugins.yaml':
+  source => "puppet:///modules/contrail/vmware_data_${contrail::cluster_id}.yaml",
+}
+
+file { '/etc/hiera/plugins/contrail.yaml':
+  ensure  => file,
+  content => 'libvirt_type: kvm',
+}
 
 # Temporary dirty hack. Fix execution of core manifests compute.pp and compute-vmware.pp.
 # When contrail packages was installed, instead of libvirtd we will have libvirt-bin files [FIXME]
