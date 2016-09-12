@@ -79,7 +79,6 @@ class ContrailPlugin(TestBasic):
         hugepages_amount = '60'
         hugepages_size = '2'
         vrouter_core_mask = '0x3'
-        sriov_physnet = 'physnet1'
 
         plugin.show_range(self, 1, 7)
         plugin.prepare_contrail_plugin(self, slaves=3)
@@ -103,8 +102,7 @@ class ContrailPlugin(TestBasic):
 
         self.show_step(7)
         plugin.activate_plugin(
-            self, contrail_global_dpdk=True, contrail_global_sriov=True,
-            dpdk_on_vf=True)
+            self, contrail_global_dpdk=True, dpdk_on_vf=True)
 
         self.show_step(8)
         attr = self.fuel_web.client.get_cluster_attributes(
@@ -117,16 +115,12 @@ class ContrailPlugin(TestBasic):
         vers = attr['metadata']['plugin_version']
         assert_equal(
             CONTRAIL_PLUGIN_VERSION, vers,
-            "Invali version.".format(vers))
+            "Invalid version.".format(vers))
 
         assert_equal(
             contrail_api_port, attr['contrail_api_public_port']['value'],
             "Invalid  contrail api port {0}.".format(
                 attr['contrail_api_public_port']['value']))
-
-        assert_equal(
-            True, attr['contrail_global_sriov']['value'],
-            "Contrail global sriov is disabled.")
 
         assert_equal(
             True, attr['dpdk_on_vf']['value'],
@@ -151,13 +145,8 @@ class ContrailPlugin(TestBasic):
             "Patch_nova is not enabled by default.")
 
         assert_equal(
-            sriov_physnet, attr['sriov_physnet']['value'],
-            "Invalid default sriov physnet {0}.".format(
-                attr['sriov_physnet']['value']))
-
-        assert_equal(
             vrouter_core_mask, attr['vrouter_core_mask']['value'],
-            "Invalid default sriov physnet {0}.".format(
+            "Invalid default vrouter_core_mask {0}.".format(
                 attr['vrouter_core_mask']['value']))
 
         assert_equal(
@@ -195,7 +184,7 @@ class ContrailPlugin(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=3)
+        plugin.prepare_contrail_plugin(slaves=3)
 
         self.show_step(2)
         plugin.activate_plugin(self)
@@ -254,7 +243,7 @@ class ContrailPlugin(TestBasic):
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
-
+        """
         plugin.show_range(self, 4, 11)
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -280,3 +269,4 @@ class ContrailPlugin(TestBasic):
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    timeout=OSTF_RUN_TIMEOUT)
+        """
