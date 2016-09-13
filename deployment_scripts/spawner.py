@@ -419,7 +419,7 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
             if not any(ds.name == storage_name for ds in cluster_obj.datastore):
                 self.logger.warning(
                     'Datastore({}) does not exist on Cluster({}). Skip creation VM: {}.'.format(storage_name, cluster,
-                                                                                                name)
+                                                                                                name))
                 return
             vm_folder = cluster_obj.parent.parent.vmFolder
             resource_pool = cluster_obj.resourcePool
