@@ -87,11 +87,15 @@ class contrail::compute::compute_override {
 qemu-kvm qemu-system-x86 qemu-system-common",
         unless  => 'dpkg -l | grep qemu-system-common | grep contrail',
         require => Apt::Source['dpdk-depends-repo'],
-      } ~>
-      service { 'qemu-kvm':
-        ensure => running,
-        enable => true,
-      } ->
+        notify  => Service['qemu-kvm'],
+      }
+      if !defined(Service['qemu-kvm']) {
+        service { 'qemu-kvm':
+          ensure => running,
+          enable => true,
+          notify => Apt::Pin['contrail-override-libvirt']
+        }
+      }
       apt::pin { 'contrail-override-libvirt':
         explanation => 'Set priority for packages that need to override from contrail repository',
         packages    => $libvirt_pkg,
@@ -107,12 +111,16 @@ qemu-kvm qemu-system-x86 qemu-system-common",
         command => "apt-get install --yes ${keep_config_files} ${force_overwrite} libvirt-bin libvirt0",
         unless  => 'dpkg -l | grep libvirt0 | grep contrail',
         require => Apt::Source['dpdk-depends-repo'],
-      } ->
+        notify  => Service['libvirtd'],
+      }
       # With a new libvirt packages this init script must be stopped
-      service { 'libvirtd':
-        ensure => stopped,
-        enable => false,
-      } ->
+      if !defined(Service['libvirtd']) {
+        service { 'libvirtd':
+          ensure => stopped,
+          enable => false,
+          notify => File_line['add_libvirt_opt1'],
+        }
+      }
       # This options must be uncommented for correct work with nova-compute
       file_line { 'add_libvirt_opt1':
         path  => '/etc/libvirt/libvirtd.conf',
@@ -127,10 +135,13 @@ qemu-kvm qemu-system-x86 qemu-system-common",
       service { $contrail::libvirt_name:
         ensure => running,
         enable => true,
-      } ~>
-      service { 'nova-compute':
-        ensure => running,
-        enable => true,
+        notify => Service['nova-compute'],
+      }
+      if !defined(Service['nova-compute']) {
+        service { 'nova-compute':
+          ensure => running,
+          enable => true,
+        }
       }
     }
   }
