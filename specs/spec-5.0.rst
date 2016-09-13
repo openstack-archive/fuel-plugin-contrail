@@ -81,6 +81,64 @@ Requirements
 Server requirements are described in [1]. There are disk space requirements for this role, at least
 256 Gb, as analytics services store the data in Cassandra database.
 
+Add HA functionality to TOR/TSN
+============================================
+
+Problem description
+-------------------
+
+Contrail TSN needs to have possibility to work with HA when configured with pssl.
+
+Proposed solution
+-----------------
+
+Add manifests to automatically create certificates, configure haproxy in active/passive mode.
+
+UI impact
+---------
+
+None
+
+Performance impact
+------------------
+
+None
+
+Documentation Impact
+--------------------
+
+User guide should be updated with information on new node role.
+
+Upgrade impact
+--------------
+
+None
+
+Data model impact
+-----------------
+
+None
+
+Other end user impact
+---------------------
+
+None
+
+Security impact
+---------------
+
+None
+
+Notifications impact
+--------------------
+
+None
+
+Requirements
+------------
+
+None
+
 Contrail with VMware vCenter
 ============================
 
