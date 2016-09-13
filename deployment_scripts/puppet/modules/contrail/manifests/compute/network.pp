@@ -41,6 +41,15 @@ class contrail::compute::network {
     onlyif  => 'ip addr show dev br-mesh | grep -q inet',
   }
 
+  if $contrail::compute_dpdk_enabled {
+    $dpdk_mac = $::mac_from_vrouter
+    if $dpdk_mac {
+      $dpdk_dev_mac = $dpdk_mac
+    } else {
+      $dpdk_dev_mac = $dev_mac
+    }
+  }
+
   case $::operatingsystem {
     'Ubuntu': {
       file {'/etc/network/interfaces.d/ifcfg-vhost0':
