@@ -184,7 +184,7 @@ class ContrailPlugin(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(slaves=3)
+        plugin.prepare_contrail_plugin(self, slaves=3)
 
         self.show_step(2)
         plugin.activate_plugin(self)
