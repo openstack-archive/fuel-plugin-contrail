@@ -126,10 +126,12 @@ class contrail {
   $admin_tenant   = $admin_settings['tenant']
 
   # Contrail settings
-  $asnum            = $settings['contrail_asnum']
-  $external         = $settings['contrail_external']
-  $route_target     = $settings['contrail_route_target']
-  $gateways         = split($settings['contrail_gateways'], ',')
+  $asnum                     = $settings['contrail_asnum']
+  $external                  = $settings['contrail_external']
+  $route_target              = $settings['contrail_route_target']
+  $gateways                  = split($settings['contrail_gateways'], ',')
+  $kafka_log_retention_bytes = pick($settings['kafka_log_retention_bytes'], '1073741824')
+  $kafka_log_segment_bytes   = pick($settings['kafka_log_segment_bytes'], '1073741824')
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
