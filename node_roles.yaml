@@ -95,6 +95,9 @@ contrail-tsn:
   has_primary: true
   public_ip_required: false
   weight: 100
+  limits:
+    min: 1
+    recommended: 2
   conflicts:
     - contrail-analytics
     - contrail-control
