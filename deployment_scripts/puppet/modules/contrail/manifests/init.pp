@@ -203,7 +203,7 @@ class contrail {
 
   # vCenter settings
   $vcenter_hash                               = hiera_hash('vcenter', false)
-  if $vcenter_hash {
+  if $vcenter_hash and !empty($vcenter_hash) {
     $vcenter_server_ip                          = $vcenter_hash['computes'][0]['vc_host']
     $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']
     $vcenter_server_pass                        = $vcenter_hash['computes'][0]['vc_password']
