@@ -21,6 +21,7 @@ from random import choice
 
 from devops.helpers.helpers import tcp_ping
 from devops.helpers.helpers import wait
+from devops.helpers.ssh_client import SSHAuth
 
 from fuelweb_test import logger
 from fuelweb_test.helpers import os_actions
@@ -32,6 +33,7 @@ from fuelweb_test.settings import SERVTEST_PASSWORD
 from fuelweb_test.settings import SERVTEST_TENANT
 from fuelweb_test.settings import SERVTEST_USERNAME
 from fuelweb_test.settings import DISABLE_SSL
+from fuelweb_test.settings import SSH_IMAGE_CREDENTIALS
 
 from proboscis import test
 from proboscis.asserts import assert_true
@@ -64,6 +66,7 @@ class SystemTests(TestBasic):
     cluster_id = ''
     pack_path = CONTRAIL_PLUGIN_PACK_UB_PATH
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
+    cirros_auth = SSHAuth(**SSH_IMAGE_CREDENTIALS)
 
     def ping_instance_from_instance(self, os_conn, node_name,
                                     ip_pair, ping_result=0):
@@ -74,7 +77,6 @@ class SystemTests(TestBasic):
         :param ping_result: type interger, exite code of command execution
         by default is 0
         """
-        creds = ("cirros", "cubswin:)")
         for ip_from in ip_pair:
             with self.fuel_web.get_ssh_for_node(node_name) as remote:
                 for ip_to in ip_pair[ip_from]:
@@ -83,9 +85,11 @@ class SystemTests(TestBasic):
                         "Check connectin from {0} to {1}.".format(
                             ip_from, ip_to))
                     assert_true(
-                        os_conn.execute_through_host(
-                            remote, ip_from, command,
-                            creds)['exit_code'] == ping_result,
+                        remote.execute_through_host(
+                        hostname=ip_from,
+                        cmd=command,
+                        auth=self.cirros_auth
+                    )['exit_code'] == ping_result,
                         'Ping responce is not received.')
 
     def get_role(self, os_conn, role_name):
@@ -132,7 +136,6 @@ class SystemTests(TestBasic):
         Duration 90 min
 
         """
-        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(
             self, slaves=5, options={'ceilometer': True})
@@ -141,7 +144,7 @@ class SystemTests(TestBasic):
         vsrx.activate()
 
         plugin.show_range(self, 2, 4)
-        plugin.activate_plugin(self, **conf_contrail)
+        plugin.activate_plugin(self, dedicated_analytics_db=True)
 
         plugin.show_range(self, 4, 8)
         self.fuel_web.update_nodes(
@@ -723,6 +726,6 @@ class SystemTests(TestBasic):
         self.show_step(4)
         for instance in [access_point, instance]:
             os_conn.delete_instance(instance)
-            assert_true(
-                os_conn.verify_srv_deleted(instance),
-                "Instance was not deleted.")
+            wait(
+                lambda: self.os_conn.is_srv_deleted(instance),
+                timeout=200, timeout_msg="Instance was not deleted.")
