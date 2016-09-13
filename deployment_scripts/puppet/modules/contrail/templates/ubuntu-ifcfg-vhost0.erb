@@ -11,3 +11,6 @@ mtu <%= scope.lookupvar('contrail::phys_dev_mtu') -%>
 post-up ip route add <%= route['net'] %> via <%= route['via'] %> dev vhost0
 <% end -%>
 <% end -%>
+<% if @dpdk_dev_mac -%>
+post-up ip link set address <%= @dpdk_dev_mac -%> dev vhost0
+<% end -%>
