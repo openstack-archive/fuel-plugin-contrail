@@ -35,7 +35,18 @@ class contrail::compute::nova {
     'DEFAULT/heal_instance_info_cache_interval': value => '0';
   }
 
-  if $contrail::compute_dpdk_enabled or $contrail::compute_sriov_enabled {
+  if $contrail::compute_dpdk_enabled {
+    if $contrail::compute_dpdk_on_vf {
+      $pci_wl = generate_passthrough_whitelist(
+        $contrail::dpdk_physnet,
+        $contrail::compute_dpdk_on_vf,
+        $contrail::phys_dev,
+        $contrail::dpdk_vf_number
+      )
+      nova_config {
+        'DEFAULT/pci_passthrough_whitelist':       value => $pci_wl;
+      }
+    }
     nova_config {
       'libvirt/virt_type': value => 'kvm';
       'CONTRAIL/use_userspace_vhost': value => true;
