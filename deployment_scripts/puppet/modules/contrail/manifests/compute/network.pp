@@ -18,17 +18,14 @@ class contrail::compute::network {
   $netmask        = $contrail::netmask_short
   $default_gw     = undef
 
-  $br_file = $::operatingsystem ? {
-    'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
-    'CentOS' => '/etc/sysconfig/network-scripts/ifcfg-br-mesh',
-  }
-
   Exec {
     provider => 'shell',
     path => '/usr/bin:/bin:/sbin',
   }
 
-  file { $br_file: ensure => absent } ->
+  file { '/etc/network/interfaces.d/ifcfg-br-mesh':
+    ensure => absent,
+  } ->
   # Remove interface from the bridge
   exec {"remove_${ifname}_mesh":
     command => "brctl delif br-mesh ${ifname}",
@@ -38,22 +35,41 @@ class contrail::compute::network {
     command => 'ip addr flush dev br-mesh',
     returns => [0,1] # Idempotent
   }
-  case $::operatingsystem {
-    'Ubuntu': {
-      file {'/etc/network/interfaces.d/ifcfg-vhost0':
-        ensure  => present,
-        content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
-      }
+  file {'/etc/network/interfaces.d/ifcfg-vhost0':
+    ensure  => present,
+    content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
+  }
+
+  # Configure persistent network device for DPDK VF
+  if $contrail::compute_dpdk_on_vf {
+
+    $vf_data = get_vf_data($contrail::phys_dev, $contrail::dpdk_vf_number)
+    $dpdk_dev_name = "dpdk-vf${contrail::dpdk_vf_number}"
+    $dpdk_vf_origin_name = $vf_data['vf_dev_name']
+    $dpdk_dev_pci = $vf_data['vf_pci_addr']
+    $dpdk_dev_mac = $vf_data['vf_mac_addr']
+    $phys_dev = $dpdk_dev_name
+
+    exec { 'rename-dpdk-vf':
+      path    => '/bin:/usr/bin:/usr/sbin',
+      command => "ip link set ${dpdk_vf_origin_name} name ${dpdk_dev_name}",
+      unless  => "ip link | grep ${dpdk_dev_name}",
     }
-    'CentOS': {
-      exec {"remove_bridge_from_${ifname}_config":
-        command => "sed -i '/BRIDGE/d' /etc/sysconfig/network-scripts/ifcfg-${ifname}",
-      }
-      file {'/etc/sysconfig/network-scripts/ifcfg-vhost0':
-        ensure  => present,
-        content => template('contrail/centos-ifcfg-vhost0.erb'),
-      }
+
+    file {'/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules':
+      ensure  => present,
+      content => template('contrail/72-contrail-dpdk-on-vf.rules.erb'),
     }
-    default: {}
+
+    $interface_config = join(["auto ${dpdk_dev_name}",
+                            "iface ${dpdk_dev_name} inet manual",
+                            ],"\n")
+
+    file {"/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}":
+      ensure  => file,
+      content => $interface_config,
+      require => File['/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules'],
+    }
+
   }
 }
