@@ -14,11 +14,18 @@
 
 class contrail::compute::vrouter {
 
-  # facter uses underscore instead of dot as a separator for interface name with vlan
-  $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-  $dev_mac  = getvar("::macaddress_${phys_dev_facter}")
-  $phys_dev = $contrail::phys_dev
-  $dpdk_dev_pci = $contrail::phys_dev_pci
+  if $contrail::compute_dpdk_on_vf {
+    $vf_data = get_vf_data($contrail::phys_dev, $contrail::dpdk_vf_number)
+    $phys_dev = "dpdk-vf${contrail::dpdk_vf_number}"
+    $dpdk_dev_pci = $vf_data['vf_pci_addr']
+    $dev_mac = $vf_data['vf_mac_addr']
+  } else {
+    # facter uses underscore instead of dot as a separator for interface name with vlan
+    $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
+    $dev_mac  = getvar("::macaddress_${phys_dev_facter}")
+    $phys_dev = $contrail::phys_dev
+    $dpdk_dev_pci = $contrail::phys_dev_pci
+  }
 
   Exec {
     path => '/sbin:/usr/sbin:/bin:/usr/bin',
@@ -26,11 +33,15 @@ class contrail::compute::vrouter {
 
   if $contrail::compute_dpdk_enabled {
 
-    $dpdk_mac = $::mac_from_vrouter
-    if $dpdk_mac {
-      $dpdk_dev_mac = $dpdk_mac
-    } else {
+    $mac_from_vrouter = $::mac_from_vrouter
+    if $contrail::compute_dpdk_on_vf {
       $dpdk_dev_mac = $dev_mac
+    } else {
+      if $mac_from_vrouter {
+        $dpdk_dev_mac = $mac_from_vrouter
+      } else {
+        $dpdk_dev_mac = $dev_mac
+      }
     }
 
     $raw_phys_dev = regsubst($::contrail::phys_dev, '\..*' , '')
@@ -114,73 +125,49 @@ class contrail::compute::vrouter {
     require => Package[$install_packages],
   }
 
-  if $contrail::compute_dpkd_on_vf {
-    $sriov_in_kernel = sriov_in_kernel()
-    $cmd_arr = ['puppet apply -v -d --logdest /var/log/puppet.log',
-      '--modulepath=/etc/puppet/modules/:/etc/fuel/plugins/contrail-4.0/puppet/modules/',
-      '/etc/fuel/plugins/contrail-4.0/puppet/manifests/contrail-compute-dpdk-on-vf.pp',
-      '&& sed -i "/contrail-compute-dpdk-on-vf/d" /etc/rc.local']
+  contrail_vrouter_agent_config {
+    'DEFAULT/log_file':                          value => '/var/log/contrail/contrail-vrouter-agent.log';
+    'DEFAULT/log_level':                         value => 'SYS_NOTICE';
+    'DEFAULT/log_local':                         value => '1';
+    'DEFAULT/log_flow':                          value => '1';
+    'DEFAULT/use_syslog':                        value => '1';
+    'DEFAULT/syslog_facility':                   value => 'LOG_LOCAL0';
+    'DEFAULT/headless_mode':                     value => $contrail::headless_mode;
+    'DISCOVERY/server':                          value => $contrail::contrail_private_vip;
+    'DISCOVERY/max_control_nodes':               value => '2';
+    'HYPERVISOR/type':                           value => 'kvm';
+    'FLOWS/thread_count':                        value => '2';
+    'METADATA/metadata_proxy_secret':            value => $contrail::metadata_secret;
+    'NETWORKS/control_network_ip':               value => $contrail::address;
+    'VIRTUAL-HOST-INTERFACE/name':               value => 'vhost0';
+    'VIRTUAL-HOST-INTERFACE/ip':                 value => "${contrail::address}/${contrail::netmask_short}";
+    'VIRTUAL-HOST-INTERFACE/physical_interface': value => $phys_dev;
+    'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
+  } ->
 
-    if $sriov_in_kernel {
-      class { 'contrail::compute::dpdk_on_vf':
-        require => [Package[$install_packages],Exec['remove-ovs-modules'],
-                    File['/etc/contrail/agent_param']],
-      }
-    } else {
-      file_line {'apply_dpdk_on_vf_after_reboot':
-        line => join($cmd_arr, ' '),
-        path => '/etc/rc.local',
-      }
+  ini_setting { 'vrouter-threadcount':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_vrouter.conf',
+    section => 'supervisord',
+    setting => 'environment',
+    value   => 'TBB_THREAD_COUNT=8',
+    notify  => Service['supervisor-vrouter'],
+  }
 
-      service {'supervisor-vrouter':
-        ensure  => stopped,
-        enable  => false,
-        require => Package[$install_packages],
-      }
+  if $contrail::gateway {
+    contrail_vrouter_agent_config { 'VIRTUAL-HOST-INTERFACE/gateway': value => $contrail::gateway; }
+  }
+
+  if $contrail::compute_dpdk_enabled == true {
+      'DEFAULT/platform':                    value => 'dpdk';
+      'DEFAULT/physical_interface_address' : value => $dpdk_dev_pci;
+      'DEFAULT/physical_interface_mac':      value => $dpdk_dev_mac;
     }
-
+    service {'supervisor-vrouter':
+      ensure    => running,
+      enable    => true,
+    }
   } else {
-    contrail_vrouter_agent_config {
-      'DEFAULT/log_file':                          value => '/var/log/contrail/contrail-vrouter-agent.log';
-      'DEFAULT/log_level':                         value => 'SYS_NOTICE';
-      'DEFAULT/log_local':                         value => '1';
-      'DEFAULT/log_flow':                          value => '1';
-      'DEFAULT/use_syslog':                        value => '1';
-      'DEFAULT/syslog_facility':                   value => 'LOG_LOCAL0';
-      'DEFAULT/headless_mode':                     value => $contrail::headless_mode;
-      'DISCOVERY/server':                          value => $contrail::contrail_private_vip;
-      'DISCOVERY/max_control_nodes':               value => '2';
-      'HYPERVISOR/type':                           value => 'kvm';
-      'FLOWS/thread_count':                        value => '2';
-      'METADATA/metadata_proxy_secret':            value => $contrail::metadata_secret;
-      'NETWORKS/control_network_ip':               value => $contrail::address;
-      'VIRTUAL-HOST-INTERFACE/name':               value => 'vhost0';
-      'VIRTUAL-HOST-INTERFACE/ip':                 value => "${contrail::address}/${contrail::netmask_short}";
-      'VIRTUAL-HOST-INTERFACE/physical_interface': value => $contrail::phys_dev;
-      'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
-    } ->
-
-    ini_setting { 'vrouter-threadcount':
-      ensure  => present,
-      path    => '/etc/contrail/supervisord_vrouter.conf',
-      section => 'supervisord',
-      setting => 'environment',
-      value   => 'TBB_THREAD_COUNT=8',
-      notify  => Service['supervisor-vrouter'],
-    }
-
-    if $contrail::gateway {
-      contrail_vrouter_agent_config { 'VIRTUAL-HOST-INTERFACE/gateway': value => $contrail::gateway; }
-    }
-
-    if $contrail::compute_dpdk_enabled == true {
-      contrail_vrouter_agent_config {
-        'DEFAULT/platform':                    value => 'dpdk';
-        'DEFAULT/physical_interface_address' : value => $contrail::phys_dev_pci;
-        'DEFAULT/physical_interface_mac':      value => $dpdk_dev_mac;
-      }
-    }
-
     service {'supervisor-vrouter':
       ensure     => running,
       enable     => true,
@@ -191,16 +178,7 @@ sync && \
 echo 3 > /proc/sys/vm/drop_caches && \
 echo 1 > /proc/sys/vm/compact_memory && \
 service supervisor-vrouter start',
-      subscribe  => [Package[$install_packages],Exec['remove-ovs-modules'],
-                    File['/etc/contrail/agent_param']
-                    ],
     }
-  # Temporary dirty hack. Network configuration fails because of deployed contrail vrouter [FIXME]
-    exec {'no_network_reconfigure':
-      command => '/bin/echo "#NOOP here. Modified by contrail plugin" > /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp',
-      onlyif  => '/usr/bin/test -f /opt/contrail/provision-vrouter-DONE',
-    }
-
   }
   Package[$install_packages] -> Contrail_vrouter_nodemgr_config <||> ~> Service['supervisor-vrouter']
   Package[$install_packages] -> Contrail_vrouter_agent_config <||>   ~> Service['supervisor-vrouter']
