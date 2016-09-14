@@ -113,11 +113,12 @@ class contrail {
 
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
-  $dpdk_on_vf           = $settings['dpdk_on_vf']
   $compute_dpdk_enabled = $global_dpdk_enabled and 'dpdk' in hiera_array('roles')
 
   # DPDK on VF settings
-  $compute_dpkd_on_vf    = $compute_dpdk_enabled and $compute_sriov_enabled and $settings['dpdk_on_vf']
+  $dpdk_on_vf            = $settings['dpdk_on_vf']
+  $compute_dpdk_on_vf    = $compute_dpdk_enabled and $settings['dpdk_on_vf']
+  $sriov_physnet         = $settings['dpdk_physnet']
   $dpdk_vf_number        = 0
 
 

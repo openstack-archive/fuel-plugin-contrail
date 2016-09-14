@@ -14,19 +14,22 @@
 
 class contrail::compute::dpdk_on_vf {
 
-  if $contrail::compute_dpkd_on_vf {
-    $vf_data = get_fv_data($contrail::phys_dev, $contrail::dpdk_vf_number)
+  if $contrail::compute_dpdk_on_vf {
+    $vf_data = get_vf_data($contrail::phys_dev, $contrail::dpdk_vf_number)
     $dpdk_dev_name = "dpdk-vf${contrail::dpdk_vf_number}"
     $dpdk_vf_origin_name = $vf_data['vf_dev_name']
     $dpdk_dev_pci = $vf_data['vf_pci_addr']
     $dpdk_dev_mac = $vf_data['vf_mac_addr']
     $phys_dev = $dpdk_dev_name
     $pci_wl = generate_passthrough_whitelist(
-      $contrail::sriov_physnet,
-      $contrail::compute_dpkd_on_vf,
+      $contrail::dpdk_physnet,
+      $contrail::compute_dpdk_on_vf,
       $contrail::phys_dev,
       $contrail::dpdk_vf_number
       )
+
+    $sriov_hash = get_sriov_devices($contrail::compute_dpdk_on_vf, $contrail::phys_dev)
+    create_resources(contrail::create_vfs, $sriov_hash)
 
     exec { 'rename-dpdk-vf':
       path    => '/bin:/usr/bin:/usr/sbin',

@@ -104,8 +104,8 @@ class contrail::compute::vrouter {
   if $contrail::compute_dpkd_on_vf {
     $sriov_in_kernel = sriov_in_kernel()
     $cmd_arr = ['puppet apply -v -d --logdest /var/log/puppet.log',
-      '--modulepath=/etc/puppet/modules/:/etc/fuel/plugins/contrail-4.0/puppet/modules/',
-      '/etc/fuel/plugins/contrail-4.0/puppet/manifests/contrail-compute-dpdk-on-vf.pp',
+      '--modulepath=/etc/puppet/modules/:/etc/fuel/plugins/contrail-5.0/puppet/modules/',
+      '/etc/fuel/plugins/contrail-5.0/puppet/manifests/contrail-compute-dpdk-on-vf.pp',
       '&& sed -i "/contrail-compute-dpdk-on-vf/d" /etc/rc.local']
 
     if $sriov_in_kernel {
