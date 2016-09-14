@@ -826,7 +826,7 @@
   condition:
     yaql_exp: ('dpdk' in $.roles)
   required_for: [deploy_end, contrail-override-repository]
-  requires: [deploy_start, netconfig]
+  requires: [deploy_start, netconfig, contrail-compute-vrouter]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-netconfig-override.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
