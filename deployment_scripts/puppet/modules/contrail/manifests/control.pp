@@ -70,6 +70,16 @@ class contrail::control {
     'IFMAP/user':        value => "${contrail::address}.dns";
   }
 
+  ini_setting { 'control-fdlimit':
+    ensure  => present,
+    path    => '/etc/contrail/supervisord_control.conf',
+    section => 'supervisord',
+    setting => 'minfds',
+    value   => '10240',
+    require => Package['contrail-control'],
+    notify  => Service['supervisor-control'],
+  }
+
   file { '/etc/contrail/dns/contrail-named.conf':
     content => template('contrail/contrail-named.conf.erb'),
     require => Package['contrail-dns'],
