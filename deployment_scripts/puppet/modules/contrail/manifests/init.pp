@@ -218,4 +218,5 @@ class contrail {
     $vmware_iface_name                          = get_vmware_devices()
   }
 
+  $aaa_mode = pick($settings['aaa_mode'], 'cloud-admin')
 }

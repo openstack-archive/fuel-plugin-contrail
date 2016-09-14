@@ -93,7 +93,7 @@ class contrail::config {
     'DEFAULTS/cassandra_server_list':     value => $contrail::contrail_db_list_9160;
     'DEFAULTS/listen_ip_addr':            value => '0.0.0.0';
     'DEFAULTS/listen_port':               value => '9100';
-    'DEFAULTS/aaa_mode':                  value => 'cloud-admin';
+    'DEFAULTS/aaa_mode':                  value => $contrail::aaa_mode;
     'DEFAULTS/cloud_admin_role':          value => 'admin';
     'DEFAULTS/log_file':                  value => '/var/log/contrail/contrail-api.log';
     'DEFAULTS/log_local':                 value => '1';
