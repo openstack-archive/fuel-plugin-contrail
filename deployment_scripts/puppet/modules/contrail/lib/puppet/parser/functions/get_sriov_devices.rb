@@ -36,22 +36,6 @@ module Puppet::Parser::Functions
 
     sriov_hash = Hash.new
 
-    Dir.foreach('/sys/class/net') do |network_interface|
-      next if network_interface == '.' or network_interface == '..'
-      network_interface_path = "/sys/class/net/" + network_interface
-      if (File.exists?(network_interface_path + "/device/sriov_totalvfs") and
-          not bridge_interfaces.include?(network_interface) and
-          not bond_interfaces.include?(network_interface))
-        system "ip link set #{network_interface} up"
-        sleep 30   # wait to be sure that interface became up
-        if IO.read(network_interface_path + "/operstate").to_s.strip == "up"
-          sriov_hash[network_interface] = Hash.new
-          sriov_hash[network_interface]["totalvfs"] = IO.read(network_interface_path + "/device/sriov_totalvfs").to_i
-          sriov_hash[network_interface]["numvfs"] = IO.read(network_interface_path + "/device/sriov_numvfs").to_i
-        end
-      end
-    end
-
     if dpdk_on_vf
       hiera_data_key = "priv_int_sriov_data"
       private_interface = args[1]
