@@ -93,16 +93,29 @@ attributes:
         action: "hide"
   dpdk_on_vf:
     value: false
-    label: "DPDK on VF (experimental)"
+    label: "DPDK on VF"
     description: "Configure DPDK vrouter use VF network adapter"
     weight: 160
     type: "checkbox"
     restrictions:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
         action: "hide"
+  dpdk_physnet:
+    value: 'physnet2'
+    label: 'Provide name for physical net'
+    description: >
+      This physical network will be provided for SRIOV capable interfaces used with DPDK on VF.
+    weight: 220
+    type: 'text'
+    regex:
+      source: '^\w+$'
+      error: "Name has to be alphanumeric"
+    restrictions:
+      - action: hide
+        condition: not (settings:contrail.dpdk_on_vf.value == true)
   enable_tor_agents:
     value: false
-    label: "Enable ToR agents (experimental)"
+    label: "Enable ToR agents"
     description: "Enable this option to unlock the Tor Agent configuration feature."
     weight: 230
     type: "checkbox"
@@ -210,7 +223,7 @@ attributes:
         action: "hide"
   aaa_mode:
     type: "select"
-    weight: 340
+    weight: 64
     value: "cloud-admin"
     label: "AAA Mode"
     description: "Authentication mode"

@@ -14,3 +14,6 @@ post-up ip route add <%= gw %>/32 via <%= scope.lookupvar('contrail::gateway') %
 post-up ip route add <%= route['net'] %> via <%= route['via'] %> dev vhost0
 <% end -%>
 <% end -%>
+<% if scope.lookupvar('contrail::compute_dpdk_enabled') -%>
+post-up ip link set vhost0 address <%= @dpdk_dev_mac %>
+<% end -%>
