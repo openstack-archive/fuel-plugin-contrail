@@ -191,6 +191,7 @@ class contrail::controller {
     'QUOTAS/quota_network':               value => '-1';
     'QUOTAS/quota_subnet':                value => '-1';
     'QUOTAS/quota_port':                  value => '-1';
+    'QUOTAS/quota_driver':                value => 'neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDriver';
   } ->
   file { '/etc/contrail/vnc_api_lib.ini':
     content => template('contrail/vnc_api_lib.ini.erb')
