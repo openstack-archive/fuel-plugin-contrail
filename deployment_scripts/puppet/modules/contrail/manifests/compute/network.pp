@@ -18,6 +18,9 @@ class contrail::compute::network {
   $netmask        = $contrail::netmask_short
   $default_gw     = undef
 
+  $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
+  $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
+
   $br_file = $::operatingsystem ? {
     'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
     'CentOS' => '/etc/sysconfig/network-scripts/ifcfg-br-mesh',
@@ -39,6 +42,15 @@ class contrail::compute::network {
   exec {'flush_addr_br_mesh':
     command => 'ip addr flush dev br-mesh',
     onlyif  => 'ip addr show dev br-mesh | grep -q inet',
+  }
+
+  if $contrail::compute_dpdk_enabled {
+    $dpdk_mac = $::mac_from_vrouter
+    if $dpdk_mac {
+      $dpdk_dev_mac = $dpdk_mac
+    } else {
+      $dpdk_dev_mac = $dev_mac
+    }
   }
 
   case $::operatingsystem {
