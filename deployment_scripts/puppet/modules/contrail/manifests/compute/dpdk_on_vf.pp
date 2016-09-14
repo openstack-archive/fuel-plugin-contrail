@@ -14,19 +14,22 @@
 
 class contrail::compute::dpdk_on_vf {
 
-  if $contrail::compute_dpkd_on_vf {
-    $vf_data = get_fv_data($contrail::phys_dev, $contrail::dpdk_vf_number)
+  if $contrail::compute_dpdk_on_vf {
+    $vf_data = get_vf_data($contrail::phys_dev, $contrail::dpdk_vf_number)
     $dpdk_dev_name = "dpdk-vf${contrail::dpdk_vf_number}"
     $dpdk_vf_origin_name = $vf_data['vf_dev_name']
     $dpdk_dev_pci = $vf_data['vf_pci_addr']
     $dpdk_dev_mac = $vf_data['vf_mac_addr']
     $phys_dev = $dpdk_dev_name
     $pci_wl = generate_passthrough_whitelist(
-      $contrail::sriov_physnet,
-      $contrail::compute_dpkd_on_vf,
+      $contrail::dpdk_physnet,
+      $contrail::compute_dpdk_on_vf,
       $contrail::phys_dev,
       $contrail::dpdk_vf_number
       )
+
+    $sriov_hash = get_sriov_devices($contrail::compute_dpdk_on_vf, $contrail::phys_dev)
+    create_resources(contrail::create_vfs, $sriov_hash)
 
     exec { 'rename-dpdk-vf':
       path    => '/bin:/usr/bin:/usr/sbin',
@@ -34,14 +37,19 @@ class contrail::compute::dpdk_on_vf {
       unless  => 'ip link | grep vhost0',
     }
 
+    $interface_config = join(["auto ${dpdk_dev_name}",
+                            "iface ${dpdk_dev_name} inet manual",
+                            "pre-up ip link set ${dpdk_vf_origin_name} name ${dpdk_dev_name}",
+                            ],"\n")
+
+    file {"/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}":
+      ensure  => file,
+      content => $interface_config,
+    }
+
     file {'/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules':
       ensure  => present,
       content => template('contrail/72-contrail-dpdk-on-vf.rules.erb'),
-    }
-
-    file {'/etc/contrail/contrail-vrouter-agent.conf':
-      ensure  => present,
-      content => template('contrail/contrail-vrouter-agent.conf.erb'),
     }
 
     nova_config {
@@ -51,13 +59,6 @@ class contrail::compute::dpdk_on_vf {
     service { 'nova-compute':
       ensure => running,
       enable => true,
-    }
-
-    service {'supervisor-vrouter':
-      ensure    => running,
-      enable    => true,
-      subscribe => [Exec['rename-dpdk-vf'],
-                    File['/etc/contrail/contrail-vrouter-agent.conf']],
     }
   }
 }

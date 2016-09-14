@@ -25,10 +25,7 @@ module Puppet::Parser::Functions
     sriov_hash = function_get_sriov_devices([])
     network_scheme = function_hiera_hash(['network_scheme', {}])
 
-    list = sriov_hash.map { |dev, _|
-      pci_address = function_get_dev_pci_addr([dev, network_scheme])
-      Hash["address" => pci_address, "physical_network" => physnet]
-    }
+    list = function_get_nic_passthrough_whitelist(['sriov'])
 
     if dpdk_on_vf
       hiera_data_key = "priv_int_vfn_wl"
