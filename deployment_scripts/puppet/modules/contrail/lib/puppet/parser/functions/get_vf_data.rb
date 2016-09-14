@@ -13,7 +13,7 @@
 #    under the License.
 
 module Puppet::Parser::Functions
-  newfunction(:get_fv_data, :type => :rvalue, :doc => <<-EOS
+  newfunction(:get_vf_data, :type => :rvalue, :doc => <<-EOS
     Returns interface name, pci address, mac address related to specific virtual function
     example:
       get_vf_data(dev_name, vf_number)
