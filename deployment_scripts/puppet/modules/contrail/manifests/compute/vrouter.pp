@@ -108,7 +108,6 @@ class contrail::compute::vrouter {
     'DISCOVERY/server':                          value => $contrail::contrail_private_vip;
     'DISCOVERY/max_control_nodes':               value => '2';
     'HYPERVISOR/type':                           value => 'kvm';
-    'TASK/thread_count':                         value => '8';
     'METADATA/metadata_proxy_secret':            value => $contrail::metadata_secret;
     'NETWORKS/control_network_ip':               value => $contrail::address;
     'VIRTUAL-HOST-INTERFACE/name':               value => 'vhost0';
