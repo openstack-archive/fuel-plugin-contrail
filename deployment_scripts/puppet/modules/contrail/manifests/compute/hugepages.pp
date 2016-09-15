@@ -42,13 +42,13 @@ class contrail::compute::hugepages {
       } ->
       kernel_parameter { 'hugepages':
         ensure => present,
-        value  => $contrail::hugepages_size,
+        value  => $contrail::hugepages_number,
       }
 
       #This need for vrouter start when 1Gb hugepages not enabled yet
       exec { 'temporary_add_hugepages':
         path    => ['/sbin', '/usr/bin'],
-        command => 'sysctl -w vm.nr_hugepages=256',
+        command => 'sysctl -w vm.nr_hugepages=2000',
         onlyif  => 'test ! -d /sys/kernel/mm/hugepages/hugepages-1048576kB',
       }
       exec { 'reboot_require':
