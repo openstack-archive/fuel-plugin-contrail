@@ -131,14 +131,18 @@
   version: 2.0.0
   groups: ['/.*/']
   required_for: [pre_deployment_end]
-  requires: [gather_vmware_data]
+  requires: [gather_vmware_data, gather_esxi_mac_bindings]
   cross-depends:
     - name: gather_vmware_data
+      role: master
+    - name: gather_esxi_mac_bindings
       role: master
   parameters:
     files:
       - src: /var/lib/fuel/contrail/{CLUSTER_ID}.yaml
         dst: /etc/hiera/override/plugins.yaml
+      - src: /var/lib/fuel/contrail/{CLUSTER_ID}_host_to_mac_bind.yaml
+        dst: /etc/hiera/override/host_to_mac_bind.yaml
     permissions: '0600'
     dir_permissions: '0700'
     cwd: /
@@ -153,6 +157,19 @@
   required_for: [copy_vmware_data]
   parameters:
     cmd: /usr/bin/python /var/www/nailgun/plugins/contrail-3.0/deployment_scripts/get_vmware_settings.py {CLUSTER_ID}
+    timeout: 180
+    cwd: /
+  condition:
+    yaql_exp: *use_vcenter
+
+- id: gather_esxi_mac_bindings
+  type: shell
+  version: 2.0.0
+  role: master
+  requires: [pre_deployment_start]
+  required_for: [copy_vmware_data]
+  parameters:
+    cmd: /usr/bin/python /var/www/nailgun/plugins/contrail-3.0/deployment_scripts/get_dvs.py -e {CLUSTER_ID} -y
     timeout: 180
     cwd: /
   condition:
