@@ -106,7 +106,7 @@ class contrail::contrail_vmware {
       'DEFAULT/physical_interface_address'        : value => $contrail::phys_dev_pci;
       'DEFAULT/physical_interface_mac'            : value => $dev_mac;
       'DEFAULT/log_file'                          : value => '/var/log/contrail/contrail-vrouter-agent.log';
-      'DEFAULT/log_level'                         : value => 'SYS_NOTICE';
+      'DEFAULT/log_level'                         : value => 'SYS_INFO';
       'DEFAULT/log_local'                         : value => '1';
       'DEFAULT/log_flow'                          : value => '1';
       'DEFAULT/use_syslog'                        : value => '1';
