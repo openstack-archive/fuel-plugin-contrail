@@ -156,12 +156,15 @@ class Vcenter_base(object):
         parser.add_argument(
             '--map-ips', action='store_true', dest='map_ips', default=None, help='Map vmware vm\'s to fuel admin ip\'s',
             required=False)
+        parser.add_argument(
+            '--dvs-mtu-ext', type=int, dest='dvs_mtu_ext', help='Max MTU for external DVS', default=None)
+        parser.add_argument(
+            '--dvs-mtu-priv', type=int, dest='dvs_mtu_priv', help='Max MTU for private DVS', default=None)
+        parser.add_argument(
+            '--dvs-mtu-int', type=int, dest='dvs_mtu_int', help='Max MTU for internal DVS', default=None)
 
         args = parser.parse_args()
-        env_id = args.env_id
-        spawn = args.spawn
-        map_ips = args.map_ips
-        return env_id, spawn, map_ips
+        return args
 
     @staticmethod
     def get_vcenter_credentials(cluster_id):
@@ -175,9 +178,12 @@ class Vcenter_base(object):
         if cl:
             # TODO add check if cred setup also check NIC name
             vmware_settings = objects.Cluster.get_vmware_attributes(cl).get('editable')
-            vcenter_host = vmware_settings['value']['availability_zones'][0]['vcenter_host']
-            vcenter_username = vmware_settings['value']['availability_zones'][0]['vcenter_username']
-            vcenter_password = vmware_settings['value']['availability_zones'][0]['vcenter_password']
+            vcenter_host = vmware_settings['value']['availability_zones'][0].get('vcenter_host')
+            vcenter_username = vmware_settings['value']['availability_zones'][0].get('vcenter_username')
+            vcenter_password = vmware_settings['value']['availability_zones'][0].get('vcenter_password')
+            if not vcenter_host or not vcenter_username or not vcenter_password:
+                logging.error('Credentials for vcenter not specified fully. Specify their in Fuel vmware tab.')
+                sys.exit(1)
             return vcenter_host, vcenter_username, vcenter_password
         else:
             logging.error('Could not find cluster with ID: {}'.format(cluster_id))
@@ -268,7 +274,7 @@ class Vcenter_obj_tpl(object):
                                    vmPathName=datastore_path)
         return vmx_file
 
-    def dvs_info(self, dvs_name, private_vlan=None):
+    def dvs_info(self, dvs_name, private_vlan=None, max_mtu=None):
         pvlan_configs = []
         dvs_create_spec = vim.DistributedVirtualSwitch.CreateSpec()
         dvs_config_spec = vim.dvs.VmwareDistributedVirtualSwitch.ConfigSpec()
@@ -294,6 +300,8 @@ class Vcenter_obj_tpl(object):
                 pvlan_configs.append(pvlan_config_spec2)
             dvs_config_spec.pvlanConfigSpec = pvlan_configs
         dvs_config_spec.name = dvs_name
+        if max_mtu:
+            dvs_config_spec.maxMtu = int(max_mtu)
         dvs_create_spec.configSpec = dvs_config_spec
         return dvs_create_spec
 
@@ -337,6 +345,23 @@ class Vcenter_obj_tpl(object):
         dv_pg_spec.defaultPortConfig.securityPolicy.macChanges = vim.BoolPolicy(value=False)
         dv_pg_spec.defaultPortConfig.securityPolicy.inherited = False
         return dv_pg_spec
+
+    def startup_info(self, vm_obj, host_obj):
+        hostdefsettings = vim.host.AutoStartManager.SystemDefaults()
+        hostdefsettings.enabled = True
+        hostdefsettings.startDelay = 120
+        spec = host_obj.configManager.autoStartManager.config
+        spec.defaults = hostdefsettings
+        auto_power_info = vim.host.AutoStartManager.AutoPowerInfo()
+        auto_power_info.key = vm_obj
+        auto_power_info.startAction = 'powerOn'
+        auto_power_info.startDelay = -1
+        auto_power_info.startOrder = -1
+        auto_power_info.stopAction = 'None'
+        auto_power_info.stopDelay = -1
+        auto_power_info.waitForHeartbeat = 'no'
+        spec.powerInfo = [auto_power_info]
+        return spec
 
 
 class Vm(Vcenter_base, Vcenter_obj_tpl):
@@ -460,9 +485,30 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
         task = vm_obj.PowerOnVM_Task()
         self.wait_for_tasks(self.service_instance, [task])
 
+    def enable_startup(self, name):
+        """
+        Enable startup for virtual machine
+
+        :param name:  name of virtual machine
+        """
+        vm_obj = self.get_obj([vim.VirtualMachine], name)
+        if not vm_obj:
+            self.logger.error('VM({}) does not exist. Skip adding to startup VM: {}.'.format(name, name))
+            return
+        host_obj = vm_obj.summary.runtime.host
+        power_info = host_obj.configManager.autoStartManager.config.powerInfo
+        if not host_obj:
+            self.logger.warning('Host({}) does not exist. Skip adding to startup VM: {}.'.format(host_obj.name, name))
+            return
+        if any(pf.key == vm_obj for pf in power_info):
+            self.logger.info('VM({}) already added to startup. Skip adding to startup VM: {}.'.format(name, name))
+        spec = self.startup_info(vm_obj, host_obj)
+        host_obj.configManager.autoStartManager.ReconfigureAutostart(spec)
+        self.logger.info('Enable startup for VM: {}'.format(name))
+
 
 class Dvs(Vcenter_base, Vcenter_obj_tpl):
-    def create(self, dvs_name, private_vlan):
+    def create(self, dvs_name, private_vlan, max_mtu=None):
         """
         Create Distributed Virtual Switch
 
@@ -473,7 +519,7 @@ class Dvs(Vcenter_base, Vcenter_obj_tpl):
         if dvs_obj:
             self.logger.info('DVS({}) already exist. Skip creation DVS: {}.'.format(dvs_name, dvs_name))
             return dvs_obj
-        dvs_spec = self.dvs_info(dvs_name, private_vlan)
+        dvs_spec = self.dvs_info(dvs_name, private_vlan, max_mtu)
         self.logger.info('Creating DVS {}...'.format(dvs_name))
         task = self.network_folder.CreateDVS_Task(dvs_spec)
         self.wait_for_tasks(self.service_instance, [task])
@@ -491,7 +537,6 @@ class Dvs(Vcenter_base, Vcenter_obj_tpl):
             self.logger.warning('DVS({}) does not exist. Skip adding Hosts: {}.'.format(dvs_name, str(hosts_list)))
             return
         for h in hosts_list:
-            # FIXME it can be implement for all hosts together
             host = h['host']
             uplink = h['uplink']
             if any(dvs_host.config.host.name == host for dvs_host in dvs_obj.config.host):
@@ -607,7 +652,11 @@ class Vcenterdata(object):
 
 if __name__ == '__main__':
     # Parse parameter from command line
-    env_id, spawn, map_ips = Vcenter_base.get_args()
+    args = Vcenter_base.get_args()
+    env_id = args.env_id
+    dvs_mtu_ext = args.dvs_mtu_ext
+    dvs_mtu_priv = args.dvs_mtu_priv
+    dvs_mtu_int = args.dvs_mtu_int
     # Get credential to vCenter from Fuel vmware tab
     vcenter_host, vcenter_username, vcenter_password = Vcenter_base.get_vcenter_credentials(env_id)
     user_data = {'vcenter_ip': vcenter_host, 'vcenter_user': vcenter_username, 'vcenter_password': vcenter_password}
@@ -648,20 +697,20 @@ if __name__ == '__main__':
         vmware_data = vmware_data_new
     vmware_datastore.put(vmware_data)
 
-    if spawn:
+    if args.spawn:
         # Create DVS's and DVPG's
         dvs = Dvs(si=si)
         dvpg = Dvpg(si=si)
 
-        dvs.create(dvs_name=dvs_external, private_vlan=False)
+        dvs.create(dvs_name=dvs_external, private_vlan=False, max_mtu=dvs_mtu_ext)
         dvs.add_hosts(hosts_list=host_list_dvs_ext, dvs_name=dvs_external, attach_uplink=True)
         dvpg.create(dv_pg_name=dvpg_external, dvs_name=dvs_external, vlan_type='trunk', vlan_list=[0, 4094])
 
-        dvs.create(dvs_name=dvs_internal, private_vlan=True)
+        dvs.create(dvs_name=dvs_internal, private_vlan=True, max_mtu=dvs_mtu_int)
         dvs.add_hosts(hosts_list=host_list_dvs_int, dvs_name=dvs_internal, attach_uplink=False)
         dvpg.create(dv_pg_name=dvpg_internal, dvs_name=dvs_internal, vlan_type='trunk', vlan_list=[0, 4094])
 
-        dvs.create(dvs_name=dvs_private, private_vlan=False)
+        dvs.create(dvs_name=dvs_private, private_vlan=False, max_mtu=dvs_private)
         dvs.add_hosts(hosts_list=host_list_dvs_priv, dvs_name=dvs_private, attach_uplink=True)
         dvpg.create(dv_pg_name=dvpg_private, dvs_name=dvs_private, vlan_type='trunk', vlan_list=[0, 4094])
 
@@ -678,7 +727,7 @@ if __name__ == '__main__':
             vm.add_nic(dv_pg_name=dvpg_private)
             vm.add_nic(dv_pg_name=dvpg_internal)
             vm.create(name=vm_name, cpu=vm_cpu, memory=vm_memory, storage_name=storage_name, host=vm_host)
+            vm.enable_startup(vm_name)
             vm.power_on(vm_name)
-    elif map_ips:
+    elif args.map_ips:
         vmware_datastore.add_admin_ip()
-
