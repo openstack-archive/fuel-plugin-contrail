@@ -42,7 +42,7 @@ class contrail::compute::hugepages {
       } ->
       kernel_parameter { 'hugepages':
         ensure => present,
-        value  => $contrail::hugepages_size,
+        value  => $contrail::hugepages_number,
       }
 
       #This need for vrouter start when 1Gb hugepages not enabled yet
