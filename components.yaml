@@ -7,7 +7,3 @@
   compatible:
     - name: 'hypervisor:kvm'
     - name: 'hypervisor:qemu'
-  incompatible:
-    - name: 'hypervisor:vmware'
-      description: 'Contrail plugin is not compatible with VMware for now'
-
