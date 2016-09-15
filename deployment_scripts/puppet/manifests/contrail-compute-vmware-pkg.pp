@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-compute-pkg.pp')
+notice('MODULAR: contrail/contrail-compute-vmware-pkg.pp')
 
 include contrail
 class { 'contrail::compute::vmware_pkg': }
