@@ -224,7 +224,7 @@ attributes:
         action: "hide"
   dvs_internal:
     value: "Contrail-DVS-Int"
-    label: "Private DVS name"
+    label: "Internal DVS name"
     description: "Name of DVS that need for internal contrail traffic"
     weight: 330
     type: "text"
