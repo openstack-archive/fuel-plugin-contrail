@@ -99,7 +99,7 @@ class contrail::compute::vrouter {
 
   contrail_vrouter_agent_config {
     'DEFAULT/log_file':                          value => '/var/log/contrail/contrail-vrouter-agent.log';
-    'DEFAULT/log_level':                         value => 'SYS_NOTICE';
+    'DEFAULT/log_level':                         value => 'SYS_INFO';
     'DEFAULT/log_local':                         value => '1';
     'DEFAULT/log_flow':                          value => '1';
     'DEFAULT/use_syslog':                        value => '1';
