@@ -17,7 +17,7 @@ require 'hiera'
 
 Facter.add("mac_from_vrouter") do
   setcode do
-    output=`vif --list`
+    output=`vif --get 0`
     hiera = Hiera.new(:config => '/etc/hiera.yaml')
     network_scheme = hiera.lookup('network_scheme', {}, {}, nil, :hash)
 
