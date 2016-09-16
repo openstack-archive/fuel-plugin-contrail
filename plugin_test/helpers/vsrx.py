@@ -14,6 +14,7 @@ under the License.
 """
 
 import subprocess
+import time
 from fuelweb_test import logger
 from devops.helpers.helpers import wait
 from devops.helpers.helpers import tcp_ping
@@ -97,13 +98,16 @@ def multiple_networks(obj, vsrx_ip, net_name):
             ip_private_net_default) + 'next-table public.inet.0',
         'set routing-options dynamic-tunnels dynamic_overlay_tunnels'
         ' destination-networks {0}'.format(ip_private_net),
-        'commit']
+        'commit',
+        'exit',
+        'show configuration']
 
     wait(
         lambda: tcp_ping(vsrx_ip, 22), timeout=60 * 2, interval=10,
         timeout_msg="Node {0} is not accessible by SSH.".format(vsrx_ip))
     with obj.env.d_env.get_ssh_to_remote(vsrx_ip) as remote:
         for command in commands:
+            logger.info('Execute command {0} on VSRX'.format(command))
             remote.execute_async(command)
 
 
