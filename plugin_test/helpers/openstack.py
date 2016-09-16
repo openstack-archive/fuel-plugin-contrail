@@ -194,9 +194,23 @@ def enable_sriov(obj):
 
 
 def check_slave_memory(min_memory):
+    """Check memmory on slave."""
     if HARDWARE["slave_node_memory"] < min_memory:
         error_msg = 'Out of slaves ram'
         raise MemoryError(error_msg)
     else:
         msg = 'Slaves have {0} mb ram'.format(HARDWARE["slave_node_memory"])
         logger.info(msg)
+
+
+def setup_hugepages(obj, hp_2mb=512, hp_1gb=6, hp_dpdk_mb=0):
+    """Set value of huge page on dpdk node."""
+    node_mac = obj.bm_drv.conf['target_macs']
+    nailgun_node = obj.bm_drv.get_bm_node(obj, node_mac)
+    node_attributes = obj.fuel_web.client.get_node_attributes(
+        nailgun_node['id'])
+    node_attributes['hugepages']['nova']['value']['2048'] = hp_2mb
+    node_attributes['hugepages']['nova']['value']['1048576'] = hp_1gb
+    node_attributes['hugepages']['dpdk']['value'] = hp_dpdk_mb
+    obj.fuel_web.client.upload_node_attributes(node_attributes,
+                                                    nailgun_node['id'])

@@ -281,7 +281,7 @@ class TestContrailCheck(object):
         logger.info('Make snapshot of the created instance.')
         image = self.os_conn.nova.servers.create_image(srv_1, self.image_name)
         wait(lambda: self.os_conn.nova.images.get(image).status == 'ACTIVE',
-             timeout=1800, timeout_msg='Image is not active.')
+             timeout=300, timeout_msg='Image is not active.')
 
         logger.info('Delete the last created instance.')
         self.os_conn.delete_instance(srv_1)

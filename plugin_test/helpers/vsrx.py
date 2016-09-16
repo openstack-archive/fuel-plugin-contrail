@@ -14,22 +14,22 @@ under the License.
 """
 
 import subprocess
-from fuelweb_test import logger
+
 from devops.helpers.helpers import wait
 from devops.helpers.helpers import tcp_ping
+from fuelweb_test import logger
 
 from helpers import settings
 
 
 def activate(
-    obj=None, add_network=None, vsrx_config=False, vsrx_ip='10.109.4.250'):
+    obj=None, add_network=None, upload_config=False, vsrx_ip='10.109.4.250'):
     """Activate vSRX1 image.
 
     :param obj: Test case object
     :param vsrx_ip: ip of vSRX router
     :param add_network: name of no default private network which add to
                        vsrx configuration
-    :param vsrx_config: upload vsrx configuration template
 
     """
     def call_cmd(cmd):
@@ -68,7 +68,7 @@ def activate(
     if add_network:
         assert obj, "obj is None"
         multiple_networks(obj, vsrx_ip, add_network)
-    if vsrx_config and settings.VSRX_CONFIG_PATH:
+    if upload_config and settings.VSRX_CONFIG_PATH:
         assert obj, "obj is None"
         upload_config(obj, settings.VSRX_CONFIG_PATH, vsrx_ip)
     return True
