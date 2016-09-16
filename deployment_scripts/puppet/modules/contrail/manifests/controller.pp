@@ -80,7 +80,7 @@ class contrail::controller {
     ensure => 'present',
     line   => '. /etc/default/neutron-server',
     path   => '/etc/init/neutron-server.conf',
-    after  => 'neutron_plugin_ini_path',
+    after  => '^script',
   }
   file { '/etc/contrail/vnc_api_lib.ini':
     content => template('contrail/vnc_api_lib.ini.erb')
