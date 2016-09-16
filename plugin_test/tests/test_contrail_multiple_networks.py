@@ -816,7 +816,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate(self, add_network='private2',
-                                               upload_config=True)
+                                               vsrx_config=True)
 
         self.show_step(7)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
