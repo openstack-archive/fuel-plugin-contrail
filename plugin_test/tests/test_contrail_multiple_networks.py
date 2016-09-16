@@ -670,7 +670,7 @@ class TestMultipleNets(TestMultipleClusterNets):
             11. Put new json on master node and update network data
             12. Verify that new IP ranges are applied for network config
             13. Add following nodes to default nodegroup:
-                * 3 controller
+                * 1 controller
             14. Add following nodes to custom nodegroup:
                 * 1 compute+ceph-osd
                 * 1 contrail-config+contrail-control+contrail-db+
@@ -702,7 +702,7 @@ class TestMultipleNets(TestMultipleClusterNets):
                 'osd_pool_size': '1'})
 
         cluster_id = self.fuel_web.get_last_created_cluster()
-        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:1])
 
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
@@ -719,7 +719,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.fuel_web.client.delete_nodegroup(custom_group2['id'])
 
         self.show_step(7)
-        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:7])
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[1:5])
 
         self.show_step(8)
         updated_storage_default, updated_storage_custom, \
@@ -734,13 +734,11 @@ class TestMultipleNets(TestMultipleClusterNets):
             cluster_id,
             {
                 'slave-01': [['controller'], nodegroup_default],
-                'slave-02': [['controller'], nodegroup_default],
-                'slave-03': [['controller'], nodegroup_default],
-                'slave-04': [
+                'slave-02': [
                     ['contrail-config', 'contrail-control', 'contrail-db',
                      'contrail-analytics'], nodegroup_custom1],
-                'slave-05': [['contrail-analytics-db'], nodegroup_custom1],
-                'slave-06': [['compute', 'ceph-osd'], nodegroup_custom1],
+                'slave-03': [['contrail-analytics-db'], nodegroup_custom1],
+                'slave-04': [['compute', 'ceph-osd'], nodegroup_custom1],
             }
         )
         self.show_step(14)
@@ -752,7 +750,7 @@ class TestMultipleNets(TestMultipleClusterNets):
             self.fuel_web.run_ostf(cluster_id=cluster_id)
 
         self.show_step(16)
-        conf_compute = {'slave-07': [['compute'], nodegroup_custom1]}
+        conf_compute = {'slave-05': [['compute'], nodegroup_custom1]}
 
         self.fuel_web.update_nodes(cluster_id, conf_compute)
 
@@ -816,7 +814,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate(self, add_network='private2',
-                                               upload_config=True)
+                                               vsrx_config=True)
 
         self.show_step(7)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
