@@ -151,8 +151,7 @@ def activate_dpdk(obj, **kwargs):
     openstack.assign_vlan(obj, storage=102, management=101)
 
     opts = {
-        'contrail_global_dpdk': True,
-        'hugepages_amount': '60',
+        'contrail_global_dpdk': True
     }
     if kwargs:
         opts.update(kwargs)

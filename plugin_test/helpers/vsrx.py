@@ -14,9 +14,10 @@ under the License.
 """
 
 import subprocess
-from fuelweb_test import logger
+
 from devops.helpers.helpers import wait
 from devops.helpers.helpers import tcp_ping
+from fuelweb_test import logger
 
 from helpers import settings
 
