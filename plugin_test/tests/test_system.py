@@ -727,5 +727,5 @@ class SystemTests(TestBasic):
         for instance in [access_point, instance]:
             os_conn.delete_instance(instance)
             wait(
-                lambda: self.os_conn.is_srv_deleted(instance),
+                lambda: os_conn.is_srv_deleted(instance),
                 timeout=200, timeout_msg="Instance was not deleted.")

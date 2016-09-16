@@ -97,14 +97,18 @@ def multiple_networks(obj, vsrx_ip, net_name):
             ip_private_net_default) + 'next-table public.inet.0',
         'set routing-options dynamic-tunnels dynamic_overlay_tunnels'
         ' destination-networks {0}'.format(ip_private_net),
-        'commit']
+        'commit',
+        'exit']
 
     wait(
         lambda: tcp_ping(vsrx_ip, 22), timeout=60 * 2, interval=10,
         timeout_msg="Node {0} is not accessible by SSH.".format(vsrx_ip))
     with obj.env.d_env.get_ssh_to_remote(vsrx_ip) as remote:
         for command in commands:
+            logger.info('Exexute command {0} on VSRX'.format(command))
             remote.execute_async(command)
+        output = remote .execute('show configuration')
+        logger.info('{0}'.format(output))
 
 
 def upload_config(obj, config_path, vsrx_ip):
