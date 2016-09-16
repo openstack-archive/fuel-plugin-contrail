@@ -190,3 +190,15 @@ def enable_sriov(obj):
                 interface['interface_properties']['sriov']['sriov_totalvfs']
     obj.fuel_web.client.put_node_interfaces(
         [{'id': nailgun_node['id'], 'interfaces': node_networks}])
+
+
+def setup_hugepages(obj, hp_2mb=0, hp_1gb=0, hp_dpdk_mb=0):
+    node_mac = obj.bm_drv.conf['target_macs']
+    nailgun_node = obj.bm_drv.get_bm_node(obj, node_mac)
+    node_attributes = obj.fuel_web.client.get_node_attributes(
+        nailgun_node['id'])
+    node_attributes['hugepages']['nova']['value']['2048'] = hp_2mb
+    node_attributes['hugepages']['nova']['value']['1048576'] = hp_1gb
+    node_attributes['hugepages']['dpdk']['value'] = hp_dpdk_mb
+    obj.fuel_web.client.upload_node_attributes(node_attributes,
+                                                    nailgun_node['id'])
