@@ -557,6 +557,7 @@ class SRIOVTests(TestBasic):
             nodes_dict=conf_nodes,
             update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
+        openstack.assign_vlan(self, storage=102, management=101)
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
