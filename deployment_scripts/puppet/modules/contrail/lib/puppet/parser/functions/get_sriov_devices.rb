@@ -38,7 +38,7 @@ module Puppet::Parser::Functions
 
     if dpdk_on_vf
       hiera_data_key = "priv_int_sriov_data"
-      private_interface = args[1]
+      private_interface = args[1].sub(/\..*/, '')
       private_interface_path = "/sys/class/net/" + private_interface
       if (File.exists?(private_interface_path + "/device/sriov_totalvfs"))
         sriov_hash[private_interface] = Hash.new
