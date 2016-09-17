@@ -29,7 +29,7 @@ module Puppet::Parser::Functions
 
     if dpdk_on_vf
       hiera_data_key = "priv_int_vfn_wl"
-      priv_int = args[2]
+      priv_int = args[2].sub(/\..*/, '')
       dpdk_vf_number = args[3]
       if (File.exists?("/sys/class/net/#{priv_int}"))
         vfn = Dir.glob "/sys/class/net/#{priv_int}/device/virtfn*"
