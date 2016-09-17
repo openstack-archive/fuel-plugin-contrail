@@ -44,19 +44,10 @@ class contrail::compute::network {
     $dpdk_vf_origin_name = $vf_data['vf_dev_name']
     $dpdk_dev_pci = $vf_data['vf_pci_addr']
     $dpdk_dev_mac = $vf_data['vf_mac_addr']
-
+    $raw_phys_dev = regsubst($::contrail::phys_dev, '\..*' , '')
     exec { 'rename-dpdk-vf':
       command => "ip link set ${dpdk_vf_origin_name} name ${dpdk_dev_name}",
       unless  => "ip link | grep ${dpdk_dev_name}",
-    } ->
-    exec { 'set-dpdk-vf-vlan':
-      command => "ip link set link dev ${contrail::phys_dev} vf ${contrail::dpdk_vf_number} vlan 0"
-    }
-    exec { 'set-dpdk-vf-up':
-      command => "ip link set link dev ${dpdk_dev_name} up",
-    } ->
-    exec { 'set-dpdk-vf-spoof':
-      command => "ip link set link dev ${contrail::phys_dev} vf ${contrail::dpdk_vf_number} spoof off",
     }
 
     file {'/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules':
@@ -66,14 +57,46 @@ class contrail::compute::network {
 
     $interface_config = join(["auto ${dpdk_dev_name}",
                             "iface ${dpdk_dev_name} inet manual",
-                            "pre-up ip link set link dev ${contrail::phys_dev} vf ${contrail::dpdk_vf_number} vlan 0",
-                            "post-up ip link set link dev ${contrail::phys_dev} vf ${contrail::dpdk_vf_number} spoof off",
+                            "pre-up ip link set link dev ${raw_phys_dev} vf ${contrail::dpdk_vf_number} vlan 0",
+                            "post-up ip link set link dev ${raw_phys_dev} vf ${contrail::dpdk_vf_number} spoof off",
                             ],"\n")
+    # Add vlan interface config if needed
+    if ($::contrail::phys_dev != $raw_phys_dev) {
+
+      $vlan_tag = regsubst($::contrail::phys_dev, '^.+\.' , '')
+      $vlan_interface_config = join(["auto ${dpdk_dev_name}.${vlan_tag}",
+                                     "iface ${dpdk_dev_name}.${vlan_tag} inet manual",
+                                     "vlan-raw-device dpdk_dev_name"
+                                    ],"\n")
+
+      file {"/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}.${vlan_tag}":
+        ensure  => file,
+        content => $vlan_interface_config,
+        require => [File['/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules'],
+                    File["/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}"],
+                    ],
+      }
+
+      exec { "ifup_${dpdk_dev_name}.${vlan_tag}":
+        command      => "ifup ${dpdk_dev_name}.${vlan_tag}",
+        unless       => "ip link show dev ${dpdk_dev_name}.${vlan_tag} | grep ,UP",
+        require      => [File["/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}.${vlan_tag}"],
+                         Exec["ifup_${dpdk_dev_name}"],
+                         ],
+      }
+
+    }
 
     file {"/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}":
       ensure  => file,
       content => $interface_config,
       require => File['/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules'],
+    }
+
+    exec { "ifup_${dpdk_dev_name}":
+      command      => "ifup ${dpdk_dev_name}",
+      unless       => "ip link show dev ${dpdk_dev_name} | grep ,UP",
+      require      => File["/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}"],
     }
   }
 
