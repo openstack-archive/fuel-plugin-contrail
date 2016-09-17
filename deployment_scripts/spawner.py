@@ -162,6 +162,9 @@ class Vcenter_base(object):
             '--dvs-mtu-priv', type=int, dest='dvs_mtu_priv', help='Max MTU for private DVS', default=None)
         parser.add_argument(
             '--dvs-mtu-int', type=int, dest='dvs_mtu_int', help='Max MTU for internal DVS', default=None)
+        parser.add_argument(
+            '--reduce-vm-params', action='store_true', dest='reduce_vm_params',
+            help='Reduce memory value for ContrailVM\'s', default=None)
 
         args = parser.parse_args()
         return args
@@ -671,9 +674,12 @@ if __name__ == '__main__':
     esxi_uplink_priv = Vcenter_base.get_contrail_settings(env_id, 'esxi_uplink_priv')
     storage_name = Vcenter_base.get_contrail_settings(env_id, 'esxi_datastore_name')
 
-    vm_disk_size = 20  # GB
+    vm_disk_size = 10  # GB
     vm_cpu = 2  # Amount
-    vm_memory = 1024  # MB
+    if args.reduce_vm_params:
+        vm_memory = 2048  # MB
+    else:
+        vm_memory = 8228  # MB
 
     vcenter_connect = Vcenter_base(user_data)
     si = vcenter_connect.connect_to_vcenter()
@@ -731,3 +737,4 @@ if __name__ == '__main__':
             vm.power_on(vm_name)
     elif args.map_ips:
         vmware_datastore.add_admin_ip()
+
