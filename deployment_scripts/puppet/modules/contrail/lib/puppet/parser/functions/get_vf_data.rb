@@ -20,7 +20,7 @@ module Puppet::Parser::Functions
     EOS
   ) do |args|
 
-    dev_name = args[0]
+    dev_name = args[0].sub(/\..*/, '')
     vf_number = args[1]
     vf_sys = "/sys/class/net/#{dev_name}/device/virtfn#{vf_number}"
     vf_data = Hash.new
