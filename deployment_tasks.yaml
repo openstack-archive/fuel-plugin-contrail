@@ -949,19 +949,34 @@
 
 - id: sahara-contrail
   type: puppet
-  version: 2.0.0
-  role: [primary-controller, controller]
-  condition: "settings:additional_components.sahara.value == true"
-  required_for: [post_deployment_end]
-  requires: [openstack-controller-provision]
+  version: 2.1.0
+  groups: [primary-controller, controller]
+  condition:
+    yaql_exp: >
+      $.sahara.enabled and changedAny($.access, $.sahara, $.rabbit,
+      $.public_ssl, $.ceilometer,
+      ('primary-controller' in $.roles), $.network_metadata.vips,
+      $.get('database_vip'), $.quantum_settings, $.quantum, $.network_scheme,
+      $.get('syslog_log_facility_sahara'), $.debug, $.get('verbose'),
+      $.get('default_log_levels'), $.get('use_syslog'), $.get('use_stderr'),
+      $.get('rabbit_ha_queues'), $.get('amqp_port'),
+      $.network_metadata.nodes.values().where(
+        $.node_roles.any($.matches('controller'))).network_roles.select(
+          $.get('mgmt/messaging')), $.get('amqp_hosts'),
+      $.get('external_lb'), $.get('use_ssl'), $.get('kombu_compression'))
+  required_for: [deploy_end]
+  requires: [openstack-network-end, horizon, openstack-controller-provision]
+  cross-depends:
+    - name: sahara-db
+    - name: sahara-keystone
   parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/sahara/sahara.pp
+    puppet_manifest: /etc/puppet/modules/openstack_tasks/examples/sahara/sahara.pp
     puppet_modules: /etc/puppet/modules
     timeout: 3600
   test_pre:
-    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/sahara/sahara_pre.rb
+    cmd: ruby /etc/puppet/modules/openstack_tasks/examples/sahara/sahara_pre.rb
   test_post:
-    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/sahara/sahara_post.rb
+    cmd: ruby /etc/puppet/modules/openstack_tasks/examples/sahara/sahara_post.rb
 
 ##############################################################
 #  Compute vmware tasks section
