@@ -27,6 +27,19 @@ class contrail::controller::scheduler {
     }
   }
 
+  if $contrail::settings['dpdk_on_vf'] {
+    ini_subsetting {'add_pci_passthrough_filter':
+      ensure             => present,
+      section            => 'DEFAULT',
+      key_val_separator  => '=',
+      path               => '/etc/nova/nova.conf',
+      setting            => 'scheduler_default_filters',
+      subsetting         => 'PciPassthroughFilter',
+      subsetting_separator => ',',
+      notify             => Service['nova-scheduler'],
+    }
+  }
+
   Ini_subsetting <||> ~>
   service { 'nova-scheduler':
     ensure    => $ensure,
