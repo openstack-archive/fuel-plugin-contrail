@@ -14,9 +14,18 @@
 
 class contrail::compute::vrouter {
 
+  $raw_phys_dev = regsubst($::contrail::phys_dev, '\..*' , '')
+  $vlan_tag = regsubst($::contrail::phys_dev, '^.+\.' , '')
+
   if $contrail::compute_dpdk_on_vf {
     $vf_data = get_vf_data($contrail::phys_dev, $contrail::dpdk_vf_number)
-    $phys_dev = "dpdk-vf${contrail::dpdk_vf_number}"
+
+    # Add vlan to phys_dev if needed
+    if ($::contrail::phys_dev != $raw_phys_dev) {
+      $phys_dev = "dpdk-vf${contrail::dpdk_vf_number}.${vlan_tag}"
+    } else {
+      $phys_dev = "dpdk-vf${contrail::dpdk_vf_number}"
+    }
     $dpdk_dev_pci = $vf_data['vf_pci_addr']
     $dev_mac = $vf_data['vf_mac_addr']
   } else {
@@ -44,7 +53,6 @@ class contrail::compute::vrouter {
       }
     }
 
-    $raw_phys_dev = regsubst($::contrail::phys_dev, '\..*' , '')
     # in case of bonds, MAC address should be set permanently, because slave interfaces
     # may start in random order during the boot process
     if ( 'bond' in $raw_phys_dev) {

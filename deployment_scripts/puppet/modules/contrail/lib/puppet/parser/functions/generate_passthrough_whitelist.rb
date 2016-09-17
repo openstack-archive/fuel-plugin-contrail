@@ -25,11 +25,14 @@ module Puppet::Parser::Functions
     sriov_hash = function_get_sriov_devices([])
     network_scheme = function_hiera_hash(['network_scheme', {}])
 
-    list = function_get_nic_passthrough_whitelist(['sriov'])
+    list = []
+    if function_get_nic_passthrough_whitelist(['sriov'])
+      list += function_get_nic_passthrough_whitelist(['sriov'])
+    end
 
     if dpdk_on_vf
       hiera_data_key = "priv_int_vfn_wl"
-      priv_int = args[2]
+      priv_int = args[2].sub(/\..*/, '')
       dpdk_vf_number = args[3]
       if (File.exists?("/sys/class/net/#{priv_int}"))
         vfn = Dir.glob "/sys/class/net/#{priv_int}/device/virtfn*"
