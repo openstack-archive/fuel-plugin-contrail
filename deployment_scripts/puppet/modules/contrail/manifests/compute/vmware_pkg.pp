@@ -32,9 +32,9 @@ exec { 'fix wrong tzdata':
 package { $vcenter_compute_pkgs: }
 
 # Install vCenter-specific contrail packages
+package { 'contrail-install-vcenter-plugin': } ->
 package { ['libxml-commons-external-java', 'libxml-commons-resolver1.1-java', 'libxerces2-java',
             'libslf4j-java', 'libnetty-java', 'libjline-java', 'libzookeeper-java']: } ->
-package { 'contrail-install-vcenter-plugin': } ->
 package { ['libcontrail-java-api','libcontrail-vijava','libcontrail-vrouter-java-api']: } ->
 package { 'contrail-vcenter-plugin': }
 

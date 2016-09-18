@@ -34,9 +34,7 @@ class contrail::contrail_vmware {
 
     package { $install_packages:
       ensure => present,
-      tag    => ['install'],
     } ->
-
     file {'/etc/contrail/agent_param':
       ensure  => present,
       content => template('contrail/agent_param.erb'),
@@ -54,7 +52,7 @@ class contrail::contrail_vmware {
       'DEFAULT/syslog_facility'                   : value => 'LOG_LOCAL0';
       'DEFAULT/headless_mode'                     : value => true;
       'DISCOVERY/server'                          : value => $contrail::contrail_private_vip;
-      'DISCOVERY/max_control_nodes'               : value => '2';               # TODO check this param
+      'DISCOVERY/max_control_nodes'               : value => '2'; 
       'HYPERVISOR/type'                           : value => 'vmware';
       'HYPERVISOR/vmware_mode'                    : value => 'vcenter';
       'HYPERVISOR/vmware_physical_interface'      : value => $contrail::vmware_iface_name;
@@ -75,25 +73,23 @@ class contrail::contrail_vmware {
       command => '/bin/rm /etc/init/supervisor-vrouter.override',
       onlyif  => '/usr/bin/test -f /etc/init/supervisor-vrouter.override',
       require => Package[$install_packages],
-    }
-
-    service {'supervisor-vrouter':
-      ensure     => running,
-      enable     => true,
-      hasrestart => false,
-      restart    => 'service supervisor-vrouter stop && \
-modprobe -r vrouter && \
-sync && \
-echo 3 > /proc/sys/vm/drop_caches && \
-echo 1 > /proc/sys/vm/compact_memory && \
-service supervisor-vrouter start',
+    } ->
+    exec { 'restart_supervisor_vrouter':
+      path => '/usr/bin:/usr/sbin:/bin:/sbin',
+      command => 'service supervisor-vrouter stop && \
+    modprobe -r vrouter && \
+    sync && \
+    echo 3 > /proc/sys/vm/drop_caches && \
+    echo 1 > /proc/sys/vm/compact_memory && \
+    service supervisor-vrouter start;sleep 10;ip link show vhost0 || exit 1',
+      tries     => 3,
+      refreshonly => true,
       subscribe  => [Package[$install_packages],
                     File['/etc/contrail/agent_param']
                     ],
     }
 
-    Contrail_vrouter_nodemgr_config <||> ~> Service['supervisor-vrouter']
-    Contrail_vrouter_agent_config   <||> ~> Service['supervisor-vrouter']
+    Package[$install_packages] -> Contrail_vrouter_nodemgr_config <||> ~> Exec['restart_supervisor_vrouter']
+    Package[$install_packages] -> Contrail_vrouter_agent_config   <||> ~> Exec['restart_supervisor_vrouter']
 
 }
-
