@@ -116,7 +116,7 @@ class contrail {
   $compute_dpdk_on_vf = $compute_dpdk_enabled and roles_include('dpdk-on-vf')
   $dpdk_physnet       = $settings['dpdk_physnet']
   $dpdk_vf_number     = 0
-
+  $vf_prefix          = 'vf_'
   # ToR/TSN agent settings
   $enable_tor_agents = $settings['enable_tor_agents']
   if $enable_tor_agents == true {
