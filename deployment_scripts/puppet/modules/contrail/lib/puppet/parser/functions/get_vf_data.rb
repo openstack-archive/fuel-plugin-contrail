@@ -16,24 +16,23 @@ module Puppet::Parser::Functions
   newfunction(:get_vf_data, :type => :rvalue, :doc => <<-EOS
     Returns interface name, pci address, mac address related to specific virtual function
     example:
-      get_vf_data(dev_name, vf_number)
+      get_vf_data(pf_dev_name, vf_number)
     EOS
   ) do |args|
 
-    dev_name = args[0].sub(/\..*/, '')
+    pf_dev_name = args[0].split('.').first
     vf_number = args[1]
-    vf_sys = "/sys/class/net/#{dev_name}/device/virtfn#{vf_number}"
+    vf_sys = "/sys/class/net/#{pf_dev_name}/device/virtfn#{vf_number}"
     vf_data = Hash.new
-    hiera_data_key = "dpdk_vf_int_data"
 
-    if (File.exists?("/sys/class/net/#{dev_name}/device/virtfn#{vf_number}/net"))
+    if (File.exists?("/sys/class/net/#{pf_dev_name}/device/virtfn#{vf_number}/net"))
         vf_dev_name = Dir.entries("#{vf_sys}/net/")[2]
         vf_pci_addr = File.readlink(vf_sys).split("/")[1]
         vf_mac_addr = File.open("#{vf_sys}/net/#{vf_dev_name}/address", "rb") { |f| f.read.strip }
         vf_data = {"vf_dev_name" => vf_dev_name, "vf_pci_addr" => vf_pci_addr, "vf_mac_addr" => vf_mac_addr}
-        function_add_data_to_yaml(["/etc/hiera/plugins/contrail.yaml", hiera_data_key, vf_data])
-    elsif not function_hiera_hash([hiera_data_key, {}]).empty?
-      vf_data = function_hiera_hash([hiera_data_key, {}])
+        function_add_data_to_yaml(["/etc/hiera/plugins/contrail.yaml", vf_dev_name, vf_data])
+    elsif not function_hiera_hash([vf_dev_name, {}]).empty?
+      vf_data = function_hiera_hash([vf_dev_name, {}])
     end
 
     return vf_data
