@@ -16,6 +16,7 @@ class contrail::contrail_vmware {
 
     $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
     $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
+    $phys_dev        = $contrail::phys_dev
 
     $install_packages = ['contrail-utils', 'contrail-vrouter-dkms',
       'contrail-vrouter-common', 'contrail-nova-vif', 'iproute2']
@@ -69,14 +70,18 @@ class contrail::contrail_vmware {
       'DISCOVERY/server': value => $contrail::contrail_private_vip;
       'DISCOVERY/port':   value => '5998';
     } ->
+    file {'/etc/network/interfaces.d/ifcfg-vhost0':
+      ensure  => present,
+      content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
+    } ->
     exec { 'remove_supervisor_override':
       command => '/bin/rm /etc/init/supervisor-vrouter.override',
       onlyif  => '/usr/bin/test -f /etc/init/supervisor-vrouter.override',
       require => Package[$install_packages],
     } ->
     exec { 'restart_supervisor_vrouter':
-      path       => '/usr/bin:/usr/sbin:/bin:/sbin',
-      command    => 'service supervisor-vrouter stop && \
+      path        => '/usr/bin:/usr/sbin:/bin:/sbin',
+      command     => 'service supervisor-vrouter stop && \
     modprobe -r vrouter && \
     sync && \
     echo 3 > /proc/sys/vm/drop_caches && \

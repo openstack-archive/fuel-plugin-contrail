@@ -1,4 +1,18 @@
 #!/usr/bin/python
+#    Copyright 2016 Mirantis, Inc.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
 import sys
 import atexit
 import random
@@ -16,14 +30,6 @@ from nailgun import objects
 
 class Vcenter_base(object):
     def __init__(self, user_data=None, si=None):
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        ch.setFormatter(formatter)
-        self.logger.addHandler(ch)
-
         if user_data:
             self.vc_ip = user_data['vcenter_ip']
             self.vc_user = user_data['vcenter_user']
@@ -34,12 +40,10 @@ class Vcenter_base(object):
             self.datacenter = self.content.rootFolder.childEntity[0]
             self.network_folder = self.datacenter.networkFolder
         else:
-            self.logger.error('Need to specify credential for vcenter (user_data) or service instance object (si)')
+            logger.error('Need to specify credential for vcenter (user_data) or service instance object (si)')
 
     def connect_to_vcenter(self):
-        """
-        Create connection for vCenter instance
-        """
+        """Create connection for vCenter instance"""
         self.service_instance = connect.SmartConnect(host=self.vc_ip,
                                                      user=self.vc_user,
                                                      pwd=self.vc_pass,
@@ -51,9 +55,9 @@ class Vcenter_base(object):
         return self.service_instance
 
     def wait_for_tasks(self, service_instance, tasks):
-        """
-        Given the service instance si and tasks, it returns after all the
-        tasks are complete
+        """Given the service instance si and tasks,
+
+        it returns after all the tasks are complete
         """
         property_collector = service_instance.content.propertyCollector
         task_list = [str(task) for task in tasks]
@@ -98,9 +102,7 @@ class Vcenter_base(object):
                 pcfilter.Destroy()
 
     def get_obj(self, vimtype, name):
-        """
-        Get the vsphere object associated with a given text name
-        """
+        """Get the vsphere object associated with a given text name"""
         obj = None
         container = self.content.viewManager.CreateContainerView(self.content.rootFolder, vimtype, True)
         for c in container.view:
@@ -118,9 +120,7 @@ class Vcenter_base(object):
         return host_list
 
     def gen_mac(self):
-        """
-        Generate mac address
-        """
+        """Generate mac address"""
         mac = [0x00, 0x16, 0x3e,
                random.randint(0x00, 0x7f),
                random.randint(0x00, 0xff),
@@ -144,9 +144,7 @@ class Vcenter_base(object):
 
     @staticmethod
     def get_args():
-        """
-        Parse command line arguments
-        """
+        """Parse command line arguments"""
         parser = argparse.ArgumentParser()
         parser.add_argument(
             '--env_id', type=int, help='Environment id', required=True)
@@ -171,44 +169,50 @@ class Vcenter_base(object):
 
     @staticmethod
     def get_vcenter_credentials(cluster_id):
-        """
-        Fetch vCenter credential from nailgun
+        """Fetch vCenter credential from nailgun
 
         :param cluster_id: Fuel environment id
         """
         cl = objects.Cluster.get_by_uid(cluster_id)
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
         if cl:
-            # TODO add check if cred setup also check NIC name
             vmware_settings = objects.Cluster.get_vmware_attributes(cl).get('editable')
             vcenter_host = vmware_settings['value']['availability_zones'][0].get('vcenter_host')
             vcenter_username = vmware_settings['value']['availability_zones'][0].get('vcenter_username')
             vcenter_password = vmware_settings['value']['availability_zones'][0].get('vcenter_password')
             if not vcenter_host or not vcenter_username or not vcenter_password:
-                logging.error('Credentials for vcenter not specified fully. Specify their in Fuel vmware tab.')
+                logger.error('Credentials for vcenter not specified fully. Specify their in Fuel vmware tab.')
                 sys.exit(1)
             return vcenter_host, vcenter_username, vcenter_password
         else:
-            logging.error('Could not find cluster with ID: {}'.format(cluster_id))
+            logger.error('Could not find cluster with ID: {}'.format(cluster_id))
             sys.exit(1)
 
     @staticmethod
     def get_contrail_settings(cluster_id, setting_name):
-        """
-        Fetch Contrail settings from nailgun
+        """Fetch Contrail settings from nailgun
 
         :param cluster_id: Fuel environment id
         :param setting_name: Fuel Contrail setting name
         """
         cl = objects.Cluster.get_by_uid(cluster_id)
         contrail_setting = objects.Cluster.get_editable_attributes(cl)['contrail'].get(setting_name)
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
         if contrail_setting:
             value = contrail_setting['value']
             return value
         else:
-            logging.error('Contrail setting {} does not exist'.format(setting_name))
+            logger.error('Contrail setting {} does not exist'.format(setting_name))
             sys.exit(1)
+
+    @staticmethod
+    def create_logger():
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+        return logger
 
 
 class Vcenter_obj_tpl(object):
@@ -377,8 +381,7 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
         self.vm_devices.append(self.scsi_spec)
 
     def add_disk(self, disk_size):
-        """
-        Add disk specifications for vm object
+        """Add disk specifications for vm object
 
         :param disk_size: size of disk in MB
         """
@@ -391,8 +394,7 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
         self.vm_devices.append(disk_spec)
 
     def add_nic(self, nic_type='Vmxnet3', mac_address=None, dv_pg_name=None):
-        """
-        Add nic specification for vm object
+        """Add nic specification for vm object
 
         :param nic_type: type of virtual Ethernet adapter. possible values: Vmxnet3, E1000
         :param mac_address: mac address of virtual Ethernet adapter
@@ -406,15 +408,14 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
         if dv_pg_name:
             dv_pg_obj = self.get_obj([vim.DistributedVirtualPortgroup], dv_pg_name)
             if not dv_pg_obj:
-                self.logger.warning('Port group: {} does not exist.'.format(dv_pg_name))
+                logger.warning('Port group: {} does not exist.'.format(dv_pg_name))
         else:
             dv_pg_obj = None
         nic_spec = self.nic_info(nic_type, mac_address, label, dv_pg_obj)
         self.vm_devices.append(nic_spec)
 
     def create(self, name, cpu, memory, storage_name, cluster=None, host=None):
-        """
-        Create virtual machine
+        """Create virtual machine
 
         :param name: name of virtual machine
         :param cpu: cpu amount
@@ -425,15 +426,15 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
         """
         vm_obj = self.get_obj([vim.VirtualMachine], name)
         if vm_obj:
-            self.logger.info('VM({}) already exist. Skip creation VM: {}.'.format(name, name))
+            logger.info('VM({}) already exist. Skip creation VM: {}.'.format(name, name))
             return vm_obj
         if host:
             host_obj = self.get_obj([vim.HostSystem], host)
             if not host_obj:
-                self.logger.warning('Host({}) does not exist. Skip creation VM: {}.'.format(host, name))
+                logger.warning('Host({}) does not exist. Skip creation VM: {}.'.format(host, name))
                 return
             if not any(ds.name == storage_name for ds in host_obj.datastore):
-                self.logger.warning(
+                logger.warning(
                     'Datastore({}) does not exist on Host({}). Skip creation VM: {}.'.format(storage_name, host, name))
                 return
             vm_folder = host_obj.parent.parent.parent.vmFolder
@@ -442,17 +443,17 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
             host_obj = None
             cluster_obj = self.get_obj([vim.ClusterComputeResource], cluster)
             if not cluster_obj:
-                self.logger.warning('Cluster({}) does not exist. Skip creation VM: {}.'.format(cluster, name))
+                logger.warning('Cluster({}) does not exist. Skip creation VM: {}.'.format(cluster, name))
                 return
             if not any(ds.name == storage_name for ds in cluster_obj.datastore):
-                self.logger.warning(
+                logger.warning(
                     'Datastore({}) does not exist on Cluster({}). Skip creation VM: {}.'.format(storage_name, cluster,
                                                                                                 name))
                 return
             vm_folder = cluster_obj.parent.parent.vmFolder
             resource_pool = cluster_obj.resourcePool
         else:
-            self.logger.error(
+            logger.error(
                 'Need to specify Cluster or Host name where you want to create vm. Skip creation VM: {}.'.format(name))
             return
 
@@ -467,69 +468,65 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
             deviceChange=self.vm_devices,
         )
 
-        self.logger.info('Creating VM {}...'.format(name))
+        logger.info('Creating VM {}...'.format(name))
 
         task = vm_folder.CreateVM_Task(config=self.config, pool=resource_pool, host=host_obj)
         self.wait_for_tasks(self.service_instance, [task])
 
     def power_on(self, name):
-        """
-        Power on virtual machine
+        """Power on virtual machine
 
         :param name: name of virtual machine
         """
         vm_obj = self.get_obj([vim.VirtualMachine], name)
         if not vm_obj:
-            self.logger.error('VM({}) does not exist. Skip power on VM: {}.'.format(name, name))
+            logger.error('VM({}) does not exist. Skip power on VM: {}.'.format(name, name))
             return
         if vm_obj.summary.runtime.powerState == 'poweredOn':
-            self.logger.info('VM({}) already power on. Skip power on VM: {}.'.format(name, name))
+            logger.info('VM({}) already power on. Skip power on VM: {}.'.format(name, name))
             return
         task = vm_obj.PowerOnVM_Task()
         self.wait_for_tasks(self.service_instance, [task])
 
     def enable_startup(self, name):
-        """
-        Enable startup for virtual machine
+        """Enable startup for virtual machine
 
         :param name:  name of virtual machine
         """
         vm_obj = self.get_obj([vim.VirtualMachine], name)
         if not vm_obj:
-            self.logger.error('VM({}) does not exist. Skip adding to startup VM: {}.'.format(name, name))
+            logger.error('VM({}) does not exist. Skip adding to startup VM: {}.'.format(name, name))
             return
         host_obj = vm_obj.summary.runtime.host
         power_info = host_obj.configManager.autoStartManager.config.powerInfo
         if not host_obj:
-            self.logger.warning('Host({}) does not exist. Skip adding to startup VM: {}.'.format(host_obj.name, name))
+            logger.warning('Host({}) does not exist. Skip adding to startup VM: {}.'.format(host_obj.name, name))
             return
         if any(pf.key == vm_obj for pf in power_info):
-            self.logger.info('VM({}) already added to startup. Skip adding to startup VM: {}.'.format(name, name))
+            logger.info('VM({}) already added to startup. Skip adding to startup VM: {}.'.format(name, name))
         spec = self.startup_info(vm_obj, host_obj)
         host_obj.configManager.autoStartManager.ReconfigureAutostart(spec)
-        self.logger.info('Enable startup for VM: {}'.format(name))
+        logger.info('Enable startup for VM: {}'.format(name))
 
 
 class Dvs(Vcenter_base, Vcenter_obj_tpl):
     def create(self, dvs_name, private_vlan, max_mtu=None):
-        """
-        Create Distributed Virtual Switch
+        """Create Distributed Virtual Switch
 
         :param dvs_name: name of switch
         :param private_vlan: if set, configure private VLAN range
         """
         dvs_obj = self.get_obj([vim.DistributedVirtualSwitch], dvs_name)
         if dvs_obj:
-            self.logger.info('DVS({}) already exist. Skip creation DVS: {}.'.format(dvs_name, dvs_name))
+            logger.info('DVS({}) already exist. Skip creation DVS: {}.'.format(dvs_name, dvs_name))
             return dvs_obj
         dvs_spec = self.dvs_info(dvs_name, private_vlan, max_mtu)
-        self.logger.info('Creating DVS {}...'.format(dvs_name))
+        logger.info('Creating DVS {}...'.format(dvs_name))
         task = self.network_folder.CreateDVS_Task(dvs_spec)
         self.wait_for_tasks(self.service_instance, [task])
 
     def add_hosts(self, hosts_list, dvs_name, attach_uplink):
-        """
-        Add ESXi hosts to Distributed Virtual Switch
+        """Add ESXi hosts to Distributed Virtual Switch
 
         :param hosts_list: list of hosts with uplink relation. Example: [{'host': '192.168.0.100', 'uplink': 'vmnic1'},]
         :param dvs_name: name of Distributed Virtual Switch
@@ -537,13 +534,13 @@ class Dvs(Vcenter_base, Vcenter_obj_tpl):
         """
         dvs_obj = self.get_obj([vim.DistributedVirtualSwitch], dvs_name)
         if not dvs_obj:
-            self.logger.warning('DVS({}) does not exist. Skip adding Hosts: {}.'.format(dvs_name, str(hosts_list)))
+            logger.warning('DVS({}) does not exist. Skip adding Hosts: {}.'.format(dvs_name, str(hosts_list)))
             return
         for h in hosts_list:
             host = h['host']
             uplink = h['uplink']
             if any(dvs_host.config.host.name == host for dvs_host in dvs_obj.config.host):
-                self.logger.info(
+                logger.info(
                     'Host({}) already adding to DVS({}). Skip adding Host: {}.'.format(host, dvs_name, host))
                 continue
             if not attach_uplink:
@@ -551,15 +548,14 @@ class Dvs(Vcenter_base, Vcenter_obj_tpl):
             host_obj = self.get_obj([vim.HostSystem], host)
             dvs_host_spec = self.dvs_host_info(host_obj, uplink)
             dvs_host_spec.configVersion = dvs_obj.config.configVersion
-            self.logger.info('Adding {} to DVS: {}'.format(host, dvs_name))
+            logger.info('Adding {} to DVS: {}'.format(host, dvs_name))
             task = dvs_obj.ReconfigureDvs_Task(dvs_host_spec)
             self.wait_for_tasks(self.service_instance, [task])
 
 
 class Dvpg(Vcenter_base, Vcenter_obj_tpl):
     def create(self, dvs_name, dv_pg_ports_num=128, dv_pg_name=None, vlan_type='access', vlan_list=[0]):
-        """
-        Create Distributed Virtual Port Group
+        """Create Distributed Virtual Port Group
 
         :param dvs_name: name of DVS where DVPG will be created
         :param dv_pg_ports_num: number of ports in DVPG
@@ -572,14 +568,14 @@ class Dvpg(Vcenter_base, Vcenter_obj_tpl):
             dv_pg_name = dvs_name + '-PG'
         dvs_obj = self.get_obj([vim.DistributedVirtualSwitch], dvs_name)
         if not dvs_obj:
-            self.logger.warning('DVS({}) does not exist. Skip creation DVS-PG: {}.'.format(dvs_name, dv_pg_name))
+            logger.warning('DVS({}) does not exist. Skip creation DVS-PG: {}.'.format(dvs_name, dv_pg_name))
             return
         dv_pg_obj = self.get_obj([vim.dvs.DistributedVirtualPortgroup], dv_pg_name)
         if dv_pg_obj:
-            self.logger.info('DVS-PG({}) already exist. Skip creation DVS-PG: {}.'.format(dv_pg_name, dv_pg_name))
+            logger.info('DVS-PG({}) already exist. Skip creation DVS-PG: {}.'.format(dv_pg_name, dv_pg_name))
             return
         dv_pg_spec = self.dvs_pg_info(dv_pg_name, dv_pg_ports_num, vlan_type, vlan_list)
-        self.logger.info('Adding PG: {} to DVS: {}'.format(dv_pg_name, dvs_name))
+        logger.info('Adding PG: {} to DVS: {}'.format(dv_pg_name, dvs_name))
         task = dvs_obj.AddDVPortgroup_Task([dv_pg_spec])
         self.wait_for_tasks(self.service_instance, [task])
 
@@ -589,27 +585,18 @@ class Vcenterdata(object):
         self.file = file_name
         self.data_key = 'contrail_esxi_info'
         self.old_data = None
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        ch.setFormatter(formatter)
-        self.logger.addHandler(ch)
 
     def exists(self):
-        """
-        Check if file exists
-        """
+        """Check if file exists"""
         if os.path.exists(self.file):
             return True
         else:
-            self.logger.info('File: {} does not exist'.format(self.file))
+            logger.info('File: {} does not exist'.format(self.file))
             return False
 
     def put(self, data):
-        """
-        Save data in given file
+        """Save data in given file
+
         :param data: data to save
         """
         if self.exists():
@@ -626,18 +613,14 @@ class Vcenterdata(object):
                 yaml.dump(content, f, default_flow_style=False, explicit_start=True)
 
     def get(self):
-        """
-        Get data from given file
-        """
+        """Get data from given file"""
         if self.exists():
             with open(self.file) as f:
                 content = yaml.load(f.read())
                 return content[self.data_key]
 
     def add_admin_ip(self):
-        """
-        Append file with a ip's from admin fuel network
-        """
+        """Append file with a ip's from admin fuel network"""
         if self.exists():
             with open(self.file, 'r+') as f:
                 content = yaml.load(f.read())
@@ -646,7 +629,7 @@ class Vcenterdata(object):
                     mac = v['mac_for_vm']
                     node_obj = objects.Node.get_by_mac_or_uid(mac=mac)
                     if not node_obj:
-                        self.logger.warning('Node with mac: {} not found.'.format(mac))
+                        logger.warning('Node with mac: {} not found.'.format(mac))
                         continue
                     admin_ip = node_obj.ip
                     content[self.data_key][i]['admin_ip'] = admin_ip
@@ -654,6 +637,7 @@ class Vcenterdata(object):
 
 
 if __name__ == '__main__':
+    logger = Vcenter_base.create_logger()
     # Parse parameter from command line
     args = Vcenter_base.get_args()
     env_id = args.env_id
