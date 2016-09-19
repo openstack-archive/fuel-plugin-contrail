@@ -18,22 +18,40 @@ class contrail::compute::vrouter {
   $vlan_tag = regsubst($::contrail::phys_dev, '^.+\.' , '')
 
   if $contrail::compute_dpdk_on_vf {
-    $vf_data = get_vf_data($contrail::phys_dev, $contrail::dpdk_vf_number)
 
-    # Add vlan to phys_dev if needed
-    if ($::contrail::phys_dev != $raw_phys_dev) {
-      $phys_dev = "dpdk-vf${contrail::dpdk_vf_number}.${vlan_tag}"
+    $sriov_hash    = get_sriov_devices($contrail::phys_dev)
+    $sriov_ifaces  = keys($sriov_hash)
+    $pf_dev_name   = $sriov_ifaces[0]
+    $dpdk_dev_name = "dpdk-vf-${pf_dev_name}"
+
+    # unbonded VFs go here
+    if count(keys($sriov_hash)) == 1 {
+
+      if $vlan_tag =~ /^\d*$/ {
+        $phys_dev = "${dpdk_dev_name}.${vlan_tag}"
+      } else {
+        $phys_dev = $dpdk_dev_name
+      }
+
+      $dev_mac      = getvar("::macaddress_${phys_dev}")
+      $dpdk_dev_pci = get_dev_pci_addr($phys_dev, $network_scheme)
+
+    # bonds from VFs go here
     } else {
-      $phys_dev = "dpdk-vf${contrail::dpdk_vf_number}"
+
+        $phys_dev     = $contrail::phys_dev
+        $dev_mac      = getvar("::macaddress_${dpdk_dev_name}")
+        $dpdk_dev_pci = $contrail::phys_dev_pci
+
     }
-    $dpdk_dev_pci = $vf_data['vf_pci_addr']
-    $dev_mac = $vf_data['vf_mac_addr']
+
+  # usual dpdk and kernel-based routers go here
   } else {
-    # facter uses underscore instead of dot as a separator for interface name with vlan
-    $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-    $dev_mac  = getvar("::macaddress_${phys_dev_facter}")
-    $phys_dev = $contrail::phys_dev
-    $dpdk_dev_pci = $contrail::phys_dev_pci
+      # facter uses underscore instead of dot as a separator for interface name with vlan
+      $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
+      $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
+      $phys_dev        = $contrail::phys_dev
+      $dpdk_dev_pci    = $contrail::phys_dev_pci
   }
 
   Exec {
