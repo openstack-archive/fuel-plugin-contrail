@@ -31,23 +31,36 @@ module Puppet::Parser::Functions
     end
 
     if dpdk_on_vf
+
       hiera_data_key = "priv_int_vfn_wl"
-      priv_int = args[2].sub(/\..*/, '')
+      interface = args[2].sub(/\..*/, '')
       dpdk_vf_number = args[3]
-      if (File.exists?("/sys/class/net/#{priv_int}"))
-        vfn = Dir.glob "/sys/class/net/#{priv_int}/device/virtfn*"
-        vfn_wl = vfn.map { |f|
-           if not f.end_with? "virtfn#{dpdk_vf_number}"
-             pci_address = File.readlink(f).split("/")[1]
-             Hash["address" => pci_address, "physical_network" => physnet]
-           end
-        }
-        list += vfn_wl
-        function_add_data_to_yaml(["/etc/hiera/plugins/contrail.yaml", hiera_data_key, vfn_wl])
-      elsif not function_hiera_array([hiera_data_key, []]).empty?
-        vfn_wl = function_hiera_array([hiera_data_key, []])
-        list += vfn_wl
+
+      network_scheme = function_hiera_hash(['network_scheme', {}])
+      network_scheme['transformations'].each do |entry|
+        if entry['name'] == interface and entry.has_key?('bond_properties') and entry['action'] == "add-bond"
+          interfaces.push(*entry['interfaces'])
+        elsif entry['action'] == 'add-port' and entry['name'] == args[0]
+          interfaces << interface
+        end
       end
+
+      interfaces.each do |interface|
+
+        if (File.exists?("/sys/class/net/#{interface}"))
+          vfn = Dir.glob "/sys/class/net/#{interface}/device/virtfn*"
+          vfn_wl = vfn.map { |f|
+             if not f.end_with? "virtfn#{dpdk_vf_number}"
+               pci_address = File.readlink(f).split("/")[1]
+               Hash["address" => pci_address, "physical_network" => physnet]
+             end
+          }
+          list += vfn_wl
+          function_add_data_to_yaml(["/etc/hiera/plugins/contrail.yaml", hiera_data_key, vfn_wl])
+        elsif not function_hiera_array([hiera_data_key, []]).empty?
+          vfn_wl = function_hiera_array([hiera_data_key, []])
+          list += vfn_wl
+        end
     end
 
     return list.to_json
