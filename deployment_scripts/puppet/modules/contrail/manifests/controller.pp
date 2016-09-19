@@ -172,7 +172,7 @@ class contrail::controller {
       value   => 'neutron_plugin_contrail.plugins.opencontrail.neutron_middleware:token_factory',
       notify  => Service['neutron-server'],
     }
-    else {
+  } else {
       ini_setting {'no_user_token':
         ensure  => present,
         path    => '/etc/neutron/api-paste.ini',
@@ -181,7 +181,6 @@ class contrail::controller {
         value   => 'cors request_id catch_errors authtoken keystonecontext extensions neutronapiapp_v2_0',
         notify  => Service['neutron-server'],
       }
-    }
   }
 
   Neutron_config <||> ~> Service <|title == 'neutron-server'|>
