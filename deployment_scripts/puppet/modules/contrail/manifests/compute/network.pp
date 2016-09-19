@@ -38,43 +38,57 @@ class contrail::compute::network {
 
   # Configure persistent network device for DPDK VF
   if $contrail::compute_dpdk_on_vf {
-    $vlan_tag = regsubst($::contrail::phys_dev, '^.+\.' , '')
-    $vf_data = get_vf_data($contrail::phys_dev, $contrail::dpdk_vf_number)
-    $dpdk_dev_name = "dpdk-vf${contrail::dpdk_vf_number}"
-    $dpdk_vf_origin_name = $vf_data['vf_dev_name']
-    $dpdk_dev_pci = $vf_data['vf_pci_addr']
-    $dpdk_dev_mac = $vf_data['vf_mac_addr']
-    $raw_phys_dev = regsubst($::contrail::phys_dev, '\..*' , '')
-    exec { 'rename-dpdk-vf':
-      command => "ip link set ${dpdk_vf_origin_name} name ${dpdk_dev_name}",
-      unless  => "ip link | grep ${dpdk_dev_name}",
-    }
+
+    $phys_dev = $contrail::phys_dev
+
+    $vlan_tag            = regsubst($phys_dev, '^.+\.' , '')
+    $raw_phys_dev        = regsubst($phys_dev, '\..*' , '')
 
     file {'/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules':
       ensure  => present,
-      content => template('contrail/72-contrail-dpdk-on-vf.rules.erb'),
     }
 
-    $interface_config = join(["auto ${dpdk_dev_name}",
-                              "iface ${dpdk_dev_name} inet manual",
-                              "pre-up ip link set link dev ${raw_phys_dev} vf ${contrail::dpdk_vf_number} vlan 0",
-                              "post-up ip link set link dev ${raw_phys_dev} vf ${contrail::dpdk_vf_number} spoof off",
-                              ],"\n")
+    $sriov_hash = get_sriov_devices($contrail::phys_dev)
 
-    file {"/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}":
-      ensure  => file,
-      content => $interface_config,
-      require => File['/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules'],
-    }
+    # If $sriov_hash contains more than one key,
+    # $phys_dev is likely a bond
+    if count(keys($sriov_hash)) > 1 {
 
-    exec { "ifup_${dpdk_dev_name}":
-      command => "ifup ${dpdk_dev_name}",
-      unless  => "ip link show dev ${dpdk_dev_name} | grep ,UP",
-      require => File["/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}"],
+      exec {"destroy_old_${raw_phys_dev}":
+        command => "ifdown ${raw_phys_dev}",
+      }
+
+      $sriov_defaults = {
+        'bond_dev_name' => $raw_phys_dev,
+      }
+      create_resources(contrail::configure_vfs, $sriov_hash, $sriov_defaults)
+  
+      $bond_vfs = keys(prefix($sriov_hash, 'dpdk-vf-'))
+      $slaves   = join($bond_vfs, ' ')
+
+      file_line {"set_bond_slaves_for_${raw_phys_dev}":
+        line    => "bond-slaves ${slaves}",
+        path    => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
+        match   => '/^.*bond-slaves.*$/',
+        replace => true,
+      }
+      exec {"create_${raw_phys_dev}":
+        command => "ifdown ${raw_phys_dev}",
+      }
+      Exec["destroy_old_${raw_phys_dev}"] -> Configure_vfs <||>
+
+    } else {
+      create_resources(contrail::configure_vfs, $sriov_hash)
     }
 
     # Add vlan interface config if needed
-    if ($::contrail::phys_dev != $raw_phys_dev) {
+    # In case of bond, this is skipped,
+    # vlan interface config provided by l23network
+    if ($vlan_tag =~ /^\d*$/ and count(keys($sriov_hash)) == 1 ) {
+
+      $sriov_ifaces  = keys($sriov_hash)
+      $pf_dev_name   = $sriov_ifaces[0]
+      $dpdk_dev_name = "dpdk-vf-${pf_dev_name}"
 
       $vlan_interface_config = join([ "auto ${dpdk_dev_name}.${vlan_tag}",
                                       "iface ${dpdk_dev_name}.${vlan_tag} inet manual",
@@ -84,21 +98,16 @@ class contrail::compute::network {
       file {"/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}.${vlan_tag}":
         ensure  => file,
         content => $vlan_interface_config,
-        require => [File['/etc/udev/rules.d/72-contrail-dpdk-on-vf.rules'],
-                    File["/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}"],
-                    ],
       }
 
       exec { "ifup_${dpdk_dev_name}.${vlan_tag}":
         command => "ifup ${dpdk_dev_name}.${vlan_tag}",
         unless  => "ip link show dev ${dpdk_dev_name}.${vlan_tag} | grep ,UP",
         require => [File["/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}.${vlan_tag}"],
-                    Exec["ifup_${dpdk_dev_name}"],
-                    ],
+                    File["/etc/network/interfaces.d/ifcfg-${dpdk_dev_name}"],
+                    ]
       }
-
     }
-
   }
 
 }
