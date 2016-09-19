@@ -16,40 +16,36 @@ module Puppet::Parser::Functions
   newfunction(:get_sriov_devices, :type => :rvalue, :doc => <<-EOS
     Returns sriov capable devices
     example:
-      get_sriov_devices()
+      get_sriov_devices('phys_dev')
     EOS
   ) do |args|
 
-    dpdk_on_vf = args[0]
-    bridge_interfaces = Array.new()
-    bond_interfaces = Array.new()
+    interface = args[0].sub(/\..*/, '')
+    interfaces = Array.new()
+    sriov_hash = Hash.new
 
     network_scheme = function_hiera_hash(['network_scheme', {}])
     network_scheme['transformations'].each do |entry|
-       if entry.has_key?('bridge') and entry['action'] == "add-port"
-         bridge_interfaces.push(entry['name'])
-       end
-       if entry.has_key?('bond_properties') and entry['action'] == "add-bond"
-         bond_interfaces.push(*entry['interfaces'])
-       end
+      if entry['name'] == interface and entry.has_key?('bond_properties') and entry['action'] == "add-bond"
+        interfaces.push(*entry['interfaces'])
+      else
+        interfaces << interface
+      end
     end
 
-    sriov_hash = Hash.new
-
-    if dpdk_on_vf
-      hiera_data_key = "priv_int_sriov_data"
-      private_interface = args[1].sub(/\..*/, '')
-      private_interface_path = "/sys/class/net/" + private_interface
-      if (File.exists?(private_interface_path + "/device/sriov_totalvfs"))
-        sriov_hash[private_interface] = Hash.new
-        sriov_hash[private_interface]["totalvfs"] = IO.read(private_interface_path + "/device/sriov_totalvfs").to_i
-        sriov_hash[private_interface]["numvfs"] = IO.read(private_interface_path + "/device/sriov_numvfs").to_i
-        function_add_data_to_yaml(["/etc/hiera/plugins/contrail.yaml", hiera_data_key, sriov_hash[private_interface]])
+    interfaces.each do |interface|
+      hiera_data_key = interface + "_sriov_data" 
+      interface_path = "/sys/class/net/" + interface
+      if (File.exists?(interface_path + "/device/sriov_totalvfs"))
+        sriov_hash[interface] = Hash.new
+        sriov_hash[interface]["totalvfs"] = IO.read(interface_path + "/device/sriov_totalvfs").to_i
+        sriov_hash[interface]["numvfs"] = IO.read(interface_path + "/device/sriov_numvfs").to_i
+        function_add_data_to_yaml(["/etc/hiera/plugins/contrail.yaml", hiera_data_key, sriov_hash[interface]])
       elsif not function_hiera_hash([hiera_data_key, {}]).empty?
         sriov_hiera = function_hiera_hash([hiera_data_key, {}])
-        sriov_hash[private_interface] = Hash.new
-        sriov_hash[private_interface]["totalvfs"] = sriov_hiera["totalvfs"]
-        sriov_hash[private_interface]["numvfs"] = sriov_hiera["numvfs"]
+        sriov_hash[interface] = Hash.new
+        sriov_hash[interface]["totalvfs"] = sriov_hiera["totalvfs"]
+        sriov_hash[interface]["numvfs"] = sriov_hiera["numvfs"]
       end
     end
 
