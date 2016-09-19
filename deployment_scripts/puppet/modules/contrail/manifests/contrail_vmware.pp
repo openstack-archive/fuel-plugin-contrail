@@ -16,6 +16,7 @@ class contrail::contrail_vmware {
 
     $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
     $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
+    $phys_dev        = $contrail::phys_dev
 
     $install_packages = ['contrail-utils', 'contrail-vrouter-dkms',
       'contrail-vrouter-common', 'contrail-nova-vif', 'iproute2']
@@ -68,6 +69,10 @@ class contrail::contrail_vmware {
     contrail_vrouter_nodemgr_config {
       'DISCOVERY/server': value => $contrail::contrail_private_vip;
       'DISCOVERY/port':   value => '5998';
+    } ->
+    file {'/etc/network/interfaces.d/ifcfg-vhost0':
+      ensure  => present,
+      content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
     } ->
     exec { 'remove_supervisor_override':
       command => '/bin/rm /etc/init/supervisor-vrouter.override',
