@@ -25,12 +25,20 @@ define contrail::create_vfs (
     path => '/usr/bin:/bin:/sbin',
   }
 
-  $final_vf = min(63, $totalvfs)
+  $bond = get_bond_name($contrail::network_scheme, $contrail::phys_dev, $contrail::compute_dpdk_on_vf)
 
-  $interface_config = join(["auto ${network_device}",
-                            "iface ${network_device} inet manual",
-                            "post-up echo ${final_vf} > /sys/class/net/${network_device}/device/sriov_numvfs"
-                            ],"\n")
+
+  $interface_config_array = ["auto ${network_device}",
+                             "iface ${network_device} inet manual",
+                             "post-up echo ${totalvfs} > /sys/class/net/${network_device}/device/sriov_numvfs",
+                             "post-up ip link set link dev ${network_device} vf ${contrail::dpdk_vf_number} spoof off", '',
+                             ]
+
+  if !$bond {
+    $interface_config=join(concat($interface_config_array, "post-up ip link set link dev ${pf_dev_name} vf ${vf_number} vlan 0"), "\n")
+    } else {
+      $interface_config=join($interface_config_array, "\n")
+    }
 
   file {"/etc/network/interfaces.d/ifcfg-${network_device}":
     ensure  => file,
@@ -38,8 +46,7 @@ define contrail::create_vfs (
   }
 
   exec {"create_vfs_on_${network_device}":
-    command => "echo ${final_vf} > /sys/class/net/${network_device}/device/sriov_numvfs",
-    tag     => ['create_vfs'],
+    command => "echo ${totalvfs} > /sys/class/net/${network_device}/device/sriov_numvfs",
   }
 
 }
