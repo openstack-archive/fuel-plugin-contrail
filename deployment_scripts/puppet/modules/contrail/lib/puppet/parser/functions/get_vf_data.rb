@@ -24,9 +24,9 @@ module Puppet::Parser::Functions
     vf_number = args[1]
     vf_sys = "/sys/class/net/#{dev_name}/device/virtfn#{vf_number}"
     vf_data = Hash.new
-    hiera_data_key = "dpdk_vf_int_data"
 
     if (File.exists?("/sys/class/net/#{dev_name}/device/virtfn#{vf_number}/net"))
+        hiera_data_key = "dpdk_vf_" + vf_number + "_data"
         vf_dev_name = Dir.entries("#{vf_sys}/net/")[2]
         vf_pci_addr = File.readlink(vf_sys).split("/")[1]
         vf_mac_addr = File.open("#{vf_sys}/net/#{vf_dev_name}/address", "rb") { |f| f.read.strip }
