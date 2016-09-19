@@ -1,3 +1,5 @@
+
+▽
 #    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,12 +14,18 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-compute-dpdkonvf.pp')
+module Puppet::Parser::Functions
+  newfunction(:list_bond_vf_slaves, :type => :rvalue, :doc => <<-EOS
+    #FIXME
+    Returns pci_passthrough_whitelist for nova config
+    EOS
+  ) do | args |
 
-include contrail
+  sriov_hash = function_get_sriov_devices(['bond0.436'])
 
-# Create virtual functions for DPDK VF
-if $contrail::compute_dpdk_on_vf {
-  $sriov_hash = get_sriov_devices($contrail::phys_dev)
-  create_resources(contrail::create_vfs, $sriov_hash)
-}
+  b = sriov_hash.map { |k, v| 'dpdk-vf-' + k }
+  c = b.join(' ')
+
+  return  c
+  end
+end
