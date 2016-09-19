@@ -674,8 +674,8 @@ if __name__ == '__main__':
     esxi_uplink_priv = Vcenter_base.get_contrail_settings(env_id, 'esxi_uplink_priv')
     storage_name = Vcenter_base.get_contrail_settings(env_id, 'esxi_datastore_name')
 
-    vm_disk_size = 10  # GB
-    vm_cpu = 2  # Amount
+    vm_disk_size = 20  # GB
+    vm_cpu = 3  # Amount
     if args.reduce_vm_params:
         vm_memory = 2048  # MB
     else:
@@ -716,7 +716,7 @@ if __name__ == '__main__':
         dvs.add_hosts(hosts_list=host_list_dvs_int, dvs_name=dvs_internal, attach_uplink=False)
         dvpg.create(dv_pg_name=dvpg_internal, dvs_name=dvs_internal, vlan_type='trunk', vlan_list=[0, 4094])
 
-        dvs.create(dvs_name=dvs_private, private_vlan=False, max_mtu=dvs_private)
+        dvs.create(dvs_name=dvs_private, private_vlan=False, max_mtu=dvs_mtu_priv)
         dvs.add_hosts(hosts_list=host_list_dvs_priv, dvs_name=dvs_private, attach_uplink=True)
         dvpg.create(dv_pg_name=dvpg_private, dvs_name=dvs_private, vlan_type='trunk', vlan_list=[0, 4094])
 

@@ -1046,25 +1046,23 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
-- id: contrail-vmware-task
+- id: contrail-vmware-network
   type: puppet
   version: 2.0.0
   groups: [contrail-vmware]
-  required_for: [contrail-vmware-network]
-  requires: [hosts, ssl-dns-setup]
+  required_for: [contrail-vmware-task]
+  requires: [deploy_start, hosts]
   parameters:
-    puppet_manifest: puppet/manifests/contrail-vmware.pp
+    puppet_manifest: puppet/manifests/contrail-compute-network.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
-  cross-depends:
-    - name: contrail-db-provision-all
 
 - id: contrail-vmware-provision
   type: puppet
   version: 2.0.0
   groups: [contrail-vmware]
-  required_for: [deploy_end]
-  requires: [contrail-vmware-task]
+  required_for: [contrail-vmware-task, deploy_end]
+  requires: [contrail-utils]
   parameters:
     puppet_manifest: puppet/manifests/contrail-compute-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -1073,4 +1071,15 @@
     - name: openstack-controller-provision
       role: primary-controller
 
-
+- id: contrail-vmware-task
+  type: puppet
+  version: 2.0.0
+  groups: [contrail-vmware]
+  required_for: [deploy_end]
+  requires: [hosts, ssl-dns-setup]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-vmware.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+  cross-depends:
+    - name: contrail-db-provision-all
