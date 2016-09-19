@@ -150,15 +150,6 @@ class contrail::compute::vrouter {
     'VIRTUAL-HOST-INTERFACE/ip':                 value => "${contrail::address}/${contrail::netmask_short}";
     'VIRTUAL-HOST-INTERFACE/physical_interface': value => $phys_dev;
     'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
-  } ->
-
-  ini_setting { 'vrouter-threadcount':
-    ensure  => present,
-    path    => '/etc/contrail/supervisord_vrouter.conf',
-    section => 'supervisord',
-    setting => 'environment',
-    value   => 'TBB_THREAD_COUNT=8',
-    notify  => Service['supervisor-vrouter'],
   }
 
   if $contrail::gateway {
@@ -180,6 +171,10 @@ class contrail::compute::vrouter {
       enable    => true,
     }
   } else {
+    contrail_vrouter_agent_config {
+      'TASK/thread_count':  value => '8';
+      'FLOWS/thread_count': value => '2';
+    }
     file {'/etc/network/interfaces.d/ifcfg-vhost0':
       ensure  => present,
       content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
