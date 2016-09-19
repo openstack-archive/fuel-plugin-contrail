@@ -182,7 +182,6 @@ class contrail::controller {
         notify  => Service['neutron-server'],
       }
     }
-  }
 
   Neutron_config <||> ~> Service <|title == 'neutron-server'|>
   Ini_setting <||> ~> Service <|title == 'neutron-server'|>
