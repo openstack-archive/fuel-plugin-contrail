@@ -22,6 +22,7 @@ class contrail::compute::vrouter {
 
     # Add vlan to phys_dev if needed
     if ($::contrail::phys_dev != $raw_phys_dev) {
+      #FIXME: Proper VF name
       $phys_dev = "dpdk-vf${contrail::dpdk_vf_number}.${vlan_tag}"
     } else {
       $phys_dev = "dpdk-vf${contrail::dpdk_vf_number}"
