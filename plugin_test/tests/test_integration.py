@@ -862,7 +862,8 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
-        conf_contrail = {"dedicated_analytics_db": True}
+        conf_contrail = {"dedicated_analytics_db": True,
+                        "contrail_api_public_port": "8098"}
         plugin.show_range(self, 1, 3)
         plugin.prepare_contrail_plugin(self, slaves=5,
                                        options={'murano': True})
