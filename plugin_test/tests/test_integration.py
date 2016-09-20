@@ -794,7 +794,12 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
+        min_slave_ram = 8138
         conf_contrail = {"dedicated_analytics_db": True}
+
+        # check slave`s ram
+        openstack.check_slave_memory(self, min_slave_ram)
+
         plugin.show_range(self, 1, 3)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True,
@@ -862,8 +867,13 @@ class IntegrationTests(TestBasic):
         Duration 120 min
 
         """
+        min_slave_ram = 12000
         conf_contrail = {"dedicated_analytics_db": True,
-                        "contrail_api_public_port": "8098"}
+                         "contrail_api_public_port": "8098"}
+
+        # check slave`s ram
+        openstack.check_slave_memory(self, min_slave_ram)
+
         plugin.show_range(self, 1, 3)
         plugin.prepare_contrail_plugin(self, slaves=5,
                                        options={'murano': True})

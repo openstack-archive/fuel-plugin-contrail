@@ -18,6 +18,7 @@ import time
 from devops.helpers.helpers import wait
 from fuelweb_test import logger
 from fuelweb_test.settings import DEPLOYMENT_MODE
+from fuelweb_test.settings import HARDWARE
 from fuelweb_test.helpers.checkers import check_repo_managment
 
 import settings
@@ -190,3 +191,12 @@ def enable_sriov(obj):
                 interface['interface_properties']['sriov']['sriov_totalvfs']
     obj.fuel_web.client.put_node_interfaces(
         [{'id': nailgun_node['id'], 'interfaces': node_networks}])
+
+
+def check_slave_memory(obj, memory):
+    msg = 'Slaves have {0} mb ram'.format(HARDWARE["slave_node_memory"])
+    error_msg = 'Out of slaves ram'
+    if HARDWARE["slave_node_memory"] < memory:
+        raise MemoryError(error_msg)
+    else:
+        logger.info(msg)
