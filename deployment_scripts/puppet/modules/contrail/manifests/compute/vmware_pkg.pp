@@ -14,6 +14,22 @@
 
 class contrail::compute::vmware_pkg {
 
+$ceilometer_enabled = $contrail::ceilometer_hash['enabled']
+if ($ceilometer_enabled) {
+  group { 'libvirt':
+    ensure => 'present',
+  }
+
+  apt::pin { 'contrail-override-ceilometer':
+    explanation => 'Set priority for ceilometer packages',
+    priority    => 1450,
+    label       => 'mos9.0',
+    originator  => 'Mirantis',
+    packages    => ['ceilometer-common', 'python-ceilometer'],
+  }
+
+}
+
 Package {
   ensure => installed,
 }
