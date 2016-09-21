@@ -87,16 +87,20 @@ class contrail::compute::compute_override {
 qemu-kvm qemu-system-x86 qemu-system-common",
         unless  => 'dpkg -l | grep qemu-system-common | grep contrail',
         require => Apt::Source['dpdk-depends-repo'],
-      } ~>
-      service { 'qemu-kvm':
-        ensure => running,
-        enable => true,
-      } ->
+      }
+      if !defined(Service['qemu-kvm']) {
+        service { 'qemu-kvm':
+          ensure  => running,
+          enable  => true,
+          require => Exec['override-qemu'],
+        }
+      }
       apt::pin { 'contrail-override-libvirt':
         explanation => 'Set priority for packages that need to override from contrail repository',
         packages    => $libvirt_pkg,
         priority    => 1200,
         label       => 'dpdk-depends-packages',
+        require     => Service['qemu-kvm'],
       } ->
       # Install options are supported starting from puppet 3.5.1
       #package { $libvirt_pkg:
@@ -107,17 +111,27 @@ qemu-kvm qemu-system-x86 qemu-system-common",
         command => "apt-get install --yes ${keep_config_files} ${force_overwrite} libvirt-bin libvirt0",
         unless  => 'dpkg -l | grep libvirt0 | grep contrail',
         require => Apt::Source['dpdk-depends-repo'],
-      } ->
+      }
       # With a new libvirt packages this init script must be stopped
-      service { 'libvirtd':
-        ensure => stopped,
-        enable => false,
-      } ->
+      if !defined(Service['libvirtd']) {
+        service { 'libvirtd':
+          ensure  => stopped,
+          enable  => false,
+          require => Exec['override-libvirt'],
+        }
+      }
+      else {
+        Service <| (title == 'libvirtd') |> {
+          ensure => stopped,
+          enable => false,
+        }
+      }
       # This options must be uncommented for correct work with nova-compute
       file_line { 'add_libvirt_opt1':
-        path  => '/etc/libvirt/libvirtd.conf',
-        match => 'auth_unix_ro',
-        line  => 'auth_unix_ro = "none"',
+        path    => '/etc/libvirt/libvirtd.conf',
+        match   => 'auth_unix_ro',
+        line    => 'auth_unix_ro = "none"',
+        require => Service['libvirtd'],
       } ->
       file_line { 'add_libvirt_opt2':
         path  => '/etc/libvirt/libvirtd.conf',
@@ -127,10 +141,13 @@ qemu-kvm qemu-system-x86 qemu-system-common",
       service { $contrail::libvirt_name:
         ensure => running,
         enable => true,
-      } ~>
-      service { 'nova-compute':
-        ensure => running,
-        enable => true,
+      }
+      if !defined(Service['nova-compute']) {
+        service { 'nova-compute':
+          ensure  => running,
+          enable  => true,
+          require => Service[$contrail::libvirt_name],
+        }
       }
     }
   }
