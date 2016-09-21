@@ -402,3 +402,43 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors.
+
+
+Verify that RBAC works and can be changed
+-----------------------------------------
+
+
+ID
+##
+
+contrail_rbac
+
+
+Description
+###########
+
+Verify that RBAC works and can be changed
+
+
+Complexity
+##########
+
+advanced
+
+
+Steps
+#####
+
+    1. Deploy Contrail cluster with RBAC enabled
+    2. Create via ContrailUI API access for new member without delete permission
+    3. Login as admin to Openstack Horizon UI
+    4. Create new user with this access
+    5. Verify via cli, that the permissions are applied
+    6. Change in FuelUI AAA Mode to Admin cloud and apply it
+    7. Verify via cli, that the RBAC permissions are not applied for the user
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
