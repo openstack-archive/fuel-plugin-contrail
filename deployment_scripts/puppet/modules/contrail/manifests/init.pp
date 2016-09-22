@@ -209,4 +209,7 @@ class contrail {
   $cassandra_server_list_9160 = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:9160\" }.join(' ') %>")
   $kafka_broker_list          = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:9092\" }.join(' ') %>")
   $zk_server_ip               = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:2181\" }.join(',') %>")
+
+  # Perfomance tuning
+  $cassandra_rpc_max_threads = pick($settings['cassandra_rpc_max_threads'], false)
 }
