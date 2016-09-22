@@ -17,9 +17,8 @@ class contrail::compute::network {
   $ifname         = $contrail::phys_dev
   $netmask        = $contrail::netmask_short
   $default_gw     = undef
-
-  $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-  $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
+  $raw_phys_dev   = $::contrail::raw_phys_dev
+  $dev_mac        = $::contrail::dev_mac
 
   $br_file = $::operatingsystem ? {
     'Ubuntu' => '/etc/network/interfaces.d/ifcfg-br-mesh',
@@ -29,6 +28,10 @@ class contrail::compute::network {
   Exec {
     provider => 'shell',
     path     => '/usr/bin:/bin:/sbin',
+  }
+
+  if $contrail::compute_dpdk_enabled {
+    $dpdk_dev_mac = $dev_mac
   }
 
   file { $br_file: ensure => absent } ->
@@ -44,15 +47,7 @@ class contrail::compute::network {
     onlyif  => 'ip addr show dev br-mesh | grep -q inet',
   }
 
-  if $contrail::compute_dpdk_enabled {
-    $dpdk_mac = $::mac_from_vrouter
-    if $dpdk_mac {
-      $dpdk_dev_mac = $dpdk_mac
-    } else {
-      $dpdk_dev_mac = $dev_mac
-    }
-  }
-
+  #ifcfg-vhost0 uses $dpdk_dev_mac
   case $::operatingsystem {
     'Ubuntu': {
       file {'/etc/network/interfaces.d/ifcfg-vhost0':
