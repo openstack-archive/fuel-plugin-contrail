@@ -28,6 +28,7 @@ class contrail::contrail_vmware {
     $internal_vip            = $contrail::mos_mgmt_vip
     $external_vip            = $contrail::mos_public_vip
     $contrail_internal_vip   = $contrail::contrail_private_vip
+    $dev_mac                 = $contrail::dev_mac
     $mgmt_self_ip            = $::ipaddress_br_mgmt
 
     # Fetching the esxi data from hash
@@ -42,9 +43,6 @@ class contrail::contrail_vmware {
     #$esxi_data               = fetch_esxi_data($host)
     #$vmware                  = pick($esxi_data['ip'], '10.0.0.0')
     #$vmware_iface_name       = pick($esxi_data['contrail_vm']['vmware_iface_name'], 'ens161')
-
-    $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-    $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
 
     l23network::l3::ifconfig { $vmware_iface_name: ipaddr => 'none' }
 
