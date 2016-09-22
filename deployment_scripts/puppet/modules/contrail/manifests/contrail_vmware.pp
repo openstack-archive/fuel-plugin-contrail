@@ -108,7 +108,7 @@ class contrail::contrail_vmware {
       'DEFAULT/log_file'                          : value => '/var/log/contrail/contrail-vrouter-agent.log';
       'DEFAULT/log_level'                         : value => 'SYS_INFO';
       'DEFAULT/log_local'                         : value => '1';
-      'DEFAULT/log_flow'                          : value => '1';
+      'DEFAULT/log_flow'                          : value => '0';
       'DEFAULT/use_syslog'                        : value => '1';
       'DEFAULT/syslog_facility'                   : value => 'LOG_LOCAL0';
       'DEFAULT/headless_mode'                     : value => true;
