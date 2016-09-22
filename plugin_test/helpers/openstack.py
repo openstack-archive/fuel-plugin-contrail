@@ -194,13 +194,15 @@ def enable_sriov(obj):
 
 
 def check_slave_memory(min_memory):
-    """Check memmory on slave."""
+    """Check memory on slave."""
     if HARDWARE["slave_node_memory"] < min_memory:
         error_msg = 'Out of slaves ram'
-        raise MemoryError(error_msg)
+        logger.warning(error_msg)
+        return False
     else:
         msg = 'Slaves have {0} mb ram'.format(HARDWARE["slave_node_memory"])
         logger.info(msg)
+        return True
 
 
 def setup_hugepages(obj, hp_2mb=512, hp_1gb=6, hp_dpdk_mb=0):
