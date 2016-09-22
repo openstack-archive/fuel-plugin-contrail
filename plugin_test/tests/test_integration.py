@@ -205,6 +205,7 @@ class IntegrationTests(TestBasic):
 
         """
         conf_contrail = {"dedicated_analytics_db": True}
+        min_slave_ram = 10000
         self.show_step(1)
         plugin.prepare_contrail_plugin(
             self,
@@ -239,15 +240,23 @@ class IntegrationTests(TestBasic):
         self.show_step(13)
         TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(14)
+        check_ram_result = openstack.check_slave_memory(min_slave_ram)
         # https://bugs.launchpad.net/fuel/newton/+bug/1584190
         # remove should fail, when bug will be fixed
-        if vsrx_setup_result:
+        if vsrx_setup_result and check_ram_result:
             self.fuel_web.run_ostf(
-                cluster_id=self.cluster_id,
+                cluster_id=self.ostf_list,
                 test_sets=['smoke', 'sanity', 'ha', 'tests_platform'],
-                timeout=60 * 60,
+                timeout=settings.OSTF_RUN_TIMEOUT,
                 should_fail=1,
                 failed_test_name=['Check stack autoscaling'])
+        elif vsrx_setup_result:
+            logger.warming('Ostf tests will be run without platform tests')
+            self.fuel_web.run_ostf(
+                cluster_id=self.ostf_list,
+                test_sets=['smoke', 'sanity', 'ha'],
+                timeout=settings.OSTF_RUN_TIMEOUT)
+
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_jumbo", "contrail_integration_tests"])
@@ -835,12 +844,20 @@ class IntegrationTests(TestBasic):
         self.show_step(10)
         TestContrailCheck(self).cloud_check(['contrail'])
         self.show_step(11)
-        if vsrx_setup_result:
+        check_ram_result = openstack.check_slave_memory(min_slave_ram)
+        if vsrx_setup_result and check_ram_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
                 test_sets=['smoke', 'sanity', 'tests_platform'],
                 timeout=settings.OSTF_RUN_TIMEOUT
                 )
+        elif vsrx_setup_result:
+            logger.warming('Ostf tests will be run without platform tests')
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity'],
+                timeout=settings.OSTF_RUN_TIMEOUT
+            )
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_murano", "contrail_integration_tests"])
@@ -902,9 +919,17 @@ class IntegrationTests(TestBasic):
         TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(12)
-        if vsrx_setup_result:
+        check_ram_result = openstack.check_slave_memory(min_slave_ram)
+        if vsrx_setup_result and check_ram_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
                 test_sets=['smoke', 'sanity', 'tests_platform'],
+                timeout=settings.OSTF_RUN_TIMEOUT
+                )
+        elif vsrx_setup_result:
+            logger.warming('Ostf tests will be run without platform tests')
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity'],
                 timeout=settings.OSTF_RUN_TIMEOUT
                 )
