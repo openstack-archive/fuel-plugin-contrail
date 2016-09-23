@@ -60,10 +60,9 @@ class SRIOVTests(TestBasic):
                 node-03: 'controller', 'ceph-osd';
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'compute', 'ceph-osd';
-                node-06: 'contrail-db';
-                node-07: 'contrail-config';
-                node-08: 'contrail-control';
-                node-09: 'contrail-analytics';
+                node-06: 'contrail-controller';
+                node-07: 'contrail-analytics';
+                node-08: 'contrail-analytics-db';
                 node-sriov: 'compute';
             4. Run OSTF tests
             5. Run contrail health check tests
@@ -97,10 +96,9 @@ class SRIOVTests(TestBasic):
             'slave-03': ['controller', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
-            'slave-06': ['contrail-db'],
-            'slave-07': ['contrail-config'],
-            'slave-08': ['contrail-control'],
-            'slave-09': ['contrail-analytics']
+            'slave-06': ['contrail-controller'],
+            'slave-07': ['contrail-analytics'],
+            'slave-08': ['contrail-analytics-db'],
         }
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
@@ -134,21 +132,19 @@ class SRIOVTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Enable dedicated analytics DB
-            4. Deploy cluster with following node configuration:
-                node-1: 'controller', 'ceph-osd';
-                node-2: 'contrail-config', 'contrail-control',
-                        'contrail-db', 'contrail-analytics';
-                node-3: 'compute', 'ceph-osd';
-                node-4: 'compute', 'ceph-osd';
-                node-bm: 'compute'(sriov);
-                node-6: 'compute', 'ceph-osd';
-            5. Run OSTF tests
-            6. Add one node with following configuration:
-                node-5: 'contrail-analytics-db';
-            7. Deploy changes
-            8. Run OSTF tests
-            9. Run contrail health check tests
+            3. Deploy cluster with following node configuration:
+               node-1: 'controller', 'ceph-osd';
+               node-2: 'contrail-analytics', 'contrail-controller';
+               node-3: 'compute', 'ceph-osd';
+               node-4: 'compute', 'ceph-osd';
+               node-6: 'contrail-analytics-db';
+               node-bm: 'compute'(sriov);
+            4. Run OSTF tests
+            5. Add one node with following configuration:
+               node-5: 'compute', 'ceph-osd';
+            6. Deploy changes
+            7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -160,22 +156,19 @@ class SRIOVTests(TestBasic):
                                                 'volumes_lvm': False})
         self.bm_drv.host_prepare()
 
-        plugin.show_range(self, 2, 4)
+        self.show_step(2)
         # enable plugin
-        plugin.activate_plugin(self, dedicated_analytics_db=True)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        self.show_step(4)
+        self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute'])
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
-            'slave-02': ['contrail-config',
-                         'contrail-control',
-                         'contrail-db',
-                         'contrail-analytics'],
+            'slave-02': ['contrail-controller', 'contrail-analytics'],
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-06': ['contrail-analytics-db'],
@@ -192,7 +185,7 @@ class SRIOVTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(5)
+        self.show_step(4)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id, should_fail=2,
@@ -203,7 +196,7 @@ class SRIOVTests(TestBasic):
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
         # Add Compute node and check again
-        self.show_step(6)
+        self.show_step(5)
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
                                    nodes_dict=conf_compute,
@@ -211,10 +204,10 @@ class SRIOVTests(TestBasic):
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         openstack.enable_sriov(self)
         # Deploy cluster
-        self.show_step(7)
+        self.show_step(6)
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(8)
+        self.show_step(7)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id, should_fail=2,
@@ -222,7 +215,7 @@ class SRIOVTests(TestBasic):
                     'Instance live migration',
                     'Check network connectivity from SRIOV instance via' +
                     ' floating IP'])
-            self.show_step(9)
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -237,10 +230,9 @@ class SRIOVTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                 node-01: 'controller';
-                node-02: 'contrail-control', 'contrail-config',
-                         'contrail-db', 'contrail-analytics';
+                node-02: 'contrail-controller'
                 node-03: 'compute', 'cinder';
-                node-04: 'compute';
+                node-05: 'contrail-analytics', 'contrail-analytics-db';
                 node-bm: 'compute'(sriov);
             4. Run OSTF tests
             5. Delete node-04 with "compute" role
@@ -265,11 +257,10 @@ class SRIOVTests(TestBasic):
                                     roles=['compute'])
         conf_no_compute = {
             'slave-01': ['controller'],
-            'slave-02': ['contrail-control',
-                         'contrail-config',
-                         'contrail-db',
-                         'contrail-analytics'],
+            'slave-02': ['contrail-controller'],
             'slave-03': ['compute', 'cinder'],
+            # slave-04 compute here
+            'slave-05': ['contrail-analytics', 'contrail-analytics-db'],
         }
         conf_compute = {'slave-04': ['compute']}
 
@@ -326,21 +317,19 @@ class SRIOVTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Enable dedicated analytics DB
-            4. Deploy cluster with following node configuration:
+            3. Deploy cluster with following node configuration:
                 node-1: 'controller', 'ceph-osd';
-                node-2: 'contrail-config', 'contrail-control',
-                        'contrail-db';
+                node-2: 'contrail-controller';
                 node-3: 'compute', 'ceph-osd';
                 node-4: 'compute', 'ceph-osd';
+                node-6: 'contrail-analytics', 'contrail-analytics-db';
                 node-bm: 'compute'(sriov);
-                node-6:  'contrail-analytics', 'contrail-analytics';
-            5. Run OSTF tests
-            6. Add one node with following configuration:
+            4. Run OSTF tests
+            5. Add one node with following configuration:
                 node-5: "controller", "ceph-osd";
-            7. Deploy changes
-            8. Run OSTF tests
-            9. Run contrail health check tests
+            6. Deploy changes
+            7. Run OSTF tests
+            8. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -354,21 +343,19 @@ class SRIOVTests(TestBasic):
 
         plugin.show_range(self, 2, 4)
         # enable plugin
-        plugin.activate_plugin(self, dedicated_analytics_db=True)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute'])
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
-            'slave-02': ['contrail-config',
-                         'contrail-control',
-                         'contrail-db'],
+            'slave-02': ['contrail-controller'],
             'slave-03': ['compute', 'ceph-osd'],
             'slave-04': ['compute', 'ceph-osd'],
+            # slave-05 controlle, ceph-osd here
             'slave-06': ['contrail-analytics-db', 'contrail-analytics'],
         }
         conf_controller = {'slave-05': ['controller', 'ceph-osd']}
@@ -383,7 +370,7 @@ class SRIOVTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(5)
+        self.show_step(4)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
@@ -395,17 +382,17 @@ class SRIOVTests(TestBasic):
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
         # Add Compute node and check again
-        self.show_step(6)
+        self.show_step(5)
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
                                    nodes_dict=conf_controller,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         # Deploy cluster
-        self.show_step(7)
+        self.show_step(6)
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(8)
+        self.show_step(7)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
@@ -414,7 +401,7 @@ class SRIOVTests(TestBasic):
                     'Instance live migration',
                     'Check network connectivity from SRIOV instance via'
                     ' floating IP'])
-            self.show_step(9)
+            self.show_step(8)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -429,10 +416,10 @@ class SRIOVTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Deploy cluster with following node configuration:
                node-01: 'controller';
-               node-02: 'contrail-control', 'contrail-config',
-                        'contrail-db', 'contrail-analytics';
+               node-02: 'contrail-analytics', 'contrail-controller';
                node-03: 'compute', 'cinder';
                node-04: 'controller';
+               node-05: 'contrail-analytics-db';
                node-bm: 'compute'(sriov);
             4. Run OSTF tests
             5. Delete node-04 with "controller" role
@@ -457,11 +444,10 @@ class SRIOVTests(TestBasic):
                                     roles=['compute'])
         conf_no_compute = {
             'slave-01': ['controller'],
-            'slave-02': ['contrail-control',
-                         'contrail-config',
-                         'contrail-db',
-                         'contrail-analytics'],
+            'slave-02': ['contrail-controller', 'contrail-analytics'],
             'slave-03': ['compute', 'cinder'],
+            'slave-04': ['controller'],
+            'slave-05': ['contrail-analytics-db'],
         }
         conf_controller = {'slave-04': ['controller']}
 
@@ -515,21 +501,19 @@ class SRIOVTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Enable dedicated analytics DB
-            4. Deploy cluster with following node configuration:
+            3. Deploy cluster with following node configuration:
                 node-01: 'controller', 'ceph-osd';
-                node-02: 'contrail-config', 'contrail-control';
-                node-03: 'contrail-db', 'contrail-analytics';
+                node-02: 'contrail-controller';
+                node-03: 'contrail-analytics', 'contrail-analytics-db';
                 node-04: 'compute', 'ceph-osd';
                 node-05: 'compute', 'ceph-osd';
-                node-06: 'contrail-analytics-db', 'contrail-analytics';
-            5. Run OSTF tests
-            6. Run contrail health check tests
-            7. Add one node with following configuration:
+            4. Run OSTF tests
+            5. Run contrail health check tests
+            6. Add one node with following configuration:
                 node-bm: "compute"(sriov);
-            8. Deploy changes
-            9. Run OSTF tests
-            10. Run contrail health check tests
+            7. Deploy changes
+            8. Run OSTF tests
+            9. Run contrail health check tests
 
         """
         self.show_step(1)
@@ -537,20 +521,19 @@ class SRIOVTests(TestBasic):
                                        options={'images_ceph': True})
         self.bm_drv.host_prepare()
 
-        plugin.show_range(self, 2, 4)
+        self.show_step(2)
         # enable plugin
         plugin.activate_plugin(self, dedicated_analytics_db=True)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 6)
+        plugin.show_range(self, 3, 5)
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
-            'slave-02': ['contrail-config', 'contrail-control'],
-            'slave-03': ['contrail-db'],
+            'slave-02': ['contrail-controller'],
+            'slave-03': ['contrail-analytics-db', 'contrail-analytics'],
             'slave-04': ['compute', 'ceph-osd'],
             'slave-05': ['compute', 'ceph-osd'],
-            'slave-06': ['contrail-analytics-db', 'contrail-analytics'],
         }
         self.fuel_web.update_nodes(
             self.cluster_id,
@@ -565,23 +548,23 @@ class SRIOVTests(TestBasic):
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
             TestContrailCheck(self).cloud_check(['contrail'])
 
-        self.show_step(7)
+        self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute'])
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
-        self.show_step(8)
+        self.show_step(7)
         openstack.deploy_cluster(self)
 
-        self.show_step(9)
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id, should_fail=1,
                 failed_test_name=[
                     'Check network connectivity from SRIOV '
                     'instance via floating IP'])
-            self.show_step(10)
+            self.show_step(9)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
@@ -594,40 +577,36 @@ class SRIOVTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable and configure Contrail plugin
-            3. Enable dedicated analytics DB
-            4. Deploy cluster with following node configuration:
+            3. Deploy cluster with following node configuration:
                 node-01: 'controller';
                 node-02: 'controller';
                 node-03: 'controller', 'cinder';
-                node-04: 'contrail-control', 'contrail-config',
-                         'contrail-db', 'contrail-analytics';
-                node-05: 'contrail-control', 'contrail-config',
-                         'contrail-db', 'contrail-analytics';
-                node-06: 'contrail-control', 'contrail-config',
-                         'contrail-db', 'contrail-analytics';
+                node-04: 'contrail-controller';
+                node-05: 'contrail-analytics';
+                node-06: 'contrail-analytics-db';
                 node-07: 'compute';
                 node-08: 'compute';
-                node-bm: 'compute'(sriov);
                 node-09: 'contrail-analytics-db';
-            5. Run OSTF tests
-            6. Run contrail health check tests
-            7. Delete node-bm with 'compute'(sriov) role
-            8. Deploy changes
-            9. Run OSTF tests
-            10. Run contrail health check tests
+                node-bm: 'compute'(sriov);
+            4. Run OSTF tests
+            5. Run contrail health check tests
+            6. Delete node-bm with 'compute'(sriov) role
+            7. Deploy changes
+            8. Run OSTF tests
+            9. Run contrail health check tests
 
         """
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
         self.bm_drv.host_prepare()
 
-        plugin.show_range(self, 2, 4)
+        self.show_step(2)
         # enable plugin
         plugin.activate_plugin(self, dedicated_analytics_db=True)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        self.show_step(4)
+        self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute'])
@@ -635,18 +614,9 @@ class SRIOVTests(TestBasic):
             'slave-01': ['controller'],
             'slave-02': ['controller'],
             'slave-03': ['controller', 'cinder'],
-            'slave-04': ['contrail-control',
-                         'contrail-config',
-                         'contrail-db',
-                         'contrail-analytics'],
-            'slave-05': ['contrail-control',
-                         'contrail-config',
-                         'contrail-db',
-                         'contrail-analytics'],
-            'slave-06': ['contrail-control',
-                         'contrail-config',
-                         'contrail-db',
-                         'contrail-analytics'],
+            'slave-04': ['contrail-controller'],
+            'slave-05': ['contrail-analytics'],
+            'slave-06': ['contrail-analytics-db'],
             'slave-07': ['compute'],
             'slave-08': ['compute'],
             'slave-09': ['contrail-analytics-db'],
@@ -662,32 +632,32 @@ class SRIOVTests(TestBasic):
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
-        self.show_step(5)
+        self.show_step(4)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id, should_fail=1,
                 failed_test_name=[
                     'Check network connectivity from SRIOV '
                     'instance via floating IP'])
-            self.show_step(6)
+            self.show_step(5)
             TestContrailCheck(self).cloud_check(['sriov', 'contrail'])
 
-        self.show_step(7)
+        self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute'],
                                     pending_deletion=True,
                                     pending_addition=False)
-        self.show_step(8)
+        self.show_step(7)
         openstack.deploy_cluster(self)
 
-        self.show_step(9)
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id, should_fail=1,
                 failed_test_name=['Check that required services are running']
                 )
-            self.show_step(10)
+            self.show_step(9)
             TestContrailCheck(self).cloud_check(['contrail'])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
@@ -697,11 +667,12 @@ class SRIOVTests(TestBasic):
         """Check updating core repos with Contrail plugin and SRIOV.
 
         Scenario:
-            1. Deploy cluster with some
-               controller,
-               compute+cinder,
-               compute+sriov and
-               contrail-specified nodes
+            1. Deploy cluster with with following node configuration:
+               node-01: 'controller';
+               node-02: 'compute', 'cinder';
+               node-03: 'contrail-controller';
+               node-04: 'contrail-analytics';
+               node-05: 'contrail-analytics-db';
             2. Run 'fuel-mirror create -P ubuntu -G mos ubuntu'
                on the master node
             3. Run 'fuel-mirror apply -P ubuntu -G mos ubuntu
@@ -723,8 +694,8 @@ class SRIOVTests(TestBasic):
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
-            'slave-03': ['contrail-config', 'contrail-control'],
-            'slave-04': ['contrail-db', 'contrail-analytics'],
+            'slave-03': ['contrail-controller'],
+            'slave-04': ['contrail-analytics'],
             'slave-05': ['contrail-analytics-db'],
         }
         self.fuel_web.update_nodes(self.cluster_id, conf_nodes)

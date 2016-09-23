@@ -1,5 +1,5 @@
 =================================================
-Master Test Plan for Contrail v 4.0.1 Fuel Plugin
+Master Test Plan for Contrail v 5.0 Fuel Plugin
 =================================================
 
 
@@ -192,6 +192,7 @@ Not Run test cases - this metric shows a count of test cases which should be run
 .. include:: test_suite_gui.rst
 .. include:: test_suite_system.rst
 .. include:: test_suite_dpdk.rst
+.. include:: test_suite_dpdk_on_vf.rst
 .. include:: test_suite_sriov.rst
 .. include:: test_suite_dpdk_vf.rst
 .. include:: test_suite_multiple_networks.rst
