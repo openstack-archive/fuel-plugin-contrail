@@ -20,12 +20,15 @@ import yaml
 import os.path
 import argparse
 import logging
+from copy import deepcopy
 
 from pyVim import connect
 from pyVmomi import vim
 from pyVmomi import vmodl
 
 from nailgun import objects
+from nailgun.db.sqlalchemy.models import Cluster
+from nailgun.db import db
 
 
 class Vcenter_base(object):
@@ -161,6 +164,8 @@ class Vcenter_base(object):
         parser.add_argument(
             '--dvs-mtu-int', type=int, dest='dvs_mtu_int', help='Max MTU for internal DVS', default=None)
         parser.add_argument(
+            '--cluster-list', type=str, dest='cluster_list', help='Change cluster list', default=None)
+        parser.add_argument(
             '--reduce-vm-params', action='store_true', dest='reduce_vm_params',
             help='Reduce memory value for ContrailVM\'s', default=None)
 
@@ -214,6 +219,13 @@ class Vcenter_base(object):
         logger.addHandler(ch)
         return logger
 
+    @staticmethod
+    def change_cluster_list(env_id, cluster_list):
+        cluster_db = db.query(Cluster).get(env_id)
+        cluster_db.vmware_attributes.editable = deepcopy(cluster_db.vmware_attributes.editable)
+        cluster_db.vmware_attributes.editable['value']['availability_zones'][0]['nova_computes'][0][
+            'vsphere_cluster'] = cluster_list
+        db.commit()
 
 class Vcenter_obj_tpl(object):
     def controller_info(self):
@@ -665,6 +677,9 @@ if __name__ == '__main__':
     else:
         vm_memory = 8228  # MB
 
+    if args.cluster_list:
+        Vcenter_base.change_cluster_list(env_id=env_id, cluster_list=args.cluster_list)
+
     vcenter_connect = Vcenter_base(user_data)
     si = vcenter_connect.connect_to_vcenter()
     hosts_name = vcenter_connect.get_all_hosts()
@@ -673,7 +688,7 @@ if __name__ == '__main__':
     host_list_dvs_int = [{'host': host, 'uplink': None} for host in hosts_name]
     vmware_data_new = vcenter_connect.fetch_hosts_data()
 
-    # Specify where save vmware_data
+    # Specify where save vmware data
     file_dir = '/var/www/nailgun/plugins/contrail-5.0/deployment_scripts/puppet/modules/contrail/files/'
     file_name = 'vmware_data_{}.yaml'.format(str(env_id))
     vmware_datastore = Vcenterdata(file_dir + file_name)
@@ -721,4 +736,3 @@ if __name__ == '__main__':
             vm.power_on(vm_name)
     elif args.map_ips:
         vmware_datastore.add_admin_ip()
-
