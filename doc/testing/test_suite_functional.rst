@@ -42,9 +42,9 @@ Steps
     12. Delete a Controller node and deploy changes
     13. Run OSTF tests
     14. Run contrail health check tests
-    16. Add a node with "Controller" role and deploy changes
-    17. Run OSTF tests.
-    18. Run contrail health check tests
+    15. Add a node with "Controller" role and deploy changes
+    16. Run OSTF tests.
+    17. Run contrail health check tests
 
 Expected results
 ################
@@ -172,19 +172,19 @@ Steps
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration
     2. Enable and configure Contrail plugin with Vcenter
-    4. Add a controller and a compute+cinder nodes
-    5. Add 2 nodes with "contrail-controller" roles
-    6. Add a node with "contrail-analytics" role
-    7. Add a node with "contrail-analytics-db" role
-    8. Add a node with "compute-vmware" role
-    9. Add a node with "contrail-vmware" role
-    10. Deploy cluster
-    11. Run OSTF tests
-    12. Run contrail health check tests
-    13. Add one node with "contrail-controller" role
-    14. Deploy changes
-    15. Run OSTF tests
-    16. Run contrail health check tests
+    3. Add a controller and a compute+cinder nodes
+    4. Add 2 nodes with "contrail-controller" roles
+    5. Add a node with "contrail-analytics" role
+    6. Add a node with "contrail-analytics-db" role
+    7. Add a node with "compute-vmware" role
+    8. Add a node with "contrail-vmware" role
+    9. Deploy cluster
+    10. Run OSTF tests
+    11. Run contrail health check tests
+    12. Add one node with "contrail-controller" role
+    13. Deploy changes
+    14. Run OSTF tests
+    15. Run contrail health check tests
 
 
 Expected results
@@ -223,14 +223,14 @@ Steps
     3. Add a node with "controller" + "mongo" roles and  3 nodes with "compute" + "ceph-osd" roles
     4. Add a node with contrail-controller role
     5. Add a node with contrail-analytics and contrail-analytics-db
-    5. Deploy cluster and run OSTF tests
-    6. Run contrail health check tests
-    7. Add node with "compute" role
-    8. Deploy changes and run OSTF tests
-    9. Run contrail health check tests
-    10. Delete node with "compute" role
-    11. Deploy cluster and run OSTF tests
-    12. Run contrail health check tests
+    6. Deploy cluster and run OSTF tests
+    7. Run contrail health check tests
+    8. Add node with "compute" role
+    9. Deploy changes and run OSTF tests
+    10. Run contrail health check tests
+    11. Delete node with "compute" role
+    12. Deploy cluster and run OSTF tests
+    13. Run contrail health check tests
 
 
 Expected results
@@ -452,7 +452,7 @@ Steps
     3. Add a node with controller and cinder role
     4. Add 2 nodes with compute role
     5. Add 3 nodes with contrail-controller
-      and contrail-analytics roles
+       and contrail-analytics roles
     6. Add a node with contrail-analytics-db role
     7. Deploy cluster
     8. Run OSTF tests

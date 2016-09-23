@@ -33,7 +33,8 @@ Steps
     2. Enable and configure Contrail plugin
     3. Add some controller (at least 3), compute,
        compute with sriov and storage nodes
-    4. And contrail-control, contrail-config, contrail-db and contrail-analytics nodes
+    4. Add contrail-controler,
+       contrail-analytics and contrail-analytics-db nodes
     5. Deploy cluster
     6. Run OSTF tests
     7. Run contrail check tests
@@ -73,7 +74,7 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH storage
-    2. Enable and configure Contrail plugin with dedicated analytics DB
+    2. Enable and configure Contrail plugin
     3. Deploy cluster with some controller, compute+ceph, compute,
        compute with sriov and contrail-specified nodes
     4. Run OSTF tests
@@ -162,7 +163,7 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH+Cinder storage
-    2. Enable and configure Contrail plugin with dedicated analytics DB
+    2. Enable and configure Contrail plugin
     3. Deploy cluster with some controller+ceph, compute+ceph, compute,
        compute with sriov and contrail-specified nodes
     4. Run OSTF tests
@@ -206,7 +207,7 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and Cinder storage
-    2. Enable and configure Contrail plugin with dedicated analytics DB
+    2. Enable and configure Contrail plugin
     3. Deploy cluster with some controller, controller+cinder, compute+cinder,
        compute, compute with sriov and contrail-specified nodes
     4. Run OSTF tests
@@ -290,7 +291,7 @@ Steps
 
     1. Create an environment with "Neutron with tunneling segmentation"
        as a network configuration and CEPH storage
-    2. Enable and configure Contrail plugin with dedicated analytics DB
+    2. Enable and configure Contrail
     3. Deploy cluster with some controller, compute+ceph,
        compute, compute with sriov and contrail-specified nodes
     4. Run OSTF tests

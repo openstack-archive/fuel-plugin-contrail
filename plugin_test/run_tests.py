@@ -59,6 +59,7 @@ def import_tests():
     from tests import test_dpdk  # noqa
     from tests import test_sriov  # noqa
     from tests import test_dpdk_vf  # noqa
+    from tests import test_dpdk_on_vf  # noqa
     from tests import test_contrail_multiple_networks  # noqa
 
 
