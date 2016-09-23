@@ -33,7 +33,8 @@ Steps
     2. Enable and configure Contrail plugin
     3. Add some controller (at least 3), compute,
        compute with sriov and storage nodes
-    4. And contrail-control, contrail-config, contrail-db and contrail-analytics nodes
+    4. And contrail-controler,
+       contrail-analytics and contrail-analytics-db nodes
     5. Deploy cluster
     6. Run OSTF tests
     7. Run contrail check tests
