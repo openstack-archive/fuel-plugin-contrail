@@ -632,8 +632,8 @@ class TestContrailCheck(object):
                 out = remote.execute(command)['stdout']
                 for res in out:
                     logger.info('Check status: {}'.format(res))
-                    assert('active' in res,
-                           "Contrail node status invalid: {}".format(out))
+                    assert_true('active' in res,
+                                "Contrail node status invalid: {}".format(out))
             return True
 
         nailgun_nodes = self.obj.fuel_web.client.list_cluster_nodes(cluster_id)
