@@ -77,7 +77,6 @@ class ContrailPlugin(TestBasic):
         contrail_external = '10.100.1.0/24'
         contrail_asnum = '64512'
         hugepages_amount = '60'
-        hugepages_size = '2'
         vrouter_core_mask = '0x3'
 
         plugin.show_range(self, 1, 7)
@@ -130,11 +129,6 @@ class ContrailPlugin(TestBasic):
             contrail_route_target, attr['contrail_route_target']['value'],
             "Invalid default contrail route target {0}.".format(
                 attr['contrail_route_target']['value']))
-
-        assert_equal(
-            hugepages_size, attr['hugepages_size']['value'],
-            "Invalid default hugepages size {0}.".format(
-                attr['hugepages_size']['value']))
 
         assert_equal(
             True, attr['contrail_global_dpdk']['value'],
