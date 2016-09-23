@@ -759,13 +759,15 @@ class DPDKTests(TestBasic):
         # Run OSTF tests
         if vsrx_setup_result:
             self.show_step(8)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id, should_fail=1,
+                failed_test_name=[
+                    'Check network connectivity from SRIOV '
+                    'instance via floating IP'])
             TestContrailCheck(self).cloud_check(
                 ['dpdk', 'contrail'],
                 should_fail=[
-                    "test_dpdk_boot_snapshot_vm",
-                    "Check network connectivity from SRIOV instance via"
-                    " floating IP"])
+                    "test_dpdk_boot_snapshot_vm"])
 
         # Add Contrail node and check again
         self.show_step(9)
