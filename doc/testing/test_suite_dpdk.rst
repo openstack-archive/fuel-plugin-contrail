@@ -420,7 +420,7 @@ Steps
     5. Enable sriov on interfaces of dpdk+compute node
     6. Deploy cluster
     7. Run OSTF
-    8  Run contrail health check tests
+    8. Run contrail health check tests
     9. Add nodes with configurations:
        node-5: 'contrail-controller';
        node-6: 'contrail-controller';
