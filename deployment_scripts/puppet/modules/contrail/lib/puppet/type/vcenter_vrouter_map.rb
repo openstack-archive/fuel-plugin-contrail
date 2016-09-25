@@ -45,4 +45,9 @@ Puppet::Type.newtype(:vcenter_vrouter_map) do
     defaultto false
   end
 
+  newparam(:dvs, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+    desc 'Get DVS mappings YAML-format output'
+    defaultto false
+  end
+
 end

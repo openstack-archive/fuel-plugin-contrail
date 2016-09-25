@@ -43,6 +43,7 @@ Puppet::Type.type(:vcenter_vrouter_map).provide(:ruby) do
     return @vrouter_map if @vrouter_map
     options = ['-p', resource[:password], '-u', resource[:username], '-s', resource[:vcenter_host], '-i', resource[:ips]]
     options += ['-y'] if resource[:yaml]
+    options += ['-d'] if resource[:dvs]
     @vrouter_map = script *options
     @vrouter_map += "\n" unless @vrouter_map.end_with? "\n"
     @vrouter_map
