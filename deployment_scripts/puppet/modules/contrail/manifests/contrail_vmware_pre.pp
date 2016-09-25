@@ -47,6 +47,17 @@ class contrail::contrail_vmware_pre {
       ips          => $contrail::contrail_vcenter_vm_ips,
       path         => '/etc/hiera/plugins/contrail-esxi-vrouter-map.yaml',
       yaml         => true,
+      dvs          => false,
+    }
+
+    vcenter_vrouter_map { 'contrail-host-to-mac-bind.yaml' :
+      ensure       => present,
+      password     => $contrail::vcenter_server_pass,
+      username     => $contrail::vcenter_server_user,
+      vcenter_host => $contrail::vcenter_server_ip,
+      path         => '/etc/hiera/plugins/contrail-host-to-mac-bind.yaml',
+      yaml         => true,
+      dvs          => true,
     }
 
     Class['contrail::package']  -> Vcenter_vrouter_map['contrail-esxi-vrouter-map.yaml']
