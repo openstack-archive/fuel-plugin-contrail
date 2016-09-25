@@ -2,18 +2,9 @@
 import sys
 import atexit
 import argparse
-import urllib3
 import yaml
 import time
 from pyVim import connect
-
-#import ssl
-
-#ssl._create_default_https_context = ssl._create_unverified_context
-
-urllib3.disable_warnings()
-
-# $ virtual_machine_device_info.py -s vcsa -u my_user -i 172.16.254.101
 
 
 class VrouterMap(object):
@@ -141,5 +132,5 @@ class VrouterMap(object):
 
 if __name__ == '__main__':
     vm = VrouterMap()
-    vm.main(
-)
+    vm.main()
+

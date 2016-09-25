@@ -32,9 +32,9 @@ class contrail::contrail_vmware {
 
     # Fetching the esxi data from hash
     $mapping_data            = loadyaml('/etc/hiera/plugins/contrail-esxi-vrouter-map.yaml')
-    $host_to_mac_bind        = loadyaml('/etc/hiera/override/host_to_mac_bind.yaml')
+    $host_to_mac_bind        = loadyaml('/etc/hiera/plugins/contrail-host-to-mac-bind.yaml')
     $host                    = pick($mapping_data['esxi_mapping'][$contrail::address], '')
-    $esxi_dvs_mac_list       = pick($host_to_mac_bind[$host], '')
+    $esxi_dvs_mac_list       = pick($host_to_mac_bind['contrail_host_to_mac_binding'][$host], '')
     $if_names                = interface_name_by_mac($esxi_dvs_mac_list)
     $vmware_iface_name       = pick($if_names['0'], 'ens162')
     #NOTE(AKirilochkin): Obsolete, please keep it for future use,
