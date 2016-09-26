@@ -4,7 +4,7 @@ pre-up /opt/contrail/bin/if-vhost0
 address <%= scope.lookupvar('contrail::address') %>/<%= scope.lookupvar('contrail::netmask_short') %>
 network_name contrail
 <% if scope.lookupvar('contrail::phys_dev_mtu') -%>
-mtu <%= scope.lookupvar('contrail::phys_dev_mtu') -%>
+mtu <%= scope.lookupvar('contrail::phys_dev_mtu') %>
 <% end -%>
 <% if scope.lookupvar('contrail::gateway') -%>
 <% scope.lookupvar('contrail::routes').each do |route| -%>
@@ -12,5 +12,5 @@ post-up ip route add <%= route['net'] %> via <%= route['via'] %> dev vhost0
 <% end -%>
 <% end -%>
 <% if @dpdk_dev_mac -%>
-post-up ip link set address <%= @dpdk_dev_mac -%> dev vhost0
+post-up ip link set address <%= @dpdk_dev_mac %> dev vhost0
 <% end -%>
