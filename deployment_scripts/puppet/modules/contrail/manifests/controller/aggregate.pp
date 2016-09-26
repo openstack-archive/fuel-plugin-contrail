@@ -48,7 +48,7 @@ class contrail::controller::aggregate {
 
 # Create host aggregate for huge pages
     exec {'create-hpgs-aggr':
-      command => 'bash -c "nova aggregate-create hpgs-aggr hpgs"',
+      command => 'bash -c "nova aggregate-create hpgs-aggr"',
       unless  => 'bash -c "nova aggregate-list | grep -q hpgs-aggr"',
     } ->
     exec {'aggr-set-metadata':
