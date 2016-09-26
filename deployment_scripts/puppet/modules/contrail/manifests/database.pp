@@ -112,9 +112,9 @@ class contrail::database {
     group   => 'cassandra',
   } ->
   file_line { 'JVM_stack_size':
-    path => '/etc/cassandra/cassandra-env.sh',
-    line => 'JVM_OPTS="$JVM_OPTS -Xss512k"',
-    match   => 'JVM_OPTS=\"\$JVM_OPTS -Xss.*\"',
+    path  => '/etc/cassandra/cassandra-env.sh',
+    line  => 'JVM_OPTS="$JVM_OPTS -Xss512k"',
+    match => 'JVM_OPTS=\"\$JVM_OPTS -Xss.*\"',
   }
 
 # Supervisor-database

@@ -131,7 +131,8 @@
   role: [primary-contrail-db, contrail-db,
         primary-contrail-config, contrail-config,
         primary-contrail-control,contrail-control,
-        primary-contrail-analytics,contrail-analytics]
+        primary-contrail-analytics,contrail-analytics,
+        primary-contrail-analytics-db,contrail-analytics-db]
   tasks: [configure_default_route, dns-client, ntp-client]
   required_for: [post_deployment_end]
   requires: [post_deployment_start]
