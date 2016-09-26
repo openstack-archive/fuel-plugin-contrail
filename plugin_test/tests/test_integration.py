@@ -251,7 +251,7 @@ class IntegrationTests(TestBasic):
                 should_fail=1,
                 failed_test_name=['Check stack autoscaling'])
         elif vsrx_setup_result:
-            logger.warming('Ostf tests will be run without platform tests')
+            logger.warning('Ostf tests will be run without platform tests')
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
                 test_sets=['smoke', 'sanity', 'ha'],
@@ -849,7 +849,7 @@ class IntegrationTests(TestBasic):
                 timeout=settings.OSTF_RUN_TIMEOUT
                 )
         elif vsrx_setup_result:
-            logger.warming('Ostf tests will be run without platform tests')
+            logger.warning('Ostf tests will be run without platform tests')
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
                 test_sets=['smoke', 'sanity'],
@@ -921,7 +921,7 @@ class IntegrationTests(TestBasic):
                 timeout=settings.OSTF_RUN_TIMEOUT
                 )
         elif vsrx_setup_result:
-            logger.warming('Ostf tests will be run without platform tests')
+            logger.warning('Ostf tests will be run without platform tests')
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
                 test_sets=['smoke', 'sanity'],
