@@ -13,7 +13,7 @@ cache_prefix=$host
 <%  @vc_cluster.split(',').map(&:strip).each do |cluster_name| -%>
 cluster_name=<%= cluster_name %>
 <% end %>
-vcenter_dvswitch=<%= contrail_data['contrail_vcenter_dvswitch'] %>
+vcenter_dvswitch=<%= contrail_data['dvs_internal'] %>
 
 host_ip=<%= @vc_host %>
 host_username=<%= @vc_user %>
