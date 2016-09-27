@@ -46,9 +46,9 @@ Steps
        * 1 contrail-analytics-db
     5. Configure interfaces on nodes.
     6. Configure network settings.
-    8. Deploy the cluster.
-    9. Run OSTF tests.
-    10. Verify that TLS certificate should be  generated for TSN and TOR.
+    7. Deploy the cluster.
+    8. Run OSTF tests.
+    9. Verify that TLS certificate should be  generated for TSN and TOR.
 
 
 Expected results
@@ -95,12 +95,12 @@ Steps
        * 1 Contrail-config + contrail-control + contrail-db + contrail-analytics
     5. Configure interfaces on nodes.
     6. Configure network settings.
-    8. Deploy the cluster.
-    9. Run OSTF tests.
-    10. Add TOR switch and configure interfaces via Contrail UI.
-    11. Check that ToR agent is active.
-    12. Reboot TSN nodes.
-    13. Check that ToR agents is active after reboot.
+    7. Deploy the cluster.
+    8. Run OSTF tests.
+    9. Add TOR switch and configure interfaces via Contrail UI.
+    10. Check that ToR agent is active.
+    11. Reboot TSN nodes.
+    12. Check that ToR agents is active after reboot.
 
 
 Expected results
@@ -136,15 +136,15 @@ Steps
     1. Setup Contrail TSN HA.
     2. Launch few instances.
     3. Add ips and macs of instances to TOR interface via Contrail UI.
-    4. Check that assosiated instance ports is displayed in the local unicast table on TOR switch.
-        Run command 'ovs-vsctl show'.
+    4. Check that associated instance ports is displayed in the local unicast table on TOR switch.
+       Run command 'ovs-vsctl show'.
 
 
 Expected results
 ################
 
 Cluster should be deployed and OSTF test cases should be passed.
-All assosiated instance ports is displayd in the local unicast table on TOR switch.
+All associated instance ports is displayed in the local unicast table on TOR switch.
 
 
 Contrail TSN add TSN
@@ -190,8 +190,8 @@ Steps
     7. Deploy the cluster.
     8. Run OSTF tests.
     9. Add TSN node.
-    11. Redeploy cluster.
-    12. Run OSTF tests.
+    10. Redeploy cluster.
+    11. Run OSTF tests.
 
 
 Expected results
@@ -245,8 +245,8 @@ Steps
     7. Deploy the cluster.
     8. Run OSTF tests.
     9. Add TSN node.
-    11. Redeploy cluster.
-    12. Run OSTF tests.
+    10. Redeploy cluster.
+    11. Run OSTF tests.
 
 
 Expected results

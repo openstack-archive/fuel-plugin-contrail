@@ -45,7 +45,7 @@ Steps
     14. Add following nodes to custom nodegroup:
         * 1 compute
         * 1 contrail-config+contrail-control+contrail-db+
-          contrail-analytics+contrail-analytics-db
+        contrail-analytics+contrail-analytics-db
         * 1 contrail-analytics+contrail-analytics-db
     15. Deploy cluster
     16. Run network verification
@@ -153,8 +153,7 @@ Steps
         * 1 controller+mongo
     14. Add following nodes to default nodegroup:
         * 1 compute
-        * 1 contrail-config+contrail-control+contrail-db+
-          contrail-analytics
+        * 1 contrail-config+contrail-control+contrail-db+contrail-analytics
         * 1 contrail-analytics-db
         * 1 cinder
     15. Deploy cluster
@@ -264,7 +263,7 @@ Steps
     14. Add following nodes to custom nodegroup:
         * 1 compute+ceph-osd
         * 1 contrail-config+contrail-control+contrail-db+
-          contrail-analytics
+        contrail-analytics
         * 1 contrail-analytics-db
     15. Deploy cluster
     16. Run health checks (OSTF)
@@ -317,11 +316,11 @@ Steps
     13. Add following nodes to default nodegroup:
         * 1 controller
         * 2 contrail-config+contrail-control+contrail-db+
-          contrail-analytics
+        contrail-analytics
     14. Add following nodes to custom nodegroup:
         * 1 cinder
         * 1 contrail-config+contrail-control+contrail-db+
-          contrail-analytics
+        contrail-analytics
         * 1 contrail-analytics-db
     15. Deploy cluster
     16. Run health checks (OSTF)

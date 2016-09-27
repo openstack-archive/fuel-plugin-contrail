@@ -79,7 +79,7 @@ Steps
     5. Add 2 nodes with "compute" and "Storage-cinder" roles
     6. Add a node with Base-OS role
     7. Add 3 nodes with "contrail-config", "contrail-control",
-        "contrail-db" and "contrail-analytics" roles
+       "contrail-db" and "contrail-analytics" roles
     8. Add a node with 'contrail-analytics-db' role
     9. Deploy cluster with plugin
     10. Run contrail health check tests
@@ -269,7 +269,7 @@ Steps
     4. Add 3 nodes with controller role
     5. Add 2 nodes with "compute" roles
     6. Add 3 nodes with "contrail-config", "contrail-control".
-        "contrail-db" and "contrail-analytics" roles
+       "contrail-db" and "contrail-analytics" roles
     7. Add a node with "contrail-analytics-db" role
     8. Bond network interfaces with balance-rr mode
     9. Deploy cluster with plugin
@@ -391,17 +391,17 @@ Steps
 #####
 
     1. Create an environment with "Neutron with tunneling
-        segmentation" as a network configuration and CEPH storage
+       segmentation" as a network configuration and CEPH storage
     2. Enable and configure Contrail plugin
     3. Enable dedicated analytics DB
     4. Add 1 node with "controller", "storage-cinder",
-        and "Ceph-OSD" roles
+       and "Ceph-OSD" roles
     5. Add 1 node with "controller" + "storage-cinder" and 1 node
-        with "controller" + "Ceph-OSD" multiroles
+       with "controller" + "Ceph-OSD" multiroles
     6. Add 1 nodes with "compute", "cinder", "ceph-osd" roles
     7. Add 1 nodes with "compute" role
     8. Add 3 nodes with "contrail-config", "contrail-control",
-        "contrail-db" and "contrail-analytics" roles
+       "contrail-db" and "contrail-analytics" roles
     9. Add a node with 'contrail-analytics-db' roles
     10. Deploy cluster with plugin
     11. Run contrail health check tests
@@ -485,13 +485,13 @@ Steps
     5. Add a node with controller role
     6. Add 3 nodes with "compute" and "Ceph-OSD" roles
     7. Add a node with contrail-config, contrail-control,
-        contrail-db and contrail-analytics roles
+       contrail-db and contrail-analytics roles
     8. Add a node with 'contrail-analytics'+'contrail-analytics-db'
        roles
     9. Add a node with 'contrail-analytics-db' role
-    9. Deploy cluster with plugin
-    10. Run contrail health check tests
-    11. Run OSTF tests
+    10. Deploy cluster with plugin
+    11. Run contrail health check tests
+    12. Run OSTF tests
 
 Expected results
 ################
