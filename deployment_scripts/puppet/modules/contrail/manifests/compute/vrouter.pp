@@ -14,27 +14,18 @@
 
 class contrail::compute::vrouter {
 
-  # facter uses underscore instead of dot as a separator for interface name with vlan
-  $phys_dev_facter = regsubst($::contrail::phys_dev, '\.' , '_')
-  $dev_mac         = getvar("::macaddress_${phys_dev_facter}")
+  $raw_phys_dev = $contrail::raw_phys_dev
 
   if $contrail::compute_dpdk_enabled {
-    $dpdk_mac = $::mac_from_vrouter
-    if $dpdk_mac {
-      $dpdk_dev_mac = $dpdk_mac
-    } else {
-      $dpdk_dev_mac = $dev_mac
-    }
 
-    $raw_phys_dev = regsubst($::contrail::phys_dev, '\..*' , '')
     # in case of bonds, MAC address should be set permanently, because slave interfaces
     # may start in random order during the boot process
     if ( 'bond' in $raw_phys_dev) {
       file_line { 'permanent_mac':
         ensure => present,
-        line => "hwaddress ${dpdk_dev_mac}",
-        path => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
-        after => "iface ${raw_phys_dev} inet manual",
+        line   => "hwaddress ${::dpdk_mac_address}",
+        path   => "/etc/network/interfaces.d/ifcfg-${raw_phys_dev}",
+        after  => "iface ${raw_phys_dev} inet manual",
       }
     }
 
@@ -124,7 +115,7 @@ class contrail::compute::vrouter {
     contrail_vrouter_agent_config {
       'DEFAULT/platform':                    value => 'dpdk';
       'DEFAULT/physical_interface_address' : value => $contrail::phys_dev_pci;
-      'DEFAULT/physical_interface_mac':      value => $dpdk_dev_mac;
+      'DEFAULT/physical_interface_mac':      value => $::dpdk_mac_address;
     }
   } else {
     contrail_vrouter_agent_config {
