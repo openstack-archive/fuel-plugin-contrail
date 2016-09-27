@@ -55,8 +55,8 @@ class contrail::compute::vmware {
     'DEFAULT/vcenter.username':     value => $contrail::vcenter_server_user;
     'DEFAULT/vcenter.password':     value => $contrail::vcenter_server_pass;
     'DEFAULT/vcenter.datacenter':   value => $contrail::contrail_vcenter_datacenter;
-    'DEFAULT/vcenter.dvswitch':     value => $contrail::contrail_vcenter_dvswitch;
-    'DEFAULT/vcenter.ipfabricpg':   value => $contrail::contrail_vcenter_prv_vswitchpg;
+    'DEFAULT/vcenter.dvswitch':     value => $contrail::dvs_internal;
+    'DEFAULT/vcenter.ipfabricpg':   value => $contrail::dvs_private_pg;
     'DEFAULT/mode':                 value => 'vcenter-as-compute';
     'DEFAULT/auth_url':             value => "${contrail::internal_auth_protocol}://${contrail::internal_auth_address}:35357/v2.0";
     'DEFAULT/admin_user':           value => $contrail::neutron_user;
