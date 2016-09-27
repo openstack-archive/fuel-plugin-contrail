@@ -149,7 +149,7 @@ config.vcenter.server_ip = '<%= scope.lookupvar('contrail::vcenter_server_ip') %
 config.vcenter.server_port = '443';             //Port
 config.vcenter.authProtocol = 'https';          //http or https
 config.vcenter.datacenter = '<%= scope.lookupvar('contrail::contrail_vcenter_datacenter') %>';          //datacenter name
-config.vcenter.dvsswitch = '<%= scope.lookupvar('contrail::contrail_vcenter_dvswitch') %>';           //dvsswitch name
+config.vcenter.dvsswitch = '<%= scope.lookupvar('contrail::dvs_internal') %>';           //dvsswitch name
 config.vcenter.strictSSL = false;               //Validate the certificate or ignore
 config.vcenter.ca = '';                         //specify the certificate key file
 config.vcenter.wsdl = '/usr/src/contrail/contrail-web-core/webroot/js/vim.wsdl';
