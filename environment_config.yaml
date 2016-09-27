@@ -89,7 +89,7 @@ attributes:
     value: "Datacenter"
     label: "vCenter Datacenter"
     description: "vCenter Datacenter for Contrail"
-    weight: 160
+    weight: 170
     type: "text"
     regex:
       source: '^\w+$'
@@ -97,65 +97,65 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
-  contrail_vcenter_dvswitch:
-    value: "Contrail_dvSwitch"
-    label: "vCenter dvSwitch"
-    description: "vCenter dvSwitch for Contrail"
-    weight: 170
-    type: "text"
-    regex:
-      source: '^\w+$'
-      error: "Invalid vCenter dvSwitch"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-  contrail_vcenter_dvportgroup:
-    value: "Contrail_DV_Port_Group"
-    label: "vCenter DV Port Group"
-    description: "vCenter DV Port Group for Contrail"
-    weight: 180
-    type: "text"
-    regex:
-      source: '^\w+$'
-      error: "Invalid vCenter DV Port Group"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
-  private_vswitch_pg:
-    value: "contrail_pg"
-    label: "vCenter Private Port Group"
-    description: "Contrail vSwitch Port Group name"
-    weight: 180
-    type: "text"
-    regex:
-      source: '^[\w-]{1,63}$'
-      error: "Invalid vSwitch Port Group name"
-    restrictions:
-      - condition: "settings:common.use_vcenter.value == false"
-        action: "hide"
   patch_nova_vmware:
     value: true
     label: "Patch Nova for VCenter support"
     description: "Patch python-nova on compute-vmware package for VCenter Contrail compatibility."
-    weight: 140
+    weight: 180
     type: "checkbox"
     restrictions:
       - action: "hide"
         condition: "settings:contrail.metadata.enabled == false"
       - action: "hide"
         condition: "settings:common.use_vcenter.value == false"
-  contrail_vcenter_esxi_yaml:
-    value: |
-      '---'
-      # This field no more used anywhere,
-      # and saved only for feature use such like Overrides
-    label: "vCenter ESXi data"
-    description: "vCenter ESXi data in YAML format"
-    weight: 200
-    type: "textarea"
+  dvs_external:
+    value: "Contrail-DVS-Ext"
+    label: "External DVS name"
+    description: "Name of DVS that provide connection between ESXi nodes and Fuel admin network"
+    weight: 310
+    type: "text"
     regex:
-      source: '.'
-      error: "Invalid vCenter ESXi data"
+      source: '^[A-Za-z0-9_-]+$'
+      error: "Invalid DVS name"
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
+  dvs_internal:
+    value: "Contrail-DVS-Int"
+    label: "Internal DVS name"
+    description: "Name of DVS that need for internal contrail traffic"
+    weight: 330
+    type: "text"
+    regex:
+      source: '^[A-Za-z0-9_-]+$'
+      error: "Invalid DVS name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+#  dvs_internal_pg
+#  contrail_vcenter_dvportgroup:
+#    value: "Contrail_DV_Port_Group"
+#    label: "vCenter DV Port Group"
+#    description: "vCenter DV Port Group for Contrail"
+#    weight: 180
+#    type: "text"
+#    regex:
+#      source: '^\w+$'
+#      error: "Invalid vCenter DV Port Group"
+#    restrictions:
+#      - condition: "settings:common.use_vcenter.value == false"
+#        action: "hide"
+  #private_vswitch_pg
+  dvs_private:
+    value: "Contrail-DVS-Priv"
+    label: "Private DVS name"
+    description: "Name of DVS that provide connection between ESXi nodes and Fuel private network"
+    weight: 320
+    type: "text"
+    regex:
+      source: '^[A-Za-z0-9_-]+$'
+      error: "Invalid DVS name"
+    restrictions:
+      - condition: "settings:common.use_vcenter.value == false"
+        action: "hide"
+

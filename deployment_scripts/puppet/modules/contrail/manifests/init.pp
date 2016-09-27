@@ -171,10 +171,10 @@ class contrail {
     $vcenter_server_pass                = pick($vcenter_hash['computes'][0]['vc_password'], 'admin')
     $vcenter_server_name                = pick($vcenter_hash['computes'][0]['availability_zone_name'], 'vcenter')
     $contrail_vcenter_datacenter        = pick($settings['contrail_vcenter_datacenter'], 'datacenter')
-    $contrail_vcenter_dvswitch          = pick($settings['contrail_vcenter_dvswitch'], 'Contrail_dvSwitch')
-    $contrail_vcenter_dvportgroup       = pick($settings['contrail_vcenter_dvportgroup'], 'Contrail_DVPG')
-    $contrail_vcenter_prv_vswitchpg     = pick($settings['private_vswitch_pg'], 'contrail_pg')
-    $contrail_vcenter_esxi_yaml         = pick($settings['contrail_vcenter_esxi_yaml'], '')
+    $dvs_internal                       = pick($settings['dvs_internal'], 'Contrail-DVS-Int')
+    $dvs_internal_pg                    = "${dvs_internal}-PG"
+    $dvs_private                        = pick($settings['dvs_private'], 'Contrail-DVS-Priv')
+    $dvs_private_pg                     = "${dvs_private}-PG"
     $contrail_compute_vmware_nodes_hash = get_nodes_hash_by_roles($network_metadata, ['compute-vmware'])
     $contrail_compute_vmware_ips        = values(get_node_to_ipaddr_map_by_network_role($contrail_compute_vmware_nodes_hash, 'neutron/mesh'))
     $contrail_vmware_nodes_hash         = get_nodes_hash_by_roles($contrail::network_metadata, ['contrail-vmware'])
