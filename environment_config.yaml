@@ -55,6 +55,9 @@ attributes:
     label: "Dedicated Analytics DB"
     description: "Enable this option to enable deployment of dedicated Cassandra database for Contrail Analytics"
     weight: 65
+    restrictions:
+      - condition: "cluster:status == 'operational'"
+        action: "disable"
   contrail_global_dpdk:
     value: false
     label: "Enable DPDK feature for this environment."
