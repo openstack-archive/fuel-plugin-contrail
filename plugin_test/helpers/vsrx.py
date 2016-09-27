@@ -51,13 +51,13 @@ def activate(
     map(call_cmd, [
         'virsh destroy vSRX1',
         'virsh undefine vSRX1',
-        'sed -r "s/ENV_NAME/$ENV_NAME/g" {0} > logs/vSRX1.xml'.format(
+        'sed -r "s/ENV_NAME/$ENV_NAME/g" {0} > vSRX1.xml'.format(
             settings.VSRX_TEMPLATE_PATH),
-        'sed -i -r "s/vSRX1.img/vSRX.400.img/g" logs/vSRX1.xml',
+        'sed -i -r "s/vSRX1.img/vSRX.400.img/g" vSRX1.xml',
     ])
 
     logger.info("#" * 10 + 'Create vSRX...' + "#" * 10)
-    if subprocess.call('virsh create logs/vSRX1.xml', shell=True):
+    if subprocess.call('virsh create vSRX1.xml', shell=True):
         logger.info("#" * 10 + 'VSRX could not be established, '
                     'OSTF will not be running' + "#" * 10)
         return False
