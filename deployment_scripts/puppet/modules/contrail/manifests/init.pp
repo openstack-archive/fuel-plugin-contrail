@@ -51,6 +51,8 @@ class contrail {
   $phys_dev          = get_private_ifname($interface, $network_scheme)
   $phys_dev_pci      = get_dev_pci_addr($phys_dev, $network_scheme)
   $phys_dev_mtu      = get_physdev_mtu(regsubst($phys_dev, '\..*' , ''))
+  $raw_phys_dev      = regsubst($phys_dev, '\..*' , '')
+  $dev_mac           = getvar("::macaddress_${raw_phys_dev}")
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
   $headless_mode     = pick($settings['headless_mode'], true)
   $multi_tenancy     = pick($settings['multi_tenancy'], true)
