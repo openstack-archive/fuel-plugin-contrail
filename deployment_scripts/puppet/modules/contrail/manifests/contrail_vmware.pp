@@ -38,11 +38,6 @@ class contrail::contrail_vmware {
     $esxi_dvs_mac_list       = pick($host_to_mac_bind['contrail_host_to_mac_binding'][$host], '')
     $if_names                = interface_name_by_mac($esxi_dvs_mac_list)
     $vmware_iface_name       = pick($if_names['0'], 'ens162')
-    #NOTE(AKirilochkin): Obsolete, please keep it for future use,
-    # like per-host override configuration
-    #$esxi_data               = fetch_esxi_data($host)
-    #$vmware                  = pick($esxi_data['ip'], '10.0.0.0')
-    #$vmware_iface_name       = pick($esxi_data['contrail_vm']['vmware_iface_name'], 'ens161')
 
     l23network::l3::ifconfig { $vmware_iface_name: ipaddr => 'none' }
 
