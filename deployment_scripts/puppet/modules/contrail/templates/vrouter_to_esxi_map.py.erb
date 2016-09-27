@@ -131,6 +131,7 @@ class VrouterMap(object):
         self.generic = generic
         self._search_index = None
         self._data = None
+        self.service_instance = None
 
     @property
     def search_index(self):
@@ -146,10 +147,11 @@ class VrouterMap(object):
         )
         atexit.register(connect.Disconnect, si)
 
+        self.service_instance = si
         self._search_index = si.content.searchIndex
         return self._search_index
 
-    def esxi_ip_get(self, vrouter_private_ip=None):
+    def esxi_hostname_get(self, vrouter_private_ip=None):
         try:
             esxi_object = self.search_index.FindByIp(None, vrouter_private_ip, True)
             if not esxi_object:
@@ -161,15 +163,34 @@ class VrouterMap(object):
         except TypeError:
             return None
 
-    def retrieve_esxi_ip(self, vrouter_private_ip=None):
+    def retrieve_esxi_hostname(self, vrouter_private_ip=None):
         for retry in xrange(10):
-            esxi_ip = self.esxi_ip_get(vrouter_private_ip)
-            if esxi_ip is not None:
-                return esxi_ip
+            esxi_hostname = self.esxi_hostname_get(vrouter_private_ip)
+            esxi_ip = self.get_host_ip_by_name(esxi_hostname)
+            if esxi_hostname is not None:
+                return esxi_hostname
             self.generic.debug("Can not get ip will try one more time")
             time.sleep(5)
         self.generic.debug("Could not get association for that ip: ", vrouter_private_ip)
         return None
+
+    def get_host_ip_by_name(self, name):
+        host_obj = self.get_obj([vim.HostSystem], name)
+        host_ip = host_obj.config.vmotion.ipConfig.ipAddress
+        return host_ip
+
+    def get_obj(self, vimtype, name):
+        """
+        Get the vsphere object associated with a given text name
+        """
+        obj = None
+        content = self.service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(content.rootFolder, vimtype, True)
+        for c in container.view:
+            if c.name == name:
+                obj = c
+                break
+        return obj
 
     @property
     def data(self):
@@ -181,7 +202,7 @@ class VrouterMap(object):
             return self._data
         self._data = {}
         for vrouter_ip in self.generic.options.ip:
-            esxi_ip = self.retrieve_esxi_ip(vrouter_ip)
+            esxi_ip = self.retrieve_esxi_hostname(vrouter_ip)
             if esxi_ip is None:
                 continue
             self._data[vrouter_ip] = esxi_ip
@@ -385,8 +406,8 @@ class Dvs(object):
 
     def main(self):
 
-        vcenter_dvswitch = self.hiera_contrail_settings['contrail_vcenter_dvswitch']
-        vcenter_dvswitch_pg = self.hiera_contrail_settings['contrail_vcenter_dvportgroup']
+        vcenter_dvswitch = self.hiera_contrail_settings['dvs_internal']
+        vcenter_dvswitch_pg = vcenter_dvswitch + "-PG"
         contrail_vm_data = {}
         contrail_vm_list = []
         for data in self.hosts_all_data:
