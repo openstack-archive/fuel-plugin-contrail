@@ -42,8 +42,8 @@ Steps
     12. Verify that new IP ranges are applied for network config
     13. Add following nodes to default nodegroup:
         * 3 controller+ceph
-    14. Add following nodes to custom nodegroup:
         * 1 compute
+    14. Add following nodes to custom nodegroup:
         * 1 contrail-config+contrail-control+contrail-db+
           contrail-analytics+contrail-analytics-db
         * 1 contrail-analytics+contrail-analytics-db
