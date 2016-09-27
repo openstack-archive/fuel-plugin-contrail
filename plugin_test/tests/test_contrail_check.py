@@ -425,7 +425,7 @@ class TestContrailCheck(object):
         logger.info(
             "Check connectivity to the floating IP using ping command.")
         wait(
-            lambda: tcp_ping(fip, 22), timeout=120, interval=5,
+            lambda: tcp_ping(fip, 22), timeout=180, interval=5,
             timeout_msg="Node {0} is not accessible by SSH.".format(fip))
 
         logger.info(

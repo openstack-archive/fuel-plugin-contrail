@@ -175,8 +175,8 @@ class TestMultipleNets(TestMultipleClusterNets):
             12. Verify that new IP ranges are applied for network config
             13. Add following nodes to default nodegroup:
                 * 3 controller+ceph
-            14. Add following nodes to custom nodegroup:
                 * 1 compute
+            14. Add following nodes to custom nodegroup:
                 * 1 contrail-config+contrail-control+contrail-db+
                   contrail-analytics+contrail-analytics-db
                 * 1 contrail-analytics+contrail-analytics-db
@@ -202,7 +202,7 @@ class TestMultipleNets(TestMultipleClusterNets):
                                                 'volumes_lvm': False})
 
         cluster_id = self.fuel_web.get_last_created_cluster()
-        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:4])
 
         plugin.activate_plugin(self, **conf_contrail)
         # activate vSRX image
@@ -219,7 +219,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.fuel_web.client.delete_nodegroup(custom_group2['id'])
 
         self.show_step(7)
-        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:6])
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[4:6])
 
         self.show_step(8)
         updated_storage_default, updated_storage_custom, \
@@ -242,10 +242,10 @@ class TestMultipleNets(TestMultipleClusterNets):
                     ['controller', 'ceph-osd'], nodegroup_default],
                 'slave-03': [
                     ['controller', 'ceph-osd'], nodegroup_default],
-                'slave-04': [
+                'slave-04': [['compute'], nodegroup_default],
+                'slave-05': [
                     ['contrail-config', 'contrail-control', 'contrail-db',
                      'contrail-analytics'], nodegroup_custom1],
-                'slave-05': [['compute'], nodegroup_custom1],
                 'slave-06': [
                     ['contrail-analytics', 'contrail-analytics-db'],
                       nodegroup_custom1],
