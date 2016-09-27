@@ -14,16 +14,15 @@ under the License.
 """
 
 import subprocess
-
+from fuelweb_test import logger
 from devops.helpers.helpers import wait
 from devops.helpers.helpers import tcp_ping
-from fuelweb_test import logger
 
 from helpers import settings
 
 
 def activate(
-    obj=None, add_network=None, vsrx_config=False, vsrx_ip='10.109.4.250'):
+    obj=None, vsrx_config=False, vsrx_ip='10.109.4.250'):
     """Activate vSRX1 image.
 
     :param obj: Test case object
@@ -66,9 +65,6 @@ def activate(
         'sudo ip route del 10.100.1.0/24',
         'sudo ip route add 10.100.1.0/24 via 10.109.3.250'])
 
-    if add_network:
-        assert obj, "obj is None"
-        multiple_networks(obj, vsrx_ip, add_network)
     if vsrx_config and settings.VSRX_CONFIG_PATH:
         assert obj, "obj is None"
         upload_config(obj, settings.VSRX_CONFIG_PATH, vsrx_ip)
@@ -114,11 +110,15 @@ def upload_config(obj, config_path, vsrx_ip):
     commands = [
         'cli', 'configure',
         'load override {0}'.format(config_path.split('/').pop()),
-        'commit']
+        'commit',
+        'exit',
+        'show configuration']
     wait(
         lambda: tcp_ping(vsrx_ip, 22), timeout=60 * 2, interval=10,
         timeout_msg="Node {0} is not accessible by SSH.".format(vsrx_ip))
     with obj.env.d_env.get_ssh_to_remote(vsrx_ip) as remote:
+        logger.info('Upload template {0}'.format(config_path))
         remote.upload(config_path, '/cf/root')
         for command in commands:
+            logger.info('Execute command {0}.'.format(command))
             remote.execute_async(command)
