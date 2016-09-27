@@ -385,8 +385,8 @@ class Dvs(object):
 
     def main(self):
 
-        vcenter_dvswitch = self.hiera_contrail_settings['contrail_vcenter_dvswitch']
-        vcenter_dvswitch_pg = self.hiera_contrail_settings['contrail_vcenter_dvportgroup']
+        vcenter_dvswitch = self.hiera_contrail_settings['dvs_internal']
+        vcenter_dvswitch_pg = vcenter_dvswitch + "-PG"
         contrail_vm_data = {}
         contrail_vm_list = []
         for data in self.hosts_all_data:
