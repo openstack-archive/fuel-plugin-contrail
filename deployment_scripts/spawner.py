@@ -37,16 +37,14 @@ class Vcenter_base(object):
 
         # Getting VCenter connection settings
         if user_data:
-            self.vc_ip = user_data['vcenter_ip']
-            self.vc_user = user_data['vcenter_user']
-            self.vc_pass = user_data['vcenter_password']
+            self._vcenter_host = user_data['vcenter_ip']
+            self._vcenter_user = user_data['vcenter_user']
+            self._vcenter_password = user_data['vcenter_password']
         elif si:
             self.service_instance = si
             self.content = self.service_instance.RetrieveContent()
             self.datacenter = self.content.rootFolder.childEntity[0]
             self.network_folder = self.datacenter.networkFolder
-        else:
-            self.logger.error('Need to specify credential for vcenter (user_data) or service instance object (si)')
 
     @property
     def options(self):
@@ -129,7 +127,7 @@ class Vcenter_base(object):
             return self._vcenter_password
         self.save_vcenter_credentials()
         return self._vcenter_password
-    
+
     @property
     def vcenter_datastore(self):
         if self._vcenter_datastore:
@@ -231,15 +229,20 @@ class Vcenter_base(object):
 
     def get_host_ip_by_name(self, name):
         host_obj = self.get_obj([vim.HostSystem], name)
-        host_ip = host_obj.config.vmotion.ipConfig.ipAddress
-        return host_ip
+        if host_obj.config.vmotion.ipConfig:
+            ip = host_obj.config.vmotion.ipConfig.ipAddress
+        else:
+            net_config = host_obj.config.vmotion.netConfig
+            ip = net_config.candidateVnic[0].spec.ip.ipAddress
+        return ip
+
 
     def fetch_hosts_data(self):
         hosts_data = list()
         for cl in self.datacenter.hostFolder.childEntity:
             for h in cl.host:
                 host_name = h.name
-                host_ip = h.config.vmotion.ipConfig.ipAddress
+                host_ip = self.get_host_ip_by_name(host_name)
                 hosts_data.append({'host': host_name, 'host_ip': host_ip, 'mac_for_vm': self.gen_mac})
         return hosts_data
 
@@ -419,6 +422,22 @@ class Vcenter_obj_tpl(object):
         dv_pg_spec.defaultPortConfig.securityPolicy.inherited = False
         return dv_pg_spec
 
+    def startup_info(self, vm_obj, host_obj):
+        hostdefsettings = vim.host.AutoStartManager.SystemDefaults()
+        hostdefsettings.enabled = True
+        hostdefsettings.startDelay = 120
+        spec = host_obj.configManager.autoStartManager.config
+        spec.defaults = hostdefsettings
+        auto_power_info = vim.host.AutoStartManager.AutoPowerInfo()
+        auto_power_info.key = vm_obj
+        auto_power_info.startAction = 'powerOn'
+        auto_power_info.startDelay = -1
+        auto_power_info.startOrder = -1
+        auto_power_info.stopAction = 'None'
+        auto_power_info.stopDelay = -1
+        auto_power_info.waitForHeartbeat = 'no'
+        spec.powerInfo = [auto_power_info]
+        return spec
 
 class Vm(Vcenter_base, Vcenter_obj_tpl):
     def __init__(self, user_data=None, si=None):
@@ -508,10 +527,6 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
 
         vmx_file = self.vmx_file_info(storage_name, name)
 
-
-
-
-
         self.config = vim.vm.ConfigSpec(name=name,
                                         memoryMB=memory,
                                         numCPUs=cpu,
@@ -540,6 +555,27 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
             return
         task = vm_obj.PowerOnVM_Task()
         self.wait_for_tasks(self.service_instance, [task])
+
+    def enable_startup(self, name):
+        """
+        Enable startup for virtual machine
+
+        :param name:  name of virtual machine
+        """
+        vm_obj = self.get_obj([vim.VirtualMachine], name)
+        if not vm_obj:
+            self.logger.error('VM({}) does not exist. Skip adding to startup VM: {}.'.format(name, name))
+            return
+        host_obj = vm_obj.summary.runtime.host
+        power_info = host_obj.configManager.autoStartManager.config.powerInfo
+        if not host_obj:
+            self.logger.warning('Host({}) does not exist. Skip adding to startup VM: {}.'.format(host_obj.name, name))
+            return
+        if any(pf.key == vm_obj for pf in power_info):
+            self.logger.info('VM({}) already added to startup. Skip adding to startup VM: {}.'.format(name, name))
+        spec = self.startup_info(vm_obj, host_obj)
+        host_obj.configManager.autoStartManager.ReconfigureAutostart(spec)
+        self.logger.info('Enable startup for VM: {}'.format(name))
 
 
 class Dvs(Vcenter_base, Vcenter_obj_tpl):
@@ -761,7 +797,7 @@ if __name__ == '__main__':
             vm.add_nic(dv_pg_name=dvpg_private)
             vm.add_nic(dv_pg_name=dvpg_internal)
             vm.create(name=vm_name, cpu=vm_cpu, memory=vm_memory, storage_name=storage_name, host=vm_host)
+            vm.enable_startup(vm_name)
             vm.power_on(vm_name)
     elif map_ips:
         vmware_datastore.add_admin_ip()
-

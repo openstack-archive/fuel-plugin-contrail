@@ -133,6 +133,14 @@ class contrail::contrail_vmware {
         'HYPERVISOR/vmware_physical_interface'      : value => $vmware_iface_name;
       }
     }
+
+    # VNC API
+    if !defined(File['/etc/contrail/vnc_api_lib.ini']) {
+      file { '/etc/contrail/vnc_api_lib.ini':
+        content => template('contrail/vnc_api_lib.ini.erb'),
+      }
+    }
+
     service {'supervisor-vrouter':
       ensure    => running,
       enable    => true,
@@ -145,7 +153,7 @@ class contrail::contrail_vmware {
       command => "python provision_vrouter.py --host_name ${::fqdn} --host_ip ${contrail::address} \
 --api_server_ip ${contrail_internal_vip} --api_server_port ${contrail::api_server_port} \
 --oper add --admin_user ${keystone_admin_user} --admin_password ${keystone_admin_password} \
---admin_tenant_name ${service_tenant_name} --openstack_ip ${internal_vip} \
+--admin_tenant_name ${service_tenant_name} --openstack_ip ${contrail::internal_auth_address} \
 && touch /opt/contrail/register_contrailvm_vrouter-DONE",
       creates => '/opt/contrail/register_contrailvm_vrouter-DONE',
     }
