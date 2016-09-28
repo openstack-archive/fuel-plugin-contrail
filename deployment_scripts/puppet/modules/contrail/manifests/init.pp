@@ -199,7 +199,8 @@ class contrail {
   $zk_server_ip               = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:2181\" }.join(',') %>")
 
   # vCenter settings
-  $vcenter_hash                               = hiera_hash('vcenter', false)
+  $use_vcenter                = hiera('use_vcenter', false)
+  $vcenter_hash               = hiera_hash('vcenter', false)
   if $vcenter_hash and !empty($vcenter_hash) {
     $vcenter_server_ip                          = $vcenter_hash['computes'][0]['vc_host']
     $vcenter_server_user                        = $vcenter_hash['computes'][0]['vc_user']

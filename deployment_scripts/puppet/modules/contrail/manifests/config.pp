@@ -207,6 +207,12 @@ class contrail::config {
     'SCHEDULER/analytics_server_port': value => '8081';
   }
 
+  if $contrail::use_vcenter {
+    contrail_svc_monitor_config {
+      'SCHEDULER/netns_availability_zone': value => 'nova';
+    }
+  }
+
   contrail_device_manager_config {
     'DEFAULTS/api_server_ip':         value => $contrail::contrail_mgmt_vip;
     'DEFAULTS/api_server_port':       value => '8082';
