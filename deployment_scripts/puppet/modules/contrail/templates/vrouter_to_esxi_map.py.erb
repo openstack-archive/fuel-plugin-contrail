@@ -176,8 +176,12 @@ class VrouterMap(object):
 
     def get_host_ip_by_name(self, name):
         host_obj = self.get_obj([vim.HostSystem], name)
-        host_ip = host_obj.config.vmotion.ipConfig.ipAddress
-        return host_ip
+        if host_obj.config.vmotion.ipConfig:
+            ip = host_obj.config.vmotion.ipConfig.ipAddress
+        else:
+            net_config = host_obj.config.vmotion.netConfig
+            ip = net_config.candidateVnic[0].spec.ip.ipAddress
+        return ip
 
     def get_obj(self, vimtype, name):
         """
@@ -431,3 +435,4 @@ class Dvs(object):
 if __name__ == '__main__':
     generic_object = Generic()
     generic_object.main()
+
