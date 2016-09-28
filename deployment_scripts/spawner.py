@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 import argparse
 import atexit
@@ -129,7 +129,7 @@ class Vcenter_base(object):
             return self._vcenter_password
         self.save_vcenter_credentials()
         return self._vcenter_password
-    
+
     @property
     def vcenter_datastore(self):
         if self._vcenter_datastore:
@@ -762,6 +762,3 @@ if __name__ == '__main__':
             vm.add_nic(dv_pg_name=dvpg_internal)
             vm.create(name=vm_name, cpu=vm_cpu, memory=vm_memory, storage_name=storage_name, host=vm_host)
             vm.power_on(vm_name)
-    elif map_ips:
-        vmware_datastore.add_admin_ip()
-
