@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 import argparse
 import atexit
@@ -37,16 +37,14 @@ class Vcenter_base(object):
 
         # Getting VCenter connection settings
         if user_data:
-            self.vc_ip = user_data['vcenter_ip']
-            self.vc_user = user_data['vcenter_user']
-            self.vc_pass = user_data['vcenter_password']
+            self._vcenter_host = user_data['vcenter_ip']
+            self._vcenter_user = user_data['vcenter_user']
+            self._vcenter_password = user_data['vcenter_password']
         elif si:
             self.service_instance = si
             self.content = self.service_instance.RetrieveContent()
             self.datacenter = self.content.rootFolder.childEntity[0]
             self.network_folder = self.datacenter.networkFolder
-        else:
-            self.logger.error('Need to specify credential for vcenter (user_data) or service instance object (si)')
 
     @property
     def options(self):
@@ -231,15 +229,20 @@ class Vcenter_base(object):
 
     def get_host_ip_by_name(self, name):
         host_obj = self.get_obj([vim.HostSystem], name)
-        host_ip = host_obj.config.vmotion.ipConfig.ipAddress
-        return host_ip
+        if host_obj.config.vmotion.ipConfig:
+            ip = host_obj.config.vmotion.ipConfig.ipAddress
+        else:
+            net_config = host_obj.config.vmotion.netConfig
+            ip = net_config.candidateVnic[0].spec.ip.ipAddress
+        return ip
+
 
     def fetch_hosts_data(self):
         hosts_data = list()
         for cl in self.datacenter.hostFolder.childEntity:
             for h in cl.host:
                 host_name = h.name
-                host_ip = h.config.vmotion.ipConfig.ipAddress
+                host_ip = self.get_host_ip_by_name(host_name)
                 hosts_data.append({'host': host_name, 'host_ip': host_ip, 'mac_for_vm': self.gen_mac})
         return hosts_data
 
@@ -508,10 +511,6 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
 
         vmx_file = self.vmx_file_info(storage_name, name)
 
-
-
-
-
         self.config = vim.vm.ConfigSpec(name=name,
                                         memoryMB=memory,
                                         numCPUs=cpu,
@@ -764,4 +763,3 @@ if __name__ == '__main__':
             vm.power_on(vm_name)
     elif map_ips:
         vmware_datastore.add_admin_ip()
-
