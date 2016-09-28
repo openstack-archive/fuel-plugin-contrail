@@ -566,11 +566,14 @@ class SystemTests(TestBasic):
         os_ip = self.fuel_web.get_public_vip(cluster_id)
 
         self.show_step(2)
-        horizon_cert = ssl.get_server_certificate((os_ip, 443))
+        horizon_cert = ssl.get_server_certificate((os_ip, 443),
+                       ssl_version = ssl.PROTOCOL_TLSv1)
         self.show_step(3)
-        contrail_ui_cert = ssl.get_server_certificate((os_ip, 8143))
+        contrail_ui_cert = ssl.get_server_certificate((os_ip, 8143),
+                           ssl_version = ssl.PROTOCOL_TLSv1)
         self.show_step(4)
-        contrail_api_cert = ssl.get_server_certificate((os_ip, 8082))
+        contrail_api_cert = ssl.get_server_certificate((os_ip, 8082),
+                            ssl_version = ssl.PROTOCOL_TLSv1)
         self.show_step(5)
         if not horizon_cert == contrail_ui_cert:
             raise Exception("ContrailUI certificate is not valid")
