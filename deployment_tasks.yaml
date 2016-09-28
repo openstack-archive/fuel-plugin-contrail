@@ -199,6 +199,7 @@
   type: puppet
   version: 2.0.0
   groups: [primary-contrail-db, primary-contrail-analytics-db]
+  reexecute_on: [deploy_changes]
   required_for: [deploy_end]
   requires: [contrail-utils]
   parameters:
@@ -224,6 +225,7 @@
   type: puppet
   version: 2.0.0
   groups: [contrail-db, contrail-analytics-db]
+  reexecute_on: [deploy_changes]
   required_for: [deploy_end]
   requires: [contrail-utils]
   cross-depends:
