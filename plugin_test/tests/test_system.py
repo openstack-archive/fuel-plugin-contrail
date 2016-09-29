@@ -141,7 +141,7 @@ class SystemTests(TestBasic):
             self, slaves=5, options={'ceilometer': True})
 
         # activate vSRX image
-        vsrx.activate()
+        vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 2, 4)
         plugin.activate_plugin(self, dedicated_analytics_db=True)
@@ -162,10 +162,11 @@ class SystemTests(TestBasic):
         self.show_step(8)
         openstack.deploy_cluster(self)
         self.show_step(9)
-        self.fuel_web.run_ostf(
-            cluster_id=self.cluster_id,
-            test_sets=['smoke', 'sanity', 'tests_platform'],
-            timeout=OSTF_RUN_TIMEOUT)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'tests_platform'],
+                timeout=OSTF_RUN_TIMEOUT)
         TestContrailCheck(self).cloud_check(['contrail'])
 
         self.env.make_snapshot("systest_setup", is_make=True)
