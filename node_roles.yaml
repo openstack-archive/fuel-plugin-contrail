@@ -162,10 +162,19 @@ contrail-vmware:
     - contrail-db
     - contrail-config
     - contrail-control
+    - contrail-analytics
     - ceph-osd
     - cinder
     - dpdk
     - compute
+    - base-os
+    - compute-vmware
+    - cinder-vmware
+    - contrail-tsn
+    - dpdk-on-vf
+    - contrail-analytics-db
+    - mongo
+    - ironic
   restrictions:
     - condition: "settings:common.use_vcenter.value == false"
       action: hide
