@@ -33,15 +33,17 @@ class contrail::database {
   sysctl::value { 'vm.swappiness':
     value => '10'
   }
+
   if roles_include($contrail::contrail_controller_roles) {
     $cassandra_ips   = $::contrail::contrail_controller_ips
     $cassandra_seeds = $contrail::primary_contrail_controller_ip
     $cluster_name    = 'Contrail'
-
-  # Zookeeper
+    $priv_ip         = $::contrail::address
+    # Zookeeper
+    $zookeeper_id = $contrail::uid % 255
     package { 'zookeeper': } ->
     file { '/etc/zookeeper/conf/myid':
-      content => $contrail::uid,
+      content => "${zookeeper_id}\n",
       require => Package['zookeeper'],
     }
 
