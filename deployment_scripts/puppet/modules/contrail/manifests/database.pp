@@ -33,15 +33,20 @@ class contrail::database {
   sysctl::value { 'vm.swappiness':
     value => '10'
   }
+
   if roles_include($contrail::contrail_controller_roles) {
     $cassandra_ips   = $::contrail::contrail_controller_ips
     $cassandra_seeds = $contrail::primary_contrail_controller_ip
     $cluster_name    = 'Contrail'
+    $priv_ip         = $::contrail::address
+    # Zookeeper
 
-  # Zookeeper
+    # this is a remanider from dividing by 255
+    # + 1 is to avoid it being 0 if uid is a multiplicator of 255
+    $zookeeper_id = $contrail::uid % 255 + 1
     package { 'zookeeper': } ->
     file { '/etc/zookeeper/conf/myid':
-      content => $contrail::uid,
+      content => "${zookeeper_id}\n",
       require => Package['zookeeper'],
     }
 
