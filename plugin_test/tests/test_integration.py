@@ -98,8 +98,7 @@ class IntegrationTests(TestBasic):
                 'slave-06': ['compute', 'ceph-osd'],
                 'slave-07': ['contrail-config',
                              'contrail-control',
-                             'contrail-db',
-                             'contrail-analytics'],
+                             'contrail-db'],
                 'slave-08': ['contrail-analytics',
                              'contrail-analytics-db']
             })
