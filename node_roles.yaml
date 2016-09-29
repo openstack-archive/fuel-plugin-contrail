@@ -101,11 +101,16 @@ contrail-tsn:
     recommended: 2
   conflicts:
     - contrail-analytics
+    - contrail-analytics-db
     - contrail-control
     - contrail-config
     - contrail-db
     - controller
     - compute
+    - compte-vmware
+    - dpdk-compute
+    - dpdk-on-vf
+    - cinder-volume
     - ceph-osd
     - cinder
     - base-os
