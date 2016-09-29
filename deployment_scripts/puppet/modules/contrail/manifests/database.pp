@@ -35,13 +35,14 @@ class contrail::database {
   }
   if roles_include($contrail::contrail_db_roles) {
     $cassandra_ips   = $::contrail::contrail_db_ips
-    $cassandra_seeds = $contrail::primary_contrail_db_ip
+    $cassandra_seeds = $::contrail::primary_contrail_db_ip
     $cluster_name    = 'Contrail'
-
+    $priv_ip         = $::contrail::address
   # Zookeeper
     package { 'zookeeper': } ->
+    # myid will be a position in the array of seeds
     file { '/etc/zookeeper/conf/myid':
-      content => $contrail::uid,
+      content => inline_template("<%= @cassandra_ips.index(@priv_ip) + 1 %>"),
       require => Package['zookeeper'],
     }
 
