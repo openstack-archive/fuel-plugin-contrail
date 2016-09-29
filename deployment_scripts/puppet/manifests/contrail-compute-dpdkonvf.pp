@@ -18,6 +18,6 @@ include contrail
 
 # Create virtual functions for DPDK VF
 if $contrail::compute_dpdk_on_vf {
-  $sriov_hash = get_sriov_devices($contrail::compute_dpdk_on_vf, $contrail::phys_dev)
+  $sriov_hash = get_sriov_devices($contrail::phys_dev)
   create_resources(contrail::create_vfs, $sriov_hash)
 }
