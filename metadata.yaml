@@ -19,7 +19,7 @@ releases:
     repository_path: repositories/ubuntu
 
 # Version of plugin package
-package_version: '4.0.0'
+package_version: '5.0.0'
 licenses: ['Apache 2.0']
 authors: ['Mirantis Inc.']
 homepage: https://github.com/openstack/fuel-plugin-contrail
