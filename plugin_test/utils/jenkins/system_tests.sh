@@ -80,7 +80,7 @@ if you do need to override them.
 -K          - Keep test environment after tests are finished
 -h          - Show this help page
 
-Most variables uses guesing from Jenkins' job name but can be overriden
+Most variables uses guesing from Jenkins' job name but can be overridden
 by exported variable before script is run or by one of command line options.
 
 You can override following variables using export VARNAME="value" before running this script
@@ -125,7 +125,7 @@ GlobalVariables() {
 
   # full path where iso file should be placed
   # make from iso name and path to iso shared directory
-  # if was not overriden by options or export
+  # if was not overridden by options or export
   if [ -z "${ISO_PATH}" ]; then
     ISO_PATH="${ISO_DIR}/${ISO_NAME}"
   fi
