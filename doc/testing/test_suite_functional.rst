@@ -133,7 +133,7 @@ Steps
     8. Run OSTF tests
     9. Check Controller and Contrail nodes status
     10. Shutdown node with 'contrail-db', "contarail-config" and
-       "contrail-control" roles
+        "contrail-control" roles
     11. Run OSTF tests
     12. Check Controller and Contrail nodes status
 
@@ -271,7 +271,7 @@ Steps
     5. Add a node with 'contrail-control'+'contrail-config'
        +'contrail-db' roles
     6. Add a node with 'contrail-analytics'+'contrail-analytics-db'
-      roles
+       roles
     7. Add a node with "contrail-control" role
     8. Deploy cluster
     9. Run OSTF tests
@@ -317,7 +317,7 @@ Steps
     3. Enable dedicated analytics DB
     4. Add a controller and a compute+cinder nodes
     5. Add a node with all compatible contrail roles
-    6.Add a node with "contrail-config" role
+    6. Add a node with "contrail-config" role
     7. Add a node with "contrail-analytics-db" role
     8. Deploy cluster
     9. Run OSTF tests
