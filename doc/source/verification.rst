@@ -74,7 +74,7 @@ Run OSTF tests
 Prerequisites for OSTF
 ++++++++++++++++++++++
 
-    #. OSTF tests require two pre-defined networks created - ``net04`` and ``net04_ext``.
+    #. OSTF tests require two pre-defined networks created - ``admin_internal_net`` and ``admin_external_net``.
        The networks are created by Fuel during deployment. This section includes
        instructions how to create them if they were accidentally deleted. Floating
        IP addresses from net04_ext should be accessible from Fuel master node.
@@ -91,12 +91,12 @@ To configure OSTF networks and floating IPs:
 
 #. Go to Contrail web UI :guilabel:`Configure -> Networking -> Networks`
 
-#. Create network ``net04``
+#. Create network ``admin_internal_net``
 
         .. image:: images/create_network_net04.png
 
 
-#. Create network ``net04_ext``.
+#. Create network ``admin_external_net``.
 
    .. image:: images/create_network_net04_ext.png
 
@@ -109,7 +109,7 @@ To configure OSTF networks and floating IPs:
    .. image:: images/create_network_net04_ext3.png
 
 
-#. Allocate floating IP addresses from ``net04_ext``
+#. Allocate floating IP addresses from ``admin_external_net``
 
    #. Go to Contrail WebUI :guilabel:`Configure -> Networking -> Manage Floating IPs`
 
@@ -121,6 +121,13 @@ To configure OSTF networks and floating IPs:
 .. seealso::
 
    `Fuel user-guide <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/verify-environment/intro-health-checks.html>`_.
+
+.. warning::
+
+   `OSTF test 'Check network connectivity from SRIOV instance via floating IP'
+   is expected to fail in environments with Contrail. Contrail doesn't support
+   assigning floating addresses to SRIOV ports, they are treated as pci passthrough
+   devices.
 
 Troubleshooting
 ---------------
