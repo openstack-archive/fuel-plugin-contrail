@@ -159,12 +159,12 @@ class contrail::compute::vrouter {
     'DEFAULT/log_flow':                          value => '1';
     'DEFAULT/use_syslog':                        value => '1';
     'DEFAULT/syslog_facility':                   value => 'LOG_LOCAL0';
-    'DEFAULT/headless_mode':                     value => $contrail::headless_mode;
-    'DISCOVERY/server':                          value => $contrail::contrail_private_vip;
+    'DEFAULT/headless_mode':                     value => $::contrail::headless_mode;
+    'DISCOVERY/server':                          value => $::contrail::contrail_private_vip;
     'DISCOVERY/max_control_nodes':               value => '2';
     'HYPERVISOR/type':                           value => 'kvm';
-    'METADATA/metadata_proxy_secret':            value => $contrail::metadata_secret;
-    'NETWORKS/control_network_ip':               value => $contrail::address;
+    'METADATA/metadata_proxy_secret':            value => $::contrail::metadata_secret;
+    'NETWORKS/control_network_ip':               value => $::contrail::address;
     'VIRTUAL-HOST-INTERFACE/name':               value => 'vhost0';
     'VIRTUAL-HOST-INTERFACE/ip':                 value => "${contrail::address}/${contrail::netmask_short}";
     'VIRTUAL-HOST-INTERFACE/physical_interface': value => $phys_dev;

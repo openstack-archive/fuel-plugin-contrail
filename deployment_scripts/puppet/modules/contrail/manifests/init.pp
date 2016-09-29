@@ -55,6 +55,7 @@ class contrail {
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
   $vr_flow_entries   = pick($settings['vr_flow_entries'], '524288')
   $vr_mpls_labels    = pick($settings['vr_mpls_labels'], '5120')
+  if has_key($settings, 'headless_mode') { $headless_mode = $settings['headless_mode'] }
 
   # VIPs
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
