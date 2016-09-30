@@ -113,9 +113,10 @@ contrail-tsn:
     - controller
     - compute
     - compute-vmware
-    - dpdk-compute
+    - dpdk
     - dpdk-on-vf
     - cinder-volume
+    - cinder-vmware
     - ceph-osd
     - cinder
     - base-os
