@@ -44,9 +44,22 @@ Puppet::Type.type(:vcenter_vrouter_map).provide(:ruby) do
     options = ['-p', resource[:password], '-u', resource[:username], '-s', resource[:vcenter_host], '-i', resource[:ips]]
     options += ['-y'] if resource[:yaml]
     options += ['-d'] if resource[:dvs]
-    @vrouter_map = script *options
-    @vrouter_map += "\n" unless @vrouter_map.end_with? "\n"
-    @vrouter_map
+    resource[:retry_count].times do |retry_number|
+      begin
+        @vrouter_map = script *options
+        if not @vrouter_map or @vrouter_map == ''
+          raise Puppet::ExceptionFailure 'The command have returned an empty responce!'
+        end
+        @vrouter_map += "\n" unless @vrouter_map.end_with? "\n"
+        return @vrouter_map
+      rescue Puppet::ExecutionFailure => exception
+        Puppet.warning "Command failed: #{exception} Retry: #{retry_number + 1}"
+        @vrouter_map = nil
+        sleep resource[:retry_sleep]
+        next
+      end
+    end
+    raise "Execution of the command is still failing after #{resource[:retry_count]} retries!"
   end
 
   # Save the vcenter mapping to the file

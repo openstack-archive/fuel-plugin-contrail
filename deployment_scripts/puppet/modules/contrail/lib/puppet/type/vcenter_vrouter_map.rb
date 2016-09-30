@@ -33,6 +33,22 @@ Puppet::Type.newtype(:vcenter_vrouter_map) do
     end
   end
 
+  newparam(:retry_count) do
+    desc 'The number of retries'
+    defaultto 10
+    munge do |value|
+      value.to_i
+    end
+  end
+
+  newparam(:retry_sleep) do
+    desc 'The sleep time between retries'
+    defaultto 60
+    munge do |value|
+      value.to_i
+    end
+  end
+
   newparam(:ips, :array_matching => :all) do
     desc 'The list of VM ip addresses that should be added to the map'
     defaultto do
