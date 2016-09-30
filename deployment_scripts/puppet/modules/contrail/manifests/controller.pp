@@ -261,13 +261,23 @@ class contrail::controller {
 
   if ($ceilometer_enabled) {
     package { 'ceilometer-plugin-contrail': } ->
-    merge_yaml_settings { 'contrail_ceilometer_pipeline_yaml':
-      ensure            => present,
-      path              => '/etc/ceilometer/pipeline.yaml',
-      sample_settings   => '/etc/ceilometer/pipeline.yaml',
-      override_settings => $custom_yaml_settings,
-      require           => Package['ceilometer-plugin-contrail'],
+
+    ceilometer_pipeline_section { 'contrail_ceilometer_pipeline_yaml_source' :
+      ensure       => 'present',
+      path         => '/etc/ceilometer/pipeline.yaml',
+      data         => $custom_yaml_settings['sources'],
+      section_name => 'contrail_source',
+      array_name   => 'sources',
+    } ->
+
+    ceilometer_pipeline_section { 'contrail_ceilometer_pipeline_yaml_sink' :
+      ensure       => 'present',
+      path         => '/etc/ceilometer/pipeline.yaml',
+      data         => $custom_yaml_settings['sinks'],
+      section_name => 'contrail_sink',
+      array_name   => 'sinks',
     }
+
     if $contrail::ceilometer_ha_mode {
       service {'ceilometer-agent-central':
         ensure     => running,
@@ -276,7 +286,7 @@ class contrail::controller {
         hasstatus  => true,
         hasrestart => true,
         provider   => 'pacemaker',
-        subscribe  => Merge_yaml_settings['contrail_ceilometer_pipeline_yaml'],
+        tag        => 'ceilometer',
       }
     }
     else {
@@ -284,14 +294,14 @@ class contrail::controller {
         service { 'ceilometer-polling':
           ensure    => running,
           enable    => true,
-          subscribe => Merge_yaml_settings['contrail_ceilometer_pipeline_yaml'],
+          tag       => 'ceilometer',
         }
       }
       if !defined(Service['ceilometer-api']) {
         service { 'ceilometer-api':
           ensure    => running,
           enable    => true,
-          subscribe => Merge_yaml_settings['contrail_ceilometer_pipeline_yaml'],
+          tag       => 'ceilometer',
         }
       }
     }
@@ -299,4 +309,6 @@ class contrail::controller {
   Contrailplugin_ini_config<||> ~> File['/etc/neutron/plugin.ini']
   Heat_config<||> ~> Service['heat-engine']
   Nova_config<||> ~> Service['nova-api']
+  Ceilometer_pipeline_section <||> ~>
+  Service <| tag == 'ceilometer' |>
 }
