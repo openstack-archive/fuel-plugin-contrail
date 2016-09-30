@@ -437,13 +437,16 @@ class Vm(Vcenter_base, Vcenter_obj_tpl):
         :param host: optional, set ESXi host where vm will be created
         """
         vm_obj = self.get_obj([vim.VirtualMachine], name)
+        host_obj = self.get_obj([vim.HostSystem], host)
         if vm_obj:
             logger.info('VM({}) already exist. Skip creation VM: {}.'.format(name, name))
             return vm_obj
         if host:
-            host_obj = self.get_obj([vim.HostSystem], host)
             if not host_obj:
                 logger.warning('Host({}) does not exist. Skip creation VM: {}.'.format(host, name))
+                return
+            if host_obj.overallStatus == 'red':
+                logger.warning('Host({}) not responding. Skip creation VM: {}.'.format(host, name))
                 return
             if not any(ds.name == storage_name for ds in host_obj.datastore):
                 logger.warning(
@@ -688,7 +691,7 @@ if __name__ == '__main__':
     host_list_dvs_int = [{'host': host, 'uplink': None} for host in hosts_name]
     vmware_data_new = vcenter_connect.fetch_hosts_data()
 
-    # Specify where save vmware data
+    # Specify where save vmware_data
     file_dir = '/var/www/nailgun/plugins/contrail-5.0/deployment_scripts/puppet/modules/contrail/files/'
     file_name = 'vmware_data_{}.yaml'.format(str(env_id))
     vmware_datastore = Vcenterdata(file_dir + file_name)
