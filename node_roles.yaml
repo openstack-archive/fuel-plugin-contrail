@@ -1,25 +1,6 @@
-contrail-db:
-  name: Contrail - DB
-  description: Contrail DB role. Provides Cassandra for Contrail
-  has_primary: true
-  limits:
-    min: 1
-    recommended: 3
-  public_ip_required: false
-  weight: 100
-  conflicts:
-    - controller
-    - compute
-    - ceph-osd
-    - cinder
-    - base-os
-    - compute-vmware
-
-contrail-config:
-  name: Contrail - Config
-  description: >
-    Contrail config role. Provides IF_MAP, API, Discovery, Schema-transformer components of Contrail.
-    Analytics and WebUI components are also here.
+contrail-controller:
+  name: Contrail - Controller
+  description: Contrail Controller role.
   has_primary: true
   limits:
     min: 1
@@ -67,30 +48,7 @@ contrail-analytics-db:
     - compute
     - ceph-osd
     - cinder
-    - contrail-db
-    - contrail-config
-    - contrail-control
-    - base-os
-    - compute-vmware
-  restrictions:
-    - condition: "settings:contrail.dedicated_analytics_db.value == false"
-      message: "Dedicated Analytics DB should be enabled in plugin settings"
-
-contrail-control:
-  name: Contrail - Control
-  description: >
-    Contrail control role. Provides Control and DNS components of Contrail.
-  has_primary: true
-  limits:
-    min: 1
-    recommended: 3
-  public_ip_required: false
-  weight: 100
-  conflicts:
-    - controller
-    - compute
-    - ceph-osd
-    - cinder
+    - contrail-controller
     - base-os
     - compute-vmware
 
@@ -105,11 +63,7 @@ contrail-tsn:
     min: 1
     recommended: 2
   conflicts:
-    - contrail-analytics
-    - contrail-analytics-db
-    - contrail-control
-    - contrail-config
-    - contrail-db
+    - contrail-controller
     - controller
     - compute
     - compute-vmware
@@ -133,9 +87,7 @@ dpdk:
   weight: 100
   conflicts:
     - controller
-    - contrail-db
-    - contrail-config
-    - contrail-control
+    - contrail-controller
     - contrail-analytics
     - ceph-osd
     - cinder
@@ -154,10 +106,7 @@ dpdk-on-vf:
   weight: 100
   conflicts:
     - controller
-    - contrail-db
-    - contrail-config
-    - contrail-control
-    - contrail-analytics
+    - contrail-controller
     - compute-vmware
   restrictions:
     - condition: "settings:contrail.dpdk_on_vf.value == false"
@@ -172,10 +121,7 @@ contrail-vmware:
   weight: 100
   conflicts:
     - controller
-    - contrail-db
-    - contrail-config
-    - contrail-control
-    - contrail-analytics
+    - contrail-controller
     - ceph-osd
     - cinder
     - dpdk
