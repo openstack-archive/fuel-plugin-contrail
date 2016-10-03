@@ -22,6 +22,15 @@ attributes:
     regex:
       source: '^(?!(?:0(?:\.0){3}|255(?:\.255){3}))(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:,\s*(?!(?:0(?:\.0){3}|255(?:\.255){3}))(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})*$'
       error: "Invalid IP address list"
+  contrail_single_gateway:
+    value: ''
+    label: 'Single node group GW IP'
+    description: 'IP address of gateway, to access contrail BGP peers, only for single node deployment.'
+    weight: 40
+    type: "text"
+    regex:
+      source: '(^$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)'
+      error: "Invalid IP address"
   contrail_external:
     value: '10.100.1.0/24'
     label: 'External IP CIDR'
