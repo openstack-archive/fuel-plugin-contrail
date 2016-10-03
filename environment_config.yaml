@@ -22,10 +22,19 @@ attributes:
     regex:
       source: '^(?!(?:0(?:\.0){3}|255(?:\.255){3}))(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3}(?:,\s*(?!(?:0(?:\.0){3}|255(?:\.255){3}))(?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})*$'
       error: "Invalid IP address list"
+  contrail_single_gateway:
+    value: '10.109.4.1'
+    label: 'GW IP for Private net'
+    description: 'IP address of gateway in private net, only for single node deployment.'
+    weight: 40
+    type: "text"
+    regex:
+      source: '(^$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)'
+      error: "Invalid IP address"
   contrail_external:
     value: '10.100.1.0/24'
-    label: 'External IP CIDR'
-    description: 'The CIDR for Contrail external network'
+    label: 'Floating IP CIDR'
+    description: 'The CIDR for floating network'
     weight: 50
     type: "text"
     regex:
