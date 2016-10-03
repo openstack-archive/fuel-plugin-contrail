@@ -117,7 +117,7 @@ log.cleanup.policy=compact
 delete.topic.enable=true
 
 #default replication factors for automatically created topics
-<% if scope.lookupvar('contrail::contrail_db_ips').length > 1 -%>
+<% if scope.lookupvar('contrail::contrail_controller_ips').length > 1 -%>
 default.replication.factor=2
 <% else %>
 default.replication.factor=1

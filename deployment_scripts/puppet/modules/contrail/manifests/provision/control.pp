@@ -53,7 +53,7 @@ then exit 1; fi'",
     try_sleep => 10,
   }
 
-  if roles_include('primary-contrail-control') {
+  if roles_include('primary-contrail-controller') {
     exec { 'prov_control_asn':
       command => "python /opt/contrail/utils/provision_control.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
@@ -76,7 +76,7 @@ then exit 1; fi'",
     require  => Exec['wait_for_api'],
   }
 
-  if roles_include('primary-contrail-control') {
+  if roles_include('primary-contrail-controller') {
     contrail::provision::prov_ext_bgp { $contrail::gateways:
       require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
     }

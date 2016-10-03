@@ -25,10 +25,10 @@ helper:mapclient
 
 # This is a read-only MAPC
 reader:reader
-<%- scope.lookupvar('contrail::contrail_config_ips').each do |ip| -%>
+<%- scope.lookupvar('contrail::contrail_controller_ips').each do |ip| -%>
 <%= ip %>:<%= ip %>
 <%- end -%>
-<%- scope.lookupvar('contrail::contrail_control_ips').each do |ip| -%>
+<%- scope.lookupvar('contrail::contrail_controller_ips').each do |ip| -%>
 <%= ip %>:<%= ip %>
 <%= ip %>.dns:<%= ip %>.dns
 <%- end -%>

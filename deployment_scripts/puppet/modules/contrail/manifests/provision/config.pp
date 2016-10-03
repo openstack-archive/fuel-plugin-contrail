@@ -37,7 +37,7 @@ then exit 1; fi'",
     creates => '/opt/contrail/prov_config_node-DONE',
   }
 
-  if roles_include('primary-contrail-config') {
+  if roles_include('primary-contrail-controller') {
     exec { 'prov_metadata_services':
       command => "python /opt/contrail/utils/provision_linklocal.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
