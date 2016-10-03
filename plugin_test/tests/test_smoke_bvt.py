@@ -162,8 +162,9 @@ class ContrailPlugin(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable Contrail plugin
-            3. Add a node with contrail-config, contrail-control and
-               contrail-db and contrail-analytics roles
+            3. Add a node with contrail-controller
+            4. Add a node with contrail-analytics and
+               contrail-analytics-db roles
             4. Add a node with controller role
             5. Add a node with compute role
             6. Deploy cluster with plugin
@@ -181,12 +182,10 @@ class ContrailPlugin(TestBasic):
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
-                'slave-01': ['contrail-config',
-                             'contrail-control',
-                             'contrail-db',
-                             'contrail-analytics'],
-                'slave-02': ['controller'],
-                'slave-03': ['compute'],
+                'slave-01': ['contrail-controller'],
+                'slave-02': ['contrail-analytics', 'contrail-analytics-db'],
+                'slave-03': ['controller'],
+                'slave-04': ['compute'],
             })
 
         self.show_step(6)
@@ -207,17 +206,14 @@ class ContrailPlugin(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable Contrail plugin
-            3. Enable dedicated analytics DB
-            4. Add a node with contrail-config role
-            5. Add a node with contrail-control role
-            6. Add 3 nodes with contrail-db role
-            7. Add a node with contrail-analytics-db role.
-            8. Add a node with contrail-analytics role
-            9. Add a node with with controller role
-            10. Add a node with compute + cinder role
-            11. Deploy cluster with plugin
-            12. Run contrail health check tests
-            13. Run OSTF tests
+            3. Add 3 nodes with contrail-controller role
+            4. Add 3 nodes with contrail-analytics-db role.
+            5. Add a node with contrail-analytics role
+            6. Add a node with with controller role
+            7. Add a node with compute + cinder role
+            8. Deploy cluster with plugin
+            9. Run contrail health check tests
+            10. Run OSTF tests
 
         Duration 110 min
 
@@ -225,33 +221,33 @@ class ContrailPlugin(TestBasic):
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9)
 
-        plugin.show_range(self, 2, 4)
-        plugin.activate_plugin(self, dedicated_analytics_db=True)
+        self.show_step(2)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 4, 11)
+        plugin.show_range(self, 3, 8)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
-                'slave-01': ['contrail-config'],
-                'slave-02': ['contrail-control'],
-                'slave-03': ['contrail-analytics'],
+                'slave-01': ['contrail-controller'],
+                'slave-02': ['contrail-controller'],
+                'slave-03': ['contrail-controller'],
                 'slave-04': ['contrail-analytics-db'],
-                'slave-05': ['contrail-db'],
-                'slave-06': ['contrail-db'],
-                'slave-07': ['contrail-db'],
+                'slave-05': ['contrail-analytics-db'],
+                'slave-06': ['contrail-analytics-db'],
+                'slave-07': ['contrail-analytics'],
                 'slave-08': ['controller'],
                 'slave-09': ['compute', 'cinder']
             })
 
-        self.show_step(11)
+        self.show_step(8)
         openstack.deploy_cluster(self)
 
-        self.show_step(12)
+        self.show_step(9)
         TestContrailCheck(self).cloud_check(['contrail'])
 
-        self.show_step(13)
+        self.show_step(10)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(cluster_id=self.cluster_id,
                                    timeout=OSTF_RUN_TIMEOUT)

@@ -30,7 +30,7 @@ Steps
 
     1. Create environment with "Neutron with tunneling segmentation" as a network configuration.
     2. Activate and configure the Contrail plugin.
-    3. Add a node with contrail-config, contrail-control, contrail-db roles.
+    3. Add 3 nodes with contrail-controller.
     4. Add a node with controller role.
     5. Add a node with compute role.
     6. Deploy cluster with plugin.
@@ -70,17 +70,14 @@ Steps
     1. Create an environment with "Neutron with tunneling
        segmentation" as a network configuration
     2. Enable Contrail plugin
-    3. Enable dedicated analytics DB
-    4. Add a node with contrail-config role
-    5. Add a node with contrail-control role
-    6. Add 3 nodes with contrail-db role
-    7. Add a node with contrail-analytics-db role.
-    8. Add a node with contrail-analytics role
-    9. Add a node with with controller role
-    10. Add a node with compute + cinder role
-    11. Deploy cluster with plugin
-    12. Run contrail health check tests
-    13. Run OSTF tests
+    3. Add a 3 nodes with contrail-controller role
+    4. Add a 3 nodes with contrail-analytics-db role.
+    5. Add a node with contrail-analytics role
+    6. Add a node with with controller role
+    7. Add a node with compute + cinder role
+    8. Deploy cluster with plugin
+    9. Run contrail health check tests
+    10. Run OSTF tests
 
 Expected results
 ################
@@ -132,9 +129,10 @@ Steps
     5. Add nodes with following roles:
        * Controller
        * ComputeVMWare
-       * Contrail-vmware
        * Compute
-       * Contrail-config + contrail-control + contrail-db + contrail-analytics
+       * Contrail-controller
+       * Contrail-analytics + contrail-analytics-db
+       * Contrail-vmware
     6. Configure interfaces on nodes.
     7. Configure network settings.
     8. Configure VMware vCenter settings on VMware tab.
