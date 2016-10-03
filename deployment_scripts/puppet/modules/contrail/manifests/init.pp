@@ -42,7 +42,11 @@ class contrail {
   if $routes {
     $gateway = $routes[0]['via']
   } else {
-    $gateway = false
+    if (settings['contrail_single_gateway']) {
+      $gateway = $settings['contrail_single_gateway']
+    } else {
+      $gateway = false
+    }
   }
 
   $address           = pick(get_network_role_property('neutron/mesh', 'ipaddr'), get_network_role_property('contrail/vhost0', 'ipaddr'))
