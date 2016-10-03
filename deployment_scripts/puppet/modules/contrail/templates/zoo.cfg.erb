@@ -5,7 +5,7 @@ dataDir=/var/lib/zookeeper
 clientPort=2181
 maxSessionTimeout=120000
 <%-
-nodes=scope.lookupvar('contrail::contrail_db_nodes_hash')
+nodes=scope.lookupvar('contrail::contrail_controller_nodes_hash')
 nodes.each_pair do |node_name, node_props|
 -%>
 server.<%= node_props['uid'] %>=<%= node_props['network_roles']['neutron/mesh']%>:2888:3888
