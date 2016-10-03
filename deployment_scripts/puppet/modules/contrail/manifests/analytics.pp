@@ -46,7 +46,7 @@ class contrail::analytics {
   contrail_analytics_api_config {
     'DEFAULTS/api_server':                 value => "${::contrail::contrail_private_vip}:${::contrail::api_server_port}";
     'DEFAULTS/host_ip':                    value => $contrail::address;
-    'DEFAULTS/cassandra_server_list':      value => $contrail::cassandra_server_list;
+    'DEFAULTS/cassandra_server_list':      value => $contrail::analytics_db_list;
     'DEFAULTS/http_server_port':           value => '8090';
     'DEFAULTS/rest_api_port':              value => '9081';
     'DEFAULTS/rest_api_ip':                value => '0.0.0.0';
@@ -69,7 +69,7 @@ class contrail::analytics {
     'DEFAULT/analytics_config_audit_ttl': value => '2160';
     'DEFAULT/analytics_statistics_ttl':   value => '24';
     'DEFAULT/analytics_flow_ttl':         value => '2';
-    'DEFAULT/cassandra_server_list':      value => $contrail::cassandra_server_list;
+    'DEFAULT/cassandra_server_list':      value => $contrail::analytics_db_list;
     'DEFAULT/hostip':                     value => $contrail::address;
     'DEFAULT/log_file':                   value => '/var/log/contrail/contrail-collector.log';
     'DEFAULT/log_level':                  value => 'SYS_NOTICE';
@@ -84,7 +84,7 @@ class contrail::analytics {
   }
 
   contrail_query_engine_config {
-    'DEFAULT/cassandra_server_list': value => $contrail::cassandra_server_list;
+    'DEFAULT/cassandra_server_list': value => $contrail::analytics_db_list;
     'DEFAULT/collectors':            value => '127.0.0.1:8086';
     'DEFAULT/hostip':                value => '$__contrail_host_ip__';
     'DEFAULT/http_server_port':      value => '8091';
