@@ -14,7 +14,7 @@ volumes:
           generator: "calc_total_vg"
           generator_args: ["contrail-db"]
 volumes_roles_mapping:
-  contrail-db:
+  contrail-controller:
     - {allocate_size: "min", id: "os"}
     - {allocate_size: "min", id: "contrail-db"}
   contrail-analytics-db:
@@ -25,12 +25,6 @@ volumes_roles_mapping:
 # since the roles could be used in stand alone nodes.
 # Furthermore, there is a lot of unallocated space left over.
 
-  contrail-config:
-    - {allocate_size: "min", id: "os"}
-    - {allocate_size: "all", id: "logs"}
-  contrail-control:
-    - {allocate_size: "min", id: "os"}
-    - {allocate_size: "all", id: "logs"}
   contrail-analytics:
     - {allocate_size: "min", id: "os"}
     - {allocate_size: "all", id: "logs"}
