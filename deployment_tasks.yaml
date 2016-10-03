@@ -1,45 +1,24 @@
 # Groups
-# Contrail - DB
-- id: primary-contrail-db
+# Contrail - Controller
+- id: primary-contrail-controller
   type: group
-  role: [primary-contrail-db]
+  role: [primary-contrail-controller]
+  tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
+  required_for: [deploy_end]
+  requires: [deploy_start, primary-contrail-controller]
+  parameters:
+    strategy:
+      type: one_by_one
+
+- id: contrail-controller
+  type: group
+  role: [contrail-controller]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
   requires: [deploy_start]
   parameters:
     strategy:
       type: one_by_one
-
-- id: contrail-db
-  type: group
-  role: [contrail-db]
-  tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
-  required_for: [deploy_end]
-  requires: [deploy_start, primary-contrail-db]
-  parameters:
-    strategy:
-      type: one_by_one
-#
-# Contrail - Config
-- id: primary-contrail-config
-  type: group
-  role: [primary-contrail-config]
-  tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
-  required_for: [deploy_end]
-  requires: [deploy_start, contrail-db, primary-controller]
-  parameters:
-    strategy:
-      type: one_by_one
-
-- id: contrail-config
-  type: group
-  role: [contrail-config]
-  tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
-  required_for: [deploy_end]
-  requires: [deploy_start, primary-contrail-config]
-  parameters:
-    strategy:
-      type: parallel
 
 # Contrail - Analytics DB
 - id: primary-contrail-analytics-db
@@ -68,7 +47,7 @@
   role: [primary-contrail-analytics]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
-  requires: [deploy_start, contrail-db, primary-contrail-config]
+  requires: [deploy_start, primary-contrail-controller]
   parameters:
     strategy:
       type: one_by_one
@@ -78,28 +57,7 @@
   role: [contrail-analytics]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
-  requires: [deploy_start, contrail-db, primary-contrail-analytics]
-  parameters:
-    strategy:
-      type: parallel
-#
-# Contrail - Control
-- id: primary-contrail-control
-  type: group
-  role: [primary-contrail-control]
-  tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
-  required_for: [deploy_end]
-  requires: [deploy_start, contrail-config]
-  parameters:
-    strategy:
-      type: one_by_one
-
-- id: contrail-control
-  type: group
-  role: [contrail-control]
-  tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
-  required_for: [deploy_end]
-  requires: [deploy_start, primary-contrail-control]
+  requires: [deploy_start, primary-contrail-controller]
   parameters:
     strategy:
       type: parallel
@@ -109,7 +67,7 @@
   role: [primary-contrail-tsn]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
-  requires: [deploy_start, primary-contrail-control]
+  requires: [deploy_start, primary-contrail-controller]
   parameters:
     strategy:
       type: parallel
@@ -119,7 +77,7 @@
   role: [contrail-tsn]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
-  requires: [deploy_start, primary-contrail-control]
+  requires: [deploy_start, primary-contrail-controller]
   parameters:
     strategy:
       type: parallel
@@ -128,9 +86,7 @@
 # Group for post-deployment tasks
 - id: contrail-post-deploy
   type: group
-  role: [primary-contrail-db, contrail-db,
-        primary-contrail-config, contrail-config,
-        primary-contrail-control,contrail-control,
+  role: [primary-contrail-controller, contrail-controller,
         primary-contrail-analytics,contrail-analytics,
         primary-contrail-analytics-db,contrail-analytics-db]
   tasks: [configure_default_route, dns-client, ntp-client]
@@ -170,7 +126,7 @@
   type: group
   role: [contrail-vmware]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start, dns-client, ntp-client]
-  required_for: [deploy_end, primary-contrail-control, primary-contrail-db, primary-controller]
+  required_for: [deploy_end, primary-contrail-controller]
   requires: [deploy_start]
   parameters:
     strategy:
@@ -198,7 +154,7 @@
 - id: contrail-db-primary
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-db, primary-contrail-analytics-db]
+  groups: [primary-contrail-controller, primary-contrail-analytics-db]
   reexecute_on: [deploy_changes]
   required_for: [deploy_end]
   requires: [contrail-utils]
@@ -211,7 +167,7 @@
 - id: contrail-keystone
   type: skipped
   version: 2.0.0
-  groups: [primary-controller, controller]
+  groups: [primary-contrail-controller, contrail-controller]
   required_for: [deploy_end]
   requires: [primary-keystone, keystone, neutron-keystone, nova-keystone]
   cross-depended-by:
@@ -224,7 +180,7 @@
 - id: contrail-db-all
   type: puppet
   version: 2.0.0
-  groups: [contrail-db, contrail-analytics-db]
+  groups: [primary-contrail-controller, contrail-analytics-db]
   reexecute_on: [deploy_changes]
   required_for: [deploy_end]
   requires: [contrail-utils]
@@ -246,7 +202,7 @@
 - id: contrail-config-primary
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-config]
+  groups: [primary-contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-utils, deploy_start]
   reexecute_on: [deploy_changes]
@@ -266,7 +222,7 @@
 - id: contrail-config-provision-primary
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-config]
+  groups: [primary-contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-config-primary]
   reexecute_on: [deploy_changes]
@@ -282,7 +238,7 @@
 - id: contrail-config-all
   type: puppet
   version: 2.0.0
-  groups: [contrail-config]
+  groups: [contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-utils]
   reexecute_on: [deploy_changes]
@@ -303,7 +259,7 @@
 - id: contrail-config-provision-all
   type: puppet
   version: 2.0.0
-  groups: [contrail-config]
+  groups: [contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-config-all]
   parameters:
@@ -353,7 +309,7 @@
 - id: contrail-control-primary
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-control]
+  groups: [primary-contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-utils]
   cross-depends:
@@ -372,7 +328,7 @@
 - id: contrail-control-provision-primary
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-control]
+  groups: [primary-contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-control-primary]
   parameters:
@@ -387,7 +343,7 @@
 - id: contrail-control-all
   type: puppet
   version: 2.0.0
-  groups: [contrail-control]
+  groups: [contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-utils]
   cross-depends:
@@ -407,7 +363,7 @@
 - id: contrail-control-provision-all
   type: puppet
   version: 2.0.0
-  groups: [contrail-control]
+  groups: [contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-control-all]
   cross-depends:
@@ -426,7 +382,7 @@
 - id: contrail-db-provision-all
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-db, contrail-db, primary-contrail-analytics-db, contrail-analytics-db]
+  groups: [primary-contrail-controller, contrail-controller, primary-contrail-analytics-db, contrail-analytics-db]
   required_for: [deploy_end]
   requires: [contrail-utils]
   cross-depends:
@@ -445,7 +401,7 @@
 - id: contrail-webui-provision-primary
   type: puppet
   version: 2.0.0
-  groups: [primary-contrail-db]
+  groups: [primary-contrail-controller]
   required_for: [deploy_end]
   requires: [contrail-db-primary]
   parameters:
@@ -464,7 +420,7 @@
 - id: controller-hiera-pre
   type: puppet
   version: 2.0.0
-  groups: [primary-controller, controller]
+  groups: [primary-contrail-controller, contrail-controller]
   required_for: [openstack-network-start]
   requires: [deploy_start, globals]
   parameters:
@@ -475,7 +431,7 @@
 - id: openstack-haproxy-contrail
   type: puppet
   version: 2.0.0
-  groups: [primary-controller, controller]
+  groups: [primary-contrail-controller, contrail-controller]
   requires: [deploy_start, primary-cluster-haproxy, cluster-haproxy]
   required_for: [deploy_end, openstack-haproxy]
   reexecute_on: [deploy_changes]
@@ -607,7 +563,7 @@
 - id: controller-hiera-post
   type: puppet
   version: 2.0.0
-  groups: [primary-controller,controller]
+  groups: [primary-controller, controller]
   required_for: [deploy_end]
   requires: [openstack-network-end]
   parameters:
