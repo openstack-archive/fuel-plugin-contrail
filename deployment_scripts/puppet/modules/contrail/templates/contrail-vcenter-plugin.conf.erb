@@ -29,7 +29,7 @@ admin_tenant_name=services
 api.hostname=<%= scope.lookupvar('contrail::contrail_private_vip') %>
 api.port=8082
 
-zookeeper.serverlist=<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
+zookeeper.serverlist=<%= scope.lookupvar('contrail::contrail_controller_ips').map{ |ip| "#{ip}:2181" }.join(',') %>
 
 # HTTP Introspect
 introspect.port=8234
