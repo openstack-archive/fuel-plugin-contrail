@@ -534,8 +534,8 @@ Steps
     11. Verify that icmp ping is not enabled between instances from SG1 and VMs from SG2.
 
 
-Expected result
-###############
+Expected results
+################
 
 Network traffic is allowed/prohibited to instances according security groups
 rules.
@@ -573,8 +573,8 @@ Steps
     4. Delete all instances from horizon simultaneously.
 
 
-Expected result
-###############
+Expected results
+################
 
 All instances should be created and deleted without any error.
 
