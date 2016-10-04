@@ -83,7 +83,7 @@ attributes:
     weight: 160
     type: "checkbox"
     restrictions:
-      - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
+      - condition: "not (settings:contrail.metadata.enabled == true)"
         action: "hide"
   contrail_vcenter_datacenter:
     value: "Datacenter"
