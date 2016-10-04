@@ -260,7 +260,7 @@
     timeout: 1440
 
 ################
-#5. Provision Primary Control config
+#5. Provision Primary Contrail config
 ################
 
 - id: contrail-config-provision-primary
@@ -634,9 +634,9 @@
       role: self
     - name: /contrail-common-repo/
       role: self
-    - name: contrail-config-all
+    - name: contrail-control-provision-primary
       policy: all
-    - name: contrail-config-primary
+    - name: contrail-control-provision-all
       policy: all
     - name: openstack-controller-contrail
       policy: all
