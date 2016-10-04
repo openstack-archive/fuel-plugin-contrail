@@ -86,10 +86,9 @@ class SystemTests(TestBasic):
                             ip_from, ip_to))
                     assert_true(
                         remote.execute_through_host(
-                        hostname=ip_from,
-                        cmd=command,
-                        auth=self.cirros_auth
-                    )['exit_code'] == ping_result,
+                            hostname=ip_from,
+                            cmd=command,
+                            auth=self.cirros_auth)['exit_code'] == ping_result,
                         'Ping responce is not received.')
 
     def get_role(self, os_conn, role_name):
@@ -123,15 +122,12 @@ class SystemTests(TestBasic):
             1. Create an environment with "Neutron with tunneling
                segmentation" as a network configuration
             2. Enable Contrail plugin
-            3. Enable dedicated analytics DB
-            4. Add 1 node with contrail-config, contrail-control,
-               and contrail-db roles
-            5. Add a node with controller, mongo roles
-            6. Add a node with compute role
-            7. Add a node with contrail-analytics and contrail-analytics-db
-               roles
-            8. Deploy cluster with plugin
-            9. Run OSTF.
+            3. Add 1 node with contrail-control, contrail-analytic roles
+            4. Add a node with controller, mongo roles
+            5. Add a node with compute role
+            6. Add a node contrail-analytics-db role
+            7. Deploy cluster with plugin
+            8. Run OSTF.
 
         Duration 90 min
 
@@ -143,25 +139,23 @@ class SystemTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-        plugin.show_range(self, 2, 4)
-        plugin.activate_plugin(self, dedicated_analytics_db=True)
+        self.show_step(2)
+        plugin.activate_plugin(self)
 
-        plugin.show_range(self, 4, 8)
+        plugin.show_range(self, 3, 7)
         self.fuel_web.update_nodes(
             self.cluster_id,
             {
-                'slave-01': ['contrail-config',
-                             'contrail-control',
-                             'contrail-db'],
+                'slave-01': ['contrail-control', 'contrail-analytics'],
                 'slave-02': ['controller', 'mongo'],
                 'slave-03': ['compute'],
                 'slave-04': ['compute'],
-                'slave-05': ['contrail-analytics', 'contrail-analytics-db'],
+                'slave-05': ['contrail-analytics-db'],
             })
 
-        self.show_step(8)
+        self.show_step(7)
         openstack.deploy_cluster(self)
-        self.show_step(9)
+        self.show_step(8)
         if vsrx_setup_result:
             self.fuel_web.run_ostf(
                 cluster_id=self.cluster_id,
@@ -567,14 +561,14 @@ class SystemTests(TestBasic):
         os_ip = self.fuel_web.get_public_vip(cluster_id)
 
         self.show_step(2)
-        horizon_cert = ssl.get_server_certificate((os_ip, 443),
-                       ssl_version = ssl.PROTOCOL_TLSv1)
+        horizon_cert = ssl.get_server_certificate(
+            (os_ip, 443), ssl_version=ssl.PROTOCOL_TLSv1)
         self.show_step(3)
-        contrail_ui_cert = ssl.get_server_certificate((os_ip, 8143),
-                           ssl_version = ssl.PROTOCOL_TLSv1)
+        contrail_ui_cert = ssl.get_server_certificate(
+            (os_ip, 8143), ssl_version=ssl.PROTOCOL_TLSv1)
         self.show_step(4)
-        contrail_api_cert = ssl.get_server_certificate((os_ip, 8082),
-                            ssl_version = ssl.PROTOCOL_TLSv1)
+        contrail_api_cert = ssl.get_server_certificate(
+            (os_ip, 8082), ssl_version=ssl.PROTOCOL_TLSv1)
         self.show_step(5)
         if not horizon_cert == contrail_ui_cert:
             raise Exception("ContrailUI certificate is not valid")
