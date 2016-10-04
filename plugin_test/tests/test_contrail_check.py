@@ -620,9 +620,7 @@ class TestContrailCheck(object):
         cluster_id = self.obj.fuel_web.get_last_created_cluster()
         logger.info('Check contrail node for cluster {}'.format(cluster_id))
         contrail_node_roles = {
-            'contrail-config',
-            'contrail-control',
-            'contrail-db',
+            'contrail-controller',
             'contrail-analytics'
             'contrail-analytics-db'
         }

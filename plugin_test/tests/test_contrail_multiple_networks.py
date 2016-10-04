@@ -163,37 +163,34 @@ class TestMultipleNets(TestMultipleClusterNets):
         Scenario:
             1. Revert snapshot with ready master node
             2. Install contrail plugin
-            3. Enable dedicated analytics DB
-            4. Bootstrap slaves from default nodegroup
-            5. Create cluster with Neutron GRE and custom nodegroups
-            6. Activate plugin and configure plugins setings
-            7. Remove 2nd custom nodegroup which is added automatically
-            8. Bootstrap slave nodes from custom nodegroup
-            9. Download network configuration
-            10. Update network.json  with customized ip ranges
-            11. Put new json on master node and update network data
-            12. Verify that new IP ranges are applied for network config
-            13. Add following nodes to default nodegroup:
+            3. Bootstrap slaves from default nodegroup
+            4. Create cluster with Neutron GRE and custom nodegroups
+            5. Activate plugin and configure plugins setings
+            6. Remove 2nd custom nodegroup which is added automatically
+            7. Bootstrap slave nodes from custom nodegroup
+            8. Download network configuration
+            9. Update network.json  with customized ip ranges
+            10. Put new json on master node and update network data
+            11. Verify that new IP ranges are applied for network config
+            12. Add following nodes to default nodegroup:
                 * 3 controller+ceph
-            14. Add following nodes to custom nodegroup:
                 * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db+
-                  contrail-analytics+contrail-analytics-db
-                * 1 contrail-analytics+contrail-analytics-db
-            15. Deploy cluster
-            16. Run network verification
-            17. Verify that excluded ip is not used for nodes or VIP
-            18. Run health checks (OSTF)
+            13. Add following nodes to custom nodegroup:
+                * 1 contrail-controller
+                * 1 contrail-analytics-db+contrail-analytics
+            14. Deploy cluster
+            15. Run network verification
+            16. Verify that excluded ip is not used for nodes or VIP
+            17. Run health checks (OSTF)
 
         Duration 2.5 hours
 
         """
         if not MULTIPLE_NETWORKS:
             raise SkipTest()
-        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1, initialize=True)
         self.env.revert_snapshot("ready")
-        self.show_step(2)
+        plugin.show_range(self, 2, 6)
         plugin.prepare_contrail_plugin(self, snapshot_name="ready",
                                        options={'images_ceph': True,
                                                 'volumes_ceph': True,
@@ -204,7 +201,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         cluster_id = self.fuel_web.get_last_created_cluster()
         self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
 
-        plugin.activate_plugin(self, **conf_contrail)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate(self, vsrx_config=True)
 
@@ -243,12 +240,11 @@ class TestMultipleNets(TestMultipleClusterNets):
                 'slave-03': [
                     ['controller', 'ceph-osd'], nodegroup_default],
                 'slave-04': [
-                    ['contrail-config', 'contrail-control', 'contrail-db',
-                     'contrail-analytics'], nodegroup_custom1],
+                    ['contrail-controller'], nodegroup_custom1],
                 'slave-05': [['compute'], nodegroup_custom1],
                 'slave-06': [
-                    ['contrail-analytics', 'contrail-analytics-db'],
-                      nodegroup_custom1],
+                    ['contrail-analytics-db', 'contrail-analytics'],
+                    nodegroup_custom1],
             }
         )
         self.show_step(14)
@@ -329,46 +325,43 @@ class TestMultipleNets(TestMultipleClusterNets):
         Scenario:
             1. Revert snapshot with ready master node
             2. Install contrail plugin
-            3. Enable dedicated analytics DB
-            4. Bootstrap slaves from default nodegroup
-            5. Create cluster with Neutron GRE and custom nodegroups
-            6. Activate plugin and configure plugins setings
-            7. Remove 2nd custom nodegroup which is added automatically
-            8. Bootstrap slave nodes from custom nodegroup
-            9. Download network configuration
-            10. Update network.json  with customized ip ranges
-            11. Put new json on master node and update network data
-            12. Verify that new IP ranges are applied for network config
-            13. Add following nodes to custom nodegroup:
+            3. Bootstrap slaves from default nodegroup
+            4. Create cluster with Neutron GRE and custom nodegroups
+            5. Activate plugin and configure plugins setings
+            6. Remove 2nd custom nodegroup which is added automatically
+            7. Bootstrap slave nodes from custom nodegroup
+            8. Download network configuration
+            9. Update network.json  with customized ip ranges
+            10. Put new json on master node and update network data
+            11. Verify that new IP ranges are applied for network config
+            12. Add following nodes to custom nodegroup:
                 * 1 controller+mongo
-            14. Add following nodes to default nodegroup:
+            13. Add following nodes to default nodegroup:
                 * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db+
-                  contrail-analytics
+                * 1 contrail-controller+contrail-analytics
                 * 1 contrail-analytics-db
                 * 1 cinder
-            15. Deploy cluster
-            16. Run health checks (OSTF)
-            17. Add 1 controller node
-            18. Redeploy cluster
-            19. Run health checks (OSTF)
+            14. Deploy cluster
+            15. Run health checks (OSTF)
+            16. Add 1 controller node
+            17. Redeploy cluster
+            18. Run health checks (OSTF)
 
         Duration 2.5 hours
 
         """
         if not MULTIPLE_NETWORKS:
             raise SkipTest()
-        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1, initialize=True)
         self.env.revert_snapshot("ready")
-        self.show_step(2)
+        plugin.show_range(self, 2, 6)
         plugin.prepare_contrail_plugin(self, snapshot_name="ready",
                                        options={'ceilometer': True})
 
         cluster_id = self.fuel_web.get_last_created_cluster()
         self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
 
-        plugin.activate_plugin(self, **conf_contrail)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate(self, vsrx_config=True)
 
@@ -398,8 +391,8 @@ class TestMultipleNets(TestMultipleClusterNets):
             cluster_id,
             {
                 'slave-01': [
-                    ['contrail-config', 'contrail-control', 'contrail-db',
-                        'contrail-analytics'], nodegroup_default],
+                    ['contrail-controller', 'contrail-analytics'],
+                    nodegroup_default],
                 'slave-02': [['contrail-analytics-db'], nodegroup_default],
                 'slave-03': [['compute'], nodegroup_default],
                 'slave-04': [['cinder'], nodegroup_default],
@@ -458,11 +451,12 @@ class TestMultipleNets(TestMultipleClusterNets):
             11. Verify that new IP ranges are applied for network config
             12. Add following nodes to default nodegroup:
                 * 1 controller+cinder
-                * 2 controller
+                * 1 controller
             13. Add following nodes to custom nodegroup:
                 * 1 compute
-                * 1 contrail-config+contrail-control+contrail-db
+                * 1 contrail-controller
                 * 1 contrail-analytics
+                * 1 contrail-analytics-db
             14. Deploy cluster
             15. Run health checks (OSTF)
             16. Remove 1 controller node
@@ -476,11 +470,11 @@ class TestMultipleNets(TestMultipleClusterNets):
             raise SkipTest()
         self.show_step(1, initialize=True)
         self.env.revert_snapshot("ready")
-        self.show_step(2)
+        plugin.show_range(self, 2, 6)
         plugin.prepare_contrail_plugin(self, snapshot_name="ready")
 
         cluster_id = self.fuel_web.get_last_created_cluster()
-        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:2])
 
         plugin.activate_plugin(self)
         # activate vSRX image
@@ -497,7 +491,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.fuel_web.client.delete_nodegroup(custom_group2['id'])
 
         self.show_step(7)
-        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:6])
+        self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[2:6])
 
         self.show_step(8)
         updated_storage_default, updated_storage_custom, \
@@ -513,11 +507,9 @@ class TestMultipleNets(TestMultipleClusterNets):
             {
                 'slave-01': [['controller', 'cinder'], nodegroup_custom1],
                 'slave-02': [['controller'], nodegroup_custom1],
-                'slave-03': [['controller'], nodegroup_custom1],
+                'slave-03': [['contrail-analytics-db'], nodegroup_default],
                 'slave-04': [['compute', 'cinder'], nodegroup_default],
-                'slave-05': [
-                    ['contrail-config', 'contrail-control', 'contrail-db'],
-                    nodegroup_default],
+                'slave-05': [['contrail-controller'], nodegroup_default],
                 'slave-06': [['contrail-analytics'], nodegroup_default],
             }
         )
@@ -536,7 +528,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.show_step(16)
         conf_control = {'slave-03': [['controller'], nodegroup_custom1]}
 
-        plugin.show_range(self, 17, 19)
+        plugin.show_range(self, 17, 18)
         openstack.update_deploy_check(
             self, conf_control, delete=True,
             is_vsrx=vsrx_setup_result,
@@ -564,11 +556,12 @@ class TestMultipleNets(TestMultipleClusterNets):
             10. Put new json on master node and update network data
             11. Verify that new IP ranges are applied for network config
             12. Add following nodes to default nodegroup:
-                * 3 controller
-            13. Add following nodes to custom nodegroup:
+                * 1 controller
                 * 2 compute
-                * 1 contrail-config+contrail-control+contrail-db+
-                  contrail-analytics
+            13. Add following nodes to custom nodegroup:
+                * 1 contrail-controller
+                * 1 contrail-analytics
+                * 1 contrail-analytics-db
             14. Deploy cluster
             15. Run health checks (OSTF)
             16. Remove 1 compute node
@@ -582,7 +575,7 @@ class TestMultipleNets(TestMultipleClusterNets):
             raise SkipTest()
         self.show_step(1, initialize=True)
         self.env.revert_snapshot("ready")
-        self.show_step(2)
+        plugin.show_range(self, 2, 6)
         plugin.prepare_contrail_plugin(self, snapshot_name="ready")
 
         cluster_id = self.fuel_web.get_last_created_cluster()
@@ -618,13 +611,12 @@ class TestMultipleNets(TestMultipleClusterNets):
             cluster_id,
             {
                 'slave-01': [['controller'], nodegroup_default],
-                'slave-02': [['controller'], nodegroup_default],
-                'slave-03': [['controller'], nodegroup_default],
+                'slave-02': [['compute'], nodegroup_default],
+                'slave-03': [['compute'], nodegroup_default],
                 'slave-04': [
-                    ['contrail-config', 'contrail-control', 'contrail-db',
-                     'contrail-analytics'], nodegroup_custom1],
-                'slave-05': [['compute'], nodegroup_custom1],
-                'slave-06': [['compute'], nodegroup_custom1],
+                    ['contrail-controller'], nodegroup_custom1],
+                'slave-05': [['contrail-analytics'], nodegroup_custom1],
+                'slave-06': [['contrail-analytics-db'], nodegroup_custom1],
             }
         )
         self.show_step(14)
@@ -641,7 +633,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         self.show_step(16)
         conf_compute = {'slave-06': [['compute'], nodegroup_custom1], }
 
-        plugin.show_range(self, 17, 19)
+        plugin.show_range(self, 17, 18)
         openstack.update_deploy_check(
             self, conf_compute, delete=True,
             is_vsrx=vsrx_setup_result,
@@ -659,38 +651,35 @@ class TestMultipleNets(TestMultipleClusterNets):
         Scenario:
             1. Revert snapshot with ready master node
             2. Install contrail plugin
-            3. Enable dedicated analytics DB
-            4. Bootstrap slaves from default nodegroup
-            5. Create cluster with Neutron GRE and custom nodegroups
-            6. Activate plugin and configure plugins setings
-            7. Remove 2nd custom nodegroup which is added automatically
-            8. Bootstrap slave nodes from custom nodegroup
-            9. Download network configuration
-            10. Update network.json  with customized ip ranges
-            11. Put new json on master node and update network data
-            12. Verify that new IP ranges are applied for network config
-            13. Add following nodes to default nodegroup:
+            3. Bootstrap slaves from default nodegroup
+            4. Create cluster with Neutron GRE and custom nodegroups
+            5. Activate plugin and configure plugins setings
+            6. Remove 2nd custom nodegroup which is added automatically
+            7. Bootstrap slave nodes from custom nodegroup
+            8. Download network configuration
+            9. Update network.json  with customized ip ranges
+            10. Put new json on master node and update network data
+            11. Verify that new IP ranges are applied for network config
+            12. Add following nodes to default nodegroup:
                 * 1 controller
-            14. Add following nodes to custom nodegroup:
+            13. Add following nodes to custom nodegroup:
                 * 1 compute+ceph-osd
-                * 1 contrail-config+contrail-control+contrail-db+
-                  contrail-analytics
+                * 1 contrail-controller+contrail-analytics
                 * 1 contrail-analytics-db
-            15. Deploy cluster
-            16. Run health checks (OSTF)
-            17. Add 1 compute node
-            18. Redeploy cluster
-            19. Run health checks (OSTF)
+            14. Deploy cluster
+            15. Run health checks (OSTF)
+            16. Add 1 compute node
+            17. Redeploy cluster
+            18. Run health checks (OSTF)
 
         Duration 2.5 hours
 
         """
         if not MULTIPLE_NETWORKS:
             raise SkipTest()
-        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1, initialize=True)
         self.env.revert_snapshot("ready")
-        self.show_step(2)
+        plugin.show_range(self, 2, 6)
         plugin.prepare_contrail_plugin(
             self, snapshot_name="ready",
             options={
@@ -704,7 +693,7 @@ class TestMultipleNets(TestMultipleClusterNets):
         cluster_id = self.fuel_web.get_last_created_cluster()
         self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:1])
 
-        plugin.activate_plugin(self, **conf_contrail)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate(self, vsrx_config=True)
 
@@ -726,8 +715,7 @@ class TestMultipleNets(TestMultipleClusterNets):
             updated_mgmt_default, updated_mgmt_custom = \
             self.update_network_config(cluster_id)
 
-        self.show_step(12)
-        self.show_step(13)
+        plugin.show_range(self, 12, 14)
         nodegroup_default = NODEGROUPS[0]['name']
         nodegroup_custom1 = NODEGROUPS[1]['name']
         self.fuel_web.update_nodes(
@@ -735,8 +723,8 @@ class TestMultipleNets(TestMultipleClusterNets):
             {
                 'slave-01': [['controller'], nodegroup_default],
                 'slave-02': [
-                    ['contrail-config', 'contrail-control', 'contrail-db',
-                     'contrail-analytics'], nodegroup_custom1],
+                    ['contrail-controller', 'contrail-analytics'],
+                    nodegroup_custom1],
                 'slave-03': [['contrail-analytics-db'], nodegroup_custom1],
                 'slave-04': [['compute', 'ceph-osd'], nodegroup_custom1],
             }
@@ -775,47 +763,43 @@ class TestMultipleNets(TestMultipleClusterNets):
         Scenario:
             1. Revert snapshot with ready master node
             2. Install contrail plugin
-            3. Enable dedicated analytics DB
-            4. Bootstrap slaves from default nodegroup
-            5. Create cluster with Neutron GRE and custom nodegroups
-            6. Activate plugin and configure plugins setings
-            7. Remove 2nd custom nodegroup which is added automatically
-            8. Bootstrap slave nodes from custom nodegroup
-            9. Download network configuration
-            10. Update network.json  with customized ip ranges
-            11. Put new json on master node and update network data
-            12. Verify that new IP ranges are applied for network config
-            13. Add following nodes to default nodegroup:
+            3. Bootstrap slaves from default nodegroup
+            4. Create cluster with Neutron GRE and custom nodegroups
+            5. Activate plugin and configure plugins setings
+            6. Remove 2nd custom nodegroup which is added automatically
+            7. Bootstrap slave nodes from custom nodegroup
+            8. Download network configuration
+            9. Update network.json  with customized ip ranges
+            10. Put new json on master node and update network data
+            11. Verify that new IP ranges are applied for network config
+            12. Add following nodes to default nodegroup:
                 * 1 controller
-                * 2 contrail-config+contrail-control+contrail-db+
-                  contrail-analytics
-            14. Add following nodes to custom nodegroup:
+                * 2 contrail-controller+contrail-analytics
+            13. Add following nodes to custom nodegroup:
                 * 1 cinder
-                * 1 contrail-config+contrail-control+contrail-db+
-                  contrail-analytics
+                * 1 ccontrail-controller+ contrail-analytics
                 * 1 contrail-analytics-db
-            15. Deploy cluster
-            16. Run health checks (OSTF)
+            14. Deploy cluster
+            15. Run health checks (OSTF)
 
         Duration 2.5 hours
 
         """
-        conf_contrail = {"dedicated_analytics_db": True}
         if not MULTIPLE_NETWORKS:
             raise SkipTest()
         self.show_step(1, initialize=True)
         self.env.revert_snapshot("ready")
-        plugin.show_range(self, 2, 7)
+        plugin.show_range(self, 2, 6)
         plugin.prepare_contrail_plugin(self, snapshot_name="ready")
 
         cluster_id = self.fuel_web.get_last_created_cluster()
         self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[0:3])
 
-        plugin.activate_plugin(self, **conf_contrail)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate(self, vsrx_config=True)
 
-        self.show_step(7)
+        self.show_step(6)
         self.netconf_all_groups = self.fuel_web.client.get_networks(cluster_id)
         custom_group2 = self.fuel_web.get_nodegroup(
             cluster_id, name=NODEGROUPS[2]['name'])
@@ -825,15 +809,15 @@ class TestMultipleNets(TestMultipleClusterNets):
                         "'update_dnsmasq' is finished!")
         self.fuel_web.client.delete_nodegroup(custom_group2['id'])
 
-        self.show_step(8)
+        self.show_step(7)
         self.env.bootstrap_nodes(self.env.d_env.nodes().slaves[3:6])
 
-        self.show_step(9)
+        self.show_step(8)
         updated_storage_default, updated_storage_custom, \
             updated_mgmt_default, updated_mgmt_custom = \
             self.update_network_config(cluster_id)
 
-        plugin.show_range(self, 10, 15)
+        plugin.show_range(self, 9, 14)
         nodegroup_default = NODEGROUPS[0]['name']
         nodegroup_custom1 = NODEGROUPS[1]['name']
         self.fuel_web.update_nodes(
@@ -843,23 +827,23 @@ class TestMultipleNets(TestMultipleClusterNets):
                     ['controller'], nodegroup_default],
                 'slave-02': [['compute'], nodegroup_default],
                 'slave-03': [
-                    ['contrail-config', 'contrail-control', 'contrail-db',
-                     'contrail-analytics'], nodegroup_default],
+                    ['contrail-controller', 'contrail-analytics'],
+                    nodegroup_default],
                 'slave-04': [
-                    ['contrail-config', 'contrail-control', 'contrail-db',
-                     'contrail-analytics'], nodegroup_custom1],
+                    ['contrail-controller', 'contrail-analytics'],
+                    nodegroup_custom1],
                 'slave-05': [
-                    ['contrail-config', 'contrail-control', 'contrail-db',
-                     'contrail-analytics'], nodegroup_custom1],
+                    ['contrail-controller', 'contrail-analytics'],
+                    nodegroup_custom1],
                 'slave-06': [
                     ['contrail-analytics-db'], nodegroup_custom1],
             }
         )
-        self.show_step(15)
+        self.show_step(14)
         openstack.deploy_cluster(self)
         TestContrailCheck(self).cloud_check(['contrail'])
 
-        self.show_step(16)
+        self.show_step(15)
         if vsrx_setup_result and settings.VSRX_CONFIG_PATH:
             self.fuel_web.run_ostf(
                 cluster_id=cluster_id,
