@@ -44,6 +44,7 @@ class contrail::analytics {
     require => Package['redis-server'],
   }
   contrail_analytics_api_config {
+    'DEFAULTS/api_server':                 value => "${::contrail::contrail_private_vip}:${::contrail::api_server_port}";
     'DEFAULTS/host_ip':                    value => $contrail::address;
     'DEFAULTS/cassandra_server_list':      value => $contrail::cassandra_server_list;
     'DEFAULTS/http_server_port':           value => '8090';

@@ -27,12 +27,6 @@ class contrail::common_repo {
       file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
         ensure => absent,
       }
-      apt::pin { 'dependency-fix':
-        explanation => 'Temporary fix for contrail analytics',
-        packages    => 'libperl5.18',
-        priority    => 1400,
-        version     => '5.18.2-2ubuntu1.1',
-      }
     }
     default: {}
   }
