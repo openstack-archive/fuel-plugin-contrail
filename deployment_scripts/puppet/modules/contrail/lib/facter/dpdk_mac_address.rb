@@ -60,7 +60,7 @@ Facter.add("dpdk_mac_address") do
       end
     end
 
-    priv_ip = network_scheme['endpoints']['br-mesh']['IP'][0].split('/')[0]
+    priv_ip = network_scheme['endpoints']['br-fw-admin']['IP'][0].split('/')[0]
     if !IPAddress.valid? priv_ip
       break
     end
