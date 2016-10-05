@@ -301,19 +301,10 @@ Core
 Steps
 #####
 
-    1. Install contrail plugin.
-    2. Create an environment with "Neutron with tunneling
-       segmentation" as a network configuration.
-    3. Enable and configure Contrail plugin.
-    4. Add a node with "controller" + "MongoDB" multirole.
-    5. Add a node with "compute".
-    6. Add a node with "contrail-config", "contrail-control" and
-       "contrail-db" roles.
-    7. Deploy cluster with plugin.
-    8. Run OSTF tests.
-    9. Create 2 instances in the default network.
-    10. Send icpm packets from one instance to another.
-    11. Check contrail ceilometer metrics:
+    1. Deploy Contrail cluster with ceilometer.
+    2. Create 2 instances in the default network.
+    3. Send icpm packets from one instance to another.
+    4. Check contrail ceilometer metrics:
         "\*ip.floating.receive.bytes",
         "\*ip.floating.receive.packets",
         "\*ip.floating.transmit.bytes",
@@ -534,8 +525,8 @@ Steps
     11. Verify that icmp ping is not enabled between instances from SG1 and VMs from SG2.
 
 
-Expected result
-###############
+Expected results
+################
 
 Network traffic is allowed/prohibited to instances according security groups
 rules.
@@ -573,8 +564,8 @@ Steps
     4. Delete all instances from horizon simultaneously.
 
 
-Expected result
-###############
+Expected results
+################
 
 All instances should be created and deleted without any error.
 

@@ -35,15 +35,13 @@ Steps
        * Storage: Ceph
        * Additional services: ceilometer
     3. Configure Contrail plugin settings:
-       * enable dedicated analytics DB
        * enable and configure ToR agents
     4. Add nodes with following roles:
        * 3 Controller
        * 1 TSN
        * 2 Compute + Ceph
-       * 1 Contrail-config + contrail-control + contrail-db
-       * 1 contrail-analytics
-       * 1 contrail-analytics-db
+       * 1 contrail-controller
+       * 1 contrail-analytics + contrail-analytics-db
     5. Configure interfaces on nodes.
     6. Configure network settings.
     7. Deploy the cluster.
@@ -92,7 +90,8 @@ Steps
        * 1 Controller
        * 2 TSN
        * 1 Compute
-       * 1 Contrail-config + contrail-control + contrail-db + contrail-analytics
+       * 1 contrail-controller + contrail-analytics
+       * 1 contrail-analytics + contrail-analytics-db
     5. Configure interfaces on nodes.
     6. Configure network settings.
     7. Deploy the cluster.
@@ -184,7 +183,8 @@ Steps
        * 1 Controller
        * 1 TSN
        * 1 Compute
-       * 1 contrail-control+contrail-config+contrail-db+contrail-analytics
+       * 1 contrail-config + contrail-analytics
+       * 1 contrail-analytics + contrail-analytics-db
     5. Configure interfaces on nodes.
     6. Configure network settings.
     7. Deploy the cluster.
@@ -232,13 +232,12 @@ Steps
        * Storage: Ceph
        * Additional services: default
     3. Configure Contrail plugin settings:
-       * enable dedicated analytics DB
        * enable and configure ToR agents
     4. Add nodes with following roles:
        * 1 Controller + ceph-osd
        * 2 TSN
        * 1 Compute + cinder
-       * 1 contrail-control+contrail-config+contrail-db+contrail-analytics
+       * 1 contrail-controller + contrail-analytics
        * 1 contrail-analytics-db
     5. Configure interfaces on nodes.
     6. Configure network settings.
