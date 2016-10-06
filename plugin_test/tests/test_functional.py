@@ -699,7 +699,7 @@ class FunctionalTests(TestBasic):
         plugin.prepare_contrail_plugin(self, slaves=9)
 
         self.show_step(2)
-        plugin.activate_plugin(selfl)
+        plugin.activate_plugin(self)
         vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 10)
