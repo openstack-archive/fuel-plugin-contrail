@@ -33,6 +33,7 @@ class contrail::database {
   sysctl::value { 'vm.swappiness':
     value => '10'
   }
+
   if roles_include($contrail::contrail_controller_roles) {
     $cassandra_ips   = $::contrail::contrail_controller_ips
     $cassandra_seeds = $contrail::primary_contrail_controller_ip
@@ -59,7 +60,6 @@ class contrail::database {
                     ],
     }
   } elsif roles_include($contrail::analytics_db_roles) {
-    $cassandra_ips   = $::contrail::analytics_db_ips
     $cassandra_seeds = $contrail::primary_analytics_db_ip
     $cluster_name    = 'Analytics'
   }
