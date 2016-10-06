@@ -562,7 +562,8 @@ class FunctionalTests(TestBasic):
             2. Enable and configure Contrail plugin
             3. Add a controller and a compute+cinder nodes
             4. Add a node with "contrail-controller" role
-            5. Add a node with "contrail-analytics" and "contrail-analytics-db" roles
+            5. Add a node with "contrail-analytics" and "contrail-analytics-db"
+               roles
             6. Add a node with "contrail-analytics" role
             7. Deploy cluster
             8. Run OSTF tests
@@ -685,7 +686,7 @@ class FunctionalTests(TestBasic):
             'slave-03': ['compute'],
             'slave-04': ['contrail-controller',
                          'contrail-analytics'],
-            'slave-05': [ 'contrail-controller',
+            'slave-05': ['contrail-controller',
                           'contrail-analytics'],
             'slave-06': ['contrail-controller',
                          'contrail-analytics'],
@@ -700,7 +701,7 @@ class FunctionalTests(TestBasic):
         plugin.prepare_contrail_plugin(self, slaves=9)
 
         self.show_step(2)
-        plugin.activate_plugin(selfl)
+        plugin.activate_plugin(self)
         vsrx_setup_result = vsrx.activate()
 
         plugin.show_range(self, 3, 10)
