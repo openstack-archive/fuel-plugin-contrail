@@ -35,7 +35,6 @@ class contrail::database {
   }
 
   if roles_include($contrail::contrail_controller_roles) {
-    $cassandra_ips      = $::contrail::contrail_controller_ips
     $cassandra_seeds    = $contrail::primary_contrail_controller_ip
     $cluster_name       = 'Contrail'
     $priv_ip            = $::contrail::address
@@ -65,7 +64,6 @@ class contrail::database {
                     ],
     }
   } elsif roles_include($contrail::analytics_db_roles) {
-    $cassandra_ips      = $::contrail::analytics_db_ips
     $cassandra_seeds    = $contrail::primary_analytics_db_ip
     $cluster_name       = 'Analytics'
     $contrail_databases = 'analytics'
