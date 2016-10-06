@@ -38,11 +38,13 @@ class contrail::compute::vmware {
   file {'/etc/contrail/contrail-vcenter-plugin.conf':
     ensure  => present,
     content => template('contrail/contrail-vcenter-plugin.conf.erb'),
-  }~>
+  }
   # Enable and start service
   service { 'contrail-vcenter-plugin':
-    ensure => running,
-    enable => true,
+    ensure    => running,
+    enable    => true,
+    subscribe => [File['/etc/contrail/ESXiToVRouterIp.map'],
+                  File['/etc/contrail/contrail-vcenter-plugin.conf'],]
   }
 
   Nova_Config <||> ~>
