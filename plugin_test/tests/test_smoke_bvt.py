@@ -152,7 +152,7 @@ class ContrailPlugin(TestBasic):
             "Invalid default 'contrail external' {0}.".format(
                 attr['contrail_external']['value']))
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_smoke"])
     @log_snapshot_after_test
     def contrail_smoke(self):
@@ -173,7 +173,7 @@ class ContrailPlugin(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=3)
+        plugin.prepare_contrail_plugin(self, slaves=5)
 
         self.show_step(2)
         plugin.activate_plugin(self)
