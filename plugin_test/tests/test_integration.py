@@ -233,7 +233,7 @@ class IntegrationTests(TestBasic):
                 test_sets=['smoke', 'sanity', 'ha'],
                 timeout=settings.OSTF_RUN_TIMEOUT)
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_jumbo", "contrail_integration_tests"])
     @log_snapshot_after_test
     def contrail_jumbo(self):
@@ -258,7 +258,7 @@ class IntegrationTests(TestBasic):
         """
         self.show_step(1)
         plugin.prepare_contrail_plugin(
-            self, slaves=9, options={'images_ceph': True}
+            self, slaves=5, options={'images_ceph': True}
         )
 
         jumbo = TestJumboFrames()
@@ -331,7 +331,7 @@ class IntegrationTests(TestBasic):
             self.fuel_web.run_ostf(cluster_id=self.cluster_id)
 
         for node_name in ['slave-01', 'slave-02',
-                          'slave-03', 'slave-04', 'slave-05', 'slave-06']:
+                          'slave-03', 'slave-04', 'slave-05']:
             node = self.fuel_web.get_nailgun_node_by_name(node_name)
             with self.env.d_env.get_ssh_to_remote(node['ip']) as remote:
                 asserts.assert_true(
