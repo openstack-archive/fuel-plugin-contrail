@@ -269,7 +269,7 @@ class FunctionalTests(TestBasic):
                 check_node_state(self.cluster_id, node_name, 'ready')
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_add_control"])
+          groups=["contrail_add_controller"])
     @log_snapshot_after_test
     def contrail_add_controller(self):
         """Verify that Contrail control role can be added after deploying.
@@ -304,13 +304,12 @@ class FunctionalTests(TestBasic):
         conf_nodes = {
             'slave-01': ['controller'],
             'slave-02': ['compute', 'cinder'],
-            'slave-03': ['contrail-control',
-                         'contrail-db'],
-            'slave-04': ['contrail-config',
-                         'contrail-analytics'],
+            'slave-03': ['contrail-controller'],
+            'slave-04': ['contrail-controller'],
+            'slave-05': ['contrail-analytics'],
             'slave-06': ['contrail-analytics-db']
         }
-        conf_control = {'slave-05': ['contrail-control']}
+        conf_control = {'slave-07': ['contrail-control']}
 
         plugin.show_range(self, 7, 10)
         openstack.update_deploy_check(self, conf_nodes,
