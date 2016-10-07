@@ -24,7 +24,7 @@ class contrail::compute::compute_netconfig_override {
                                                   $contrail::phys_dev,
                                                   $contrail::compute_dpdk_enabled)
 
-    file { '/etc/hiera/plugins/contrail-vrouter-override_ns.yaml':
+    file { '/etc/hiera/plugins/100-contrail-vrouter-override_ns.yaml':
       ensure  => file,
       content => inline_template('<%= YAML.dump @override_ns %>'),
       replace => false,

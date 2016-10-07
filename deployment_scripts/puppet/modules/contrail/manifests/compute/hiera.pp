@@ -21,9 +21,9 @@ class contrail::compute::hiera {
   }
 
   if roles_include('dpdk') {
-    file_line {'contrail-vrouter-override_ns':
+    file_line {'100-contrail-vrouter-override_ns':
         path  => '/etc/hiera.yaml',
-        line  => '    - plugins/contrail-vrouter-override_ns',
+        line  => '    - plugins/100-contrail-vrouter-override_ns',
         after => '  !ruby/sym hierarchy:',
     }
   }
