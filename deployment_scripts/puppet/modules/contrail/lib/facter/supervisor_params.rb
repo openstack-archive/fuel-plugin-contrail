@@ -27,7 +27,8 @@ Facter.add("supervisor_params") do
       mac_from_config = config_vrouter_params.split.find { |param| param.include?('mac') }
       mac_from_config = mac_from_config.split(',').find { |param| param.include?('mac') }.split('=')
     end
-    if `status supervisor-vrouter`.include?('stop/waiting')
+    status = `status supervisor-vrouter 2>/dev/null`
+    if $?.exitstatus and status.include?('stop/waiting')
       # NOTE (dukov) We do not need to gather data from system in case vrouter has started
       # Moreover these data may differ from data without vrouter service started
       bond_policy_map = {
