@@ -5,7 +5,7 @@
   role: [primary-contrail-controller]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
-  requires: [deploy_start, primary-contrail-controller]
+  requires: [deploy_start]
   parameters:
     strategy:
       type: one_by_one
@@ -15,7 +15,7 @@
   role: [contrail-controller]
   tasks: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   required_for: [deploy_end]
-  requires: [deploy_start]
+  requires: [deploy_start, primary-contrail-controller]
   parameters:
     strategy:
       type: one_by_one
