@@ -206,6 +206,9 @@ class contrail {
   $kafka_broker_list          = inline_template("<%= scope.lookupvar('contrail::analytics_db_ips').map{ |ip| \"#{ip}:9092\" }.join(' ') %>")
   $zk_server_ip               = inline_template("<%= scope.lookupvar('contrail::contrail_controller_ips').map{ |ip| \"#{ip}:2181\" }.join(',') %>")
 
+  # Perfomance tuning
+  $cassandra_rpc_max_threads = pick($settings['cassandra_rpc_max_threads'], false)
+
   # vCenter settings
   $use_vcenter                = hiera('use_vcenter', false)
   $vcenter_hash               = hiera_hash('vcenter', false)
@@ -222,4 +225,5 @@ class contrail {
   }
 
   $aaa_mode = pick($settings['aaa_mode'], 'cloud-admin')
+
 }
