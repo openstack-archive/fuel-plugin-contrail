@@ -53,7 +53,7 @@ contrail-analytics-db:
     - compute-vmware
 
 contrail-tsn:
-  name: Contrail - TSN node
+  name: Contrail - TSN
   description: >
     Contrail TSN role. Provides Control TSN and TOR agent components of Contrail.
   has_primary: true
