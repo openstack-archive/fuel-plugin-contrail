@@ -35,10 +35,11 @@ class contrail::database {
   }
 
   if roles_include($contrail::contrail_controller_roles) {
-    $cassandra_ips   = $::contrail::contrail_controller_ips
-    $cassandra_seeds = $contrail::primary_contrail_controller_ip
-    $cluster_name    = 'Contrail'
-    $priv_ip         = $::contrail::address
+    $cassandra_ips      = $::contrail::contrail_controller_ips
+    $cassandra_seeds    = $contrail::primary_contrail_controller_ip
+    $cluster_name       = 'Contrail'
+    $priv_ip            = $::contrail::address
+    $contrail_databases = 'config'
     # Zookeeper
 
     # this is a remanider from dividing by 255
@@ -64,9 +65,10 @@ class contrail::database {
                     ],
     }
   } elsif roles_include($contrail::analytics_db_roles) {
-    $cassandra_ips   = $::contrail::analytics_db_ips
-    $cassandra_seeds = $contrail::primary_analytics_db_ip
-    $cluster_name    = 'Analytics'
+    $cassandra_ips      = $::contrail::analytics_db_ips
+    $cassandra_seeds    = $contrail::primary_analytics_db_ip
+    $cluster_name       = 'Analytics'
+    $contrail_databases = 'analytics'
   }
 
 # Kafka
@@ -127,6 +129,7 @@ class contrail::database {
 # Supervisor-database
   contrail_database_nodemgr_config {
     'DEFAULT/hostip':         value => $contrail::address;
+    'DEFAULT/contrail_databases': value => $contrail_databases
     'DEFAULT/minimum_diskGB': value => '4';
     'DISCOVERY/server':       value => $contrail::contrail_private_vip;
     'DISCOVERY/port':         value => '5998';
