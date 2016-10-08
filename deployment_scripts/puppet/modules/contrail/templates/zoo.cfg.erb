@@ -8,5 +8,5 @@ maxSessionTimeout=120000
 nodes=scope.lookupvar('contrail::contrail_controller_nodes_hash')
 nodes.each_pair do |node_name, node_props|
 -%>
-server.<%= node_props['uid'] %>=<%= node_props['network_roles']['neutron/mesh']%>:2888:3888
+server.<%= node_props['uid'].to_i % 255 + 1 %>=<%= node_props['network_roles']['neutron/mesh']%>:2888:3888
 <%- end -%>
