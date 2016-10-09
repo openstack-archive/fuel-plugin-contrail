@@ -632,7 +632,7 @@ class TestContrailCheck(object):
                 out = remote.execute(command)['stdout']
                 for res in out:
                     logger.info('Check status: {}'.format(res))
-                    assert_true('active' in res,
+                    assert_true(('active' in res) or ('backup' in res),
                                 "Contrail node status invalid: {}".format(out))
             return True
 
