@@ -25,7 +25,7 @@ attributes:
   contrail_single_gateway:
     value: ''
     label: 'GW IP for Private net'
-    description: 'IP address of gateway in private net, only for single node deployment.'
+    description: 'IP address of gateway in private net, only for single nodegroup deployment.'
     weight: 40
     type: "text"
     regex:
