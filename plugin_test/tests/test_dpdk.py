@@ -756,7 +756,8 @@ class DPDKTests(TestBasic):
             TestContrailCheck(self).cloud_check(
                 ['dpdk', 'contrail'],
                 should_fail=[
-                    "test_dpdk_boot_snapshot_vm"])
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
         # Add Contrail node and check again
         self.show_step(9)
@@ -801,7 +802,6 @@ class DPDKTests(TestBasic):
             5. Run OSTF and check Contrail node status.
 
         """
-        conf_contrail = {"dedicated_analytics_db": True}
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=5,
                                        options={'images_ceph': True,
@@ -811,7 +811,7 @@ class DPDKTests(TestBasic):
                                                 'volumes_lvm': False,
                                                 'osd_pool_size': '1'})
         self.bm_drv.host_prepare()
-        plugin.activate_dpdk(self, **conf_contrail)
+        plugin.activate_dpdk(self)
         vsrx_setup_result = vsrx.activate()
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk'])
