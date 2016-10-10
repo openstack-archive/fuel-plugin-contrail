@@ -56,6 +56,14 @@ class contrail::compute::nova {
       ensure  => present,
       content => '',
     }
+
+    $ceph_manifest = '/etc/puppet/modules/ceph/manifests/nova_compute.pp'
+
+    file_line { 'Replace libvirt service name':
+      path  => $ceph_manifest,
+      line  => '    name   => "libvirt-bin",',
+      match => 'nova::params::libvirt_service_name',
+    }
   }
 
   Nova_config <||> ~>
