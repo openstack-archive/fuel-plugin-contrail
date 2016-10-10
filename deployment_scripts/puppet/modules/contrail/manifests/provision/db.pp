@@ -26,15 +26,7 @@ class contrail::provision::db {
     }
   }
 
-  if !defined(Exec['wait_for_api']) {
-    exec {'wait_for_api':
-      command   => "bash -c 'if ! [[ $(curl -s -o /dev/null -w \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:${contrail::api_server_port}) =~ ^(200|401)$ ]];\
-then exit 1; fi'",
-      tries     => 10,
-      try_sleep => 10,
-    }
-  }
-
+  contrail::provision::api_readiness::check{'/opt/contrail/prov_database_node-DONE':} ->
   exec { 'prov_database_node':
     command => "python /opt/contrail/utils/provision_database_node.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} \
@@ -42,6 +34,5 @@ then exit 1; fi'",
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_database_node-DONE",
     creates => '/opt/contrail/prov_database_node-DONE',
-    require => Exec['wait_for_api'],
   }
 }

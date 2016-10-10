@@ -44,16 +44,8 @@ class contrail::provision::control {
     }
   }
 
-  if !defined(Exec['wait_for_api']) {
-    exec {'wait_for_api':
-      command   => "bash -c 'if ! [[ $(curl -s -o /dev/null -w \"%{http_code}\" http://${contrail::contrail_mgmt_vip}:${contrail::api_server_port}) =~ ^(200|401)$ ]];\
-then exit 1; fi'",
-      tries     => 10,
-      try_sleep => 10,
-    }
-  }
-
   if roles_include(['primary-contrail-control']) {
+    contrail::provision::api_readiness::check{'/opt/contrail/prov_control_asn-DONE':} ->
     exec { 'prov_control_asn':
       command => "python /opt/contrail/utils/provision_control.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} \
@@ -61,11 +53,11 @@ then exit 1; fi'",
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_control_asn-DONE",
       creates => '/opt/contrail/prov_control_asn-DONE',
-      require => Exec['wait_for_api'],
       before  => Exec['prov_control_bgp'],
     }
   }
 
+  contrail::provision::api_readiness::check{'/opt/contrail/prov_control_bgp-DONE':} ->
   exec { 'prov_control_bgp':
     command => "python /opt/contrail/utils/provision_control.py \
 --api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} \
@@ -73,16 +65,15 @@ then exit 1; fi'",
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_control_bgp-DONE",
     creates => '/opt/contrail/prov_control_bgp-DONE',
-    require => Exec['wait_for_api'],
   }
 
   if roles_include('primary-contrail-control') {
     contrail::provision::prov_ext_bgp { $contrail::gateways:
-      require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
+      require  => Exec['prov_control_bgp'],
     }
   }
 
   contrail::provision::add_route_to_mx { $contrail::gateways:
-      require  => [Exec['wait_for_api'],Exec['prov_control_bgp']],
+      require  => Exec['prov_control_bgp'],
   }
 }
