@@ -157,6 +157,7 @@
   groups: [primary-contrail-controller, primary-contrail-analytics-db]
   required_for: [deploy_end]
   requires: [contrail-utils]
+  reexecute_on: [deploy_changes]
   parameters:
     puppet_manifest: puppet/manifests/contrail-db.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -182,6 +183,7 @@
   groups: [contrail-controller, contrail-analytics-db]
   required_for: [deploy_end]
   requires: [contrail-utils]
+  reexecute_on: [deploy_changes]
   cross-depends:
   - name: contrail-db-primary
   parameters:
