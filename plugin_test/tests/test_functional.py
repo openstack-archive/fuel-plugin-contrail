@@ -575,10 +575,10 @@ class FunctionalTests(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self)
+        plugin.prepare_contrail_plugin(self, slaves=5)
 
         self.show_step(2)
-        plugin.activate_plugin(self,)
+        plugin.activate_plugin(self)
 
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
