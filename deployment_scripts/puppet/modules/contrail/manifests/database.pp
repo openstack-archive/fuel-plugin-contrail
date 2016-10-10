@@ -64,7 +64,7 @@ class contrail::database {
                     ],
     }
   } elsif roles_include($contrail::analytics_db_roles) {
-    $cassandra_seeds    = $contrail::primary_analytics_db_ip
+    $cassandra_seeds    = $::contrail::analytics_db_ips
     $cluster_name       = 'Analytics'
     $contrail_databases = 'analytics'
   }
