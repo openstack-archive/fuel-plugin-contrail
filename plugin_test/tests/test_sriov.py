@@ -523,7 +523,7 @@ class SRIOVTests(TestBasic):
 
         self.show_step(2)
         # enable plugin
-        plugin.activate_plugin(self, dedicated_analytics_db=True)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
@@ -602,7 +602,7 @@ class SRIOVTests(TestBasic):
 
         self.show_step(2)
         # enable plugin
-        plugin.activate_plugin(self, dedicated_analytics_db=True)
+        plugin.activate_plugin(self)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
@@ -687,7 +687,7 @@ class SRIOVTests(TestBasic):
         plugin.prepare_contrail_plugin(self, slaves=5)
         self.bm_drv.host_prepare()
         # enable plugin
-        plugin.activate_plugin(self, dedicated_analytics_db=True)
+        plugin.activate_plugin(self)
         vsrx_setup_result = vsrx.activate()
         self.bm_drv.setup_fuel_node(self, cluster_id=self.cluster_id,
                                     roles=['compute'])
