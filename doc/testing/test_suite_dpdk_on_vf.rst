@@ -85,13 +85,11 @@ Steps
        node-1: 'controller', 'ceph-osd';
        node-2: 'contrail-controller';
        node-3: 'compute', 'ceph-osd';
-       node-4: 'compute', 'ceph-osd';
-       node-5: 'compute', 'ceph-osd';
-       node-6: 'contrail-analytics', 'contrail-analytics-db';
+       node-4: 'contrail-analytics', 'contrail-analytics-db';
        node-dpdk: 'compute', 'dpdk';
     5. Run OSTF tests
     6. Add one node with following configuration:
-       node-7: "compute", "ceph-osd";
+       node-5: "compute", "ceph-osd";
     7. Deploy changes
     8. Run OSTF tests
     9. Run contrail health check tests
@@ -355,99 +353,3 @@ Expected results
 ################
 
 All steps must be completed successfully, without any errors
-
-
-Contrail DPDK on VF disable
----------------------------
-
-
-ID
-##
-
-contrail_dpdk_on_vf_disable
-
-
-Description
-###########
-
-Verify that DPDK on VF feature could be disabled
-
-
-Complexity
-##########
-
-advanced
-
-
-Steps
-#####
-
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
-    2. Enable and configure Contrail plugin
-    3. Enable DPDK on VF feature
-    4. Deploy cluster with following node configuration:
-       node-01: 'controller', 'ceph-osd', 'cinder';
-       node-02: 'contrail-controller', 'contrail-analytics';
-       node-03: 'compute', 'ceph-osd';
-       node-04: 'compute', 'ceph-osd';
-       node-dpdk: 'compute', 'dpdk';
-    5. Run OSTF tests
-    6. Run contrail health check tests
-    7. Disable DPDK on VF feature
-    8. Deploy changes
-    9. Run OSTF tests
-    10. Run contrail health check tests
-
-
-Expected results
-################
-
-All steps must be completed successfully, without any errors
-
-
-Contrail DPDK on VF enable
---------------------------
-
-
-ID
-##
-
-contrail_dpdk_on_vf_enable
-
-
-Description
-###########
-
-Verify that DPDK on VF feature could be enabled.
-
-
-Complexity
-##########
-
-advanced
-
-
-Steps
-#####
-
-    1. Create an environment with "Neutron with tunneling segmentation" as a network configuration
-    2. Enable and configure Contrail plugin
-    3. Deploy cluster with following node configuration:
-       node-01: 'controller', 'ceph-osd', 'cinder';
-       node-02: 'contrail-controller', 'contrail-analytics';
-       node-03: 'compute', 'ceph-osd';
-       node-04: 'compute', 'ceph-osd';
-       node-dpdk: 'compute', 'dpdk';
-    4. Run OSTF tests
-    5. Run contrail health check tests
-    6. Enable DPDK on VF feature
-    7. Deploy changes
-    8. Run OSTF tests
-    9. Run contrail health check tests
-
-
-Expected results
-################
-
-All steps must be completed successfully, without any errors
-

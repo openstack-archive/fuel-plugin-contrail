@@ -107,8 +107,8 @@ class DPDKonVFTests(TestBasic):
         self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'])
-        openstack.setup_hugepages(self)
+                                    roles=['compute', 'dpdk', 'dpdk-on-vf'])
+        openstack.setup_hugepages(self, hp_1gb=40)
 
         conf_nodes = {
             'slave-01': ['controller'],
@@ -135,17 +135,23 @@ class DPDKonVFTests(TestBasic):
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
             self.show_step(5)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'],
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=2,
+                failed_test_name=[
+                    'Instance live migration',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             self.show_step(6)
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_dpdk_on_vf_add_compute",
                   "contrail_dpdk_on_vf_tests"])
     @log_snapshot_after_test
@@ -161,13 +167,11 @@ class DPDKonVFTests(TestBasic):
                 node-1: 'controller', 'ceph-osd';
                 node-2: 'contrail-controller';
                 node-3: 'compute', 'ceph-osd';
-                node-4: 'compute', 'ceph-osd';
-                node-5: 'compute', 'ceph-osd';
-                node-6: 'contrail-analytics', 'contrail-analytics-db';
+                node-4: 'contrail-analytics', 'contrail-analytics-db';
                 node-dpdk: 'compute', 'dpdk';
             5. Run OSTF tests
             6. Add one node with following configuration:
-               node-7: "compute", "ceph-osd";
+               node-5: "compute", "ceph-osd";
             7. Deploy changes
             8. Run OSTF tests
             9. Run contrail health check tests
@@ -177,12 +181,13 @@ class DPDKonVFTests(TestBasic):
             "dpdk_on_vf": True,
         }
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9,
+        plugin.prepare_contrail_plugin(self, slaves=5,
                                        options={'images_ceph': True,
                                                 'volumes_ceph': True,
                                                 'ephemeral_ceph': True,
                                                 'objects_ceph': True,
-                                                'volumes_lvm': False})
+                                                'volumes_lvm': False,
+                                                "osd_pool_size": '1'})
         self.bm_drv.host_prepare()
 
         plugin.show_range(self, 2, 4)
@@ -194,19 +199,17 @@ class DPDKonVFTests(TestBasic):
         self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'])
+                                    roles=['compute', 'dpdk', 'dpdk-on-vf'])
         openstack.setup_hugepages(self)
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
             'slave-02': ['contrail-controller'],
             'slave-03': ['compute', 'ceph-osd'],
-            'slave-04': ['compute', 'ceph-osd'],
-            'slave-05': ['compute', 'ceph-osd'],
             # slave-06 here
-            'slave-07': ['contrail-analytics',
+            'slave-04': ['contrail-analytics',
                          'contrail-analytics-db'],
         }
-        conf_compute = {'slave-06': ['compute', 'ceph-osd']}
+        conf_compute = {'slave-05': ['compute', 'ceph-osd']}
 
         # Cluster configuration
         self.fuel_web.update_nodes(self.cluster_id,
@@ -223,13 +226,20 @@ class DPDKonVFTests(TestBasic):
         self.show_step(5)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=2,
+                failed_test_name=[
+                    'Instance live migration',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
         # Add Compute node and check again
         self.show_step(6)
@@ -245,14 +255,20 @@ class DPDKonVFTests(TestBasic):
         self.show_step(8)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                should_fail=2,
+                failed_test_name=[
+                    'Instance live migration',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             self.show_step(9)
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_on_vf_delete_compute",
@@ -296,7 +312,7 @@ class DPDKonVFTests(TestBasic):
         self.show_step(3)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'])
+                                    roles=['compute', 'dpdk', 'dpdk-on-vf'])
         openstack.setup_hugepages(self)
         conf_no_compute = {
             'slave-01': ['controller'],
@@ -323,10 +339,20 @@ class DPDKonVFTests(TestBasic):
         # Run OSTF tests
         if vsrx_setup_result:
             self.show_step(4)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=2,
+                failed_test_name=[
+                    'Instance live migration',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
         # Delete Compute node and check again
         self.show_step(5)
@@ -342,16 +368,21 @@ class DPDKonVFTests(TestBasic):
         # Run OSTF tests
         if vsrx_setup_result:
             self.show_step(7)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity'],
-                                   should_fail=1,
-                                   failed_test_name=['Check that required '
-                                                     'services are running']
-                                   )
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity'],
+                should_fail=2,
+                failed_test_name=[
+                    'Check that required services are running',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             self.show_step(8)
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_on_vf_add_dpdk",
@@ -392,8 +423,6 @@ class DPDKonVFTests(TestBasic):
         self.bm_drv.host_prepare()
 
         plugin.show_range(self, 2, 4)
-        # activate plugin with DPDK feature
-        plugin.activate_dpdk(self, **conf_contrail)
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
@@ -422,26 +451,42 @@ class DPDKonVFTests(TestBasic):
         # Run OSTF tests
         self.show_step(5)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'])
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=1,
+                failed_test_name=['Instance live migration']
+            )
             self.show_step(6)
             TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(7)
+        # activate plugin with DPDK feature
+        plugin.activate_dpdk(self, **conf_contrail)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'])
+                                    roles=['compute', 'dpdk', 'dpdk-on-vf'])
         openstack.setup_hugepages(self)
         self.show_step(8)
         openstack.deploy_cluster(self)
 
         self.show_step(9)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity'],
+                should_fail=2,
+                failed_test_name=[
+                    'Check that required services are running',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             self.show_step(10)
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_on_vf_delete_dpdk",
@@ -509,16 +554,26 @@ class DPDKonVFTests(TestBasic):
         # Run OSTF tests
         self.show_step(4)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=2,
+                failed_test_name=[
+                    'Instance live migration',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             self.show_step(5)
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
         self.show_step(6)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'],
+                                    roles=['compute', 'dpdk', 'dpdk-on-vf'],
                                     pending_deletion=True,
                                     pending_addition=False)
         self.show_step(7)
@@ -584,7 +639,7 @@ class DPDKonVFTests(TestBasic):
         self.show_step(4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'])
+                                    roles=['compute', 'dpdk', 'dpdk-on-vf'])
         openstack.setup_hugepages(self)
         conf_nodes = {
             'slave-01': ['controller', 'ceph-osd'],
@@ -612,13 +667,20 @@ class DPDKonVFTests(TestBasic):
         self.show_step(5)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=2,
+                failed_test_name=[
+                    'Instance live migration',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
         # Add Compute node and check again
         self.show_step(6)
@@ -636,14 +698,21 @@ class DPDKonVFTests(TestBasic):
         self.show_step(8)
         # FIXME: remove shouldfail, when livemigration+DPDK works
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=2,
+                failed_test_name=[
+                    'Instance live migration',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             self.show_step(9)
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
           groups=["contrail_dpdk_on_vf_delete_controller",
@@ -687,7 +756,7 @@ class DPDKonVFTests(TestBasic):
         plugin.show_range(self, 3, 4)
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'])
+                                    roles=['compute', 'dpdk', 'dpdk-on-vf'])
         openstack.setup_hugepages(self)
 
         conf_controller = {'slave-01': ['controller']}
@@ -716,10 +785,20 @@ class DPDKonVFTests(TestBasic):
         openstack.deploy_cluster(self)
         # Run OSTF tests
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id)
+            self.fuel_web.run_ostf(
+                cluster_id=self.cluster_id,
+                test_sets=['smoke', 'sanity', 'ha'],
+                should_fail=2,
+                failed_test_name=[
+                    'Instance live migration',
+                    'Check network connectivity from SRIOV instance via'
+                    ' floating IP']
+            )
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
 
         # Delete Compute node and check again
         plugin.show_range(self, 5, 7)
@@ -741,199 +820,7 @@ class DPDKonVFTests(TestBasic):
                                    )
             self.show_step(8)
             TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
-
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_dpdk_on_vf_disable",
-                  "contrail_dpdk_on_vf_tests"])
-    @log_snapshot_after_test
-    def contrail_dpdk_on_vf_disable(self):
-        """Verify that DPDK on VF feature could be disabled.
-
-        Scenario:
-            1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration
-            2. Enable and configure Contrail plugin
-            3. Enable DPDK on VF feature
-            4. Deploy cluster with following node configuration:
-                node-01: 'controller', 'ceph-osd', 'cinder';
-                node-02: 'contrail-controller';
-                node-03: 'compute', 'ceph-osd';
-                node-04: 'compute', 'ceph-osd';
-                node-dpdk: 'compute', 'dpdk';
-            5. Run OSTF tests
-            6. Run contrail health check tests
-            7. Disable DPDK on VF feature
-            8. Deploy changes
-            9. Run OSTF tests
-            10. Run contrail health check tests
-
-        """
-        self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9,
-                                       options={'images_ceph': True})
-        self.bm_drv.host_prepare()
-
-        plugin.show_range(self, 2, 4)
-        # activate plugin with DPDK feature
-        conf_contrail = {"dpdk_on_vf": True}
-        plugin.activate_dpdk(self, **conf_contrail)
-        # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
-
-        self.show_step(4)
-        self.bm_drv.setup_fuel_node(self,
-                                    cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'])
-        openstack.setup_hugepages(self)
-
-        conf_nodes = {
-            'slave-01': ['controller', 'ceph-osd', 'cinder'],
-            'slave-02': ['contrail-controller'],
-            'slave-03': ['compute', 'ceph-osd'],
-            'slave-04': ['compute', 'ceph-osd'],
-        }
-        # Cluster configuration
-        self.fuel_web.update_nodes(self.cluster_id,
-                                   nodes_dict=conf_nodes,
-                                   update_interfaces=False)
-        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
-        # Enable SRIOV on interface
-        openstack.enable_sriov(self)
-        # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
-        # Deploy cluster
-        openstack.deploy_cluster(self)
-        # Run OSTF tests
-        # FIXME: remove shouldfail, when livemigration+DPDK works
-        if vsrx_setup_result:
-            self.show_step(5)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'],
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
-            self.show_step(6)
-            TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
-
-        self.show_step(7)
-        # activate plugin with DPDK feature
-        conf_contrail = {"dpdk_on_vf": False}
-        plugin.activate_dpdk(self, **conf_contrail)
-        self.show_step(8)
-        # Deploy cluster
-        openstack.deploy_cluster(self)
-        # Run OSTF tests
-        # FIXME: remove shouldfail, when livemigration+DPDK works
-        if vsrx_setup_result:
-            self.show_step(9)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'],
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
-            self.show_step(10)
-            TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
-
-    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
-          groups=["contrail_dpdk_on_vf_enable",
-                  "contrail_dpdk_on_vf_tests"])
-    @log_snapshot_after_test
-    def contrail_dpdk_on_vf_enable(self):
-        """Verify that DPDK on VF feature could be enabled.
-
-        Scenario:
-            1. Create an environment with "Neutron with tunneling
-               segmentation" as a network configuration
-            2. Enable and configure Contrail plugin
-            3. Deploy cluster with following node configuration:
-               node-01: 'controller', 'ceph-osd', 'cinder';
-               node-02: 'contrail-controller',
-               'contrail-analytics',
-               'contrail-analytics-db';
-               node-03: 'compute', 'ceph-osd';
-               node-04: 'compute', 'ceph-osd';
-               node-dpdk: 'compute', 'dpdk';
-            4. Run OSTF tests
-            5. Run contrail health check tests
-            6. Enable DPDK on VF feature
-            7. Deploy changes
-            8. Run OSTF tests
-            9. Run contrail health check tests
-
-        """
-        self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=9,
-                                       options={'images_ceph': True})
-        self.bm_drv.host_prepare()
-
-        plugin.show_range(self, 2, 4)
-        # activate plugin with DPDK feature
-        plugin.activate_dpdk(self)
-        # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
-
-        self.show_step(4)
-        self.bm_drv.setup_fuel_node(self,
-                                    cluster_id=self.cluster_id,
-                                    roles=['compute', 'dpdk'])
-        openstack.setup_hugepages(self)
-
-        conf_nodes = {
-            'slave-01': ['controller', 'ceph-osd', 'cinder'],
-            'slave-02': ['contrail-controller',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
-            'slave-03': ['compute', 'ceph-osd'],
-            'slave-04': ['compute', 'ceph-osd'],
-        }
-        # Cluster configuration
-        self.fuel_web.update_nodes(self.cluster_id,
-                                   nodes_dict=conf_nodes,
-                                   update_interfaces=False)
-        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
-        # Enable SRIOV on interface
-        openstack.enable_sriov(self)
-        # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
-        # Deploy cluster
-        openstack.deploy_cluster(self)
-        # Run OSTF tests
-        # FIXME: remove shouldfail, when livemigration+DPDK works
-        if vsrx_setup_result:
-            self.show_step(5)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'],
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
-            self.show_step(6)
-            TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
-
-        self.show_step(7)
-        # activate plugin with DPDK feature
-        conf_contrail = {"dpdk_on_vf": True}
-        plugin.activate_dpdk(self, **conf_contrail)
-        self.show_step(8)
-        # Deploy cluster
-        openstack.deploy_cluster(self)
-        # Run OSTF tests
-        # FIXME: remove shouldfail, when livemigration+DPDK works
-        if vsrx_setup_result:
-            self.show_step(9)
-            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
-                                   test_sets=['smoke', 'sanity', 'ha'],
-                                   should_fail=1,
-                                   failed_test_name=['Instance live migration']
-                                   )
-            self.show_step(10)
-            TestContrailCheck(self).cloud_check(
-                ['dpdk', 'contrail'],
-                should_fail=["test_dpdk_boot_snapshot_vm"])
+                ['dpdk', 'sriov', 'contrail'],
+                should_fail=[
+                    "test_dpdk_boot_snapshot_vm",
+                    "test_dpdk_check_public_connectivity_from_instance"])
