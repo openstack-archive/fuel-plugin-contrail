@@ -40,6 +40,7 @@ class contrail::database {
   if roles_include($contrail::contrail_db_roles) {
     $cassandra_seeds = $contrail::primary_contrail_db_ip
     $cluster_name    = 'Contrail'
+    $contrail_databases = 'config'
 
     # Zookeeper is created only on contrail-db nodes,
     # it is not needed on contrail-analytics-db
@@ -66,6 +67,7 @@ class contrail::database {
   } elsif roles_include($contrail::analytics_db_roles) {
       $cassandra_seeds = $contrail::primary_analytics_db_ip
       $cluster_name    = 'Analytics'
+      $contrail_databases = 'analytics'
   }
 # Kafka
   package { 'kafka': } ->
@@ -120,10 +122,11 @@ class contrail::database {
 
 # Supervisor-database
   contrail_database_nodemgr_config {
-    'DEFAULT/hostip':         value => $contrail::address;
-    'DEFAULT/minimum_diskGB': value => '4';
-    'DISCOVERY/server':       value => $contrail::contrail_private_vip;
-    'DISCOVERY/port':         value => '5998';
+    'DEFAULT/hostip':             value => $contrail::address;
+    'DEFAULT/contrail_databases': value => $contrail_databases;
+    'DEFAULT/minimum_diskGB':     value => '4';
+    'DISCOVERY/server':           value => $contrail::contrail_private_vip;
+    'DISCOVERY/port':             value => '5998';
   }
 
   service { 'contrail-database':
