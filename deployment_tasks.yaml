@@ -184,8 +184,6 @@
   required_for: [deploy_end]
   requires: [contrail-utils]
   reexecute_on: [deploy_changes]
-  cross-depends:
-  - name: contrail-db-primary
   parameters:
     puppet_manifest: puppet/manifests/contrail-db.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -193,6 +191,24 @@
     strategy:
       type: parallel
       amount: 1
+
+- id: contrail-db-sync
+  type: puppet
+  version: 2.0.0
+  groups: [contrail-controller, contrail-analytics-db,
+          primary-contrail-controller, primary-contrail-analytics-db]
+  required_for: [deploy_end]
+  requires: [contrail-utils]
+  reexecute_on: [deploy_changes]
+  cross-depends:
+  - name: /contrail-db(-primary|-all)/
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-db-sync.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+    strategy:
+      type: parallel
+
 
 ###############
 #4. Install and configure Contrail Config, Contrail WebUI
@@ -207,7 +223,7 @@
   requires: [contrail-utils, deploy_start]
   reexecute_on: [deploy_changes]
   cross-depends:
-  - name: /contrail-db(-primary|-all)/
+  - name: contrail-db-sync
   - name: openstack-haproxy-contrail
   - name: primary-keystone
   parameters:
