@@ -716,3 +716,54 @@ class FunctionalTests(TestBasic):
 
         self.show_step(14)
         TestContrailCheck(self).cloud_check(['contrail'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_private_gateway"])
+    @log_snapshot_after_test
+    def contrail_ostf_net_provisioning_disable(self):
+        """Check gateway in private network for single nodegroup deployment
+
+        Scenario:
+            1. Create an environment
+            2. Enable and configure Contrail plugin
+            3. Create new netwotk between vSRX ana private network
+            4. Deploy cluster with following node configuration:
+               * 3 controller+ceph-osd
+               * 2 compute
+               * Contrail-controller + contrail-analytics
+               * Contrail-analytics + contrail-analytics-db
+            5. Run OSTF tests
+            6. Run contrail health check tests
+
+        """
+        conf_contrail = {'contrail_single_gateway': '10.109.4.1',
+                         'contrail_gateways': '10.109.5.250'}
+
+        conf_env = {
+            'slave-01': ['controller', 'ceph-osd'],
+            'slave-02': ['controller', 'ceph-osd'],
+            'slave-03': ['controller', 'ceph-osd'],
+            'slave-04': ['compute'],
+            'slave-05': ['compute'],
+            'slave-06': ['contrail-controller', 'contrail-analytics'],
+            'slave-07': ['contrail-analytics', 'contrail-analytics-db'],
+        }
+
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=9,
+                                       options={
+                                           'images_ceph': True,
+                                           'volumes_ceph': True,
+                                           'ephemeral_ceph': True,
+                                           'objects_ceph': True,
+                                           'volumes_lvm': False})
+
+        self.show_step(2)
+        plugin.activate_plugin(self, **conf_contrail)
+
+        self.show_step(3)
+        vsrx_setup_result = vsrx.activate(separate_net=True)
+
+        plugin.show_range(self, 4, 7)
+        openstack.update_deploy_check(self, conf_env,
+                                      is_vsrx=vsrx_setup_result)

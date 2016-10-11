@@ -17,6 +17,7 @@ under the License.
 import os
 
 VSRX_TEMPLATE_PATH = os.environ.get('VSRX_TEMPLATE_PATH', False)
+LIBVIRT_NET_PATH = os.environ.get('LIBVIRT_NET_PATH', False)
 
 OSTF_RUN_TIMEOUT = 60 * 60  # 60 minutes
 DEPLOY_CLUSTER_TIMEOUT = 25 * 60  # 25 minutes

@@ -21,13 +21,14 @@ from devops.helpers.helpers import tcp_ping
 from helpers import settings
 
 
-def activate(
-    obj=None, vsrx_config=False, vsrx_ip='10.109.4.250'):
+def activate(obj=None, vsrx_config=False,
+             vsrx_ip='10.109.4.250', separate_net=False):
     """Activate vSRX1 image.
 
     :param obj: Test case object
     :param vsrx_ip: ip of vSRX router
     :param vsrx_config: upload vsrx configuration template
+    :param separate_net: create network for vSRX router
 
     """
     def call_cmd(cmd):
@@ -52,6 +53,14 @@ def activate(
             settings.VSRX_TEMPLATE_PATH),
         'sed -i -r "s/vSRX1.img/vSRX.400.img/g" logs/vSRX1.xml',
     ])
+
+    if separate_net:
+        commands = [
+            'virsh net-create {0}'.format(settings.LIBVIRT_NET_PATH),
+            'sed -i -r "s/qa_private/vsrx_internal_net/g" logs/vSRX1.xml',
+            'sed -i -r "s/vSRX.400.img/vSRX_gateway.img/g" logs/vSRX1.xml'
+        ]
+        map(call_cmd, commands)
 
     logger.info("#" * 10 + 'Create vSRX...' + "#" * 10)
     if subprocess.call('virsh create logs/vSRX1.xml', shell=True):
@@ -85,3 +94,4 @@ def upload_config(obj, config_path, vsrx_ip):
         for command in commands:
             logger.info('Execute command {0}.'.format(command))
             remote.execute_async(command)
+

@@ -599,3 +599,38 @@ Expected results
 ################
 
 All steps should pass
+
+
+ID
+##
+
+contrail_private_gateway
+
+
+Description
+###########
+
+Check gateway in private network for single nodegroup deployment
+
+
+Complexity
+##########
+
+Advanced
+
+
+Steps
+#####
+
+    1. Create an environment
+    2. Create new netwotk between vSRX ana private network
+    3. Enable and configure Contrail plugin
+    4. Deploy cluster
+    5. Run OSTF tests
+    6. Run contrail health check tests
+
+
+Expected results
+################
+
+All steps must be completed successfully, without any errors.
