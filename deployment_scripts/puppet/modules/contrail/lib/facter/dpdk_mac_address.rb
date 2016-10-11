@@ -60,11 +60,11 @@ Facter.add("dpdk_mac_address") do
       end
     end
 
-    priv_ip = network_scheme['endpoints']['br-mesh']['IP'][0].split('/')[0]
-    if !IPAddress.valid? priv_ip
+    bridge_ip = network_scheme['endpoints']['br-fw-admin']['IP'][0].split('/')[0]
+    if !IPAddress.valid? bridge_ip
       break
     end
-    generated_mac=mac_from_ip(priv_ip)
+    generated_mac=mac_from_ip(bridge_ip)
 
     #For bonds we just generate static MAC
     if phys_dev.include? 'bond'
