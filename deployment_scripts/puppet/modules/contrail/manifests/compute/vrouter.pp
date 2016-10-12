@@ -90,11 +90,11 @@ class contrail::compute::vrouter {
 
   contrail_vrouter_agent_config {
     'DEFAULT/log_file':                          value => '/var/log/contrail/contrail-vrouter-agent.log';
-    'DEFAULT/log_level':                         value => 'SYS_INFO';
+    'DEFAULT/log_level':                         value => $contrail::log_level;
     'DEFAULT/log_local':                         value => '1';
     'DEFAULT/log_flow':                          value => $contrail::log_flow;
-    'DEFAULT/use_syslog':                        value => '1';
-    'DEFAULT/syslog_facility':                   value => 'LOG_LOCAL0';
+    'DEFAULT/use_syslog':                        value => $contrail::use_syslog;
+    'DEFAULT/syslog_facility':                   value => $contrail::syslog_facility;
     'DEFAULT/headless_mode':                     value => $contrail::headless_mode;
     'DISCOVERY/server':                          value => $contrail::contrail_private_vip;
     'DISCOVERY/max_control_nodes':               value => '2';

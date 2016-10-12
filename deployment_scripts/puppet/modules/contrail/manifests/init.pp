@@ -229,4 +229,9 @@ class contrail {
 
   # Perfomance tuning
   $cassandra_rpc_max_threads = pick($settings['cassandra_rpc_max_threads'], false)
+
+  # Vrouter logging settings
+  $use_syslog      = pick($settings['use_syslog'], '1')
+  $syslog_facility = pick($settings['syslog_facility'], 'LOG_LOCAL0')
+  $log_level       = pick($settings['log_level'], 'SYS_INFO')
 }
