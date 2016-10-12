@@ -1,0 +1,8 @@
+Code-Review+2: okosse <okosse@mirantis.com>
+Workflow+1: okosse <okosse@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 12 Oct 2016 13:17:18 +0000
+Reviewed-on: https://review.openstack.org/385007
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/master
