@@ -716,3 +716,51 @@ class FunctionalTests(TestBasic):
 
         self.show_step(14)
         TestContrailCheck(self).cloud_check(['contrail'])
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_3],
+          groups=["uninstall_contrail_plugin"])
+    @log_snapshot_after_test
+    def uninstall_contrail_plugin(self):
+        """Verify that contrail plugin could be uninstalled
+
+        Scenario:
+            1. Create an environment
+            2. Enable and configure Contrail plugin without
+               OSTF network provisioning
+            3. Remove plugin:
+               fuel plugins --remove <fuel-plugin-name>==<fuel-plugin-version>
+            4. Check that it was removed successfully:
+               fuel plugins
+
+        """
+        plugin.show_range(self, 1, 2)
+        plugin.prepare_contrail_plugin(self, slaves=3)
+
+        plugin_name = 'contrail'
+        msg = "Plugin couldn't be enabled. Check plugin version. Test aborted"
+        assert_true(
+            self.fuel_web.check_plugin_exists(self.cluster_id, plugin_name),
+            msg)
+
+        self.show_step(3) # Remove plugin
+        cmd_remove_plugin = 'fuel plugins --remove {0}=={1}'.format(
+            plugin_name, settings.CONTRAIL_PLUGIN_VERSION)
+        logger.info("Execute commmand: '{0}' om master node.".format(
+            cmd_remove_plugin))
+        result = self.env.d_env.get_admin_remote().execute(cmd_remove_plugin)
+        assert_equal(
+            result['exit_code'], 0,
+            'Command "{0}" fails with message: "{1}".'.format(
+                cmd_remove_plugin, result['stderr']))
+
+        self.show_step(4) # Check plugin is uninstalled
+        cmd_check_flugins = 'fuel plugins | grep {0} | wc -l'.format(plugin_name)
+        logger.info("Execute commmand: '{0}' om master node.".format(
+            cmd_check_flugins))
+        result = self.env.d_env.get_admin_remote().execute(cmd_check_flugins)
+        assert_equal(
+            result['exit_code'], 0,
+            'Command "{0}" fails with message: "{1}".'.format(
+                cmd_check_flugins, result['stderr']))
+        assert_equal(int(result['stdout'][0]), 0,
+                     'Plugin still exists in environment.')
