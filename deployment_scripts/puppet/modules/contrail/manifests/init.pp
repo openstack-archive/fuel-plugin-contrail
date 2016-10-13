@@ -219,6 +219,10 @@ class contrail {
   $contrail_config_ips        = ipsort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'neutron/mesh')))
   $contrail_config_ips_adm    = ipsort(values(get_node_to_ipaddr_map_by_network_role($contrail_config_nodes_hash, 'fw-admin')))
 
+  # Contrail Analytics nodes Private IP list
+  $contrail_analytics_nodes_hash     = get_nodes_hash_by_roles($network_metadata, ['primary-contrail-analytics', 'contrail-analytics'])
+  $contrail_analytics_ips            = sort(values(get_node_to_ipaddr_map_by_network_role($contrail_analytics_nodes_hash, 'neutron/mesh')))
+
   # Cassandra, Kafka & Zookeeper servers list
   $contrail_db_list           = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:9042\" }.join(' ') %>")
   $contrail_db_list_9160      = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:9160\" }.join(' ') %>")
@@ -234,4 +238,7 @@ class contrail {
   $use_syslog      = pick($settings['use_syslog'], '1')
   $syslog_facility = pick($settings['syslog_facility'], 'LOG_LOCAL0')
   $log_level       = pick($settings['log_level'], 'SYS_INFO')
+
 }
+
+

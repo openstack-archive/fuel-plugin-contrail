@@ -12,8 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-notice('MODULAR: contrail/contrail-config.pp')
+notice('MODULAR: contrail/contrail-analytics-provision.pp')
 
 include contrail
-include contrail::config
-include contrail::webui
+class { 'contrail::provision::analytics': }

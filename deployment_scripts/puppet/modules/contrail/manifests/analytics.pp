@@ -33,7 +33,7 @@ class contrail::analytics {
 
   # Packages
   package { 'redis-server': } ->
-  package { 'contrail-analytics': } ->
+  package { 'contrail-analytics': }
   package { 'contrail-openstack-analytics': }
 
   # Analytics config files
@@ -130,6 +130,18 @@ class contrail::analytics {
     'DISCOVERY/disc_server_port': value => '5998';
   }
 
+  contrail_keystone_auth_config {
+    'KEYSTONE/auth_host':         value => $contrail::keystone_address;
+    'KEYSTONE/auth_protocol':     value => $contrail::keystone_protocol;
+    'KEYSTONE/auth_port':         value => '35357';
+    'KEYSTONE/admin_user':        value => $contrail::neutron_user;
+    'KEYSTONE/admin_password':    value => $contrail::service_token;
+    'KEYSTONE/admin_token':       value => $contrail::admin_token;
+    'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
+    'KEYSTONE/insecure':          value => true;
+    'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
+  }
+
   ini_setting { 'analytics-fdlimit':
     ensure  => present,
     path    => '/etc/contrail/supervisord_analytics.conf',
@@ -193,7 +205,7 @@ class contrail::analytics {
 
   # Cron job for transfer contrail-logs to Fuel master
   # Runs on primary analytics node
-  if roles_include('primary-contrail-config') {
+  if roles_include('primary-contrail-analytics') {
     file { 'contrailsyslog.sh':
       ensure  => 'present',
       path    => '/usr/local/sbin/contrailsyslog.sh',
@@ -215,6 +227,7 @@ class contrail::analytics {
   }
   Contrail_analytics_nodemgr_config <||> ~> Service['supervisor-analytics']
   Contrail_topology_config <||> ~>          Service['supervisor-analytics']
+  Contrail_keystone_auth_config <||> ~>     Service['supervisor-analytics']
   Contrail_snmp_collector_config <||> ~>    Service['supervisor-analytics']
   Contrail_query_engine_config <||> ~>      Service['supervisor-analytics']
   Contrail_analytics_api_config <||> ~>     Service['supervisor-analytics']

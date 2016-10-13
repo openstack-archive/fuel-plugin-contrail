@@ -39,13 +39,6 @@ class contrail::control {
   package { 'contrail-control': }
   package { 'contrail-openstack-control': }
 
-# Contrail control config files
-  if !defined(File['/etc/contrail/vnc_api_lib.ini']) {
-    file { '/etc/contrail/vnc_api_lib.ini':
-      content => template('contrail/vnc_api_lib.ini.erb')
-    }
-  }
-
   contrail_control_config {
     'DEFAULT/hostip':    value => $contrail::address;
     'DEFAULT/hostname':  value => $::fqdn;
