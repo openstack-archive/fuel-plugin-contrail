@@ -61,6 +61,29 @@
   parameters:
     strategy:
       type: one_by_one
+
+#
+# Contrail - Analytics
+- id: primary-contrail-analytics
+  type: group
+  role: [primary-contrail-analytics]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts, deploy_start]
+  required_for: [deploy_end]
+  requires: [deploy_start, contrail-db, primary-contrail-config]
+  parameters:
+    strategy:
+      type: one_by_one
+
+- id: contrail-analytics
+  type: group
+  role: [contrail-analytics]
+  tasks: [hiera, globals, tools, logging, netconfig, hosts, deploy_start]
+  required_for: [deploy_end]
+  requires: [deploy_start, contrail-db, primary-contrail-analytics]
+  parameters:
+    strategy:
+      type: parallel
+
 #
 # Contrail - Control
 - id: primary-contrail-control
@@ -89,6 +112,7 @@
   type: group
   role: [primary-contrail-db, contrail-db, primary-contrail-config, contrail-config,
     primary-contrail-control, contrail-control,
+    primary-contrail-analytics,contrail-analytics,
     primary-contrail-analytics-db, contrail-analytics-db]
   tasks: [configure_default_route, dns-client, ntp-client]
   required_for: [post_deployment_end]
@@ -331,6 +355,8 @@
     strategy:
       type: parallel
 
+
+
 ################
 #11. Install and configure Contrail Control Node
 ################
@@ -424,6 +450,38 @@
     timeout: 1440
     strategy:
       type: parallel
+
+###############
+#16. Install and configure Contrail Analytics Node
+###############
+#
+
+- id: contrail-analytics-all
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-analytics,contrail-analytics]
+  required_for: [deploy_end]
+  requires: [contrail-utils, deploy_start]
+  cross-depends:
+  - name: /contrail-config(-primary|-all)/
+  - name: /contrail-config-provision(-primary|-all)/
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-analytics.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+
+# Provision Control analytics
+- id: contrail-analytics-provision
+  type: puppet
+  version: 2.0.0
+  groups: [primary-contrail-analytics,contrail-analytics]
+  required_for: [deploy_end]
+  requires: [contrail-analytics-all]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-analytics-provision.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
 
 ##############################################################
 #  Openstack Controller tasks section
@@ -861,5 +919,3 @@
   parameters:
     cmd: if [ -f /tmp/contrail-reboot-require ]; then /sbin/reboot; fi
     timeout: 720
-
-

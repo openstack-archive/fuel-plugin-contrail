@@ -28,6 +28,19 @@ contrail-config:
     - contrail-vmware
     - compute-vmware
 
+contrail-analytics:
+  name: Contrail - Analytics
+  description: >
+    Contrail analytics role. Provides Collector, Analytics API, Query engine and Topology services.
+  has_primary: true
+  public_ip_required: false
+  weight: 100
+  conflicts:
+    - controller
+    - compute
+    - ceph-osd
+    - cinder
+
 contrail-analytics-db:
   name: Contrail - Analytics DB
   description: >

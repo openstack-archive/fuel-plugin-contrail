@@ -81,12 +81,6 @@ class contrail::config {
     content => template('contrail/basicauthusers.properties.erb'),
   }
 
-  if !defined(File['/etc/contrail/vnc_api_lib.ini']) {
-    file { '/etc/contrail/vnc_api_lib.ini':
-      content => template('contrail/vnc_api_lib.ini.erb')
-    }
-  }
-
   contrail_api_config {
     'DEFAULTS/ifmap_server_ip':           value => $contrail::address;
     'DEFAULTS/ifmap_server_port':         value => '8443';

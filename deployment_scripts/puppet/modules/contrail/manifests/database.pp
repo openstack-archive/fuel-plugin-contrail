@@ -30,12 +30,6 @@ class contrail::database {
     package_name => 'contrail-database-common',
     service_name => 'contrail-database',
   }
-# VNC API
-  if !defined(File['/etc/contrail/vnc_api_lib.ini']) {
-    file { '/etc/contrail/vnc_api_lib.ini':
-      content => template('contrail/vnc_api_lib.ini.erb'),
-    }
-  }
 
   if roles_include($contrail::contrail_db_roles) {
     $cassandra_seeds = $contrail::primary_contrail_db_ip

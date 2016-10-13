@@ -49,5 +49,9 @@ class contrail::utils {
   class { 'contrail::package':
     install     => $pkgs,
     pip_install => $pip_pkgs,
+  } ->
+
+  file { '/etc/contrail/vnc_api_lib.ini':
+    content => template('contrail/vnc_api_lib.ini.erb')
   }
 }
