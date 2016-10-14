@@ -1,8 +1,1 @@
-# Remove apt pin for Contrail repo
-- role: '*'
-  type: puppet
-  stage: pre_deployment
-  parameters:
-    puppet_manifest: puppet/manifests/common-repo.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+[]

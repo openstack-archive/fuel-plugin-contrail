@@ -134,6 +134,20 @@
 
 # Tasks
 #############
+#0. Remove apt pin for Contrail plugin repo
+#############
+- id: common-repo
+  type: puppet
+  version: 2.0.0
+  requires: [setup_repositories]
+  required_for: [tools]
+  role: ['/.*/']
+  parameters:
+    puppet_manifest: "puppet/manifests/common-repo.pp"
+    puppet_modules: "puppet/modules:/etc/puppet/modules"
+    timeout: 120
+
+#############
 #1. Install Contrail utils, java
 #############
 - id: contrail-utils

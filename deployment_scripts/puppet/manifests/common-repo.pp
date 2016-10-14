@@ -17,24 +17,6 @@ notice('MODULAR: contrail/common-repo.pp')
 $settings = hiera('contrail', {})
 $plugin_version = $settings['metadata']['plugin_version']
 
-case $operatingsystem
-{
-    CentOS: {
-      yumrepo {'mos': priority => 1, exclude => 'python-thrift,nodejs'} # Contrail requires newer python-thrift and nodejs from it's repo
-      package {'yum-plugin-priorities': ensure => present }
-    }
-    Ubuntu: {
-      file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
-        ensure => absent,
-      }
-      apt::pin { 'dependency-fix':
-        explanation => 'Temporary fix for contrail analytics',
-        packages    => 'libperl5.18',
-        priority    => 1400,
-        version     => '5.18.2-2ubuntu1.1',
-      }
-    }
-    default: {}
+file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
+  ensure => absent,
 }
-
-
