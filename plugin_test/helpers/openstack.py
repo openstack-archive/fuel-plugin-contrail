@@ -30,6 +30,7 @@ def assign_net_provider(obj, **options):
     default_settings = {
         "net_provider": 'neutron',
         "net_segment_type": 'tun',
+        "propagate_task_deploy": True,
         "assign_to_all_nodes": False,
         "images_ceph": False,
         "volumes_ceph": False,
