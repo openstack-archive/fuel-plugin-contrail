@@ -155,8 +155,8 @@ class contrail::database {
     command   => "nodetool status|grep ^UN|grep ${contrail::address}",
     tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
     try_sleep => 30,
-    require   => Exec['wait_for_cassandra_seed']
   }
+
   Package['contrail-openstack-database'] -> Contrail_database_nodemgr_config <||>
   Contrail_database_nodemgr_config <||> ~> Service['supervisor-database']
 }
