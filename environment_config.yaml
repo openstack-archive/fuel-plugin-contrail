@@ -65,7 +65,7 @@ attributes:
     weight: 70
     type: "checkbox"
   vrouter_core_mask:
-    value: "0x3"
+    value: "0xf"
     label: "CPU pinning"
     description: "Hexadecimal mask that determines how many and what exactly processors will be used for dpdk vrouter"
     weight: 131
