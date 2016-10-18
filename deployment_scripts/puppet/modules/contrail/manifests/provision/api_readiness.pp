@@ -20,5 +20,6 @@ class contrail::provision::api_readiness {
       try_sleep => 10,
       unless    => "test -e ${title}",
     }
+    include ::osnailyfacter::wait_for_keystone_backends
   }
 }
