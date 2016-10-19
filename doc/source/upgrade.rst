@@ -12,8 +12,10 @@ to be upgraded without touching other OpenStack components.
 The packages are updated using the plugin-based repository, and configuration files
 are updated using the templates included in the latest plugin version.
 Controllers and compute nodes are upgraded separately, using puppet manifests
-provided with plugin. Other contrail-specific roles such as DPDK-compute, SR-IOV-compute,
+provided with plugin. Other contrail-specific roles such as DPDK-compute, VMWare-compute,
 and TSN are not supported yet.
+More information on running custom deployment graphs can be found in
+`Fuel User Guide <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/maintain-environment/custom-graph.html>`_
 
 Prequisites
 -----------
@@ -28,6 +30,9 @@ Package versions supported:
 
 Update the packages on Fuel Master node
 ---------------------------------------
+
+In case Fuel Contrail plugin package should be upgraded, please execute steps 1-3, otherwise
+proceed to step 4.
 
 #. Obtain the latest package of Fuel Contrail plugin that supports your Fuel version.
 
@@ -49,7 +54,7 @@ Update the packages on Fuel Master node
 
    .. code-block:: console
 
-      scp contrail-install-packages_3.0.2.1-4~liberty_all.deb \
+      scp contrail-install-packages_3.1.0.0-25~Ubuntu-14.04.4-mitaka_all.deb \
           <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-5.0/
       ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-5.0/install.sh
 
@@ -75,11 +80,31 @@ starts. The Neutron service will be restarted in case if contrail core plugin wi
       ssh <the Fuel Master node ip>
       cd /var/www/nailgun/plugins/contrail-5.0/
 
-#. Start the upgrade of control plane:
+# Check ID of contrail plugin:
+   .. code-block:: console
+
+      fuel plugins
+
+# Check ID of your env:
+   .. code-block:: console
+
+      fuel2 env list
+
+# Upload upgrade graph:
+   .. code-block:: console
+
+      fuel2 graph upload --plugin <plugin-ID> --type contrail_upgrade_control --file upgrade_control.yaml
+
+#Verify the graph has been uploaded:
 
    .. code-block:: console
 
-      ./upgrade.sh controllers
+      fuel2 graph list --env <env-ID>
+
+# Execute the custom graph to upgrade control plane:
+   .. code-block:: console
+
+      fuel2 graph execute --env <env-ID> --type contrail_upgrade_control
 
 #. Run the contrail service verification steps from :doc:`/verification` to ensure that all
    Contrail services are up and running.
@@ -96,18 +121,38 @@ The task upgrades compute hosts one by one, in ascending order by node ID.
 The instances running on particular compute node will lose network connectivity
 during the vRouter upgrade, this can take up to 5 min.
 
-#. Log in to the Fuel Master node, change the working directory to the plugin's folder:
+#. Log in to Fuel Master node, change the working directory to plugin folder:
 
    .. code-block:: console
 
       ssh <the Fuel Master node ip>
       cd /var/www/nailgun/plugins/contrail-5.0/
 
-#. Start the upgrade of control plane:
+# Check ID of contrail plugin:
+   .. code-block:: console
+
+      fuel plugins
+
+# Check ID of your env:
+   .. code-block:: console
+
+      fuel2 env list
+
+# Upload upgrade graph:
+   .. code-block:: console
+
+      fuel2 graph upload --plugin <plugin-ID> --type contrail_upgrade_compute --file upgrade_compute.yaml
+
+#Verify the graph has been uploaded:
 
    .. code-block:: console
 
-      ./upgrade.sh computes
+      fuel2 graph list --env <env-ID>
+
+# Execute the custom graph to upgrade compute hosts:
+   .. code-block:: console
+
+      fuel2 graph execute --env <env-ID> --type contrail_upgrade_compute
 
 #. Log in to compute nodes and verify output of the ``contrail-status`` command.
    You can verify the version of the vRouter package by running ``contrail-version`` command.
