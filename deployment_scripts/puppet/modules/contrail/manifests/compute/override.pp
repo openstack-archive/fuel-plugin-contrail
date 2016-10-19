@@ -48,6 +48,9 @@ class contrail::compute::override {
       ensure  => file,
       content => 'Label: dpdk-depends-packages',
     } ->
+    apt::conf { 'allow-unathenticated':
+      content => 'APT::Get::AllowUnauthenticated 1;',
+    } ->
     apt::source { 'dpdk-depends-repo':
       location    => 'file:/opt/contrail/contrail_install_repo_dpdk',
       repos       => './',
@@ -65,6 +68,7 @@ class contrail::compute::override {
       exec { 'override-nova':
         command => "apt-get install --yes --force-yes ${keep_config_files} ${force_overwrite} nova-compute nova-compute-kvm",
         unless  => 'dpkg -l | grep nova-compute | grep contrail',
+        require => Apt::Conf['allow-unathenticated'],
       }
     }
 
