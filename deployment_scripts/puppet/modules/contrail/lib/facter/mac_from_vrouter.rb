@@ -30,7 +30,7 @@ Facter.add("mac_from_vrouter") do
     end
 
     mac = `cat /sys/class/net/#{phys_dev}/address`.chomp
-    if $?.success?
+    unless $?.success?
        output.split('vif').each do |iface|
          if iface.start_with?( '0/0')
            mac = iface.split[8][7..-1]
