@@ -205,7 +205,7 @@ def check_slave_memory(min_memory):
         return True
 
 
-def setup_hugepages(obj, hp_2mb=512, hp_1gb=6, hp_dpdk_mb=0):
+def setup_hugepages(obj, hp_2mb=512, hp_1gb=30, hp_dpdk_mb=0):
     """Set value of huge page on dpdk node."""
     node_mac = obj.bm_drv.conf['target_macs']
     nailgun_node = obj.bm_drv.get_bm_node(obj, node_mac)

@@ -19,6 +19,7 @@ import libvirt
 
 from proboscis import test
 from proboscis.asserts import assert_true
+from proboscis.asserts import assert_equal
 from fuelweb_test import logger
 from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
@@ -145,23 +146,16 @@ class FailoverTests(TestBasic):
         # activate vSRX image
         vsrx_setup_result = vsrx.activate()
 
-
         conf_env = {
-            'slave-01': ['controller'],
-            'slave-02': ['controller'],
-            'slave-03': ['controller'],
-            'slave-04': ['compute', 'ceph-osd'],
-            'slave-05': ['compute', 'ceph-osd'],
-            'slave-06': ['compute', 'ceph-osd'],
-            'slave-07': ['contrail-controller',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
-            'slave-08': ['contrail-controller',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
-            'slave-09': ['contrail-controller',
-                         'contrail-analytics',
-                         'contrail-analytics-db'],
+            'slave-01': ['controller', 'ceph-osd'],
+            'slave-02': ['controller', 'ceph-osd'],
+            'slave-03': ['controller', 'ceph-osd'],
+            'slave-04': ['contrail-controller'],
+            'slave-05': ['contrail-controller'],
+            'slave-06': ['contrail-controller'],
+            'slave-07': ['contrail-analytics', 'contrail-analytics-db'],
+            'slave-08': ['contrail-analytics', 'contrail-analytics-db'],
+            'slave-09': ['contrail-analytics', 'contrail-analytics-db'],
         }
 
         self.show_step(2)
@@ -218,4 +212,99 @@ class FailoverTests(TestBasic):
                                    timeout=OSTF_RUN_TIMEOUT)
 
         self.show_step(17)
+        TestContrailCheck(self).cloud_check(['contrail'])
+
+
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
+          groups=["contrail_ha_with_network_problems", "contrail_failover"])
+    @log_snapshot_after_test
+    def contrail_ha_with_network_problems(self):
+        """Check Contrail HA using network problems
+
+        Scenario:
+            1. Deploy openstack with HA (at lest 3 controllers
+               and 3 nodes with contrail`s roles)
+            2. Run OSTF tests
+            3. Run contrail health check tests
+            4. Connect to a contrail controller host, stop the network
+               interfaces connected to private and management networks
+            5. Run OSTF tests
+            6. Run contrail health check tests
+        """
+
+        self.show_step(1)
+        plugin.prepare_contrail_plugin(self, slaves=9)
+
+        plugin.activate_plugin(self)
+        # activate vSRX image
+        vsrx_setup_result = vsrx.activate()
+
+        conf_env = {
+            'slave-01': ['controller'],
+            'slave-02': ['controller'],
+            'slave-03': ['controller'],
+            'slave-04': ['contrail-controller'],
+            'slave-05': ['contrail-controller'],
+            'slave-06': ['contrail-controller'],
+            'slave-07': ['contrail-analytics', 'contrail-analytics-db'],
+            'slave-08': ['contrail-analytics', 'contrail-analytics-db'],
+            'slave-09': ['contrail-analytics', 'contrail-analytics-db'],
+        }
+
+        self.show_step(2)
+        openstack.update_deploy_check(self, conf_env,
+                                      is_vsrx=vsrx_setup_result)
+
+        self.show_step(3)
+        TestContrailCheck(self).cloud_check(['contrail'])
+
+        self.show_step(4)
+
+        def get_interface_name4role(cluster_id, node_name, role):
+            logger.info('[get_interface_name4role] cluster_id: {0}, '
+                        'node: {1}, '
+                        'role:{2}'.format(cluster_id, node_name, role))
+            nailgun_node = None
+            for node in self.fuel_web.client.list_cluster_nodes(cluster_id):
+                logger.info('Check node {0} for name: {1}'.format(node['name'],
+                                                                  node_name))
+                if node_name in node['name']:
+                    nailgun_node = node
+                    break
+            else:
+                assert 'slave-01 node not found in cluster: {0}'.format(
+                    self.cluster_id)
+
+            interfaces = self.fuel_web.client.get_node_interfaces(
+                nailgun_node['id'])
+            for iface in interfaces:
+                for net in iface['assigned_networks']:
+                    logger.info('Check iface {0} for role {1}'.format(
+                        iface['name'], role))
+                    if role in net['name']: # check role name for interface
+                        logger.info('Found interface: {0}'.format(
+                            iface['name']))
+                        return iface['name'] # return interface name
+            return ''
+
+        cluster_id = self.cluster_id
+        ifaces = [
+            get_interface_name4role(cluster_id, 'slave-01', 'private'),
+            get_interface_name4role(cluster_id, 'slave-01', 'management')
+        ]
+        for iface in ifaces:
+            cmd = 'sudo ifconfig {0} down'.format(iface)
+            with self.fuel_web.get_ssh_for_node("slave-01") as remote:
+                res_pgrep = remote.execute(cmd)
+                assert_equal(0, res_pgrep['exit_code'],
+                             'Failed with error code:{0}, {1}, out:{2}'.format(
+                                 res_pgrep['exit_code'],
+                                 res_pgrep['stderr'],
+                                 res_pgrep['stdout']))
+        self.show_step(5)
+        if vsrx_setup_result:
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'],
+                                   timeout=OSTF_RUN_TIMEOUT)
+        self.show_step(6)
         TestContrailCheck(self).cloud_check(['contrail'])
