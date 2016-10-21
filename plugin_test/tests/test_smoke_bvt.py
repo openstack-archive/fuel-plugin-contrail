@@ -76,7 +76,7 @@ class ContrailPlugin(TestBasic):
         contrail_route_target = '10000'
         contrail_external = '10.100.1.0/24'
         contrail_asnum = '64512'
-        vrouter_core_mask = '0x3'
+        vrouter_core_mask = '0xf'
 
         plugin.show_range(self, 1, 7)
         plugin.prepare_contrail_plugin(self, slaves=3)
