@@ -388,7 +388,7 @@ Verify that we can disable OSTF networks provisioning
 ID
 ##
 
-contrail_ostf_net_provisioning_disable
+contrail_ostf_net_provisioning_off
 
 
 Description

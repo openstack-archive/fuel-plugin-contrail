@@ -603,9 +603,9 @@ class FunctionalTests(TestBasic):
                                       is_vsrx=vsrx_setup_result)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_5],
-          groups=["contrail_ostf_net_provisioning_disable"])
+          groups=["contrail_ostf_net_provisioning_off"])
     @log_snapshot_after_test
-    def contrail_ostf_net_provisioning_disable(self):
+    def contrail_ostf_net_provisioning_off(self):
         """Verify that we can disable OSTF networks provisioning.
 
         Scenario:
