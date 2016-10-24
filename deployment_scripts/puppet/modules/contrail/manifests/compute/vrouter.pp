@@ -87,7 +87,7 @@ class contrail::compute::vrouter {
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
 
     contrail_vrouter_dpdk_ini_config {
-      'program:contrail-vrouter-dpdk/command':                 value => "taskset ${contrail::vrouter_core_mask} /usr/bin/contrail-vrouter-dpdk --no-daemon --vr_mpls_labels ${contrail::vr_mpls_labels} ${::supervisor_params}";
+      'program:contrail-vrouter-dpdk/command':                 value => "taskset ${contrail::vrouter_core_mask} /usr/bin/contrail-vrouter-dpdk --no-daemon ${::supervisor_params}";
       'program:contrail-vrouter-dpdk/priority':                value => '410';
       'program:contrail-vrouter-dpdk/loglevel':                value => 'debug';
       'program:contrail-vrouter-dpdk/autostart':               value => true;
@@ -99,7 +99,30 @@ class contrail::compute::vrouter {
       'program:contrail-vrouter-dpdk/exitcodes':               value => '0';
     }
 
-    Package[$install_packages] -> Contrail_vrouter_dpdk_ini_config <||> ~> Service['supervisor-vrouter']
+    ini_subsetting {'vr_mpls_labels':
+      ensure               => present,
+      section              => 'program:contrail-vrouter-dpdk',
+      key_val_separator    => '=',
+      path                 => '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini',
+      setting              => 'command',
+      subsetting           => "--vr_mpls_labels=${contrail::vr_mpls_labels}",
+      tag                  => 'vrouter_subsetting',
+      subsetting_separator => ' ',
+    }
+
+    ini_subsetting {'vr_flow_entries':
+      ensure               => present,
+      section              => 'program:contrail-vrouter-dpdk',
+      key_val_separator    => '=',
+      path                 => '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini',
+      setting              => 'command',
+      subsetting           => "--vr_flow_entries=${contrail::vr_flow_entries}",
+      tag                  => 'vrouter_subsetting',
+      subsetting_separator => ' ',
+    }
+
+    Class[Contrail::Package] -> Contrail_vrouter_dpdk_ini_config <||> ~> Service['supervisor-vrouter']
+    Contrail_vrouter_dpdk_ini_config <||> ->  Ini_subsetting <| tag == 'vrouter_subsetting' |> ~> Service['supervisor-vrouter']
 
   } else {
     $install_packages = ['contrail-openstack-vrouter','contrail-vrouter-dkms','iproute2','haproxy','libatm1']
