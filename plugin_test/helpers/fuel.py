@@ -13,6 +13,7 @@ License for the specific language governing permissions and limitations
 under the License.
 """
 from fuelweb_test import logger
+from pprint import pformat
 
 
 def update_cluster_settings(test_obj, cluster_id, section, attrs):
@@ -43,3 +44,18 @@ def get_cluster_settings(test_obj, cluster_id, section=''):
     if section:
         return attrs['editable'].get(section, {})
     return attrs['editable']
+
+
+def add_kernel_params(obj):
+    logger.info('Update kernel parameters for DPDK on VF.')
+    curr_params = get_cluster_settings(obj,
+                                       obj.cluster_id,
+                                       'kernel_params')
+    logger.info('attrs: {0}'.format(pformat(curr_params)))
+
+    curr_value = curr_params['kernel']['value']
+    new_value = '{0} intel_iommu=on iommu=pt'.format(curr_value)
+    logger.info('Update kernel params for cluster {0} = {1}'.format(
+        obj.cluster_id, new_value))
+    obj.update_cluster_settings(obj, obj.cluster_id,
+                               'kernel_params', {'kernel': new_value})

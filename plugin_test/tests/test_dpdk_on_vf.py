@@ -44,21 +44,6 @@ class DPDKonVFTests(TestBasic):
     CONTRAIL_DISTRIBUTION = os.environ.get('CONTRAIL_DISTRIBUTION')
     bm_drv = baremetal.BMDriver()
 
-    def add_kernel_params(self):
-        logger.info('Update kernel parameters for DPDK on VF.')
-        curr_params = fuel.get_cluster_settings(self,
-                                                self.cluster_id,
-                                                'kernel_params')
-        from pprint import pformat
-        logger.info('attrs: {0}'.format(pformat(curr_params)))
-
-        curr_value = curr_params['kernel']['value']
-        new_value = '{0} intel_iommu=on iommu=pt'.format(curr_value)
-        logger.info('Update kernel params for cluster {0} = {1}'.format(
-            self.cluster_id, new_value))
-        fuel.update_cluster_settings(self, self.cluster_id,
-                                     'kernel_params', {'kernel': new_value})
-
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_ha_dpdk_on_vf", "contrail_dpdk_on_vf_tests"])
     @log_snapshot_after_test
@@ -128,7 +113,7 @@ class DPDKonVFTests(TestBasic):
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
         # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
+        fuel.add_kernel_params()
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -219,7 +204,7 @@ class DPDKonVFTests(TestBasic):
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
         # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
+        fuel.add_kernel_params()
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -333,7 +318,7 @@ class DPDKonVFTests(TestBasic):
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
         # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
+        fuel.add_kernel_params()
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -445,7 +430,7 @@ class DPDKonVFTests(TestBasic):
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
         # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
+        fuel.add_kernel_params()
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -548,7 +533,7 @@ class DPDKonVFTests(TestBasic):
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
         # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
+        fuel.add_kernel_params()
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -660,7 +645,7 @@ class DPDKonVFTests(TestBasic):
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
         # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
+        fuel.add_kernel_params()
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
@@ -780,7 +765,7 @@ class DPDKonVFTests(TestBasic):
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
         # add mandatory kernel parameters for DPDK on VK
-        self.add_kernel_params()
+        fuel.add_kernel_params()
         # Deploy cluster
         openstack.deploy_cluster(self)
         # Run OSTF tests
