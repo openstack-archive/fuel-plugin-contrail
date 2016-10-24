@@ -526,7 +526,7 @@ class TestMultipleNets(TestMultipleClusterNets):
             )
 
         self.show_step(16)
-        conf_control = {'slave-03': [['controller'], nodegroup_custom1]}
+        conf_control = {'slave-02': [['controller'], nodegroup_custom1]}
 
         plugin.show_range(self, 17, 18)
         openstack.update_deploy_check(
