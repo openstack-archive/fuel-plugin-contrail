@@ -43,3 +43,19 @@ def get_cluster_settings(test_obj, cluster_id, section=''):
     if section:
         return attrs['editable'].get(section, {})
     return attrs['editable']
+
+
+def add_kernel_params(odj):
+    logger.info('Update kernel parameters for DPDK on VF.')
+    curr_params = get_cluster_settings(odj,
+                                       odj.cluster_id,
+                                       'kernel_params')
+    from pprint import pformat
+    logger.info('attrs: {0}'.format(pformat(curr_params)))
+
+    curr_value = curr_params['kernel']['value']
+    new_value = '{0} intel_iommu=on iommu=pt'.format(curr_value)
+    logger.info('Update kernel params for cluster {0} = {1}'.format(
+        odj.cluster_id, new_value))
+    odj.update_cluster_settings(odj, odj.cluster_id,
+                               'kernel_params', {'kernel': new_value})
