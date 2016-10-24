@@ -526,7 +526,7 @@ class TestMultipleNets(TestMultipleClusterNets):
             )
 
         self.show_step(16)
-        conf_control = {'slave-03': [['controller'], nodegroup_custom1]}
+        conf_control = {'slave-02': [['controller'], nodegroup_custom1]}
 
         plugin.show_range(self, 17, 18)
         openstack.update_deploy_check(
@@ -631,7 +631,7 @@ class TestMultipleNets(TestMultipleClusterNets):
                 timeout=settings.OSTF_RUN_TIMEOUT)
 
         self.show_step(16)
-        conf_compute = {'slave-06': [['compute'], nodegroup_custom1], }
+        conf_compute = {'slave-03': [['compute'], nodegroup_custom1], }
 
         plugin.show_range(self, 17, 18)
         openstack.update_deploy_check(
