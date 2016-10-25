@@ -742,6 +742,7 @@ class DPDKTests(TestBasic):
         self.show_step(5)
         # Enable SRIOV on interface
         openstack.enable_sriov(self)
+        fuel.add_kernel_params(self)
         # Deploy cluster
         self.show_step(6)
         openstack.deploy_cluster(self)
@@ -767,7 +768,6 @@ class DPDKTests(TestBasic):
                                    nodes_dict=conf_controller,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
-        fuel.add_kernel_params(self)
         # Deploy cluster
         self.show_step(10)
         openstack.deploy_cluster(self)

@@ -57,5 +57,5 @@ def add_kernel_params(obj):
     new_value = '{0} intel_iommu=on iommu=pt'.format(curr_value)
     logger.info('Update kernel params for cluster {0} = {1}'.format(
         obj.cluster_id, new_value))
-    obj.update_cluster_settings(obj, obj.cluster_id,
+    update_cluster_settings(obj, obj.cluster_id,
                                'kernel_params', {'kernel': new_value})
