@@ -767,7 +767,7 @@ class DPDKTests(TestBasic):
                                    nodes_dict=conf_controller,
                                    update_interfaces=False)
         self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
-        fuel.add_kernel_params()
+        fuel.add_kernel_params(self)
         # Deploy cluster
         self.show_step(10)
         openstack.deploy_cluster(self)
