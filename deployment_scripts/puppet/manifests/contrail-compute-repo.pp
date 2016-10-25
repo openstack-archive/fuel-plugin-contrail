@@ -35,4 +35,14 @@ if $contrail::compute_dpdk_enabled {
     command => "/bin/echo '#NOOP here. Modified by contrail plugin' > ${netconfig}",
     onlyif  => 'dpkg -l | grep contrail-vrouter-dpdk-init'
   }
+
+  $nova_params = '/etc/puppet/modules/nova/manifests/params.pp'
+  $libvirt_from_contrail = 'dpkg -l | grep libvirt0 | grep contrail'
+
+  exec {'libvirt name fix':
+    path    => '/usr/local/bin:/bin:/usr/bin/',
+    command => "sed -i 's/libvirtd/libvirt-bin/g' ${nova_params}",
+    onlyif  => $libvirt_from_contrail,
+  }
+
 }

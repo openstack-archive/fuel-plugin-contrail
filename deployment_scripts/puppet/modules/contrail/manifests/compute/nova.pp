@@ -63,13 +63,7 @@ class contrail::compute::nova {
       line  => '    name   => "libvirt-bin",',
       match => 'nova::params::libvirt_service_name',
     }
-    $nova_params = '/etc/puppet/modules/nova/manifests/params.pp'
-    file_line { 'Replace libvirt service name 2':
-      path     => $nova_params,
-      match    => 'libvirt_service_name',
-      line     => '$libvirt_service_name = \'libvirt-bin\'',
-      multiple => true,
-    }
+
   }
 
   Nova_config <||> ~>
