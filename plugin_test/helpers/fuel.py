@@ -58,4 +58,4 @@ def add_kernel_params(obj):
     logger.info('Update kernel params for cluster {0} = {1}'.format(
         obj.cluster_id, new_value))
     update_cluster_settings(obj, obj.cluster_id,
-                               'kernel_params', {'kernel': new_value})
+                            'kernel_params', {'kernel': new_value})
