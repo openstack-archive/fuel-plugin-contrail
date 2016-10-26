@@ -405,11 +405,12 @@ class DPDKonVFTests(TestBasic):
         self.show_step(1)
         plugin.prepare_contrail_plugin(self, slaves=9,
                                        options={'images_ceph': True})
-        self.bm_drv.host_prepare()
-
         plugin.show_range(self, 2, 4)
-        # activate vSRX image
-        vsrx_setup_result = vsrx.activate()
+
+        self.bm_drv.host_prepare()
+        # activate plugin with DPDK feature
+        plugin.activate_dpdk(self, **conf_contrail)
+        vsrx_setup_result = vsrx.activate() # activate vSRX image
 
         self.show_step(4)
         conf_nodes = {
@@ -426,31 +427,30 @@ class DPDKonVFTests(TestBasic):
             self.cluster_id,
             nodes_dict=conf_nodes,
             update_interfaces=False)
-        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
-        # Enable SRIOV on interface
-        openstack.enable_sriov(self)
         # add mandatory kernel parameters for DPDK on VK
         fuel.add_kernel_params(self)
+        self.bm_drv.update_vm_node_interfaces(self, self.cluster_id)
         # Deploy cluster
         openstack.deploy_cluster(self)
+
         # Run OSTF tests
         self.show_step(5)
         if vsrx_setup_result:
-            self.fuel_web.run_ostf(
-                cluster_id=self.cluster_id,
-                test_sets=['smoke', 'sanity', 'ha'],
-                should_fail=1,
-                failed_test_name=['Instance live migration']
-            )
+            self.fuel_web.run_ostf(cluster_id=self.cluster_id,
+                                   test_sets=['smoke', 'sanity', 'ha'],
+                                   should_fail=1,
+                                   failed_test_name=['Instance live migration']
+                                   )
             self.show_step(6)
             TestContrailCheck(self).cloud_check(['contrail'])
 
         self.show_step(7)
-        # activate plugin with DPDK feature
-        plugin.activate_dpdk(self, **conf_contrail)
+
         self.bm_drv.setup_fuel_node(self,
                                     cluster_id=self.cluster_id,
                                     roles=['compute', 'dpdk', 'dpdk-on-vf'])
+        # Enable SRIOV on interface
+        openstack.enable_sriov(self)
         openstack.setup_hugepages(self)
         self.show_step(8)
         openstack.deploy_cluster(self)
