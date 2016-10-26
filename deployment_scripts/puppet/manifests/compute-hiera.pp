@@ -18,7 +18,11 @@ notice('MODULAR: contrail/compute-hiera.pp')
 
 file { '/etc/hiera/plugins/contrail.yaml':
   ensure  => file,
-  content => 'use_ovs: false',
+} ->
+
+file_line { '/etc/hiera/plugins/contrail.yaml':
+  path    => '/etc/hiera/plugins/contrail.yaml',
+  line    => '  use_ovs: false',
 }
 
 if roles_include('dpdk') {
