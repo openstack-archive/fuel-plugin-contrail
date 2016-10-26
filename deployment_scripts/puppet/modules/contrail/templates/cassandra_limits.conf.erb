@@ -1,0 +1,5 @@
+# This file is managed by Puppet
+cassandra  -  memlock  <%= scope.lookupvar('contrail::cassandra_memlock_limit') %>
+cassandra  -  nofile   <%= scope.lookupvar('contrail::cassandra_nofile_limit') %>
+cassandra  -  as       <%= scope.lookupvar('contrail::cassandra_as_limit') %>
+cassandra  -  nproc    <%= scope.lookupvar('contrail::cassandra_nproc_limit') %>

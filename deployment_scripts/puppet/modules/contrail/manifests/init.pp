@@ -133,8 +133,16 @@ class contrail {
   $external                  = $settings['contrail_external']
   $route_target              = $settings['contrail_route_target']
   $gateways                  = split($settings['contrail_gateways'], ',')
-  $kafka_log_retention_bytes = pick($settings['kafka_log_retention_bytes'], '1073741824')
-  $kafka_log_segment_bytes   = pick($settings['kafka_log_segment_bytes'], '1073741824')
+
+  # Kafka settings
+  $kafka_log_retention_bytes        = pick($settings['kafka_log_retention_bytes'], '1073741824')
+  $kafka_log_segment_bytes          = pick($settings['kafka_log_segment_bytes'], '1073741824')
+  $kafka_log_cleanup_policy         = pick($settings['kafka_log_cleanup_policy'], 'compact')
+  $kafka_log_cleaner_threads        = pick($settings['kafka_log_cleaner_threads'], '1')
+  $kafka_cleaner_dedupe_buffer_size = pick($settings['kafka_cleaner_dedupe_buffer_size'], '134217728')
+
+
+  $discovery_hc_max_miss       = pick($settings['discovery_hc_max_miss'], '3')
 
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
@@ -233,6 +241,12 @@ class contrail {
 
   # Perfomance tuning
   $cassandra_rpc_max_threads = pick($settings['cassandra_rpc_max_threads'], false)
+
+  #Cassandra limits settings
+  $cassandra_memlock_limit = pick($settings['cassandra_memlock_limit'], 'unlimited')
+  $cassandra_nofile_limit  = pick($settings['cassandra_nofile_limit'], '100000')
+  $cassandra_as_limit      = pick($settings['cassandra_as_limit'], 'unlimited')
+  $cassandra_nproc_limit   = pick($settings['cassandra_nproc_limit'], '8096')
 
   # Vrouter logging settings
   $use_syslog      = pick($settings['use_syslog'], '1')

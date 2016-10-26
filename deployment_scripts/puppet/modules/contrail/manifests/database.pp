@@ -112,6 +112,9 @@ class contrail::database {
   } ->
   file { '/etc/cassandra/cassandra-env.sh':
     source  => 'puppet:///modules/contrail/cassandra-env.sh',
+  } ->
+  file { '/etc/security/limits.d/cassandra.conf':
+    content => template('contrail/cassandra_limits.conf.erb'),
   }
 
 # Supervisor-database

@@ -111,7 +111,9 @@ log.retention.check.interval.ms=300000
 log.cleaner.enable=true
 
 #The default cleanup policy for segments beyond the retention window, must be either "delete" or "compact"
-log.cleanup.policy=compact
+log.cleanup.policy=<%= scope.lookupvar('contrail::kafka_log_cleanup_policy') %>
+log.cleaner.threads=<%= scope.lookupvar('contrail::kafka_log_cleaner_threads') %>
+log.cleaner.dedupe.buffer.size=<%= scope.lookupvar('contrail::kafka_cleaner_dedupe_buffer_size') %>
 
 #Topic deletion option is disabled by default. To enable it set the server config
 delete.topic.enable=true
