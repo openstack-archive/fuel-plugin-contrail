@@ -68,7 +68,7 @@ class contrail::control {
     path    => '/etc/contrail/supervisord_control.conf',
     section => 'supervisord',
     setting => 'minfds',
-    value   => '10240',
+    value   => $contrail::supervisor_control_minfds,
     require => Package['contrail-control'],
     notify  => Service['supervisor-control'],
   }

@@ -239,6 +239,11 @@ class contrail {
   $syslog_facility = pick($settings['syslog_facility'], 'LOG_LOCAL0')
   $log_level       = pick($settings['log_level'], 'SYS_INFO')
 
+  #minfds settings
+  $supervisor_config_minfds    = pick($settings['supervisor_config_minfds'], '65535')
+  $supervisor_control_minfds   = pick($settings['supervisor_control_minfds'], '10240')
+  $supervisor_analytics_minfds = pick($settings['supervisor_analytics_minfds'], '65535')
+
 }
 
 

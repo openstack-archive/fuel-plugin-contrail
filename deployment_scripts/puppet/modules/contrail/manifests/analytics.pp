@@ -147,7 +147,7 @@ class contrail::analytics {
     path    => '/etc/contrail/supervisord_analytics.conf',
     section => 'supervisord',
     setting => 'minfds',
-    value   => '65535',
+    value   => $contrail::supervisor_analytics_minfds,
     require => Package['contrail-analytics'],
   }
 

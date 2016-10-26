@@ -243,7 +243,7 @@ class contrail::config {
 
 # Supervisor-config
   file { '/etc/contrail/supervisord_config.conf':
-    source  => 'puppet:///modules/contrail/supervisord_config.conf',
+    content  => template('contrail/supervisord_config.conf.erb'),
   }
 
 # Contrail services
