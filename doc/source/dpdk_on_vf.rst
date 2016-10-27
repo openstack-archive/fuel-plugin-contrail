@@ -11,7 +11,7 @@ This feature shares a physical interface for DPDK and SR-IOV usage.
 Prerequisites
 -------------
 
-- Installed `Fuel 9.* <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
+- Installed `Fuel 9.1 <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_
 - Installed Fuel Contrail Plugin :doc:`/install_guide`
 - Environment must be created with "KVM" for compute virtualization and "Contrail" for networking
 - Network card must support DPDK.
@@ -41,6 +41,6 @@ and ``DPDK-on-VF`` roles.
 During deploy following configurations will be made on compute nodes with DPDK and SR-IOV roles:
 
   #. Virtual functions will be allocated on private interface.
-  #. First VFwill be used for DPDK-based vRouter.
+  #. First VF will be used for DPDK-based vRouter.
   #. Rest of the VFs will be added to ``pci_passthrough_whitelist`` setting in ``nova.conf``
      for SR-IOV usage.

@@ -4,7 +4,7 @@ Requirements
 The plugin has the following requirements for software and hardware:
 
 +--------------------------------+-----------------------------------------------------------------+
-| Fuel version                   | 9.*                                                             |
+| Fuel version                   | 9.1                                                             |
 +--------------------------------+-----------------------------------------------------------------+
 | Juniper Contrail version       | 3.1.0.0                                                         |
 |                                | testing was performed on 3.1.0.0-25                             |

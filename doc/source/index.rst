@@ -1,6 +1,6 @@
 .. _fuel-plugin-contrail:
 
-Guide to the Contrail plugin version 5.0-5.0.0-1 for Fuel 9.0
+Guide to the Contrail plugin version 5.0-5.0.0-1 for Fuel 9.1
 =============================================================
 
 .. toctree::
