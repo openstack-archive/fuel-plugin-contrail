@@ -28,10 +28,10 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = u'Contrail plugin for Fuel'
-copyright = u'2015, Mirantis Inc.'
+copyright = u'2016, Mirantis Inc.'
 
-version = '4.0-4.0.0-1'
-release = '4.0-4.0.0-1'
+version = '5.0-5.0.0-1'
+release = '5.0-5.0.0-1'
 
 pygments_style = 'sphinx'
 
