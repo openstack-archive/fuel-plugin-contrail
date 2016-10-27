@@ -699,7 +699,7 @@ class DPDKonVFTests(TestBasic):
                     "test_dpdk_boot_snapshot_vm",
                     "test_dpdk_check_public_connectivity_from_instance"])
 
-    @test(depends_on=[SetupEnvironment.prepare_slaves_5],
+    @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_dpdk_on_vf_delete_controller",
                   "contrail_dpdk_tests"])
     @log_snapshot_after_test
@@ -728,7 +728,7 @@ class DPDKonVFTests(TestBasic):
 
         """
         self.show_step(1)
-        plugin.prepare_contrail_plugin(self, slaves=5)
+        plugin.prepare_contrail_plugin(self, slaves=9)
         self.bm_drv.host_prepare()
 
         self.show_step(2)
