@@ -139,7 +139,6 @@ class contrail::analytics {
     'KEYSTONE/admin_token':       value => $contrail::admin_token;
     'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
     'KEYSTONE/insecure':          value => true;
-    'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
   }
 
   ini_setting { 'analytics-fdlimit':
@@ -170,7 +169,7 @@ class contrail::analytics {
     path    => '/etc/contrail/supervisord_analytics_files/contrail-alarm-gen.ini',
     section => 'program:contrail-alarm-gen',
     setting => 'command',
-    value   => "/usr/bin/contrail-alarm-gen ${alarm_gen_conf}",
+    value   => "/usr/bin/contrail-alarm-gen ${alarm_gen_conf} ${keystone_auth_conf}",
     require => Package['contrail-analytics'],
   }
 
