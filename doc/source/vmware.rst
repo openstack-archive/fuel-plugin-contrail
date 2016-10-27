@@ -17,7 +17,7 @@ Integration with vCenter include two main roles: compute-vmware and contrail-vmw
 Prerequisites
 -------------
 
-   - Installed `Fuel 9.0 <https://docs.mirantis.com/openstack/fuel/fuel-9.0/quickstart-guide.html#introduction>`_
+   - Installed `Fuel 9.1 <https://docs.mirantis.com/openstack/fuel/fuel-9.0/quickstart-guide.html#introduction>`_
    - Installed Fuel Contrail Plugin :doc:`/install_guide`
    - Environment must be created with "vCenter" support for compute virtualization and Contrail for networking
    - vSphere environments must be already preconfigured
