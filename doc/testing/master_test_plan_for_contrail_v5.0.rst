@@ -34,7 +34,7 @@ It uses Fuel plugin architecture along with pluggable architecture enhancements 
 The plugin must be compatible with  the  version 9.1 of Mirantis OpenStack and Contrail release 3.1.0.0-25.
 It will be allowed to deploy an only Contrail Controller (for test-bed environments) and add more controllers later (to add true HA).
 
-See Contrail Plugin 5.0.5 Proposal for more details
+See Contrail Plugin 5.0.0 Proposal for more details
 
 
 2.1. Evaluation Test Mission
