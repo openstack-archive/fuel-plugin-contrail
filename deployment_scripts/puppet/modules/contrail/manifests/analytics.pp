@@ -136,7 +136,6 @@ class contrail::analytics {
     'KEYSTONE/auth_port':         value => '35357';
     'KEYSTONE/admin_user':        value => $contrail::neutron_user;
     'KEYSTONE/admin_password':    value => $contrail::service_token;
-    'KEYSTONE/admin_token':       value => $contrail::admin_token;
     'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
     'KEYSTONE/insecure':          value => true;
   }
