@@ -132,13 +132,13 @@ class contrail::controller {
   }
   if !defined(Neutron_config['DEFAULT/service_plugins']) {
     neutron_config {
-      'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin';
+      'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2';
     }
   }
   else {
     Neutron_config<| title == 'DEFAULT/service_plugins' |> {
       ensure => present,
-      value  => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin',
+      value  => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2',
     }
   }
   if !defined(Neutron_config['DEFAULT/allow_overlapping_ips']) {
@@ -185,6 +185,16 @@ class contrail::controller {
       value  => $contrail::keystone_protocol,
     }
   }
+  if !defined(Neutron_config['keystone_authtoken/auth_type']) {
+    neutron_config {
+      'keystone_authtoken/auth_type': ensure => absent,
+    }
+  }
+  else {
+    Neutron_config<| (title == 'keystone_authtoken/auth_type') |> {
+      ensure => absent,
+    }
+  }
 
   neutron_config {
     'service_providers/service_provider': value => 'LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default';
@@ -199,7 +209,8 @@ class contrail::controller {
   contrailplugin_ini_config {
     'APISERVER/api_server_ip':       value => $contrail::contrail_mgmt_vip;
     'APISERVER/api_server_port':     value => $contrail::api_server_port;
-    'APISERVER/multi_tenancy':       value => 'True';
+    'APISERVER/aaa_mode':            value => 'cloud-admin';
+    'APISERVER/cloud_admin_role':    value => 'admin';
     'APISERVER/contrail_extensions': value => 'ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None';
     'COLLECTOR/analytics_api_ip':    value => $contrail::contrail_mgmt_vip;
     'COLLECTOR/analytics_api_port':  value => '8081';
