@@ -20,7 +20,7 @@ More information on running custom deployment graphs can be found in
 Prequisites
 -----------
 
-This guide assumes that you have installed Fuel 9.0 with the Fuel Contrail plugin,
+This guide assumes that you have installed Fuel 9.1 with the Fuel Contrail plugin,
 and successfully deployed the environment according to :doc:`/install_guide`.
 
 Package versions supported:
@@ -80,28 +80,32 @@ starts. The Neutron service will be restarted in case if contrail core plugin wi
       ssh <the Fuel Master node ip>
       cd /var/www/nailgun/plugins/contrail-5.0/
 
-# Check ID of contrail plugin:
+#. Check ID of contrail plugin:
+
    .. code-block:: console
 
       fuel plugins
 
-# Check ID of your env:
+#. Check ID of your env:
+
    .. code-block:: console
 
       fuel2 env list
 
-# Upload upgrade graph:
+#. Upload upgrade graph:
+
    .. code-block:: console
 
       fuel2 graph upload --plugin <plugin-ID> --type contrail_upgrade_control --file upgrade_control.yaml
 
-#Verify the graph has been uploaded:
+#. Verify the graph has been uploaded:
 
    .. code-block:: console
 
       fuel2 graph list --env <env-ID>
 
-# Execute the custom graph to upgrade control plane:
+#. Execute the custom graph to upgrade control plane:
+
    .. code-block:: console
 
       fuel2 graph execute --env <env-ID> --type contrail_upgrade_control
@@ -128,28 +132,32 @@ during the vRouter upgrade, this can take up to 5 min.
       ssh <the Fuel Master node ip>
       cd /var/www/nailgun/plugins/contrail-5.0/
 
-# Check ID of contrail plugin:
+#. Check ID of contrail plugin:
+
    .. code-block:: console
 
       fuel plugins
 
-# Check ID of your env:
+#. Check ID of your env:
+
    .. code-block:: console
 
       fuel2 env list
 
-# Upload upgrade graph:
+#. Upload upgrade graph:
+
    .. code-block:: console
 
       fuel2 graph upload --plugin <plugin-ID> --type contrail_upgrade_compute --file upgrade_compute.yaml
 
-#Verify the graph has been uploaded:
+#. Verify the graph has been uploaded:
 
    .. code-block:: console
 
       fuel2 graph list --env <env-ID>
 
-# Execute the custom graph to upgrade compute hosts:
+#. Execute the custom graph to upgrade compute hosts:
+
    .. code-block:: console
 
       fuel2 graph execute --env <env-ID> --type contrail_upgrade_compute

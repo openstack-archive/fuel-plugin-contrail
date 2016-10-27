@@ -16,11 +16,10 @@ Guide to the Contrail plugin version 5.0-5.0.0-1 for Fuel 9.0
     dpdk_on_vf
     enable_sriov
     contrail_tsn
-    using_network_templates
+    vmware
     upgrade
     verification
     restoring_failed_contrail_node
     contrail_ui_intro
     tuning
-    vmware
     appendix
