@@ -101,6 +101,8 @@ class contrail::config {
     'DEFAULTS/rabbit_port':               value => '5673';
     'DEFAULTS/list_optimization_enabled': value => true;
     'DEFAULTS/auth':                      value => 'keystone';
+    'DEFAULTS/aaa_mode':                  value => 'cloud-admin';
+    'DEFAULTS/cloud_admin_role':          value => 'admin';
     'DEFAULTS/rabbit_user':               value => 'nova';
     'DEFAULTS/rabbit_password':           value => $contrail::rabbit_password;
     'SECURITY/use_certs':                 value => false;
@@ -163,7 +165,6 @@ class contrail::config {
     'KEYSTONE/auth_port':         value => '35357';
     'KEYSTONE/admin_user':        value => $contrail::neutron_user;
     'KEYSTONE/admin_password':    value => $contrail::service_token;
-    'KEYSTONE/admin_token':       value => $contrail::admin_token;
     'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
     'KEYSTONE/insecure':          value => true;
     'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
