@@ -4,15 +4,14 @@ Requirements
 The plugin has the following requirements for software and hardware:
 
 +--------------------------------+-----------------------------------------------------------------+
-| Fuel version                   | 8.0                                                             |
+| Fuel version                   | 9.*                                                             |
 +--------------------------------+-----------------------------------------------------------------+
-| Juniper Contrail version       | 3.0.2                                                           |
-|                                | testing was performed on 3.0.2.1-4                              |
+| Juniper Contrail version       | 3.1.0.0                                                         |
+|                                | testing was performed on 3.1.0.0-25                             |
 +--------------------------------+-----------------------------------------------------------------+
-| Hardware                       | *   At least 1 additional server for Contrail controller        |
-|                                |     (contrail-control, contrail-config, contrail-analytics,     |
-|                                |     contrail-db roles).                                         |
-|                                |     Contrail-DB requires 320 Gb disk space.                     |
+| Hardware                       | *   At least 2 additional servers: for Contrail controller      |
+|                                |     and for combined Analytics and  Analytics-DB                |
+|                                |     Analytics-DB requires 320 Gb disk space.                    |
 |                                |                                                                 |
 |                                | *   Additional network interface on each                        |
 |                                |     node except for MOS Controller.                             |

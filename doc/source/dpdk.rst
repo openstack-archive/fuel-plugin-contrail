@@ -70,8 +70,6 @@ To configure DPDK you should proceed with the following steps:
 
 #. Enable the Contrail plugin in Fuel web UI settings
 
-   .. image:: images/enable_contrail_plugin.png
-
 .. raw:: latex
 
     \pagebreak
@@ -80,10 +78,12 @@ To configure DPDK you should proceed with the following steps:
 
    .. image:: images/enable_contrail_dpdk.png
 
-#. Choose the size and amount of huge pages to allocate. They will be used for
+#. Choose the size and amount of huge pages to allocate for each Compute. They will be used for
    both vRouter process and VMs backing. 2MB sized huge pages can be added on-fly,
    1GB sized require a reboot. Also, leave some amount of memory
    for the operating system itself.
+
+   .. image:: images/huge_pages.png
 
 .. raw:: latex
 

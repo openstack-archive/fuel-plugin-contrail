@@ -102,7 +102,13 @@ To configure the Contrail plugin, follow the steps below:
 
     *   At least 1 Compute
 
-    *   At least 1 node with Contrail-Control, Contrail-Config, Contrail-Analytics and Contrail-DB roles selected
+    *   At least 1 Contrail-Controller
+
+        .. note::
+
+           Three or the greater odd number of nodes recommended for HA.
+
+    *   At least 1 Contrail-Analytics + Contrail-Analytics-DB
 
         .. note::
 
@@ -110,19 +116,13 @@ To configure the Contrail plugin, follow the steps below:
 
     *   If you plan to use Heat with autoscaling, in addition to Ceilometer you need to add node with MongoDB role
 
-    You do not need to have these three roles on the same node.
-    You can place them on different nodes if needed. For example, place Database and Analytics
-    on dedicated nodes to improve performance.
-
-    .. image:: images/contrail-roles.png
-
 
     The figure below shows sample node configuration.
 
     .. image:: images/node-roles.png
 
 
-#.  The recommended size of partition for the Contrail database is 256 GB or more.
+#.  The recommended size of partition for the Contrail-Analytics database is 256 GB or more.
 
 #.  Configure the network settings. See details at
     `Fuel User Guide <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide.html>`_.

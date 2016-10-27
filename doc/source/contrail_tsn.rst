@@ -1,5 +1,5 @@
-Contrail TSN (experimental)
-===========================
+Contrail TSN
+============
 
 
 TSN Description
