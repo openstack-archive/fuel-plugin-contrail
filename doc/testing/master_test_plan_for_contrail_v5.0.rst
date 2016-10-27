@@ -1,5 +1,5 @@
 =================================================
-Master Test Plan for Contrail v 5.0 Fuel Plugin
+Master Test Plan for Contrail v 5.0.0 Fuel Plugin
 =================================================
 
 
@@ -10,7 +10,7 @@ Master Test Plan for Contrail v 5.0 Fuel Plugin
 1.1. Purpose
 ############
 
-This document describes Master Test Plan for Contrail v 4.0.1 Fuel Plugin. The scope of this plan defines the following objectives:
+This document describes Master Test Plan for Contrail v 5.0.0 Fuel Plugin. The scope of this plan defines the following objectives:
 
 * describe testing activities;
 * outline testing approach, test types, test cycles that will be used;
@@ -31,10 +31,10 @@ Contrail plugin for Fuel provides the functionality to add Contrail SDN for Mira
 
 It uses Fuel plugin architecture along with pluggable architecture enhancements introduced in latest Mirantis OpenStack Fuel.
 
-The plugin must be compatible with  the  version 8.0 of Mirantis OpenStack and Contrail release 4.0.1.
+The plugin must be compatible with  the  version 9.1 of Mirantis OpenStack and Contrail release 3.1.0.0-25.
 It will be allowed to deploy an only Contrail Controller (for test-bed environments) and add more controllers later (to add true HA).
 
-See Contrail Plugin 4.0.1 Proposal for more details
+See Contrail Plugin 5.0.5 Proposal for more details
 
 
 2.1. Evaluation Test Mission
