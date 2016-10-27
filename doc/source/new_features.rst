@@ -1,12 +1,16 @@
-New features in plugin version 4.0-4.0.1-1
+New features in plugin version 5.0-5.0.0-1
 ==========================================
 
-* Fuel 8.0 with OpenStack Liberty support
+* Fuel 9.1 with OpenStack Mitaka support
 
-* Dedicated Analytics node role
+* Dedicated Analytics and Analytics DB node roles
 
-* DPDK on VF (experimental)
+* Contrail-Config, Contrail-Control and Contrail-DB are merged into Contrail-Controller role
 
-* TSN (experimental)
+* DPDK on VF, including bonded VFs
 
-* Sahara and Murano compatibility (experimental)
+* Sahara and Murano compatibility
+
+* vCenter as a secondary hypervisor support
+
+* TSN in HA mode

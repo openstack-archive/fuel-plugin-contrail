@@ -1,8 +1,8 @@
 Limitations
 ===========
 
-*   Plugin does not support removing Contrail-DB nodes from a cluster. This can lead to data loss and must be
-    a manual procedure.
+*   Plugin does not support removing Contrail-Controller and Analytics-DB nodes from a cluster.
+    This can lead to data loss and must be a manual procedure.
     Plugin supports adding new Contrail-DB nodes to the environment.
 
 *   The Fuel Networking option "Assign public network to all nodes" is not compatible with Contrail Plugin.

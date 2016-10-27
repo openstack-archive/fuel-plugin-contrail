@@ -42,32 +42,10 @@ run the following command on the boostraped host::
 Enable SR-IOV in Fuel
 ---------------------
 
-To enable SR-IOV in Fuel:
+To enable SR-IOV in Fuel go to node interface configuration and enable it as shown on picture
 
-#. Enable SR-IOV in plugin settings and configure a unique physnet name.
+   .. image:: images/sriov_interface.png
 
-    .. image:: images/enable_sriov_settings.png
-
-.. raw:: latex
-
-    \pagebreak
-
-2. Assign a ``SRIOV`` role to compute hosts.
-
-    .. image:: images/enable_sriov_role_node.png
-
-   .. note::
-
-      SR-IOV will be enabled on all SR-IOV capable interfaces, not assigned
-      to the Fuel bridges - the networks in Fuel web UI.
-
-.. raw:: latex
-
-    \pagebreak
-
-3. You can modify the list of interfaces manually after deployment.
-
-    .. image:: images/sriov_interfaces.png
 
 #. Deploy as in 5.3.10 :doc:`/install_guide`
 
