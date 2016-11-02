@@ -58,6 +58,7 @@ class contrail::analytics {
     'DEFAULTS/analytics_config_audit_ttl': value => '-1';
     'DEFAULTS/analytics_statistics_ttl':   value => '-1';
     'DEFAULTS/analytics_flow_ttl':         value => '-1';
+    'DEFAULTS/aaa_mode':                   value => 'no-auth'
     'DISCOVERY/disc_server_ip':            value => $contrail::contrail_private_vip;
     'DISCOVERY/disc_server_port':          value => '5998';
     'REDIS/redis_server_port':             value => '6379';
