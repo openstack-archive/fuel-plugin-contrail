@@ -55,7 +55,6 @@ class contrail {
   $dev_mac           = getvar("::macaddress_${raw_phys_dev}")
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
   $headless_mode     = pick($settings['headless_mode'], true)
-  $multi_tenancy     = pick($settings['multi_tenancy'], true)
   $vr_flow_entries   = pick($settings['vr_flow_entries'], '524288')
   $vr_mpls_labels    = pick($settings['vr_mpls_labels'], '5120')
   $log_flow          = pick($settings['log_flow'], '0')
@@ -258,6 +257,7 @@ class contrail {
   $supervisor_control_minfds   = pick($settings['supervisor_control_minfds'], '10240')
   $supervisor_analytics_minfds = pick($settings['supervisor_analytics_minfds'], '65535')
 
+  $aaa_mode = pick($settings['aaa_mode'], 'cloud-admin')
 }
 
 
