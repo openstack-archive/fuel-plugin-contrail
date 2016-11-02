@@ -209,7 +209,7 @@ class contrail::controller {
   contrailplugin_ini_config {
     'APISERVER/api_server_ip':       value => $contrail::contrail_mgmt_vip;
     'APISERVER/api_server_port':     value => $contrail::api_server_port;
-    'APISERVER/aaa_mode':            value => 'cloud-admin';
+    'APISERVER/aaa_mode':            value => $contrail::aaa_mode;
     'APISERVER/cloud_admin_role':    value => 'admin';
     'APISERVER/contrail_extensions': value => 'ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None';
     'COLLECTOR/analytics_api_ip':    value => $contrail::contrail_mgmt_vip;
@@ -317,9 +317,40 @@ class contrail::controller {
       }
     }
   }
+
+  if $contrail::aaa_mode == 'rbac' {
+    ini_setting {'user_token':
+      ensure  => present,
+      path    => '/etc/neutron/api-paste.ini',
+      section => 'composite:neutronapi_v2_0',
+      setting => 'keystone',
+      value   => 'user_token request_id catch_errors authtoken keystonecontext extensions neutronapiapp_v2_0',
+      notify  => Service['neutron-server'],
+    }
+
+    ini_setting {'filter_factory':
+      ensure  => present,
+      path    => '/etc/neutron/api-paste.ini',
+      section => 'filter:user_token',
+      setting => 'paste.filter_factory',
+      value   => 'neutron_plugin_contrail.plugins.opencontrail.neutron_middleware:token_factory',
+      notify  => Service['neutron-server'],
+    }
+  } else {
+      ini_setting {'no_user_token':
+        ensure  => present,
+        path    => '/etc/neutron/api-paste.ini',
+        section => 'composite:neutronapi_v2_0',
+        setting => 'keystone',
+        value   => 'request_id catch_errors authtoken keystonecontext extensions neutronapiapp_v2_0',
+        notify  => Service['neutron-server'],
+      }
+  }
+
+  Neutron_config <||> ~> Service <|title == 'neutron-server'|>
+  Ini_setting <||> ~> Service <|title == 'neutron-server'|>
   Contrailplugin_ini_config<||> ~> File['/etc/neutron/plugin.ini']
   Heat_config<||> ~> Service['heat-engine']
   Nova_config<||> ~> Service['nova-api']
-  Ceilometer_pipeline_section <||> ~>
-  Service <| tag == 'ceilometer' |>
+  Ceilometer_pipeline_section <||> ~> Service <| tag == 'ceilometer' |>
 }

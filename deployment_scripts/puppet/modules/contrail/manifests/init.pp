@@ -258,6 +258,7 @@ class contrail {
   $supervisor_control_minfds   = pick($settings['supervisor_control_minfds'], '10240')
   $supervisor_analytics_minfds = pick($settings['supervisor_analytics_minfds'], '65535')
 
+  $aaa_mode = pick($settings['aaa_mode'], 'cloud-admin')
 }
 
 

@@ -90,6 +90,8 @@ class contrail::config {
     'DEFAULTS/listen_ip_addr':            value => '0.0.0.0';
     'DEFAULTS/listen_port':               value => '9100';
     'DEFAULTS/multi_tenancy':             value => true;
+    'DEFAULTS/aaa_mode':                  value => $contrail::aaa_mode;
+    'DEFAULTS/cloud_admin_role':          value => 'admin';
     'DEFAULTS/log_file':                  value => '/var/log/contrail/contrail-api.log';
     'DEFAULTS/log_local':                 value => '1';
     'DEFAULTS/log_level':                 value => 'SYS_NOTICE';
@@ -101,8 +103,6 @@ class contrail::config {
     'DEFAULTS/rabbit_port':               value => '5673';
     'DEFAULTS/list_optimization_enabled': value => true;
     'DEFAULTS/auth':                      value => 'keystone';
-    'DEFAULTS/aaa_mode':                  value => 'cloud-admin';
-    'DEFAULTS/cloud_admin_role':          value => 'admin';
     'DEFAULTS/rabbit_user':               value => 'nova';
     'DEFAULTS/rabbit_password':           value => $contrail::rabbit_password;
     'SECURITY/use_certs':                 value => false;
