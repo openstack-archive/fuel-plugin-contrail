@@ -59,7 +59,7 @@ attributes:
       - condition: "not (settings:contrail.metadata.enabled == true and settings:contrail.contrail_global_dpdk.value == true)"
         action: "hide"
   patch_nova:
-    value: true
+    value: false
     label: "Patch Nova for DPDK support"
     description: "Patch Nova packages for dpdk-vrouter"
     weight: 140
