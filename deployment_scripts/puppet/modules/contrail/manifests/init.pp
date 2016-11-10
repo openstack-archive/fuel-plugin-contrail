@@ -246,7 +246,7 @@ class contrail {
   $cassandra_memlock_limit = pick($settings['cassandra_memlock_limit'], 'unlimited')
   $cassandra_nofile_limit  = pick($settings['cassandra_nofile_limit'], '100000')
   $cassandra_as_limit      = pick($settings['cassandra_as_limit'], 'unlimited')
-  $cassandra_nproc_limit   = pick($settings['cassandra_nproc_limit'], '8096')
+  $cassandra_nproc_limit   = pick($settings['cassandra_nproc_limit'], '32768')
 
   # Vrouter logging settings
   $use_syslog      = pick($settings['use_syslog'], '1')
