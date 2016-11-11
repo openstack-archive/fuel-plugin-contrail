@@ -23,7 +23,10 @@ OSTF_RUN_TIMEOUT = 60 * 60  # 60 minutes
 DEPLOY_CLUSTER_TIMEOUT = 25 * 60  # 25 minutes
 CONTRAIL_PLUGIN_VERSION = os.environ.get('CONTRAIL_PLUGIN_VERSION', '5.0.0')
 VSRX_CONFIG_PATH = os.environ.get(
-    'VSRX_CONFIG_PATH', '/storage/contrail/config.txt.lo.2nodegroups')
+    'VSRX_CONFIG_PATH', '/storage/contrail/config_2nodegroups.conf')
+
+VSRX_USER = os.eviron.get('VSRX_USER', False)
+VSRX_PASS = os.eviron.get('VSRX_PASS', False)
 
 BAREMETAL = {
     # Target Baremetal host
