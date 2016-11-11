@@ -18,6 +18,9 @@ from fuelweb_test import logger
 from devops.helpers.helpers import wait
 from devops.helpers.helpers import tcp_ping
 
+from jnpr.junos import Device
+from jnpr.junos.utils.config import Config
+
 from helpers import settings
 
 
@@ -78,20 +81,23 @@ def activate(obj=None, vsrx_config=False,
     return True
 
 
-def upload_config(obj, config_path, vsrx_ip):
-    """Upload and commit configuration for VSRX."""
-    commands = [
-        'cli', 'configure',
-        'load override {0}'.format(config_path.split('/').pop()),
-        'commit'
-        ]
-    wait(
-        lambda: tcp_ping(vsrx_ip, 22), timeout=60 * 2, interval=10,
-        timeout_msg="Node {0} is not accessible by SSH.".format(vsrx_ip))
-    with obj.env.d_env.get_ssh_to_remote(vsrx_ip) as remote:
-        logger.info('Upload template {0}'.format(config_path))
-        remote.upload(config_path, '/cf/root')
-        for command in commands:
-            logger.info('Execute command {0}.'.format(command))
-            remote.execute_async(command)
+def upload_config(obj, config_path, vsrx_ip, vsrx_user, vsrx_pass):
+    """Upload and commit configuration for VSRX.
 
+    :param obj: test case object
+    :type obj: object
+    :param config_path: path to vsrx conf file
+    :type config_path: string
+    :param vsrx_ip: vsrx ip address
+    :type vsrx_ip: string
+    :param vsrx_user: username for vsrx
+    :type vsrx_user: string
+    :param vsrx_pass: password for vsrx
+    :type vsrx_pass: string
+    """
+
+    jun_gw = Device(host=vsrx_ip, user=vsrx_user, vsrx_pass)
+    jun_gw.bind(cu=Config)
+    jun_gw.cu.load(path=config_path)
+    jun_gw.cu.commit_check()
+    jun_gw.cu.commit()
