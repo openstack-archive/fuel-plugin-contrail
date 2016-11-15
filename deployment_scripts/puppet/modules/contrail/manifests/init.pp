@@ -258,6 +258,11 @@ class contrail {
   $supervisor_analytics_minfds = pick($settings['supervisor_analytics_minfds'], '65535')
 
   $aaa_mode = pick($settings['aaa_mode'], 'cloud-admin')
+
+  $analytics_config_audit_ttl = pick($settings['analytics_config_audit_ttl'], '2160')
+  $analytics_statistics_ttl   = pick($settings['analytics_statistics_ttl'], '24')
+  $analytics_flow_ttl         = pick($settings['analytics_flow_ttl'], '2')
+  $analytics_data_ttl         = pick($settings['analytics_data_ttl'], '48')
 }
 
 
