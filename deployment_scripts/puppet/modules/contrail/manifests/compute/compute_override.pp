@@ -20,6 +20,7 @@ class contrail::compute::compute_override {
 
   $keep_config_files = '-o Dpkg::Options::="--force-confold"'
   $force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
+  $allow_unsigned    = '-o APT::Get::AllowUnauthenticated=1'
   $patch_path  = '/usr/lib/python2.7/dist-packages'
 
   Exec {
@@ -83,7 +84,7 @@ class contrail::compute::compute_override {
         packages    => $qemu_pkg,
       } ->
       exec {'override-qemu':
-        command => "apt-get install --yes ${keep_config_files} ${force_overwrite} \
+        command => "apt-get install --yes ${keep_config_files} ${force_overwrite} ${allow_unsigned} \
 qemu-kvm qemu-system-x86 qemu-system-common",
         unless  => 'dpkg -l | grep qemu-system-common | grep contrail',
         require => Apt::Source['dpdk-depends-repo'],
@@ -108,7 +109,7 @@ qemu-kvm qemu-system-x86 qemu-system-common",
       #  install_options => [$keep_config_files, $force_overwrite],
       #} ->
       exec { 'override-libvirt':
-        command => "apt-get install --yes ${keep_config_files} ${force_overwrite} libvirt-bin libvirt0",
+        command => "apt-get install --yes ${keep_config_files} ${force_overwrite} ${allow_unsigned} libvirt-bin libvirt0",
         unless  => 'dpkg -l | grep libvirt0 | grep contrail',
         require => Apt::Source['dpdk-depends-repo'],
       }
