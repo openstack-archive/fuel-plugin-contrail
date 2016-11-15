@@ -261,13 +261,13 @@ Change Huge Pages settings after deployment
 -------------------------------------------
 
 After deploy is finished, plugin settigs are locked in Fuel web UI.
-Therefore, size and ammount of huge pages cannot be changed
+Therefore, size and amount of huge pages cannot be changed
 by the plugin.
 You need to set Huge Pages settings manually on each compute node. 
 
 To set 2MB-sized huge pages:
 
-#. Calculate the number of huge pages based on the ammount you need.
+#. Calculate the number of huge pages based on the amount you need.
    For example 20GB = 20 * 1024 / 2 = 10240 pages.
 
 #. Set 2MB-sized huge pages::

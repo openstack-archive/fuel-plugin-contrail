@@ -435,7 +435,7 @@ Expected results
 All steps must be completed successfully, without any errors.
 
 
-Check conection between instances in different availibility zones
+Check connection between instances in different availibility zones
 -----------------------------------------------------------------
 
 
@@ -607,5 +607,5 @@ Steps
 Expected results
 ################
 
-Instance should get ping responce from 8.8.8.8 or any other IP outside the cloud.
-External (HOST) machine should get rping responce from instance.
+Instance should get ping response from 8.8.8.8 or any other IP outside the cloud.
+External (HOST) machine should get rping response from instance.

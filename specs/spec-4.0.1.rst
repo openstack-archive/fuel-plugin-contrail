@@ -304,8 +304,8 @@ Proposed solution
 Create a role called 'DPDK' to mark compute nodes which should be configured to
 use DPDK-based vRouter. Hugepages setup must be handled by plug-in, since there's
 no hugepages support in Fuel 8.0. For hugepages there should be 2 settings:
-type and ammount of pages to allocate. Type has 2 options: 2MB and 1GB.
-Ammount should be specified as a percentage from all available memory.
+type and amount of pages to allocate. Type has 2 options: 2MB and 1GB.
+Amount should be specified as a percentage from all available memory.
 DPDK-based vRouter should use 'Private' interface, in the same way as kernel-based
 vRouter does.
 
@@ -322,7 +322,7 @@ UI impact
 
 'DPDK' role should be present in list of roles.
 There should be a checkbox that enables DPDK in environment.
-Hugepages should have 2 settings: dropdown menu for type and a textfield for ammount.
+Hugepages should have 2 settings: dropdown menu for type and a textfield for amount.
 QEMU and Nova overrides should have checkboxes for toggling this overrides.
 
 Performance impact
@@ -526,7 +526,7 @@ Proposed solution
 -----------------
 
 Fuel can configure secure access for public-facing OpenStack services such as Nova API and Horizon
-by configuring Haproxy to recieve SSL connections as described in [2].
+by configuring Haproxy to receive SSL connections as described in [2].
 However, Contrail configuration API has no encryption enabled, but is exposed on public endpoint.
 Contrail Web UI has SSL enabled, but uses self-signed certificate by default.
 Fuel Contrail plugin should inherit SSL/TLS settings from Fuel UI configuration and configure
