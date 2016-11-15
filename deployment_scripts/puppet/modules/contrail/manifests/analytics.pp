@@ -63,10 +63,10 @@ class contrail::analytics {
   }
 
   contrail_collector_config {
-    'DEFAULT/analytics_data_ttl':         value => '48';
-    'DEFAULT/analytics_config_audit_ttl': value => '2160';
-    'DEFAULT/analytics_statistics_ttl':   value => '24';
-    'DEFAULT/analytics_flow_ttl':         value => '2';
+    'DEFAULT/analytics_data_ttl':         value => $contrail::analytics_data_ttl;
+    'DEFAULT/analytics_config_audit_ttl': value => $contrail::analytics_config_audit_ttl;
+    'DEFAULT/analytics_statistics_ttl':   value => $contrail::analytics_statistics_ttl;
+    'DEFAULT/analytics_flow_ttl':         value => $contrail::analytics_flow_ttl;
     'DEFAULT/cassandra_server_list':      value => $contrail::analytics_db_list;
     'DEFAULT/hostip':                     value => $contrail::address;
     'DEFAULT/log_file':                   value => '/var/log/contrail/contrail-collector.log';
