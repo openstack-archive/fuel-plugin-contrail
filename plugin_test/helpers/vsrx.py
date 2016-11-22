@@ -99,8 +99,8 @@ def upload_config(obj, config_path,
     """
 
     jun_gw = Device(host=vsrx_ip, user=vsrx_user, password=vsrx_pass)
-    
-    for i in range(10) 
+
+    for i in range(10):
         try:
             jun_gw.open()
         except ConnectTimeoutError:
@@ -121,6 +121,6 @@ def upload_config(obj, config_path,
         jun_gw.cu.commit()
         logger.info("New config was commited")
     else:
-        logger.info("Wrong configuration") 
+        logger.info("Wrong configuration")
         jun_gw.cu.rollback()
     jun_gw.close()
