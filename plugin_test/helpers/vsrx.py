@@ -19,7 +19,7 @@ from fuelweb_test import logger
 
 from jnpr.junos import Device
 from jnpr.junos.utils.config import Config
-from jnpr.junos import ConnectTimeoutError
+from jnpr.junos.exception import ConnectTimeoutError
 
 from helpers import settings
 
