@@ -54,6 +54,13 @@ class contrail {
   $raw_phys_dev      = regsubst($phys_dev, '\..*' , '')
   $dev_mac           = getvar("::macaddress_${raw_phys_dev}")
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+  #if user specify particular cpu's for vrouter - taskset command should differ
+  if $vrouter_core_mask =~ /^0x[0-9a-zA-Z]/ {
+    $taskset_command  = "taskset ${vrouter_core_mask}"
+  } else {
+    $taskset_command  = "taskset -c ${vrouter_core_mask}"
+  }
+
   $headless_mode     = pick($settings['headless_mode'], true)
   $vr_flow_entries   = pick($settings['vr_flow_entries'], '524288')
   $vr_mpls_labels    = pick($settings['vr_mpls_labels'], '5120')
