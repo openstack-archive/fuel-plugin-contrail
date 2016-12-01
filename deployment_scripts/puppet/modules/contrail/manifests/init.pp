@@ -35,7 +35,8 @@ class contrail {
   prepare_network_config($network_scheme)
   $interface         = pick(get_network_role_property('neutron/mesh', 'interface'), 'br-mesh')
 
-  $iface = pick($network_scheme['endpoints'][$interface], {})
+  #fallback to vhost0 for day2 scenario
+  $iface = pick($network_scheme['endpoints'][$interface], $network_scheme['endpoints']['vhost0'], {})
   $routes = pick($iface['routes'], false)
 
   if $routes {
