@@ -97,6 +97,10 @@ class contrail::compute::vrouter {
     }
   }
 
+  file { '/var/crashes':
+    ensure => directory,
+    mode   => '0777',
+  } ->
   class { 'contrail::package':
     install => [$install_packages],
     remove  => [$delete_packages],
