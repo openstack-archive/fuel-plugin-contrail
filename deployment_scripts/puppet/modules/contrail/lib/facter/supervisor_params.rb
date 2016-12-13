@@ -23,7 +23,7 @@ Facter.add("supervisor_params") do
     vrouter_config = '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini'
     mac_from_config = nil
     if File.exist?(vrouter_config)
-      config_vrouter_params = File.readlines(vrouter_config).find { |line| line.include?('command=')}.split('--no-daemon')[-1].strip
+      config_vrouter_params = File.readlines(vrouter_config).find { |line| line.match('^command=')}.split('--no-daemon')[-1].strip
       mac_from_config = config_vrouter_params.split.find { |param| param.include?('mac') }
       mac_from_config = mac_from_config.split(',').find { |param| param.include?('mac') }.split('=')
     end
