@@ -23,12 +23,13 @@ class contrail::database {
     owner   => root,
     group   => root,
   }
+
   tweaks::ubuntu_service_override { 'cassandra':
     package_name => 'cassandra',
   }
+
   tweaks::ubuntu_service_override { 'contrail-database':
-    package_name => 'contrail-database-common',
-    service_name => 'contrail-database',
+    package_name => 'contrail-openstack-database',
   }
   sysctl::value { 'vm.swappiness':
     value => '10'

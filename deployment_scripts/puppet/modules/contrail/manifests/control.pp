@@ -22,7 +22,6 @@ class contrail::control {
     mode    => '0644',
     owner   => 'contrail',
     group   => 'contrail',
-    require => Package['contrail-openstack-control'],
   }
 
   Exec {
@@ -30,8 +29,14 @@ class contrail::control {
     path     => '/usr/bin:/bin:/sbin',
   }
 
-  tweaks::ubuntu_service_override { 'supervisor-control':
+  tweaks::ubuntu_service_override { 'contrail-openstack-control':
+    package_name => 'contrail-openstack-control',
+    service_name => 'supervisor-control',
+  }
+
+  tweaks::ubuntu_service_override { 'contrail-control':
     package_name => 'contrail-control',
+    service_name => 'supervisor-control',
   }
 
 # Packages
