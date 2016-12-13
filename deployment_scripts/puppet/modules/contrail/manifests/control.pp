@@ -31,7 +31,7 @@ class contrail::control {
   }
 
   tweaks::ubuntu_service_override { 'supervisor-control':
-    package_name => 'contrail-control',
+    package_name => 'contrail-openstack-control',
   }
 
 # Packages
