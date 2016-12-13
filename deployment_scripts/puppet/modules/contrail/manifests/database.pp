@@ -23,12 +23,13 @@ class contrail::database {
     owner   => root,
     group   => root,
   }
+
   tweaks::ubuntu_service_override { 'cassandra':
     package_name => 'cassandra',
   }
+
   tweaks::ubuntu_service_override { 'contrail-database':
     package_name => 'contrail-openstack-database',
-    service_name => 'contrail-database',
   }
 
   if roles_include($contrail::contrail_db_roles) {
