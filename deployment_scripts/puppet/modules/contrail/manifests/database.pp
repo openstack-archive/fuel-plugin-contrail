@@ -27,7 +27,7 @@ class contrail::database {
     package_name => 'cassandra',
   }
   tweaks::ubuntu_service_override { 'contrail-database':
-    package_name => 'contrail-database-common',
+    package_name => 'contrail-openstack-database',
     service_name => 'contrail-database',
   }
   sysctl::value { 'vm.swappiness':

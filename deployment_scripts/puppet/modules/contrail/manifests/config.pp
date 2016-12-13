@@ -33,7 +33,7 @@ class contrail::config {
   }
 
   tweaks::ubuntu_service_override { 'supervisor-config':
-    package_name => 'contrail-config',
+    package_name => 'contrail-openstack-config',
   }
 
 # Memcache

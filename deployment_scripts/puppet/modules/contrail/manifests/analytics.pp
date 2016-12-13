@@ -28,7 +28,7 @@ class contrail::analytics {
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
   tweaks::ubuntu_service_override { 'supervisor-analytics':
-    package_name => 'contrail-analytics',
+    package_name => 'contrail-openstack-analytics',
   }
 
   # Packages
