@@ -123,9 +123,13 @@ class contrail::database {
   } ->
   file { '/etc/cassandra/cassandra.yaml':
     content => template('contrail/cassandra.yaml.erb'),
+    owner   => 'cassandra',
+    group   => 'cassandra',
   } ->
   file { '/etc/cassandra/cassandra-env.sh':
     source  => 'puppet:///modules/contrail/cassandra-env.sh',
+    owner   => 'cassandra',
+    group   => 'cassandra',
   } ->
   file { '/etc/security/limits.d/cassandra.conf':
     content => template('contrail/cassandra_limits.conf.erb'),
