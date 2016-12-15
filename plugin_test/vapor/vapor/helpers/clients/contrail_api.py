@@ -1,7 +1,10 @@
+import pytest
+
 from keystoneauth1.identity.v2 import Password
 from keystoneauth1.session import Session
 
-from conf import KEYSTONE_CREDS, PATH_TO_CERT, VERIFY_SSL, DISABLE_SSL
+from vapor.settings import (
+    KEYSTONE_CREDS, PATH_TO_CERT, VERIFY_SSL, DISABLE_SSL)
 
 
 class ContrailClient(object):
@@ -10,7 +13,9 @@ class ContrailClient(object):
     def __init__(self, controller_node_ip, contrail_port=8082,
                  credentials=KEYSTONE_CREDS, **kwargs):
         """Create ContrailClient object."""
+        print('[ContrailClient:__init__]')
         if DISABLE_SSL:
+
             self.url = "http://{0}:{1}".format(controller_node_ip,
                                                contrail_port)
             self.keystone_url = "http://{0}:5000/v2.0".format(
@@ -28,6 +33,14 @@ class ContrailClient(object):
                         tenant_name=KEYSTONE_CREDS['tenant_name'])
         self._client = Session(auth=auth, verify=False)
 
+    def __enter__(self):
+        print('[ContrailClient:__enter__]')
+        return self
+
+    def __exit__(self, type, value, traceback):
+        print('[ContrailClient:__exit__]')
+        pass
+
     @property
     def client(self):
         """Client property."""
@@ -35,6 +48,7 @@ class ContrailClient(object):
 
     def _get(self, data_path):
         """Get method."""
+        print('[_get] url: %s' % str(self.url + data_path))
         return self.client.get(url=self.url + data_path).json()
 
     def _delete(self, data_path):
@@ -138,3 +152,4 @@ class ContrailClient(object):
         :return dictionary
         """
         return self._get('/bgp-router/{0}'.format(bgp_id))
+
