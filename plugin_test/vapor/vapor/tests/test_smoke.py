@@ -1,22 +1,27 @@
-import pytest
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
 
-from vapor.helpers.clients.contrail_api import ContrailClient
-from vapor.settings import CONTRAIL_CREDS
+#     http://www.apache.org/licenses/LICENSE-2.0
 
-from stepler.keystone.fixtures import keystone_client, get_keystone_client
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
 
-@pytest.mark.parametrize("contrail_node_role", [
-    'contrail-controller',
-    'contrail-analytics',
-    'contrail-analytics-db'
-])
-@pytest.mark.idempotent_id('1b1a0953-a772-4cfe-a7da-2f6de950123')
-def test_contrail_node_exist(keystone_client, contrail_node_role):
-    services = []
-    for service in keystone_client.services.list():
-        services.append(service.name)
-    print('Check contrail node %s status' % contrail_node_role)
-    assert contrail_node_role in services
+from hamcrest import assert_that, empty
 
 
-def test_contrail_node_status(keytone_client):
+def test_contrail_node_services_status(contrail_nodes, os_faults_steps):
+    cmd = 'contrail-status | grep contrail'
+    broken_services = []
+    for node_result in os_faults_steps.execute_cmd(contrail_nodes, cmd):
+        for line in node_result.payload['stdout_lines']:
+            line = line.strip()
+            name, status = line.split(None, 1)
+            if status not in {'active', 'backup'}:
+                err_msg = "{node}:{service} - {status}".format(
+                    node=node_result.host, service=name, status=status)
+                broken_services.append(err_msg)
+    assert_that(broken_services, empty())
