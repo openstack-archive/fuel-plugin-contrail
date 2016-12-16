@@ -1,7 +1,8 @@
 # pytest settings and fixtures
 
-import pytest
 from stepler.conftest import *
+
+from vapor.fixtures.contrail import *
 # from stepler.conftest import __all__
 
 
