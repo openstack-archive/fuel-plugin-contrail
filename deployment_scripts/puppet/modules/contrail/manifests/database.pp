@@ -63,6 +63,7 @@ class contrail::database {
         ],
     }
 
+    package { 'kafka': } ->
     service { 'kafka':
       ensure    => stopped,
       enable    => false,
@@ -102,6 +103,7 @@ class contrail::database {
           ],
       }
 
+      package { 'zookeeper': } ->
       service { 'zookeeper':
         ensure    => stopped,
         enable    => false,
