@@ -54,3 +54,30 @@ def test_update_virtual_network(contrail_api_client, network):
     assert_that(
         network_data['virtual-network'],
         has_entry(display_name=new_display_name))
+
+
+def test_add_security_group(contrail_api_client):
+    security_group_name, = utils.generate_ids()
+    security_group = types.SecurityGroup(security_group_name)
+    contrail_api_client.security_group_create(security_group)
+    groups = contrail_api_client.security_groups_list()
+    assert_that(
+        groups['security-groups'],
+        has_item(has_entry(id=security_group.id)))
+
+
+def test_delete_security_group(contrail_api_client, security_group):
+    contrail_api_client.security_group_delete(security_group.id)
+    groups = contrail_api_client.security_groups_list()
+    assert_that(
+        groups['security-groups'],
+        is_not(has_item(has_entry(id=security_group.id))))
+
+
+def test_update_security_group(contrail_api_client, security_group):
+    new_display_name, = utils.generate_ids()
+    security_group.display_name = new_display_name
+    contrail_api_client.security_group_update(security_group)
+    group_data = contrail_api_client.security_group_read(security_group.id)
+    assert_that(
+        group_data['security-group'], has_entry(display_name=new_display_name))
