@@ -34,7 +34,9 @@ class contrail::database {
   tweaks::ubuntu_service_override { 'zookeeper':
     package_name => 'zookeeper',
   }
-
+  tweaks::ubuntu_service_override { 'supervisor-database':
+    package_name => 'contrail-openstack-database',
+  }
   if roles_include($contrail::contrail_db_roles) {
     $cassandra_seeds = $contrail::primary_contrail_db_ip
     $cluster_name    = 'Contrail'
@@ -61,6 +63,15 @@ class contrail::database {
         File['/etc/zookeeper/conf/zoo.cfg'],
         File['/etc/zookeeper/conf/myid'],
         ],
+    }
+
+    ini_setting { "disable_kafka":
+      ensure  => present,
+      path    => '/etc/contrail/supervisord_database.conf',
+      section => 'program:kafka',
+      setting => 'autostart',
+      value   => 'false',
+      before  => Service['supervisor-database'],
     }
 
     package { 'kafka': } ->
