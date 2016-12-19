@@ -4,13 +4,13 @@ from keystoneauth1.identity.v2 import Password
 from keystoneauth1.session import Session
 
 from vapor.settings import (
-    KEYSTONE_CREDS, PATH_TO_CERT, VERIFY_SSL, DISABLE_SSL)
+    KEYSTONE_CREDS, PATH_TO_CERT, VERIFY_SSL, DISABLE_SSL, CONTAIL_API_PORT)
 
 
 class ContrailClient(object):
     """Contrail utilite wrapper."""
 
-    def __init__(self, controller_node_ip, contrail_port=8082,
+    def __init__(self, controller_node_ip, contrail_port=CONTAIL_API_PORT,
                  credentials=KEYSTONE_CREDS, **kwargs):
         """Create ContrailClient object."""
         print('[ContrailClient:__init__]')
