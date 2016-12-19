@@ -77,3 +77,28 @@ def test_update_security_group(contrail_api_client, security_group):
     group_data = contrail_api_client.security_group_read(
         id=security_group.uuid)
     assert_that(group_data, has_property('display_name', new_display_name))
+
+
+def test_add_network_policy(contrail_api_client):
+    network_policy_name, = utils.generate_ids()
+    network_policy = types.NetworkPolicy(network_policy_name)
+    contrail_api_client.network_policy_create(network_policy)
+    policies = contrail_api_client.network_policys_list()
+    assert_that(policies['network-policys'],
+                has_item(has_entry('uuid', network_policy.uuid)))
+
+
+def test_delete_network_policy(contrail_api_client, network_policy):
+    contrail_api_client.network_policy_delete(id=network_policy.uuid)
+    policies = contrail_api_client.network_policys_list()
+    assert_that(policies['network-policys'],
+                is_not(has_item(has_entry('uuid', network_policy.uuid))))
+
+
+def test_update_network_policy(contrail_api_client, network_policy):
+    new_display_name, = utils.generate_ids()
+    network_policy.display_name = new_display_name
+    contrail_api_client.network_policy_update(network_policy)
+    policy_data = contrail_api_client.network_policy_read(
+        id=network_policy.uuid)
+    assert_that(policy_data, has_property('display_name', new_display_name))
