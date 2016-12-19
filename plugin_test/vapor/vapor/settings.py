@@ -12,3 +12,5 @@ KEYSTONE_CREDS = {
 CONTRAIL_CREDS = {
     'controller_addr': '192.168.1.127'
 }
+
+CONTAIL_API_PORT = 8082

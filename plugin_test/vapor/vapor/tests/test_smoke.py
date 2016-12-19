@@ -10,7 +10,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from hamcrest import assert_that, empty
+from hamcrest import assert_that, empty, has_item, has_entry, is_not
+import pycontrail.types as types
+from stepler.third_party import utils
 
 
 def test_contrail_node_services_status(contrail_nodes, os_faults_steps):
@@ -25,3 +27,30 @@ def test_contrail_node_services_status(contrail_nodes, os_faults_steps):
                     node=node_result.host, service=name, status=status)
                 broken_services.append(err_msg)
     assert_that(broken_services, empty())
+
+
+def test_add_virtual_network(contrail_api_client):
+    network_name, = utils.generate_ids()
+    net = types.VirtualNetwork(network_name)
+    contrail_api_client.virtual_network_create(net)
+    networks = contrail_api_client.virtual_networks_list()
+    assert_that(
+        networks['virtual-networks'], has_item(has_entry(uuid=net.uuid)))
+
+
+def test_delete_virtual_network(contrail_api_client, network):
+    contrail_api_client.virtual_network_delete(network.uuid)
+    networks = contrail_api_client.virtual_networks_list()
+    assert_that(
+        networks['virtual-networks'],
+        is_not(has_item(has_entry(uuid=network.uuid))))
+
+
+def test_update_virtual_network(contrail_api_client, network):
+    new_display_name, = utils.generate_ids()
+    network.display_name = new_display_name
+    contrail_api_client.virtual_network_update(network)
+    network_data = contrail_api_client.virtual_network_read(network.uuid)
+    assert_that(
+        network_data['virtual-network'],
+        has_entry(display_name=new_display_name))
