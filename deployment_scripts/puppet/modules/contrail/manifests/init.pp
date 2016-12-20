@@ -226,4 +226,31 @@ class contrail {
 
   $aaa_mode = pick($settings['aaa_mode'], 'cloud-admin')
 
+  $analytics_keyspace = "ContrailAnalyticsCql"
+  $analytics_tables = [
+    "flowrecordtable",
+    "flowtablevrouterver2",
+    "statstablebydbltagv3",
+    "objectvaluetable",
+    "messagetablemessagetype",
+    "messagetablekeyword",
+    "messagetabletimestamp",
+    "messagetablecategory",
+    "statstablebyu64strtagv3",
+    "statstablebyu64tagv3",
+    "messagetablesource",
+    "statstablebystrstrtagv3",
+    "systemobjecttable",
+    "flowtableprotdpver2",
+    "statstablebystru64tagv3",
+    "objecttable",
+    "statstablebyu64u64tagv3",
+    "flowtabledvndipver2",
+    "messagetable",
+    "statstablebystrtagv3",
+    "flowtableprotspver2",
+    "flowtablesvnsipver2",
+    "messagetablemoduleid"
+  ]
+
 }
