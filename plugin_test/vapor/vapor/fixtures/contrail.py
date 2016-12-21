@@ -1,6 +1,5 @@
 import pycontrail.client as client
 import pytest
-from six.moves.urllib import parse
 
 from vapor import settings
 from vapor.helpers.clients import ContrailClient
@@ -21,13 +20,32 @@ def contrail_nodes(os_faults_steps):
 
 
 @pytest.fixture
-def contrail_api_client(session):
+def contrail_controllers(os_faults_steps, contrail_nodes):
+    """Returns all contrail controller nodes."""
+    return os_faults_steps.get_nodes_by_cmd(
+        'contrail-status | grep -v "Contrail vRouter"')
+
+
+@pytest.fixture(scope='module')
+def contrail_api_endpoint(os_faults_steps):
+    """Return contrail api endpoint."""
+    config_path = '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'
+    contrail_node = os_faults_steps.get_nodes_by_cmd(
+        'grep -P "^\s*api_server_ip" {}'.format(config_path)).pick()
+    awk_cmd = r"awk -F '=' '/^\s*{key}/ {{ print $2 }}' {path}"
+    ip = os_faults_steps.execute_cmd(
+        contrail_node, awk_cmd.format(
+            key='api_server_ip', path=config_path))[0].payload['stdout']
+    port = os_faults_steps.execute_cmd(
+        contrail_node, awk_cmd.format(
+            key='api_server_port', path=config_path))[0].payload['stdout']
+    return 'http://{}:{}/'.format(ip.strip(), port.strip())
+
+
+@pytest.fixture
+def contrail_api_client(session, contrail_api_endpoint):
     """Return instance of contail client."""
-    neutron_endpoint = session.get_endpoint(service_type='network')
-    parse_result = parse.urlparse(neutron_endpoint)
-    contail_endpoint = parse_result._replace(netloc='{}:{}'.format(
-        parse_result.hostname, settings.CONTAIL_API_PORT)).geturl()
     headers = {'Content-type': 'application/json; charset="UTF-8"'}
     headers.update(session.get_auth_headers())
     return client.Client(
-        url=contail_endpoint, headers=headers)
+        url=contrail_api_endpoint, headers=headers, blocking=False)

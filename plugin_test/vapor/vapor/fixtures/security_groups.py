@@ -3,8 +3,8 @@ import pytest
 from stepler.third_party import utils
 
 
-@pytest.fixture(autouse=True)
-def security_groups_cleanup(contrail_api_client):
+@pytest.fixture
+def contrail_security_groups_cleanup(contrail_api_client):
     """Cleanup created security_groups after test."""
 
     def _get_secutiry_groups_uuids():
@@ -23,7 +23,7 @@ def security_groups_cleanup(contrail_api_client):
 
 
 @pytest.fixture
-def security_group(contrail_api_client):
+def contrail_security_group(contrail_api_client):
     security_group_name, = utils.generate_ids()
     security_group = types.SecurityGroup(security_group_name)
     contrail_api_client.security_group_create(security_group)

@@ -13,6 +13,7 @@
 from hamcrest import (assert_that, empty, has_item, has_entry, is_not,
                       has_property)  # noqa H301
 import pycontrail.types as types
+import pytest
 from stepler.third_party import utils
 
 
@@ -30,6 +31,7 @@ def test_contrail_node_services_status(contrail_nodes, os_faults_steps):
     assert_that(broken_services, empty())
 
 
+@pytest.mark.usefixtures('contrail_network_cleanup')
 def test_add_virtual_network(contrail_api_client):
     network_name, = utils.generate_ids()
     net = types.VirtualNetwork(network_name)
@@ -39,21 +41,25 @@ def test_add_virtual_network(contrail_api_client):
                 has_item(has_entry('uuid', net.uuid)))
 
 
-def test_delete_virtual_network(contrail_api_client, network):
-    contrail_api_client.virtual_network_delete(id=network.uuid)
+@pytest.mark.usefixtures('contrail_network_cleanup')
+def test_delete_virtual_network(contrail_api_client, contrail_network):
+    contrail_api_client.virtual_network_delete(id=contrail_network.uuid)
     networks = contrail_api_client.virtual_networks_list()
     assert_that(networks['virtual-networks'],
-                is_not(has_item(has_entry('uuid', network.uuid))))
+                is_not(has_item(has_entry('uuid', contrail_network.uuid))))
 
 
-def test_update_virtual_network(contrail_api_client, network):
+@pytest.mark.usefixtures('contrail_network_cleanup')
+def test_update_virtual_network(contrail_api_client, contrail_network):
     new_display_name, = utils.generate_ids()
-    network.display_name = new_display_name
-    contrail_api_client.virtual_network_update(network)
-    network_data = contrail_api_client.virtual_network_read(id=network.uuid)
+    contrail_network.display_name = new_display_name
+    contrail_api_client.virtual_network_update(contrail_network)
+    network_data = contrail_api_client.virtual_network_read(
+        id=contrail_network.uuid)
     assert_that(network_data, has_property('display_name', new_display_name))
 
 
+@pytest.mark.usefixtures('contrail_security_groups_cleanup')
 def test_add_security_group(contrail_api_client):
     security_group_name, = utils.generate_ids()
     security_group = types.SecurityGroup(security_group_name)
@@ -63,22 +69,26 @@ def test_add_security_group(contrail_api_client):
                 has_item(has_entry('uuid', security_group.uuid)))
 
 
-def test_delete_security_group(contrail_api_client, security_group):
-    contrail_api_client.security_group_delete(id=security_group.uuid)
+@pytest.mark.usefixtures('contrail_security_groups_cleanup')
+def test_delete_security_group(contrail_api_client, contrail_security_group):
+    contrail_api_client.security_group_delete(id=contrail_security_group.uuid)
     groups = contrail_api_client.security_groups_list()
-    assert_that(groups['security-groups'],
-                is_not(has_item(has_entry('uuid', security_group.uuid))))
+    assert_that(
+        groups['security-groups'],
+        is_not(has_item(has_entry('uuid', contrail_security_group.uuid))))
 
 
-def test_update_security_group(contrail_api_client, security_group):
+@pytest.mark.usefixtures('contrail_security_groups_cleanup')
+def test_update_security_group(contrail_api_client, contrail_security_group):
     new_display_name, = utils.generate_ids()
-    security_group.display_name = new_display_name
-    contrail_api_client.security_group_update(security_group)
+    contrail_security_group.display_name = new_display_name
+    contrail_api_client.security_group_update(contrail_security_group)
     group_data = contrail_api_client.security_group_read(
-        id=security_group.uuid)
+        id=contrail_security_group.uuid)
     assert_that(group_data, has_property('display_name', new_display_name))
 
 
+@pytest.mark.usefixtures('contrail_policies_cleanup')
 def test_add_network_policy(contrail_api_client):
     network_policy_name, = utils.generate_ids()
     network_policy = types.NetworkPolicy(network_policy_name)
@@ -88,17 +98,20 @@ def test_add_network_policy(contrail_api_client):
                 has_item(has_entry('uuid', network_policy.uuid)))
 
 
-def test_delete_network_policy(contrail_api_client, network_policy):
-    contrail_api_client.network_policy_delete(id=network_policy.uuid)
+@pytest.mark.usefixtures('contrail_policies_cleanup')
+def test_delete_network_policy(contrail_api_client, contrail_network_policy):
+    contrail_api_client.network_policy_delete(id=contrail_network_policy.uuid)
     policies = contrail_api_client.network_policys_list()
-    assert_that(policies['network-policys'],
-                is_not(has_item(has_entry('uuid', network_policy.uuid))))
+    assert_that(
+        policies['network-policys'],
+        is_not(has_item(has_entry('uuid', contrail_network_policy.uuid))))
 
 
-def test_update_network_policy(contrail_api_client, network_policy):
+@pytest.mark.usefixtures('contrail_policies_cleanup')
+def test_update_network_policy(contrail_api_client, contrail_network_policy):
     new_display_name, = utils.generate_ids()
-    network_policy.display_name = new_display_name
-    contrail_api_client.network_policy_update(network_policy)
+    contrail_network_policy.display_name = new_display_name
+    contrail_api_client.network_policy_update(contrail_network_policy)
     policy_data = contrail_api_client.network_policy_read(
-        id=network_policy.uuid)
+        id=contrail_network_policy.uuid)
     assert_that(policy_data, has_property('display_name', new_display_name))
