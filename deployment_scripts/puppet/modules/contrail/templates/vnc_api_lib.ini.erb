@@ -14,3 +14,4 @@ AUTHN_PROTOCOL = <%= scope.lookupvar('contrail::keystone_protocol') %>
 AUTHN_SERVER = <%= scope.lookupvar('contrail::keystone_address') %>
 AUTHN_PORT = 35357
 AUTHN_URL = /v2.0/tokens
+insecure = <%= scope.lookupvar('contrail::keystone_insecure') %>

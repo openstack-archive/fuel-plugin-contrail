@@ -143,7 +143,8 @@ class contrail::analytics {
     'KEYSTONE/admin_user':        value => $contrail::neutron_user;
     'KEYSTONE/admin_password':    value => $contrail::service_token;
     'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
-    'KEYSTONE/insecure':          value => true;
+    'KEYSTONE/insecure':          value => $contrail::keystone_insecure;
+    'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
   }
 
   ini_setting { 'analytics-fdlimit':
