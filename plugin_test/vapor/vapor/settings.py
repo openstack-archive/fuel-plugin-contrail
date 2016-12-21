@@ -14,3 +14,5 @@ CONTRAIL_CREDS = {
 }
 
 CONTAIL_API_PORT = 8082
+
+NEUTRON_CONTRAIL_PLUGIN_CONFIG_PATH = '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'  # noqa

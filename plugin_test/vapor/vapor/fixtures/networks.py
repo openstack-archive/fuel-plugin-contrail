@@ -3,9 +3,10 @@ import pytest
 from stepler.third_party import utils
 
 
-@pytest.fixture(autouse=True)
-def network_cleanup(contrail_api_client):
+@pytest.fixture
+def contrail_network_cleanup(contrail_api_client):
     """Cleanup created networks after test."""
+
     def _get_networks_uuids():
         return {
             net['uuid']
@@ -22,7 +23,7 @@ def network_cleanup(contrail_api_client):
 
 
 @pytest.fixture
-def network(contrail_api_client):
+def contrail_network(contrail_api_client):
     network_name, = utils.generate_ids()
     net = types.VirtualNetwork(network_name)
     contrail_api_client.virtual_network_create(net)
