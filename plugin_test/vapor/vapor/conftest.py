@@ -1,6 +1,9 @@
 # pytest settings and fixtures
 
 from stepler.conftest import *  # noqa
+from stepler.glance.fixtures import *  # noqa
+from stepler.neutron.fixtures import *  # noqa
+from stepler.nova.fixtures import *  # noqa
 
 from vapor.fixtures.contrail import *  # noqa
 from vapor.fixtures.networks import *  # noqa

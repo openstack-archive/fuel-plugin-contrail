@@ -16,14 +16,14 @@ def client_contrail():
 @pytest.fixture
 def contrail_nodes(os_faults_steps):
     """Returns all nodes which have contrail-status command."""
-    return os_faults_steps.get_nodes_by_cmd('which contrail-status')
+    return os_faults_steps.get_nodes_by_cmd('contrail-status | grep .')
 
 
 @pytest.fixture
 def contrail_controllers(os_faults_steps, contrail_nodes):
     """Returns all contrail controller nodes."""
     return os_faults_steps.get_nodes_by_cmd(
-        'contrail-status | grep -v "Contrail vRouter"')
+        'contrail-status | grep  "Contrail Control"')
 
 
 @pytest.fixture(scope='module')

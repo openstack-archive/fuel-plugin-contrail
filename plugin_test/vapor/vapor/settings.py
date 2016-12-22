@@ -16,3 +16,9 @@ CONTRAIL_CREDS = {
 CONTAIL_API_PORT = 8082
 
 NEUTRON_CONTRAIL_PLUGIN_CONFIG_PATH = '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'  # noqa
+
+# Time between poweroff and start contrail controller node
+CONTRAIL_CONTROLLER_RESTART_TIMEOUT = 5 * 60
+
+# Time between networks unplug and plug back to contrail controller node
+CONTRAIL_CONTROLLER_NET_REPLUG_TIMEOUT = 5 * 60
