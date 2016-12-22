@@ -283,17 +283,46 @@
     strategy:
       type: parallel
 
+
 ###############
-#8. Install Contrail Analytics
+#8, 9. Install and configure Contrail Analytics Node
 ###############
+#
+- id: primary-contrail-analytics-db-wait
+  type: puppet
+  version: 2.1.0
+  groups: [primary-contrail-analytics-db]
+  required_for: [deploy_end]
+  requires: [contrail-analytics-db, deploy_start]
+  cross-depends:
+  - name: primary-contrail-analytics-all
+  - name: /contrail-config(-primary|-all)/
+  - name: /contrail-config-provision(-primary|-all)/
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-analytics-db-wait.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
+- id: primary-contrail-analytics-all
+  type: puppet
+  version: 2.1.0
+  groups: [primary-contrail-analytics]
+  required_for: [deploy_end]
+  requires: [contrail-db-primary]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-analytics.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
 
 - id: contrail-analytics-all
   type: puppet
   version: 2.1.0
-  groups: [primary-contrail-analytics,contrail-analytics]
+  groups: [contrail-analytics]
   required_for: [deploy_end]
   requires: [contrail-utils, deploy_start]
   cross-depends:
+  - name: primary-contrail-analytics-db-wait
+  - name: primary-contrail-analytics-all
   - name: /contrail-config(-primary|-all)/
   - name: /contrail-config-provision(-primary|-all)/
   parameters:
@@ -301,20 +330,18 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
-################
-#9. Provision Contrail Analytics
-################
-
-- id: contrail-analytics-provision-all
+# Provision Contrail analytics
+- id: contrail-analytics-provision
   type: puppet
   version: 2.1.0
   groups: [primary-contrail-analytics,contrail-analytics]
   required_for: [deploy_end]
-  requires: [contrail-analytics-all]
+  requires: [primary-contrail-analytics-all, contrail-analytics-all]
   parameters:
     puppet_manifest: puppet/manifests/contrail-analytics-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
+
 
 ################
 #10. Install and configure Contrail Control Node
@@ -422,7 +449,6 @@
     puppet_manifest: puppet/manifests/contrail-webui.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
-
 
 ##############################################################
 #  Openstack Controller tasks section
