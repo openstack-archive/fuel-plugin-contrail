@@ -1,16 +1,21 @@
 import pycontrail.client as client
 import pytest
+from six.moves.urllib import parse
 
 from vapor import settings
-from vapor.helpers.clients import ContrailClient
+from vapor.helpers import clients
 
 
-@pytest.yield_fixture
-def client_contrail():
-    with ContrailClient(settings.CONTRAIL_CREDS[
-            'controller_addr']) as contrail:
+@pytest.fixture
+def client_contrail(session, contrail_api_endpoint):
+    with clients.ContrailClient(session, contrail_api_endpoint) as contrail:
         yield contrail
-    print('helpers.clients.client_contrail')
+
+
+@pytest.fixture
+def client_contrail_analytics(session, contrail_analytics_endpoint):
+    return clients.ContrailAnalyticsClient(session,
+                                           contrail_analytics_endpoint)
 
 
 def get_nodes_fixture(cmd):
@@ -60,6 +65,14 @@ def contrail_api_endpoint(os_faults_steps):
         contrail_node, awk_cmd.format(
             key='api_server_port', path=config_path))[0].payload['stdout']
     return 'http://{}:{}/'.format(ip.strip(), port.strip())
+
+
+@pytest.fixture(scope='module')
+def contrail_analytics_endpoint(contrail_api_endpoint):
+    """Return contrail analytics endpoint."""
+    parse_result = parse.urlparse(contrail_api_endpoint)
+    return parse_result._replace(netloc="{}:{}".format(
+        parse_result.hostname, settings.CONTAIL_ANALYTICS_PORT)).geturl()
 
 
 @pytest.fixture

@@ -1,69 +1,8 @@
-import pytest
-
-from keystoneauth1.identity.v2 import Password
-from keystoneauth1.session import Session
-
-from vapor.settings import (
-    KEYSTONE_CREDS, PATH_TO_CERT, VERIFY_SSL, DISABLE_SSL, CONTAIL_API_PORT)
+from . import base
 
 
-class ContrailClient(object):
+class ContrailClient(base.ContrailBaseClient):
     """Contrail utilite wrapper."""
-
-    def __init__(self, controller_node_ip, contrail_port=CONTAIL_API_PORT,
-                 credentials=KEYSTONE_CREDS, **kwargs):
-        """Create ContrailClient object."""
-        print('[ContrailClient:__init__]')
-        if DISABLE_SSL:
-
-            self.url = "http://{0}:{1}".format(controller_node_ip,
-                                               contrail_port)
-            self.keystone_url = "http://{0}:5000/v2.0".format(
-                controller_node_ip)
-        else:
-            self.url = "https://{0}:{1}".format(
-                controller_node_ip, contrail_port)
-            self.keystone_url = 'https://{0}:5000/v2.0/'.format(
-                controller_node_ip)
-            insecure = not VERIFY_SSL
-            credentials.update({'ca_cert': PATH_TO_CERT, 'insecure': insecure})
-        auth = Password(auth_url=self.keystone_url,
-                        username=KEYSTONE_CREDS['username'],
-                        password=KEYSTONE_CREDS['password'],
-                        tenant_name=KEYSTONE_CREDS['tenant_name'])
-        self._client = Session(auth=auth, verify=False)
-
-    def __enter__(self):
-        print('[ContrailClient:__enter__]')
-        return self
-
-    def __exit__(self, type, value, traceback):
-        print('[ContrailClient:__exit__]')
-        pass
-
-    @property
-    def client(self):
-        """Client property."""
-        return self._client
-
-    def _get(self, data_path):
-        """Get method."""
-        print('[_get] url: %s' % str(self.url + data_path))
-        return self.client.get(url=self.url + data_path).json()
-
-    def _delete(self, data_path):
-        """Delete method."""
-        return self.client.delete(url=self.url + data_path).json()
-
-    def _post(self, data_path, **kwargs):
-        """Post method."""
-        return self.client.post(
-            url=self.url + data_path, connect_retries=1, **kwargs).json()
-
-    def _put(self, data_path, **kwargs):
-        """Put method."""
-        return self.client.put(
-            url=self.url + data_path, connect_retries=1, **kwargs).json()
 
     def create_network(self, net_name, net_attr):
         """Create virtual-network.
@@ -152,4 +91,3 @@ class ContrailClient(object):
         :return dictionary
         """
         return self._get('/bgp-router/{0}'.format(bgp_id))
-
