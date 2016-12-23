@@ -13,17 +13,37 @@ def client_contrail():
     print('helpers.clients.client_contrail')
 
 
-@pytest.fixture
-def contrail_nodes(os_faults_steps):
-    """Returns all nodes which have contrail-status command."""
-    return os_faults_steps.get_nodes_by_cmd('contrail-status | grep .')
+def get_nodes_fixture(cmd):
+    """Fixtures to gen nodes by cmd factory."""
+
+    @pytest.fixture
+    def nodes_fixture(os_faults_steps):
+        return os_faults_steps.get_nodes_by_cmd(cmd)
+
+    return nodes_fixture
 
 
-@pytest.fixture
-def contrail_controllers(os_faults_steps, contrail_nodes):
-    """Returns all contrail controller nodes."""
-    return os_faults_steps.get_nodes_by_cmd(
-        'contrail-status | grep  "Contrail Control"')
+contrail_nodes = get_nodes_fixture('contrail-status | grep .')
+
+
+def get_contrail_nodes_fixture(role):
+    """Fixtures to get contrail nodes by role."""
+
+    @pytest.fixture
+    def nodes_fixture(os_faults_steps):
+        return os_faults_steps.get_nodes(
+            fqdns=settings.CONRTAIL_ROLES_DISTRIBUTION[role])
+
+    return nodes_fixture
+
+
+contrail_controllers = get_contrail_nodes_fixture(
+    settings.ROLE_CONTRAIL_CONTROLLER)
+
+contrail_db_nodes = get_contrail_nodes_fixture(settings.ROLE_CONTRAIL_DB)
+
+contrail_analytics_nodes = get_contrail_nodes_fixture(
+    settings.ROLE_CONTRAIL_ANALYTICS)
 
 
 @pytest.fixture(scope='module')

@@ -10,27 +10,29 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from hamcrest import (assert_that, empty, has_item, has_entry, is_not,
-                      has_property)  # noqa H301
+from hamcrest import (assert_that, has_item, has_entry, is_not,
+                      has_property, has_entries, has_items)  # noqa H301
 import pycontrail.types as types
 import pytest
 from stepler.third_party import utils
 
+from vapor.helpers import contrail_status
+from vapor import settings
 
-def test_contrail_node_services_status(contrail_nodes, os_faults_steps):
-    cmd = "contrail-status | grep -Pv '(==|^$)'"
-    broken_services = []
-    for node_result in os_faults_steps.execute_cmd(contrail_nodes, cmd):
-        for line in node_result.payload['stdout_lines']:
-            values = line.strip().split(None, 1)
-            if len(values) < 2:
-                continue
-            name, status = values
-            if status not in {'active', 'backup'}:
-                err_msg = "{node}:{service} - {status}".format(
-                    node=node_result.host, service=name, status=status)
-                broken_services.append(err_msg)
-    assert_that(broken_services, empty())
+
+def test_contrail_node_services_status(os_faults_steps):
+    contrail_status.check_services_statuses(os_faults_steps)
+
+
+@pytest.mark.parametrize('role',
+                         settings.CONRTAIL_ROLES_DISTRIBUTION)
+def test_contrail_service_distribution(os_faults_steps, role):
+    statuses = contrail_status.get_services_statuses(os_faults_steps)
+    statuses = {node: services.keys() for node, services in statuses.items()}
+    services = settings.CONTRAIL_ROLES_SERVICES_MAPPING[role]
+    nodes = settings.CONRTAIL_ROLES_DISTRIBUTION[role]
+    entries = {node: has_items(*services) for node in nodes}
+    assert_that(statuses, has_entries(**entries))
 
 
 @pytest.mark.usefixtures('contrail_network_cleanup')
