@@ -13,17 +13,21 @@ def client_contrail():
     print('helpers.clients.client_contrail')
 
 
-@pytest.fixture
-def contrail_nodes(os_faults_steps):
-    """Returns all nodes which have contrail-status command."""
-    return os_faults_steps.get_nodes_by_cmd('contrail-status | grep .')
+def get_nodes_fixture(cmd):
+    """Fixtures to gen nodes by cmd factory."""
+    @pytest.fixture
+    def nodes_fixture(os_faults_steps):
+        return os_faults_steps.get_nodes_by_cmd(cmd)
+
+    return nodes_fixture
 
 
-@pytest.fixture
-def contrail_controllers(os_faults_steps, contrail_nodes):
-    """Returns all contrail controller nodes."""
-    return os_faults_steps.get_nodes_by_cmd(
-        'contrail-status | grep  "Contrail Control"')
+contrail_nodes = get_nodes_fixture('contrail-status | grep .')
+contrail_controllers = get_nodes_fixture(
+    'contrail-status | grep "Contrail Control"')
+contrail_db_nodes = get_nodes_fixture(
+    "contrail-status | grep -P "
+    "'(Contrail Database|Contrail Supervisor Database)'")
 
 
 @pytest.fixture(scope='module')
