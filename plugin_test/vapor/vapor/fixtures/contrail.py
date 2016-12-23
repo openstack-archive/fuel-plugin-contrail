@@ -29,6 +29,9 @@ contrail_db_nodes = get_nodes_fixture(
     "contrail-status | grep -P "
     "'(Contrail Database|Contrail Supervisor Database)'")
 
+contrail_analytics_nodes = get_nodes_fixture(
+    "contrail-status | grep 'Contrail Analytics'")
+
 
 @pytest.fixture(scope='module')
 def contrail_api_endpoint(os_faults_steps):
