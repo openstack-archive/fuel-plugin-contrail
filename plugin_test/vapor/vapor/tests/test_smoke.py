@@ -33,6 +33,29 @@ def test_contrail_node_services_status(contrail_nodes, os_faults_steps):
     assert_that(broken_services, empty())
 
 
+def test_contrail_on_compute(os_faults_steps):
+    compute_cmd = 'ps ax| grep compute | grep -v grep'
+    check_cmd = "contrail-status | grep -Pv '(==|^$)'"
+    expected_services = ['supervisor-vrouter',
+                         'contrail-vrouter-agent',
+                         'contrail-vrouter-nodemgr']
+    broken_services = []
+    compute_nodes = os_faults_steps.get_nodes_by_cmd(compute_cmd)
+    for node_result in os_faults_steps.execute_cmd(compute_nodes, check_cmd):
+        for line in node_result.payload['stdout_lines']:
+            values = line.strip().split(None, 1)
+            if len(values) < 2:
+                continue
+            name, status = values
+            if name in expected_services and status not in {'active', 'backup'}:
+                err_msg = "{node}:{service} - {status}".format(
+                    node=node_result.host, service=name, status=status)
+                broken_services.append(err_msg)
+
+            print('values:%s' % str(values))
+    assert_that(broken_services, empty())
+
+
 @pytest.mark.usefixtures('contrail_network_cleanup')
 def test_add_virtual_network(contrail_api_client):
     network_name, = utils.generate_ids()
