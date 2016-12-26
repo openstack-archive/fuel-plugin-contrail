@@ -22,6 +22,8 @@ def parse_result(stdout_lines):
         service_result = service_pattern.search(line)
         if service_result:
             name, status = service_result.groups()
+            if ':' in name:
+                name = name.split(':')[0]
             results[name] = status
     return results
 

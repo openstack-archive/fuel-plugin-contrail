@@ -2,6 +2,7 @@
 
 from stepler.conftest import *  # noqa
 from stepler.glance.fixtures import *  # noqa
+from stepler.keystone.fixtures import *  # noqa
 from stepler.neutron.fixtures import *  # noqa
 from stepler.nova.fixtures import *  # noqa
 

@@ -1,0 +1,8 @@
+# Example:
+# contrail-controller:
+#   - node-2.test.domain.local
+#   - node-3.test.domain.local
+# contrail-analytics:
+#   - node-3.test.domain.local
+# contrail-db:
+#   - node-1.test.domain.local
