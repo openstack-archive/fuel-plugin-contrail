@@ -10,17 +10,30 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from hamcrest import (assert_that, has_item, has_entry, is_not,
+from hamcrest import (assert_that, has_item, has_entry, is_not, equal_to,
                       has_property)  # noqa H301
 import pycontrail.types as types
 import pytest
 from stepler.third_party import utils
 
 from vapor.helpers import contrail_status
+from vapor import settings
 
 
 def test_contrail_node_services_status(os_faults_steps):
     contrail_status.check_services_statuses(os_faults_steps)
+
+
+@pytest.mark.parametrize('service',
+                         settings.CONRTAIL_SERVICES_DISTRIBUTION)
+def test_contrail_service_distribution(os_faults_steps, service):
+    statuses = contrail_status.get_services_statuses(os_faults_steps)
+    expected = set(settings.CONRTAIL_SERVICES_DISTRIBUTION[service])
+    actual = set()
+    for node, services in statuses.items():
+        if service in services:
+            actual.add(node)
+    assert_that(actual, equal_to(expected))
 
 
 @pytest.mark.usefixtures('contrail_network_cleanup')

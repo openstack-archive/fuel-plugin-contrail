@@ -1,0 +1,6 @@
+# Example:
+# contrail-collector:
+#   - node-2.test.domain.local
+#   - node-3.test.domain.local
+# contrail-database-nodemgr:
+#   - node-3.test.domain.local
