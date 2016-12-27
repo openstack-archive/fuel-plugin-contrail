@@ -10,7 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from hamcrest import (assert_that, has_item, has_entry, is_not,
+from hamcrest import (assert_that, has_item, has_entry, is_not, empty,
                       has_property, has_entries, has_items)  # noqa H301
 import pycontrail.types as types
 import pytest
@@ -119,3 +119,8 @@ def test_update_network_policy(contrail_api_client, contrail_network_policy):
     policy_data = contrail_api_client.network_policy_read(
         id=contrail_network_policy.uuid)
     assert_that(policy_data, has_property('display_name', new_display_name))
+
+
+def test_contrail_alarms_is_empty(client_contrail_analytics):
+    alarms = client_contrail_analytics.get_alarms()
+    assert_that(alarms, empty())
