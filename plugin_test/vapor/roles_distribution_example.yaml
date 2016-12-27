@@ -6,3 +6,5 @@
 #   - node-3.test.domain.local
 # contrail-db:
 #   - node-1.test.domain.local
+# contrail-compute:
+#   - node-4.test.domain.local

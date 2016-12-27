@@ -29,6 +29,7 @@ CONTRAIL_CONTROLLER_NET_REPLUG_TIMEOUT = 5 * 60
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
+ROLE_CONTRAIL_COMPUTE = 'contrail-compute'
 
 CONTRAIL_ROLES_SERVICES_MAPPING = {
     ROLE_CONTRAIL_CONTROLLER: (
@@ -67,6 +68,10 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
         'supervisor-database',
         'contrail-database-nodemgr',
         'kafka', ),
+    ROLE_CONTRAIL_COMPUTE: (
+        'contrail-vrouter-agent',
+        'supervisor-vrouter',
+        'contrail-vrouter-nodemgr')
 }
 
 
