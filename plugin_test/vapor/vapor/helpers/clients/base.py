@@ -35,18 +35,18 @@ class ContrailBaseClient(object):
         url = self._endpoint.rstrip('/') + url
         return self.client.request(url=url, method=method, **kwargs)
 
-    def _get(self, url):
+    def _get(self, url, **kwargs):
         """Get method."""
-        return self._request(url, 'GET').json()
+        return self._request(url, 'GET', **kwargs).json()
 
-    def _delete(self, url):
+    def _delete(self, url, **kwargs):
         """Delete method."""
-        return self._request(url, 'DELETE').json()
+        return self._request(url, 'DELETE', **kwargs).json()
 
     def _post(self, url, **kwargs):
         """Post method."""
-        return self._request(url, 'POST', connect_retries=1).json()
+        return self._request(url, 'POST', connect_retries=1, **kwargs).json()
 
     def _put(self, url, **kwargs):
         """Put method."""
-        return self._request(url, 'PUT', connect_retries=1).json()
+        return self._request(url, 'PUT', connect_retries=1, **kwargs).json()

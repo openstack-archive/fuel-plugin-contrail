@@ -26,6 +26,9 @@ CONTRAIL_CONTROLLER_RESTART_TIMEOUT = 5 * 60
 # Time between networks unplug and plug back to contrail controller node
 CONTRAIL_CONTROLLER_NET_REPLUG_TIMEOUT = 5 * 60
 
+# Time to wait database purge
+DB_PURGE_TIMEOUT = 20 * 60
+
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
