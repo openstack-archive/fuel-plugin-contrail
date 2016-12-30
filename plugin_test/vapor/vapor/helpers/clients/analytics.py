@@ -32,6 +32,33 @@ class ContrailAnalyticsClient(base.ContrailBaseClient):
         """Return table schema."""
         return self._get('/analytics/table/{}/schema'.format(table_name))
 
+    def get_uves_generators(self):
+        """Return uves generators names."""
+        for generator in self._get('/analytics/uves/generators'):
+            yield generator['name']
+
+    def get_uves_generator_data(self, name):
+        """Return uves generator data."""
+        return self._get('/analytics/uves/generator/{}?flat'.format(name))
+
+    def get_uves_vrouters(self):
+        """Return uves vrouters names."""
+        for generator in self._get('/analytics/uves/vrouters'):
+            yield generator['name']
+
+    def get_uves_vrouter_ops(self, hostname):
+        """Return uves vrouter ops."""
+        return self._get('/analytics/uves/vrouter/{}?flat'.format(hostname))
+
+    def get_uves_control_nodes(self):
+        """Return uves control nodes names."""
+        for generator in self._get('/analytics/uves/control-nodes'):
+            yield generator['name']
+
+    def get_uves_control_node_ops(self, hostname):
+        """Return uves control node ops."""
+        return self._get('/analytics/uves/control-node/{}?flat'.format(hostname))
+
     def database_purge(self, purge_input):
         """Send a request to purge database."""
         return self._post(
