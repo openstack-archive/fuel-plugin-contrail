@@ -108,11 +108,16 @@ class contrail {
   $admin_tenant   = $admin_settings['tenant']
 
   # Contrail settings
-  $asnum            = $settings['contrail_asnum']
-  $external         = $settings['contrail_external']
-  $route_target     = $settings['contrail_route_target']
-  $gateways         = split($settings['contrail_gateways'], ',')
-
+  $asnum                     = $settings['contrail_asnum']
+  $external                  = $settings['contrail_external']
+  $route_target              = $settings['contrail_route_target']
+  $gateways                  = split($settings['contrail_gateways'], ',')
+  $tls_xmpp_enable           = pick($settings['tls_xmpp_enable'], false)
+  if pick($settings['tls_xmpp_enable'], false) {
+    $tls_xmpp_wildcard_crt = pick($settings['tls_xmpp_wildcard_crt'], false)
+    $tls_xmpp_wildcard_key = pick($settings['tls_xmpp_wildcard_key'], false)
+    $tls_xmpp_ca_crt       = pick($settings['tls_xmpp_ca_crt'], false)
+  }
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
   $compute_dpdk_enabled = $global_dpdk_enabled and roles_include('dpdk')
