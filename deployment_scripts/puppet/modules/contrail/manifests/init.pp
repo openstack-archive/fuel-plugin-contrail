@@ -152,6 +152,13 @@ class contrail {
 
   $discovery_hc_max_miss       = pick($settings['discovery_hc_max_miss'], '3')
 
+  $tls_xmpp_enable           = pick($settings['tls_xmpp_enable'], false)
+  if $tls_xmpp_enable {
+    $tls_xmpp_wildcard_crt = pick($settings['tls_xmpp_wildcard_crt'], 'No cert provided!')
+    $tls_xmpp_wildcard_key = pick($settings['tls_xmpp_wildcard_key'], 'No key provided!')
+    $tls_xmpp_ca_crt       = pick($settings['tls_xmpp_ca_crt'], 'No CA provided!')
+  }
+
   # Custom mount point for contrail-db
   $cassandra_path = '/var/lib/contrail_db'
   $cassandra_compaction_throughput = pick($settings['cassandra_compaction_throughput'], '16')
