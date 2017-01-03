@@ -129,7 +129,50 @@ class contrail::compute::vrouter {
     'VIRTUAL-HOST-INTERFACE/physical_interface': value => $contrail::phys_dev;
     'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
   }
+  if $::contrail::tls_xmpp_enable {
 
+    file { '/etc/contrail/ssl/':
+      ensure => directory,
+      owner  => 'contrail',
+      group  => 'contrail',
+      tag    => 'tls_xmpp',
+    }
+
+    file { '/etc/contrail/ssl/xmpp_wildcard.crt':
+      content  => $contrail::tls_xmpp_wildcard_crt,
+      owner    => 'contrail',
+      group    => 'contrail',
+      require => File['/etc/contrail/ssl/'],
+      tag      => 'tls_xmpp',
+    }
+
+    file { '/etc/contrail/ssl/xmpp_wildcard.key':
+      content  => $contrail::tls_xmpp_wildcard_key,
+      owner    => 'contrail',
+      group    => 'contrail',
+      require => File['/etc/contrail/ssl/'],
+      tag      => 'tls_xmpp',
+    }
+
+    file { '/etc/contrail/ssl/xmpp_ca.crt':
+      content  => $contrail::tls_xmpp_ca_crt,
+      owner    => 'contrail',
+      group    => 'contrail',
+      require => File['/etc/contrail/ssl/'],
+      tag      => 'tls_xmpp',
+    }
+
+    contrail_vrouter_agent_config {
+      'DEFAULT/xmpp_auth_enable': value => true;
+      'DEFAULT/xmpp_dns_auth_enable':  value => true;
+      'DEFAULT/xmpp_server_cert': value => '/etc/contrail/ssl/xmpp_wildcard.crt';
+      'DEFAULT/xmpp_server_key':  value => '/etc/contrail/ssl/xmpp_wildcard.key';
+      'DEFAULT/xmpp_ca_cert':     value => '/etc/contrail/ssl/xmpp_ca.crt';
+    }
+
+    Package[$install_packages] -> File<| tag == 'tls_xmpp' |>  -> Contrail_vrouter_agent_config <||>   ~> Service['supervisor-vrouter']
+
+  }
   if $contrail::gateway {
     contrail_vrouter_agent_config { 'VIRTUAL-HOST-INTERFACE/gateway': value => $contrail::gateway; }
   }

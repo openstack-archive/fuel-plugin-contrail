@@ -63,6 +63,56 @@ class contrail::control {
     'IFMAP/user':        value => "${contrail::address}.dns";
   }
 
+  if $::contrail::tls_xmpp_enable {
+
+    file { '/etc/contrail/ssl/':
+      ensure => directory,
+      owner  => 'contrail',
+      group  => 'contrail',
+      tag    => 'tls_xmpp',
+    }
+
+    file { '/etc/contrail/ssl/xmpp_wildcard.crt':
+      content  => $contrail::tls_xmpp_wildcard_crt,
+      owner    => 'contrail',
+      group    => 'contrail',
+      require => File['/etc/contrail/ssl/'],
+      tag      => 'tls_xmpp',
+    }
+
+    file { '/etc/contrail/ssl/xmpp_wildcard.key':
+      content  => $contrail::tls_xmpp_wildcard_key,
+      owner    => 'contrail',
+      group    => 'contrail',
+      require => File['/etc/contrail/ssl/'],
+      tag      => 'tls_xmpp',
+    }
+
+    file { '/etc/contrail/ssl/xmpp_ca.crt':
+      content  => $contrail::tls_xmpp_ca_crt,
+      owner    => 'contrail',
+      group    => 'contrail',
+      require => File['/etc/contrail/ssl/'],
+      tag      => 'tls_xmpp',
+    }
+
+    contrail_control_config {
+      'DEFAULT/xmpp_auth_enable': value => 'True';
+      'DEFAULT/xmpp_server_cert': value => '/etc/contrail/ssl/xmpp_wildcard.crt';
+      'DEFAULT/xmpp_server_key':  value => '/etc/contrail/ssl/xmpp_wildcard.key';
+      'DEFAULT/xmpp_ca_cert':     value => '/etc/contrail/ssl/xmpp_ca.crt';
+    }
+
+    contrail_dns_config {
+      'DEFAULT/xmpp_dns_auth_enable': value => 'True';
+      'DEFAULT/xmpp_server_cert': value => '/etc/contrail/ssl/xmpp_wildcard.crt';
+      'DEFAULT/xmpp_server_key':  value => '/etc/contrail/ssl/xmpp_wildcard.key';
+      'DEFAULT/xmpp_ca_cert':     value => '/etc/contrail/ssl/xmpp_ca.crt';
+    }
+
+    Package['contrail-control'] -> File<| tag == 'tls_xmpp' |>  ->  Contrail_control_config <||> ~> Service['supervisor-control']
+    Package['contrail-dns'] -> File<| tag == 'tls_xmpp' |>  ->  Contrail_dns_config <||> ~> Service['supervisor-control']
+  }
   ini_setting { 'control-fdlimit':
     ensure  => present,
     path    => '/etc/contrail/supervisord_control.conf',
