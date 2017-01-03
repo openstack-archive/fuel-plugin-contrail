@@ -129,7 +129,18 @@ class contrail::compute::vrouter {
     'VIRTUAL-HOST-INTERFACE/physical_interface': value => $contrail::phys_dev;
     'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
   }
-
+  if $::contrail::tls_xmpp_enable {
+    user {'contrail':
+      groups => ['contrail', 'puppet'];
+    }
+    contrail_vrouter_agent_config {
+      'DEFAULT/xmpp_auth_enable': value => true;
+      'DEFAULT/xmpp_dns_enable':  value => true;
+      'DEFAULT/xmpp_server_cert': value => "/var/lib/puppet/ssl/certs/$::{hostname}.pem";
+      'DEFAULT/xmpp_server_key':  value => "/var/lib/puppet/ssl/private_keys/$::{hostname}.pem";
+      'DEFAULT/xmpp_ca_cert':     value => '/var/lib/puppet/ssl/certs/ca.pem';
+    }
+  }
   if $contrail::gateway {
     contrail_vrouter_agent_config { 'VIRTUAL-HOST-INTERFACE/gateway': value => $contrail::gateway; }
   }

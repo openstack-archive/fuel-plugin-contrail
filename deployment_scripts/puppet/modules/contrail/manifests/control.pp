@@ -63,6 +63,23 @@ class contrail::control {
     'IFMAP/user':        value => "${contrail::address}.dns";
   }
 
+  if $::contrail::tls_xmpp_enable {
+    user {'contrail':
+      groups => ['contrail', 'puppet'];
+    }
+    contrail_control_config {
+      'DEFAULT/xmpp_auth_enable': value => 'True';
+      'DEFAULT/xmpp_server_cert': value => "/var/lib/puppet/ssl/certs/$::{hostname}.pem";
+      'DEFAULT/xmpp_server_key':  value => "/var/lib/puppet/ssl/private_keys/$::{hostname}.pem";
+      'DEFAULT/xmpp_ca_cert':     value => '/var/lib/puppet/ssl/certs/ca.pem';
+    }
+    contrail_dns_config {
+      'DEFAULT/xmpp_dns_auth_enable': value => 'True';
+      'DEFAULT/xmpp_server_cert':     value => "/var/lib/puppet/ssl/certs/$::{hostname}.pem";
+      'DEFAULT/xmpp_server_key':      value => "/var/lib/puppet/ssl/private_keys/$::{hostname}.pem";
+      'DEFAULT/xmpp_ca_cert':         value => '/var/lib/puppet/ssl/certs/ca.pem';
+    }
+  }
   ini_setting { 'control-fdlimit':
     ensure  => present,
     path    => '/etc/contrail/supervisord_control.conf',
