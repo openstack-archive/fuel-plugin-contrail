@@ -19,6 +19,7 @@ CONTAIL_API_PORT = 8082
 CONTAIL_ANALYTICS_PORT = 8081
 
 NEUTRON_CONTRAIL_PLUGIN_CONFIG_PATH = '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'  # noqa
+CONTRAIL_CONFIG_PATH = '/etc/contrail/'
 
 # Time between poweroff and start contrail controller node
 CONTRAIL_CONTROLLER_RESTART_TIMEOUT = 5 * 60
@@ -27,7 +28,7 @@ CONTRAIL_CONTROLLER_RESTART_TIMEOUT = 5 * 60
 CONTRAIL_CONTROLLER_NET_REPLUG_TIMEOUT = 5 * 60
 
 # Time to wait database purge
-DB_PURGE_TIMEOUT = 20 * 60
+DB_PURGE_TIMEOUT = 30 * 60
 
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
