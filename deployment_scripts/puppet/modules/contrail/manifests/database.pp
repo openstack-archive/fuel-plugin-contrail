@@ -52,7 +52,8 @@ class contrail::database {
     }
 
     file { '/etc/zookeeper/conf/zoo.cfg':
-      content => template('contrail/zoo.cfg.erb');
+      content => template('contrail/zoo.cfg.erb'),
+      require => Package['zookeeper'],
     }
 
     service { 'zookeeper':
@@ -65,12 +66,12 @@ class contrail::database {
         ],
     }
 
-    ini_setting { "disable_kafka":
+    ini_setting { 'disable_kafka':
       ensure  => present,
       path    => '/etc/contrail/supervisord_database.conf',
       section => 'program:kafka',
       setting => 'autostart',
-      value   => 'false',
+      value   => false,
       before  => Service['supervisor-database'],
     }
 
