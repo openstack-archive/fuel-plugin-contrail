@@ -52,7 +52,8 @@ class contrail::database {
     }
 
     file { '/etc/zookeeper/conf/zoo.cfg':
-      content => template('contrail/zoo.cfg.erb');
+      content => template('contrail/zoo.cfg.erb'),
+      require => Package['zookeeper'],
     }
 
     service { 'zookeeper':
