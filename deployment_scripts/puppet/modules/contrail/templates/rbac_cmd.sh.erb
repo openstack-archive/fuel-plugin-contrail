@@ -1,0 +1,20 @@
+#!/bin/bash
+#Script to call rbacutil.py in 'sudo' mode without specifying which it just does not work even as root user
+
+echo "1st parameter is $1"
+echo "2nd parameter is $2"
+echo "3rd parameter is $3"
+UTIL='/opt/contrail/utils/rbacutil.py'
+DOMAIN='default-domain'
+API='default-api-access-list'
+ACTION=$1
+PERMS=$2
+PROJECT='admin'
+USR=$4
+PWD=$5
+OPER='add-rule'
+#PORT=8182
+PORT=$3
+VIP=<%= scope.lookupvar('contrail::mos_public_vip') %>
+
+sudo python "$UTIL" --name "$DOMAIN:$API" --rule "$ACTION $PERMS" --op $OPER --os-username $USR --os-password $PWD --os-tenant-name "$PROJECT" --server "$VIP:$PORT"
