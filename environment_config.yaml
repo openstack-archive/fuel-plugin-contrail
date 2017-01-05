@@ -155,3 +155,45 @@ attributes:
         label: "Role Based Access Control"
       - data: "cloud-admin"
         label: "Cloud Admin"
+  rbac_rules:
+    label: "rbac rules"
+    type: "textarea"
+    description: "rbac rules for configuring RBAC using rbacutils"
+    validate: "yaml"
+    restrictions:
+      - condition: "settings:contrail.metadata.enabled == false"
+        action: hide
+    weight: 360
+    value:
+      list_load_balancers:
+        - admin
+        - admin_contrail
+        - demo
+      list_load_balancer_pools:
+        - admin
+        - admin_contrail
+        - demo
+      create_load_balancers:
+        - admin
+        - admin_contrail
+      create_virtual_routers:
+        - admin
+        - admin_contrail
+      list_virtual_routers:
+        - admin
+        - admin_contrail
+        - demo
+      show_virtual_router:
+        - admin
+        - admin_contrail
+        - demo
+      update_virtual_router:
+        - admin
+        - admin_contrail
+      delete_virtual_router:
+        - admin
+        - admin_contrail
+      list_virtual_DNSs:
+        - admin
+        - admin_contrail
+        - demo 
