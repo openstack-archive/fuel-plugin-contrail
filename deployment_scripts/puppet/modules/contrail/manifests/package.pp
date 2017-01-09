@@ -25,10 +25,20 @@ class contrail::package (
     }
   }
 
-  if ($install) {
+  define contrail::package::ensure (
+    $package_ensure = present,
+  ) {
 
-    package { $install:
-      ensure  => present,
+    if !defined(Package[$name]) {
+      package { $name:
+        ensure => $package_ensure,
+      }
+    }
+  }
+
+  if ($install) {
+    contrail::package::ensure { $install:
+      package_ensure  => present,
     }
     if ($pip_install) {
       contrail::package::exec_pip { $pip_install:
@@ -39,9 +49,8 @@ class contrail::package (
   }
 
   if ($remove) {
-    package { $remove:
-      ensure  => purged,
+    contrail::package::ensure { $remove:
+      package_ensure  => purged,
     }
   }
-
 }
