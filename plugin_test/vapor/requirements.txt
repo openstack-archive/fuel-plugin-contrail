@@ -2,3 +2,4 @@ git+https://github.com/Mirantis/stepler.git
 git+https://github.com/morganfainberg/positional.git
 git+https://github.com/Juniper/contrail-python-api
 dpath
+jmespath==0.9.0
