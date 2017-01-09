@@ -70,7 +70,7 @@ class contrail::compute::nova {
   }
 
   nova_config {
-    'DEFAULT/neutron_url_timeout': value => '300';
+    'neutron/timeout':                value => '300';
   }
 
   # [LCM] Workaroud to fix duplicate declaration with nova_config recource
