@@ -1,5 +1,7 @@
 import dpath.util
+import jmespath
 from hamcrest import assert_that, is_, empty  # noqa H301
+import pytest
 from six.moves import filter
 
 from vapor.helpers import analytic_steps
@@ -13,7 +15,7 @@ def test_contrail_alarms(client_contrail_analytics):
 
 def test_db_purge(client_contrail_analytics):
     purge_id = client_contrail_analytics.database_purge(
-        purge_input=20)['purge_id']
+        purge_input=1)['purge_id']
     purge_results = analytic_steps.wait_db_purge_result(
         client_contrail_analytics, purge_id, timeout=settings.DB_PURGE_TIMEOUT)
     assert_that(purge_results['stats.purge_status'], is_('success'))
@@ -73,7 +75,7 @@ def test_vrouter_uve_xmpp_connections(session, client_contrail_analytics,
         assert actual_connections_count == expected_connection_count
 
 
-def test_peer_count_in_bgp_router_uve(session, client_contrail_analytics,
+def test_peer_count_in_bgp_router_uve(client_contrail_analytics,
                                       contrail_services_http_introspect_ports,
                                       nodes_ips):
     # count of xmpp peer and bgp peer verification in bgp-router uve
@@ -92,3 +94,21 @@ def test_peer_count_in_bgp_router_uve(session, client_contrail_analytics,
         assert bgp_nodes_count == len(contrail_controllers_fqdns)
 
     assert total_agent_connections == len(contrail_computes_fqdns) * factor
+
+
+@pytest.mark.parametrize(
+    'module_id',
+    settings.CONTRAIL_CONNECTIONS[settings.ROLE_CONTRAIL_ANALYTICS])
+@pytest.mark.parametrize(
+    'query', [
+        '*.process_status[?module_id==`{}` && state!=`Functional`][]',
+        ('*.process_status[?module_id==`{}`][]'
+         '.connection_infos[?status!=`Up`][]'),
+    ],
+    ids=['process_state', 'connection_status'])
+def test_process_connection_infos_analytics_node(client_contrail_analytics,
+                                                 module_id, query):
+    for node in client_contrail_analytics.get_uves_analytics_nodes():
+        ops = client_contrail_analytics.get_uves_analytics_node_ops(node)
+        bad_items = jmespath.search(query.format(module_id), ops)
+        assert_that(bad_items, is_(empty()), '{} has problems'.format(node))

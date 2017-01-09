@@ -86,3 +86,12 @@ CONRTAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
 
 with open(CONRTAIL_ROLES_DISTRIBUTION_YAML) as f:
     CONRTAIL_ROLES_DISTRIBUTION = yaml.safe_load(f) or {}
+
+
+CONTRAIL_CONNECTIONS = {
+    ROLE_CONTRAIL_ANALYTICS: [
+        'contrail-collector',
+        'contrail-analytics-api',
+        'contrail-query-engine',
+    ]
+}
