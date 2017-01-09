@@ -1,5 +1,6 @@
 import dpath.util
 from hamcrest import assert_that, is_, empty  # noqa H301
+import pytest
 from six.moves import filter
 
 from vapor.helpers import analytic_steps
@@ -13,7 +14,7 @@ def test_contrail_alarms(client_contrail_analytics):
 
 def test_db_purge(client_contrail_analytics):
     purge_id = client_contrail_analytics.database_purge(
-        purge_input=20)['purge_id']
+        purge_input=1)['purge_id']
     purge_results = analytic_steps.wait_db_purge_result(
         client_contrail_analytics, purge_id, timeout=settings.DB_PURGE_TIMEOUT)
     assert_that(purge_results['stats.purge_status'], is_('success'))
@@ -73,7 +74,7 @@ def test_vrouter_uve_xmpp_connections(session, client_contrail_analytics,
         assert actual_connections_count == expected_connection_count
 
 
-def test_peer_count_in_bgp_router_uve(session, client_contrail_analytics,
+def test_peer_count_in_bgp_router_uve(client_contrail_analytics,
                                       contrail_services_http_introspect_ports,
                                       nodes_ips):
     # count of xmpp peer and bgp peer verification in bgp-router uve
@@ -92,3 +93,64 @@ def test_peer_count_in_bgp_router_uve(session, client_contrail_analytics,
         assert bgp_nodes_count == len(contrail_controllers_fqdns)
 
     assert total_agent_connections == len(contrail_computes_fqdns) * factor
+
+
+@pytest.mark.parametrize(
+    'module_id',
+    settings.CONTRAIL_CONNECTIONS[settings.ROLE_CONTRAIL_ANALYTICS])
+@pytest.mark.parametrize(
+    'filter_', [
+        analytic_steps.get_processes_with_wrong_state,
+        analytic_steps.get_process_with_wrong_connection_status,
+    ],
+    ids=['process_state', 'connection_status'])
+def test_process_connection_infos_analytics_node(client_contrail_analytics,
+                                                 module_id, filter_):
+    for node in client_contrail_analytics.get_uves_analytics_nodes():
+        ops = client_contrail_analytics.get_uves_analytics_node_ops(node)
+        bad_items = filter_(ops, module_id)
+        assert_that(bad_items, is_(empty()), '{} has problems'.format(node))
+
+
+@pytest.mark.parametrize(
+    'filter_', [
+        analytic_steps.get_processes_with_wrong_state,
+        analytic_steps.get_process_with_wrong_connection_status,
+    ],
+    ids=['process_state', 'connection_status'])
+def test_process_and_connection_infos_control_node(client_contrail_analytics,
+                                                   filter_):
+    for node in client_contrail_analytics.get_uves_control_nodes():
+        ops = client_contrail_analytics.get_uves_control_node_ops(node)
+        bad_items = filter_(ops, 'contrail-control')
+        assert_that(bad_items, is_(empty()), '{} has problems'.format(node))
+
+
+@pytest.mark.parametrize(
+    'module_id', settings.CONTRAIL_CONNECTIONS[settings.ROLE_CONTRAIL_CONFIG])
+@pytest.mark.parametrize(
+    'filter_', [
+        analytic_steps.get_processes_with_wrong_state,
+        analytic_steps.get_process_with_wrong_connection_status,
+    ],
+    ids=['process_state', 'connection_status'])
+def test_process_and_connection_infos_config_node(client_contrail_analytics,
+                                                  module_id, filter_):
+    for node in client_contrail_analytics.get_uves_config_nodes():
+        ops = client_contrail_analytics.get_uves_config_node_ops(node)
+        bad_items = filter_(ops, module_id)
+        assert_that(bad_items, is_(empty()), '{} has problems'.format(node))
+
+
+@pytest.mark.parametrize(
+    'filter_', [
+        analytic_steps.get_processes_with_wrong_state,
+        analytic_steps.get_process_with_wrong_connection_status,
+    ],
+    ids=['process_state', 'connection_status'])
+def test_process_and_connection_infos_compute_node(client_contrail_analytics,
+                                                   filter_):
+    for node in client_contrail_analytics.get_uves_vrouters():
+        ops = client_contrail_analytics.get_uves_vrouter_ops(node)
+        bad_items = filter_(ops, 'contrail-vrouter-agent')
+        assert_that(bad_items, is_(empty()), '{} has problems'.format(node))

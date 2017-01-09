@@ -60,6 +60,26 @@ class ContrailAnalyticsClient(base.ContrailBaseClient):
         return self._get('/analytics/uves/control-node/{}?flat'.format(
             hostname))
 
+    def get_uves_analytics_nodes(self):
+        """Return uves analytics nodes names."""
+        for generator in self._get('/analytics/uves/analytics-nodes'):
+            yield generator['name']
+
+    def get_uves_analytics_node_ops(self, hostname):
+        """Return uves analytics node ops."""
+        return self._get('/analytics/uves/analytics-node/{}?flat'.format(
+            hostname))
+
+    def get_uves_config_nodes(self):
+        """Return uves config nodes names."""
+        for generator in self._get('/analytics/uves/config-nodes'):
+            yield generator['name']
+
+    def get_uves_config_node_ops(self, hostname):
+        """Return uves config node ops."""
+        return self._get('/analytics/uves/config-node/{}?flat'.format(
+            hostname))
+
     def database_purge(self, purge_input):
         """Send a request to purge database."""
         return self._post(

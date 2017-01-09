@@ -37,6 +37,7 @@ ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
 ROLE_CONTRAIL_COMPUTE = 'contrail-compute'
+ROLE_CONTRAIL_CONFIG = 'contrail-config'
 
 CONTRAIL_ROLES_SERVICES_MAPPING = {
     ROLE_CONTRAIL_CONTROLLER: (
@@ -89,3 +90,18 @@ CONRTAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
 
 with open(CONRTAIL_ROLES_DISTRIBUTION_YAML) as f:
     CONRTAIL_ROLES_DISTRIBUTION = yaml.safe_load(f) or {}
+
+
+CONTRAIL_CONNECTIONS = {
+    ROLE_CONTRAIL_ANALYTICS: [
+        'contrail-collector',
+        'contrail-analytics-api',
+        'contrail-query-engine',
+    ],
+    ROLE_CONTRAIL_CONFIG: [
+        'DeviceManager',
+        'contrail-schema',
+        'contrail-svc-monitor',
+        'contrail-api',
+    ]
+}
