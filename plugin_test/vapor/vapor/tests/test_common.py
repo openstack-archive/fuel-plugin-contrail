@@ -11,7 +11,6 @@
 # under the License.
 
 from hamcrest import assert_that, calling, raises  # noqa H301
-from stepler.third_party import utils
 from pycontrail import exceptions
 
 
@@ -23,20 +22,11 @@ def test_network_deleting_with_server(network, server, contrail_api_client):
 
 
 def test_create_vm_bulk(net_subnet_router, tiny_flavor,
-                        create_servers_context, cirros_image,
-                        keypair, security_group):
+                        cirros_image, server_steps):
     network, _, _ = net_subnet_router
     BULK_SERVER_COUNT = 10
-    server_names = []
-    for sc in xrange(BULK_SERVER_COUNT):
-        server_names.append(
-            next(utils.generate_ids(prefix='server',
-                                    postfix=tiny_flavor.name)))
-
-    with create_servers_context(server_names=server_names,
-                                image=cirros_image,
-                                flavor=tiny_flavor,
-                                networks=[network],
-                                keypair=keypair,
-                                security_groups=[security_group]):
-        pass
+    servers = server_steps.create_servers(count=BULK_SERVER_COUNT,
+                                          image=cirros_image,
+                                          flavor=tiny_flavor,
+                                          networks=[network])
+    server_steps.delete_servers(servers)
