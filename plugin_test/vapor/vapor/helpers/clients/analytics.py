@@ -80,6 +80,16 @@ class ContrailAnalyticsClient(base.ContrailBaseClient):
         return self._get('/analytics/uves/config-node/{}?flat'.format(
             hostname))
 
+    def get_uves_bgp_peers(self):
+        """Return uves config nodes names."""
+        for generator in self._get('/analytics/uves/bgp-peers'):
+            yield generator['name']
+
+    def get_uves_bgp_peer_info(self, name):
+        """Return uves config node ops."""
+        return self._get('/analytics/uves/bgp-peer/{}?flat'.format(
+            name))
+
     def database_purge(self, purge_input):
         """Send a request to purge database."""
         return self._post(

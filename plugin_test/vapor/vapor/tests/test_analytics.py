@@ -1,5 +1,6 @@
 import dpath.util
-from hamcrest import assert_that, is_, empty  # noqa H301
+import jmespath
+from hamcrest import assert_that, is_, empty, has_key, all_of  # noqa H301
 import pytest
 from six.moves import filter
 
@@ -154,3 +155,15 @@ def test_process_and_connection_infos_compute_node(client_contrail_analytics,
         ops = client_contrail_analytics.get_uves_vrouter_ops(node)
         bad_items = filter_(ops, 'contrail-vrouter-agent')
         assert_that(bad_items, is_(empty()), '{} has problems'.format(node))
+
+
+def test_verify_bgp_peer_uve(client_contrail_analytics):
+    for peer_name in client_contrail_analytics.get_uves_bgp_peers():
+        peer_info = client_contrail_analytics.get_uves_bgp_peer_info(peer_name)
+        tx_proto_stats = jmespath.search(
+            'BgpPeerInfoData.peer_stats_info.tx_proto_stats', peer_info)
+        assert_that(tx_proto_stats,
+                    all_of(
+                        has_key('close'),
+                        has_key('open'),
+                        has_key('total'), ))
