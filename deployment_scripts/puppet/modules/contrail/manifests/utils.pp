@@ -21,20 +21,11 @@ class contrail::utils {
 
   case $::operatingsystem {
     Ubuntu: {
-      apt::pin { 'contrail-pin-100':
-        order    => '100',
-        packages => '*',
-        priority => '1200',
-        label    => 'contrail',
-      }
       $pkgs = [
         'contrail-nodemgr', 'contrail-setup', 'contrail-utils', 'ifenslave-2.6',
         'openjdk-7-jre-headless', 'patch', 'python-contrail', 'python-crypto',
         'python-netaddr', 'python-paramiko', 'supervisor', 'tzdata', 'python-urllib3',
       ]
-      Package<| (title == 'tzdata') |> {
-        require => Apt::Pin['contrail-pin-100'],
-      } -> Package<| (title != 'tzdata') |>
     }
     CentOS: {
       $pkgs     = [
