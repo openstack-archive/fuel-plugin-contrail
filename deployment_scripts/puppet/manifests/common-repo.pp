@@ -15,7 +15,7 @@
 notice('MODULAR: contrail/common-repo.pp')
 
 $settings = hiera('contrail', {})
-$plugin_version = $settings['metadata']['plugin_version']
+$plugin_version = regsubst($settings['metadata']['plugin_version'], '..$' , '')
 
 file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
   ensure => absent,
