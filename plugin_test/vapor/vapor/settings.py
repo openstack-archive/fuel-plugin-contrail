@@ -30,6 +30,9 @@ CONTRAIL_CONTROLLER_NET_REPLUG_TIMEOUT = 5 * 60
 # Time to wait database purge
 DB_PURGE_TIMEOUT = 30 * 60
 
+# Time to wait service status to be changed
+SERVICE_STATUS_CHANGE_TIMEOUT = 60
+
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
