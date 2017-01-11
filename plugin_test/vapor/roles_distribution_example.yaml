@@ -2,6 +2,9 @@
 # contrail-controller:
 #   - node-2.test.domain.local
 #   - node-3.test.domain.local
+# contrail-config:
+#   - node-2.test.domain.local
+#   - node-3.test.domain.local
 # contrail-analytics:
 #   - node-3.test.domain.local
 # contrail-db:
