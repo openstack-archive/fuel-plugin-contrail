@@ -12,26 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class contrail::rbac_settings {
+notice('MODULAR: contrail/contrail-rbac-hiera.pp')
 
-  $rbac_wrapper_path = '/var/lib/fuel/rbac_wrapper'
-  $hiera_data_dir    = '/etc/hiera'
-  $rbac_ip_port      = '127.0.0.1:9100'
-
-  file { $rbac_wrapper_path:
-    ensure => directory,
-  }
-
-  file { "${rbac_wrapper_path}/rbac_wrapper.py":
-    ensure  => present,
-    content => template('contrail/rbac_wrapper.py.erb'),
-    require => File[$rbac_wrapper_path]
-  }
-
-  file { "${rbac_wrapper_path}/rbac_cmd.sh":
-    ensure  => present,
-    content => template('contrail/rbac_cmd.sh.erb'),
-    require => File[$rbac_wrapper_path],
-  }
-
-}
+include contrail
+include contrail::rbac_hiera
