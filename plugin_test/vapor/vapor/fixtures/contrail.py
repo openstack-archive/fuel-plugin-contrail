@@ -154,3 +154,21 @@ def nodes_ips(os_faults_steps):
         node_ips_[fqdn] = node_result.payload['stdout_lines']
 
     return node_ips_
+
+
+@pytest.fixture
+def iface_route_table_create(contrail_api_client):
+    """Callable fixture to create interface router table during test.
+
+    All created tables will be deleted after test.
+    """
+    tables = []
+
+    def _iface_route_table_create(iface_route_table):
+        tables.append(iface_route_table)
+        contrail_api_client.interface_route_table_create(iface_route_table)
+
+    yield _iface_route_table_create
+
+    for table in reversed(tables):
+        contrail_api_client.interface_route_table_delete(id=table.uuid)
