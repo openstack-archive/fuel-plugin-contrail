@@ -13,6 +13,8 @@
 #    under the License.
 class contrail::rbac {
 
+  include contrail::rbac_settings
+
   $rbac_wrapper_path = '/var/lib/fuel/rbac_wrapper'
   $public_vip        = $contrail::mos_public_vip
   $api_port          = $contrail::api_server_port
@@ -29,6 +31,7 @@ class contrail::rbac {
   file { "${rbac_wrapper_path}/rbac_settings.yaml":
     ensure  => present,
     content => template('contrail/rbac_settings_dump.yaml.erb'),
+    backup  => '.puppet-bak',
   }
 
   exec { 'create default api access list':
@@ -39,11 +42,14 @@ class contrail::rbac {
   }
 
   exec { 'execute rbac custom python script':
-    command => "sudo python ${rbac_wrapper_path}/rbac_wrapper.py ${public_vip}",
-    unless  => "test `sudo python ${rbacutil_path}/rbacutil.py --name '${domain}:${access_list}' --op read --os-username ${user_name} --os-password ${user_password} --os-tenant-name '${tenant_name}' --server ${public_vip}:${api_port} | grep Rules | sed -r 's/.*\(([0-9]*).*/\1/g'` -gt 0",
-    path    => '/bin:/usr/bin:/usr/local/bin',
-    timeout => 900,
-    require => Exec['create default api access list'],
+    command     => "sudo python ${rbac_wrapper_path}/rbac_wrapper.py ${public_vip}",
+    path        => '/bin:/usr/bin:/usr/local/bin',
+    timeout     => 900,
+    require     => Exec['create default api access list'],
+    subscribe   => File["${rbac_wrapper_path}/rbac_settings.yaml"],
+    refreshonly => true,
   }
+
+  File <| require == File[$rbac_wrapper_path] |> -> File["${rbac_wrapper_path}/rbac_settings.yaml"]
 
 }
