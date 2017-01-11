@@ -1,8 +1,9 @@
 """`contrail-status` CLI command results parser."""
 import re
 
-from hamcrest import assert_that, empty  # noqa H301
+from hamcrest import assert_that, empty, has_entries  # noqa H301
 from six import moves
+from stepler.third_party import waiter
 
 GOOD_STATUSES = {'active', 'backup'}
 
@@ -55,8 +56,26 @@ def check_services_statuses(os_faults_steps):
         for name, status in services.items():
             if status not in GOOD_STATUSES:
                 err_msg = "{node}:{service} - {status}".format(
-                    node=fqdn,
-                    service=name,
-                    status=status)
+                    node=fqdn, service=name, status=status)
                 broken_services.append(err_msg)
     assert_that(broken_services, empty())
+
+
+def check_service_status(os_faults_steps,
+                         nodes_fqdns,
+                         service,
+                         expected_status,
+                         timeout=0):
+    """Check that service on nodes_fqdns has expected status."""
+
+    def predicate():
+        statuses = get_services_statuses(os_faults_steps)
+        return waiter.expect_that(statuses,
+                                  has_entries(**{
+                                      node: has_entries({
+                                          service: expected_status
+                                      })
+                                      for node in nodes_fqdns
+                                  }))
+
+    waiter.wait(predicate, timeout_seconds=timeout)

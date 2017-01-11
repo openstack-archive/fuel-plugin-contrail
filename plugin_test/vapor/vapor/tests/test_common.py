@@ -17,6 +17,9 @@ from pycontrail import exceptions
 import pycontrail.types as contrail_types
 from neutronclient.common import exceptions as neutron_exceptions
 
+from vapor.helpers import contrail_status
+from vapor import settings
+
 
 def test_network_deleting_with_server(network, server, contrail_api_client):
     assert_that(
@@ -135,3 +138,34 @@ def test_metadata_service(security_group, port_steps,
                                      ssh_timeout=60) as server_ssh:
         res = server_ssh.execute(u'ls /tmp/', timeout=60)
         assert_that(res.stdout, contains_string(output_filename))
+
+
+def test_restart_control_service(os_faults_steps):
+    """Validate restart of control node services."""
+    control_nodes_fqdns = settings.CONRTAIL_ROLES_DISTRIBUTION[
+        settings.ROLE_CONTRAIL_CONTROLLER]
+    control_nodes = os_faults_steps.get_nodes(fqdns=control_nodes_fqdns)
+
+    contrail_status.check_service_status(
+        os_faults_steps,
+        control_nodes_fqdns,
+        'contrail-control',
+        'active',
+        timeout=0)
+    # Stop services
+    os_faults_steps.execute_cmd(control_nodes, 'service contrail-control stop')
+    contrail_status.check_service_status(
+        os_faults_steps,
+        control_nodes_fqdns,
+        'contrail-control',
+        'inactive',
+        timeout=settings.SERVICE_STATUS_CHANGE_TIMEOUT)
+    # Start services
+    os_faults_steps.execute_cmd(control_nodes,
+                                'service contrail-control start')
+    contrail_status.check_service_status(
+        os_faults_steps,
+        control_nodes_fqdns,
+        'contrail-control',
+        'active',
+        timeout=settings.SERVICE_STATUS_CHANGE_TIMEOUT)
