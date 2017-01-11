@@ -14,15 +14,12 @@
 
 class contrail::webui {
 
-# Resources defaults
-  Package { ensure => present }
-
-  File {
-    ensure  => present,
-    mode    => '0644',
-    owner   => 'contrail',
-    group   => 'contrail',
-    require => Package['contrail-openstack-webui'],
+  apt::pin { 'contrail-nodejs-pin':
+    order    => '101',
+    packages => ['nodejs'],
+    priority => '1200',
+    label    => 'contrail',
+    before   => Package['nodejs'],
   }
 
 # Packages
@@ -34,10 +31,20 @@ class contrail::webui {
 # Webui config files
   file { '/etc/contrail/config.global.js':
     content => template('contrail/config.global.js.erb'),
+    ensure  => present,
+    mode    => '0644',
+    owner   => 'contrail',
+    group   => 'contrail',
+    require => Package['contrail-openstack-webui'],
   }
 
   file { '/etc/contrail/contrail-webui-userauth.js':
     content => template('contrail/contrail-webui-userauth.js.erb'),
+    ensure  => present,
+    mode    => '0644',
+    owner   => 'contrail',
+    group   => 'contrail',
+    require => Package['contrail-openstack-webui'],
   }
 
 # Services
@@ -50,5 +57,4 @@ class contrail::webui {
       File['/etc/contrail/config.global.js'],
       ],
   }
-
 }
