@@ -957,7 +957,7 @@
 - id: rbac-yaml-setting
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-config]
+  role: [primary-contrail-config, contrail-config]
   required_for: [rbac-rule-setting, post_deployment_end]
   requires: [post_deployment_start]
   parameters:
@@ -965,12 +965,23 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+- id: rbac-push-hiera
+  type: puppet
+  version: 2.0.0
+  role: [primary-contrail-config, contrail-config]
+  required_for: [rbac-rule-setting, post_deployment_end]
+  requires: [rbac-yaml-setting, post_deployment_start]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-rbac-hiera.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 - id: rbac-rule-setting
   type: puppet
   version: 2.0.0
-  role: [primary-contrail-config]
+  role: [primary-contrail-config, contrail-config]
   required_for: [post_deployment_end]
-  requires: [rbac-yaml-setting, post_deployment_start]
+  requires: [rbac-yaml-setting, rbac-push-hiera, post_deployment_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-rbac.pp
     puppet_modules: puppet/modules:/etc/puppet/modules

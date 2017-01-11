@@ -31,21 +31,27 @@ class contrail::rbac {
   file { "${rbac_wrapper_path}/rbac_settings.yaml":
     ensure  => present,
     content => template('contrail/rbac_settings_dump.yaml.erb'),
+    backup  => '.puppet-bak',
   }
 
-  exec { 'create default api access list':
-    command => "${confirmation} | sudo python ${rbacutil_path}/rbacutil.py --name '${domain}:${access_list}' --op create --os-username ${user_name} --os-password ${user_password} --os-tenant-name ${tenant_name} --server ${rbac_ip_port}",
-    unless  => "sudo python ${rbacutil_path}/rbacutil.py --name '${domain}:${access_list}' --op read --os-username ${user_name} --os-password ${user_password} --os-tenant-name '${tenant_name}' --server ${rbac_ip_port}",
-    path    => '/bin:/usr/bin:/usr/local/bin',
-    require => File["${rbac_wrapper_path}/rbac_settings.yaml"],
+  if roles_include('primary-contrail-config') {
+    exec { 'create default api access list':
+      command => "${confirmation} | sudo python ${rbacutil_path}/rbacutil.py --name '${domain}:${access_list}' --op create --os-username ${user_name} --os-password ${user_password} --os-tenant-name ${tenant_name} --server ${rbac_ip_port}",
+      unless  => "sudo python ${rbacutil_path}/rbacutil.py --name '${domain}:${access_list}' --op read --os-username ${user_name} --os-password ${user_password} --os-tenant-name '${tenant_name}' --server ${rbac_ip_port}",
+      path    => '/bin:/usr/bin:/usr/local/bin',
+      require => File["${rbac_wrapper_path}/rbac_settings.yaml"],
+    }
+
+    exec { 'execute rbac custom python script':
+      command     => "sudo python ${rbac_wrapper_path}/rbac_wrapper.py ${rbac_ip_port}",
+      path        => '/bin:/usr/bin:/usr/local/bin',
+      timeout     => 900,
+      require     => Exec['create default api access list'],
+      subscribe   => File["${rbac_wrapper_path}/rbac_settings.yaml"],
+      refreshonly => true,
+    }
   }
 
-  exec { 'execute rbac custom python script':
-    command => "sudo python ${rbac_wrapper_path}/rbac_wrapper.py ${rbac_ip_port}",
-    unless  => "test `sudo python ${rbacutil_path}/rbacutil.py --name '${domain}:${access_list}' --op read --os-username ${user_name} --os-password ${user_password} --os-tenant-name '${tenant_name}' --server ${rbac_ip_port} | grep Rules | sed -r 's/.*\(([0-9]*).*/\1/g'` -gt 0",
-    path    => '/bin:/usr/bin:/usr/local/bin',
-    timeout => 900,
-    require => Exec['create default api access list'],
-  }
+  File <| require == File[$rbac_wrapper_path] |> -> File["${rbac_wrapper_path}/rbac_settings.yaml"]
 
 }

@@ -26,11 +26,6 @@ class contrail::rbac_settings {
     ensure => directory,
   }
 
-  file { "${hiera_data_dir}/plugins/rbac_settings.yaml":
-    ensure  => present,
-    content => template('contrail/rbac_settings.yaml.erb'),
-  }
-
   file { "${rbac_wrapper_path}/rbac_wrapper.py":
     ensure  => present,
     content => template('contrail/rbac_wrapper.py.erb'),
