@@ -82,3 +82,11 @@ def get_process_with_wrong_connection_status(ops,
              '.connection_infos[?status!=`{status}`][]').format(
                  module_id=module_id, status=expected_status)
     return jmespath.search(query.format(module_id), ops)
+
+
+def get_process_info_with_wrong_state(ops,
+                                      expected_state='PROCESS_STATE_RUNNING'):
+    """Return processes with wrong state."""
+    query = 'NodeStatus.process_info[?process_state!=`{}`]'.format(
+        expected_state)
+    return jmespath.search(query, ops)

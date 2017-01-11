@@ -1,6 +1,7 @@
 import dpath.util
 import jmespath
-from hamcrest import assert_that, is_, empty, has_key, all_of  # noqa H301
+from hamcrest import (assert_that, is_, empty, has_key, all_of,
+                      equal_to)  # noqa H301
 import pytest
 from six.moves import filter
 
@@ -167,3 +168,36 @@ def test_verify_bgp_peer_uve(client_contrail_analytics):
                         has_key('close'),
                         has_key('open'),
                         has_key('total'), ))
+
+
+@pytest.mark.parametrize(['role', 'method_name'], [
+    (settings.ROLE_CONTRAIL_CONTROLLER, 'get_uves_control_nodes'),
+    (settings.ROLE_CONTRAIL_COMPUTE, 'get_uves_vrouters'),
+    (settings.ROLE_CONTRAIL_ANALYTICS, 'get_uves_analytics_nodes'),
+    (settings.ROLE_CONTRAIL_CONFIG, 'get_uves_config_nodes'),
+])
+def test_hrefs_to_all_uves_of_a_given_uve_type(client_contrail_analytics, role,
+                                               method_name):
+    func = getattr(client_contrail_analytics, method_name)
+    actual_hostnames = set(func())
+    expected_hostnames = set(settings.CONRTAIL_ROLES_DISTRIBUTION[role])
+    assert_that(actual_hostnames, equal_to(expected_hostnames))
+
+
+@pytest.mark.parametrize(['role', 'method_name'], [
+    (settings.ROLE_CONTRAIL_CONFIG, 'get_uves_config_node_ops'),
+    (settings.ROLE_CONTRAIL_ANALYTICS, 'get_uves_analytics_node_ops'),
+])
+def test_uve_module_states(client_contrail_analytics, role, method_name):
+    expected_process_list = settings.CONTRAIL_ANALYTIC_PROCESSES[role]
+    func = getattr(client_contrail_analytics, method_name)
+    for node in settings.CONRTAIL_ROLES_DISTRIBUTION[role]:
+        data = func(node)
+        process_list = jmespath.search(
+            'NodeStatus.process_info[].process_name', data)
+        process_list = map(lambda x: x.split(':')[0], process_list)
+        absent_processes = set(expected_process_list) - set(process_list)
+        assert_that(absent_processes, is_(empty()))
+        wrong_processes = analytic_steps.get_process_info_with_wrong_state(
+            data)
+        assert_that(wrong_processes, is_(empty()))

@@ -79,9 +79,8 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
     ROLE_CONTRAIL_COMPUTE: (
         'contrail-vrouter-agent',
         'supervisor-vrouter',
-        'contrail-vrouter-nodemgr')
+        'contrail-vrouter-nodemgr', )
 }
-
 
 CONRTAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
     'CONRTAIL_ROLES_DISTRIBUTION_YAML',
@@ -90,7 +89,6 @@ CONRTAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
 
 with open(CONRTAIL_ROLES_DISTRIBUTION_YAML) as f:
     CONRTAIL_ROLES_DISTRIBUTION = yaml.safe_load(f) or {}
-
 
 CONTRAIL_CONNECTIONS = {
     ROLE_CONTRAIL_ANALYTICS: [
@@ -104,4 +102,21 @@ CONTRAIL_CONNECTIONS = {
         'contrail-svc-monitor',
         'contrail-api',
     ]
+}
+
+CONTRAIL_ANALYTIC_PROCESSES = {
+    ROLE_CONTRAIL_CONFIG: [
+        'contrail-discovery',
+        'contrail-config-nodemgr',
+        'contrail-svc-monitor',
+        'ifmap',
+        'contrail-api',
+        'contrail-schema',
+    ],
+    ROLE_CONTRAIL_ANALYTICS: [
+        'contrail-query-engine',
+        'contrail-analytics-api',
+        'contrail-collector',
+        'contrail-analytics-nodemgr',
+    ],
 }
