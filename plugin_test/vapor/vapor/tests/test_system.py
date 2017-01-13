@@ -13,8 +13,11 @@
 import itertools
 import time
 
-from hamcrest import assert_that, has_length, has_items, has_entries, equal_to
+from hamcrest import (assert_that, has_length, has_items, has_entries,
+                      equal_to, is_not)
+import pytest
 from stepler import config as stepler_config
+from stepler.third_party import utils
 
 from vapor.helpers import contrail_steps
 from vapor.helpers import nodes_steps
@@ -121,3 +124,46 @@ def test_create_network_with_contrail(
                                                       server.id):
             networks.add(net.uuid)
     assert_that(networks, equal_to(set([contrail_network.uuid])))
+
+
+@pytest.mark.usefixtures('neutron_network_cleanup')
+def test_create_and_terminate_networks(contrail_api_client, network_steps):
+    """Create and terminate networks and verify in Contrail.
+
+    Steps:
+        #. Create 2 private networks with Neutron
+        #. Check that networks is present in Contrail
+        #. Delete one of networks with Neutron
+        #. Check that deleted network is not present in Contrail
+        #. Add private network with Neutron
+        #. Check that created network is present in Contrail
+    """
+    # Create networks
+    networks = []
+    for name in utils.generate_ids(count=2):
+        networks.append(network_steps.create(name))
+
+    # Check networks in contrail
+    contrail_networks = contrail_api_client.virtual_networks_list()
+    matchers = [has_entries(uuid=network['id']) for network in networks]
+    assert_that(contrail_networks['virtual-networks'], has_items(*matchers))
+
+    # Delete network
+    network_to_delete = networks.pop()
+    network_steps.delete(network_to_delete)
+
+    # Check that deleted network is not present in Contrail
+    contrail_networks = contrail_api_client.virtual_networks_list()
+    assert_that(
+        contrail_networks['virtual-networks'],
+        is_not(has_items(has_entries(uuid=network_to_delete['id']))))
+
+    # Create new network
+    net_name, = utils.generate_ids()
+    new_network = network_steps.create(name)
+
+    # Check that created network is present in Contrail
+    contrail_networks = contrail_api_client.virtual_networks_list()
+    assert_that(
+        contrail_networks['virtual-networks'],
+        has_items(has_entries(uuid=new_network['id'])))
