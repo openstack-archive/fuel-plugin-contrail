@@ -10,8 +10,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from hamcrest import assert_that, calling, raises  # noqa H301
+import pytest
+from hamcrest import (assert_that, calling, raises,
+                      has_item, has_entry)  # noqa H301
+from stepler.third_party import utils
 from pycontrail import exceptions
+import pycontrail.types as types
 
 
 def test_network_deleting_with_server(network, server, contrail_api_client):
@@ -29,4 +33,31 @@ def test_create_vm_bulk(net_subnet_router, tiny_flavor,
                                           image=cirros_image,
                                           flavor=tiny_flavor,
                                           networks=[network])
+    server_steps.delete_servers(servers)
+
+
+@pytest.mark.usefixtures('contrail_network_cleanup')
+def test_delete_vm_with_associated_vn(contrail_api_client,
+                                      tiny_flavor, cirros_image,
+                                      server_steps, network_steps):
+
+    network_name, = utils.generate_ids()
+    contrail_network = types.VirtualNetwork(network_name)
+    contrail_api_client.virtual_network_create(contrail_network)
+    networks = contrail_api_client.virtual_networks_list()
+    assert_that(networks['virtual-networks'],
+                has_item(has_entry('uuid', contrail_network.uuid)))
+
+    network = network_steps.get_network(id=contrail_network.uuid)
+    servers = server_steps.create_servers(count=1,
+                                          image=cirros_image,
+                                          flavor=tiny_flavor,
+                                          networks=[network])
+    # TODO: Is it necessary to check network deleted while attached to VM
+    network_steps.delete_network(network)
+
+    networks = contrail_api_client.virtual_networks_list()
+    assert_that(networks['virtual-networks'],
+                has_item(has_entry('uuid', contrail_network.uuid)))
+
     server_steps.delete_servers(servers)
