@@ -27,4 +27,5 @@ def contrail_network(contrail_api_client):
     network_name, = utils.generate_ids()
     net = types.VirtualNetwork(network_name)
     contrail_api_client.virtual_network_create(net)
-    return net
+    yield net
+    contrail_api_client.virtual_network_delete(id=net.uuid)

@@ -154,3 +154,9 @@ def nodes_ips(os_faults_steps):
         node_ips_[fqdn] = node_result.payload['stdout_lines']
 
     return node_ips_
+
+
+@pytest.fixture
+def default_project(contrail_api_client):
+    proj_id = contrail_api_client.project_get_default_id()
+    return contrail_api_client.project_read(id=proj_id)
