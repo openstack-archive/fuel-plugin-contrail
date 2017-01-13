@@ -35,7 +35,7 @@ class contrail::vip {
     ipaddresses            => $contrail::contrail_analytics_ips,
     public                 => true,
     internal               => true,
-    haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check'],
+    haproxy_config_options => { 'option'         => 'tcp-check',
                                 'balance'        => 'roundrobin',
                                 'tcp-check'      => 'connect port 6379',
                                 'default-server' => 'error-limit 1 on-error mark-down' },
@@ -50,8 +50,7 @@ class contrail::vip {
     ipaddresses            => $contrail::contrail_controller_ips,
     public                 => false,
     internal               => true,
-    haproxy_config_options => { 'option'  => 'nolinger',
-                                'balance' => 'roundrobin',
+    haproxy_config_options => { 'balance' => 'roundrobin',
                                 'timeout' => ['server 3m', 'client 3m'] },
     balancermember_options => 'check inter 2000 rise 2 fall 3',
   }
@@ -66,8 +65,7 @@ class contrail::vip {
     internal               => false,
     public_ssl             => $contrail::public_ssl,
     public_ssl_path        => $contrail::public_ssl_path,
-    haproxy_config_options => { 'option'  => 'nolinger',
-                                'balance' => 'roundrobin',
+    haproxy_config_options => { 'balance' => 'roundrobin',
                                 'timeout' => ['server 3m', 'client 3m'] },
     balancermember_options => 'check inter 2000 rise 2 fall 3',
   }
@@ -80,8 +78,7 @@ class contrail::vip {
     ipaddresses            => $contrail::contrail_controller_ips,
     public                 => false,
     internal               => true,
-    haproxy_config_options => { 'option'  => 'nolinger',
-                                'balance' => 'roundrobin' },
+    haproxy_config_options => { 'balance' => 'roundrobin' },
     balancermember_options => 'check inter 2000 rise 2 fall 3',
   }
 
@@ -95,7 +92,7 @@ class contrail::vip {
     internal               => false,
     public_ssl             => $contrail::public_ssl,
     public_ssl_path        => $contrail::public_ssl_path,
-    haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check'],
+    haproxy_config_options => { 'option'         => 'tcp-check',
                                 'balance'        => 'source',
                                 'tcp-check'      => "connect port ${ui_backend_port}",
                                 'default-server' => 'error-limit 1 on-error mark-down',
