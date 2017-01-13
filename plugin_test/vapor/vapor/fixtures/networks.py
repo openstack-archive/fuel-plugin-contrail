@@ -23,6 +23,20 @@ def contrail_network_cleanup(contrail_api_client):
 
 
 @pytest.fixture
+def neutron_network_cleanup(network_steps):
+
+    def _get_network_id():
+        return {net['id'] for net in network_steps.get_networks(check=False)}
+
+    before = _get_network_id()
+
+    yield
+
+    for net_id in _get_network_id() - before:
+        network_steps.delete({'id': net_id})
+
+
+@pytest.fixture
 def contrail_network(contrail_api_client):
     network_name, = utils.generate_ids()
     net = types.VirtualNetwork(network_name)
