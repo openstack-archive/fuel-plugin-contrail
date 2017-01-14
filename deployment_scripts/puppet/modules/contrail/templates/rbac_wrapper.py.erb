@@ -42,6 +42,7 @@ class RbacWrapper:
             admin_access = 'CRUD'
             # Port will dynamically get-fetched from manifest
             port = '<%= scope.lookupvar('contrail::api_server_port') %>'
+            port = '9100'
             confirm =  'y'
             contrail_usr = 'admin'
             contrail_pwd = 'admin'
