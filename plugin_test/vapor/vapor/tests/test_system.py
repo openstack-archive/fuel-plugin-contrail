@@ -15,6 +15,7 @@ import time
 
 from hamcrest import (assert_that, has_length, has_items, has_entries,
                       equal_to, is_not)
+import pycontrail.types as types
 import pytest
 from stepler import config as stepler_config
 from stepler.third_party import utils
@@ -167,3 +168,78 @@ def test_create_and_terminate_networks(contrail_api_client, network_steps):
     assert_that(
         contrail_networks['virtual-networks'],
         has_items(has_entries(uuid=new_network['id'])))
+
+
+def test_networks_connectivity_with_router(
+        contrail_2_servers_diff_nets_with_floating, create_router,
+        add_router_interfaces, server_steps):
+    """Check connectivity on different nodes and different private networks.
+
+    Test with creating router.
+
+    Steps:
+        #. Create 2 networks
+        #. Launch 2 instances in different network on different computes.
+        #. Check that there is no ping between instances.
+        #. Create a router betwheen networks.
+        #. Check ping between instances.
+
+    """
+    resources = contrail_2_servers_diff_nets_with_floating
+
+    # Check ping will fail
+    with pytest.raises(Exception):
+        server_steps.check_ping_between_servers_via_floating(resources.servers)
+
+    # Create router
+    router = create_router(next(utils.generate_ids()))
+    add_router_interfaces(router, resources.subnets)
+
+    # Check ping
+    server_steps.check_ping_between_servers_via_floating(resources.servers)
+
+
+def test_network_connectivity_with_policy(
+        contrail_2_servers_diff_nets_with_floating, contrail_network_policy,
+        set_network_policy, contrail_api_client, server_steps):
+    """Check connectivity on different nodes and different private networks.
+
+    Test with creating policy.
+
+    Steps:
+        #. Create 2 networks
+        #. Launch 2 instances in different network on different computes.
+        #. Check that there is no ping between instances.
+        #. Connect the networks via Contrail Network Policies.
+        #. Check ping between instances.
+
+    """
+    resources = contrail_2_servers_diff_nets_with_floating
+
+    # Check ping will fail
+    with pytest.raises(Exception):
+        server_steps.check_ping_between_servers_via_floating(resources.servers)
+
+    # Create policy
+    address = types.AddressType(virtual_network='any')
+    port = types.PortType(start_port=-1, end_port=-1)
+    action = types.ActionListType(simple_action='pass')
+    rule = types.PolicyRuleType(
+        protocol='any',
+        direction='<>',
+        src_addresses=[address],
+        src_ports=[port],
+        dst_addresses=[address],
+        dst_ports=[port],
+        action_list=action)
+    policy_entries = types.PolicyEntriesType(policy_rule=[rule])
+    contrail_network_policy.network_policy_entries = policy_entries
+    contrail_api_client.network_policy_update(contrail_network_policy)
+
+    # Bind policy to networks
+    for net in resources.networks:
+        contrail_net = contrail_api_client.virtual_network_read(id=net['id'])
+        set_network_policy(contrail_net, contrail_network_policy)
+
+    # Check ping
+    server_steps.check_ping_between_servers_via_floating(resources.servers)
