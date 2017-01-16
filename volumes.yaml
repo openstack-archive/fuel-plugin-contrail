@@ -3,7 +3,7 @@ volumes:
     type: "vg"
     min_size:
       generator: "calc_gb_to_mb"
-      generator_args: [256]
+      generator_args: [10]
     label: "Contrail Database"
     volumes:
       - mount: "/var/lib/contrail_db"
@@ -18,7 +18,7 @@ volumes:
     name: "Crash dumps"
     min_size:
       generator: "calc_gb_to_mb"
-      generator_args: [100]
+      generator_args: [10]
     label: "Crash_dumps"
     mount: "/var/crashes"
     file_system: "xfs"
