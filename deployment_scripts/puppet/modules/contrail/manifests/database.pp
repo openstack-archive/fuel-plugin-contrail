@@ -79,6 +79,7 @@ class contrail::database {
     service { 'kafka':
       ensure    => stopped,
       enable    => false,
+      hasstatus => false,
     }
 
   } elsif roles_include($contrail::analytics_db_roles) {
