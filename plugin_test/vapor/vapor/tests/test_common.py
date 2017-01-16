@@ -10,8 +10,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from hamcrest import assert_that, calling, raises  # noqa H301
+import pytest
+from hamcrest import (assert_that, calling, raises,
+                      has_item, has_entry)  # noqa H301
+from stepler.third_party import utils
 from pycontrail import exceptions
+import pycontrail.types as types
 
 
 def test_network_deleting_with_server(network, server, contrail_api_client):
@@ -29,4 +33,20 @@ def test_create_vm_bulk(net_subnet_router, tiny_flavor,
                                           image=cirros_image,
                                           flavor=tiny_flavor,
                                           networks=[network])
+    server_steps.delete_servers(servers)
+
+
+def test_delete_vm_with_associated_vn(contrail_network, contrail_subnet,
+                                      tiny_flavor, cirros_image,
+                                      server_steps, network_steps):
+
+    servers = server_steps.create_servers(
+        count=1, image=cirros_image, flavor=tiny_flavor,
+        nics=[{'net-id': contrail_network.uuid}])
+
+    net = network_steps.get_network(id = contrail_network.uuid)
+
+    assert_that(
+        calling(network_steps.delete).with_args(net),
+        raises(exceptions.RefsExistError))
     server_steps.delete_servers(servers)
