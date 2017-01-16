@@ -23,8 +23,10 @@ def contrail_policies_cleanup(contrail_api_client):
 
 
 @pytest.fixture
-def contrail_network_policy(contrail_api_client):
+def contrail_network_policy(contrail_api_client, contrail_current_project):
     policy_name, = utils.generate_ids()
-    policy = types.NetworkPolicy(policy_name)
+    policy = types.NetworkPolicy(
+        policy_name, parent_obj=contrail_current_project)
     contrail_api_client.network_policy_create(policy)
-    return policy
+    yield policy
+    contrail_api_client.network_policy_delete(id=policy.uuid)

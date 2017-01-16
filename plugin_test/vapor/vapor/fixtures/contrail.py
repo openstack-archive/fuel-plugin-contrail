@@ -1,4 +1,5 @@
 import os
+import uuid
 
 import pycontrail.client as client
 import pytest
@@ -160,3 +161,9 @@ def nodes_ips(os_faults_steps):
 def default_project(contrail_api_client):
     proj_id = contrail_api_client.project_get_default_id()
     return contrail_api_client.project_read(id=proj_id)
+
+
+@pytest.fixture
+def contrail_current_project(contrail_api_client, current_project):
+    project_id = str(uuid.UUID(current_project.id))
+    return contrail_api_client.project_read(id=project_id)
