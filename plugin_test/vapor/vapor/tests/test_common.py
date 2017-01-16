@@ -10,10 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import pytest
-from hamcrest import (assert_that, calling, raises,
-                      has_item, has_entry)  # noqa H301
-from stepler.third_party import utils
+from hamcrest import assert_that, calling, raises  # noqa H301
 from pycontrail import exceptions
 import pycontrail.types as types
 
@@ -50,3 +47,20 @@ def test_delete_vm_with_associated_vn(contrail_network, contrail_subnet,
         calling(network_steps.delete).with_args(net),
         raises(exceptions.RefsExistError))
     server_steps.delete_servers(servers)
+
+
+def test_two_nets_same_name(contrail_api_client, contrail_network,
+                            contrail_subnet):
+    """
+        Description: Test to validate that with the same subnet and
+            name provided, two different VNs cannot be created.
+        Test steps:
+            1. Create a VN.
+            2. Create a second VN with the same name and subnet as the first VN.
+            3. Verify that no second VN object is created.
+        Pass criteria: There is a single VN created.
+    """
+    net = types.VirtualNetwork(contrail_network.name)
+    assert_that(
+        calling(contrail_api_client.virtual_network_create).with_args(net),
+        raises(exceptions.RefsExistError))
