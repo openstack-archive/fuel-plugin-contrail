@@ -14,11 +14,14 @@ import itertools
 import time
 
 from hamcrest import (assert_that, has_length, has_items, has_entries,
-                      equal_to, is_not)
+                      equal_to, is_not, empty)
+import pycontrail.client as client
+from pycontrail import exceptions
 import pycontrail.types as types
 import pytest
 from stepler import config as stepler_config
 from stepler.third_party import utils
+from stepler.third_party import waiter
 
 from vapor.helpers import contrail_steps
 from vapor.helpers import nodes_steps
@@ -243,3 +246,54 @@ def test_network_connectivity_with_policy(
 
     # Check ping
     server_steps.check_ping_between_servers_via_floating(resources.servers)
+
+
+def test_change_login_and_password(session, current_project,
+                                   contrail_api_endpoint, create_user,
+                                   user_steps, role_steps):
+    """Verify that login and password can be changed.
+
+    Steps:
+        #. Create new user
+        #. Make Contrail client with new user credentials
+        #. Check that client is operable
+        #. Change password for user
+        #. Make Contrail client with new user credentials
+        #. Check that client is operable
+    """
+    # Create user
+    (user_name, ) = utils.generate_ids()
+    password = user_name
+    role = role_steps.get_role(name=stepler_config.ROLE_ADMIN)
+    user = create_user(user_name=user_name, password=password)
+    role_steps.grant_role(role, user, project=current_project)
+
+    # Make Contrail client with new user credentials
+    auth_params = {
+        'type': 'keystone',
+        'auth_url': session.auth.auth_url,
+        'username': user_name,
+        'password': password,
+        'tenant_name': current_project.name
+    }
+    conn = client.Client(
+        url=contrail_api_endpoint, auth_params=auth_params, blocking=False)
+
+    # Check client operate
+    assert_that(conn.virtual_networks_list(), is_not(empty()))
+
+    # Change user password
+    password = "password"
+    user_steps.update_user(user, password=password)
+
+    # Make Contrail client with new user credentials
+    auth_params['password'] = password
+    conn = client.Client(
+        url=contrail_api_endpoint, auth_params=auth_params, blocking=False)
+
+    # Check client operate
+    net_list = waiter.wait(
+        conn.virtual_networks_list,
+        expected_exceptions=exceptions.AuthenticationFailed,
+        timeout_seconds=settings.PASSWORD_CHANGE_TIMEOUT)
+    assert_that(net_list, is_not(empty()))
