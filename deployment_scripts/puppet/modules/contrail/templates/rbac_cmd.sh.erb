@@ -9,12 +9,12 @@ DOMAIN='default-domain'
 API='default-api-access-list'
 ACTION=$1
 PERMS=$2
-PROJECT='admin'
 USR=$4
 PWD=$5
 OPER='add-rule'
 #PORT=8182
 PORT=$3
 VIP=<%= scope.lookupvar('contrail::rbac_settings::rbac_ip_port') %>
+PROJECT=<%= scope.lookupvar('contrail::rbac_settings::tenant_name') %>
 
 sudo python "$UTIL" --name "$DOMAIN:$API" --rule "$ACTION $PERMS" --op $OPER --os-username $USR --os-password $PWD --os-tenant-name "$PROJECT" --server "$VIP"

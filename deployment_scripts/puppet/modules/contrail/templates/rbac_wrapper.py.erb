@@ -44,8 +44,8 @@ class RbacWrapper:
             port = '<%= scope.lookupvar('contrail::api_server_port') %>'
             port = '9100'
             confirm =  'y'
-            contrail_usr = 'admin'
-            contrail_pwd = 'admin'
+            contrail_usr = '<%= scope.lookupvar('contrail::rbac_settings::user_name') %>'
+            contrail_pwd = '<%= scope.lookupvar('contrail::rbac_settings::user_password') %>'
             script_path = '/var/lib/fuel/rbac_wrapper/rbac_cmd.sh'
             if not content.read():
                 logging.error("Empty file found")

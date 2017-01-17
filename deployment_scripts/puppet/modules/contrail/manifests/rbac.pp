@@ -23,10 +23,9 @@ class contrail::rbac {
   $confirmation      = '/bin/echo y'
   $domain            = 'default-domain'
   $access_list       = 'default-api-access-list'
-  $rbac_access       = hiera_hash('rbac_access', {})
-  $user_name         = pick($rbac_access['user'], 'admin')
-  $user_password     = pick($rbac_access['password'], 'admin')
-  $tenant_name       = pick($rbac_access['tenant'], 'admin')
+  $user_name         = $contrail::rbac_settings::user_name
+  $user_password     = $contrail::rbac_settings::user_password
+  $tenant_name       = $contrail::rbac_settings::tenant_name
   $rbac_rules        = hiera_hash('rbac_rules', {})
 
   file { "${rbac_wrapper_path}/rbac_settings.yaml":

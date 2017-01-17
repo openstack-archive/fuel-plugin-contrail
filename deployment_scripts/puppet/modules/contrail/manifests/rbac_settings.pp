@@ -17,6 +17,10 @@ class contrail::rbac_settings {
   $rbac_wrapper_path = '/var/lib/fuel/rbac_wrapper'
   $hiera_data_dir    = '/etc/hiera'
   $rbac_ip_port      = '127.0.0.1:9100'
+  $rbac_access       = hiera_hash('access', {})
+  $user_name         = pick($rbac_access['user'], 'admin')
+  $user_password     = pick($rbac_access['password'], 'admin')
+  $tenant_name       = pick($rbac_access['tenant'], 'admin')
 
   file { $rbac_wrapper_path:
     ensure => directory,
