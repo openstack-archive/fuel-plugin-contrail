@@ -36,6 +36,9 @@ SERVICE_STATUS_CHANGE_TIMEOUT = 60
 # Time to wait until nova server will know about attached floating IP
 FLOATING_IP_BIND_TIMEOUT = 30
 
+# Time to applying new password on keystone
+PASSWORD_CHANGE_TIMEOUT = 30
+
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
