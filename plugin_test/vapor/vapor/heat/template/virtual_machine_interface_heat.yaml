@@ -1,0 +1,535 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a VirtualMachineInterface:
+
+parameters:
+  name:
+    type: string
+    description: name for the VirtualMachineInterface
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the VirtualMachineInterface
+    # required: optional
+  ecmp_hashing_include_fields_hashing_configured:
+    type: boolean
+    description: When True, Packet header fields used in calculating ECMP hash is decided by following flags
+    # operations: CRUD
+    # required: optional
+  ecmp_hashing_include_fields_source_ip:
+    type: boolean
+    description: When false, do not use source ip in the ECMP hash calculation
+    # operations: CRUD
+    # required: optional
+  ecmp_hashing_include_fields_destination_ip:
+    type: boolean
+    description: When false, do not use destination ip in the ECMP hash calculation
+    # operations: CRUD
+    # required: optional
+  ecmp_hashing_include_fields_ip_protocol:
+    type: boolean
+    description: When false, do not use ip protocol in the ECMP hash calculation
+    # operations: CRUD
+    # required: optional
+  ecmp_hashing_include_fields_source_port:
+    type: boolean
+    description: When false, do not use source port in the ECMP hash calculation
+    # operations: CRUD
+    # required: optional
+  ecmp_hashing_include_fields_destination_port:
+    type: boolean
+    description: When false, do not use destination port in the ECMP hash calculation
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_host_routes_route_prefix:
+    type: string
+    description: Ip prefix/len format prefix
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_host_routes_route_next_hop:
+    type: string
+    description: Ip address or service instance name.
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_host_routes_route_next_hop_type:
+    type: string
+    description: next_hop_type for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_host_routes_route_community_attributes_community_attribute:
+    type: string
+    description: community_attribute for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_mac_addresses_mac_address:
+    type: string
+    description: mac_address for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_name:
+    type: string
+    description: Name of the DHCP option
+    # operations: CRUD
+    # required: true
+  virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_value:
+    type: string
+    description: Encoded DHCP option value (decimal)
+    # operations: CRUD
+    # required: true
+  virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_value_bytes:
+    type: string
+    description: Value of the DHCP option to be copied byte by byte
+    # operations: CRUD
+    # required: true
+  virtual_machine_interface_bindings_key_value_pair_key:
+    type: string
+    description: key for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_bindings_key_value_pair_value:
+    type: string
+    description: value for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_disable_policy:
+    type: boolean
+    description: When True all policy checks for ingress and egress traffic from this interface are disabled. Flow
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_allowed_address_pairs_allowed_address_pair_ip_ip_prefix:
+    type: string
+    description: ip_prefix for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_allowed_address_pairs_allowed_address_pair_mac:
+    type: string
+    description: mac for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_allowed_address_pairs_allowed_address_pair_address_mode:
+    type: string
+    description: Address-mode active-backup is used for VRRP address.                           Address-mode active-active is used for ECMP.
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_fat_flow_protocols_fat_flow_protocol_protocol:
+    type: string
+    description: protocol for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_fat_flow_protocols_fat_flow_protocol_port:
+    type: number
+    description: port for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_device_owner:
+    type: string
+    description: For openstack compatibility, not used by system.
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_protocol:
+    type: string
+    description: Layer 4 protocol in ip packet
+    # operations: CRUD
+    # required: true
+  vrf_assign_table_vrf_assign_rule_match_condition_src_address_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_src_address_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_src_address_virtual_network:
+    type: string
+    description: Any address that belongs to this virtul network
+    # operations: CRUD
+    # required: exclusive
+  vrf_assign_table_vrf_assign_rule_match_condition_src_address_security_group:
+    type: string
+    description: Any address that belongs to interface with this security-group
+    # operations: CRUD
+    # required: exclusive
+  vrf_assign_table_vrf_assign_rule_match_condition_src_address_network_policy:
+    type: string
+    description: Any adddress that belongs to virtul network which has this policy attached
+    # operations: CRUD
+    # required: exclusive
+  vrf_assign_table_vrf_assign_rule_match_condition_src_address_subnet_list_ip_prefix:
+    type: string
+    description: ip_prefix for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_src_address_subnet_list_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_src_port_start_port:
+    type: number
+    description: start_port for the VirtualMachineInterface
+    # operations: CRUD
+    # required: true
+  vrf_assign_table_vrf_assign_rule_match_condition_src_port_end_port:
+    type: number
+    description: end_port for the VirtualMachineInterface
+    # operations: CRUD
+    # required: true
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_address_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_address_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_address_virtual_network:
+    type: string
+    description: Any address that belongs to this virtul network
+    # operations: CRUD
+    # required: exclusive
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_address_security_group:
+    type: string
+    description: Any address that belongs to interface with this security-group
+    # operations: CRUD
+    # required: exclusive
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_address_network_policy:
+    type: string
+    description: Any adddress that belongs to virtul network which has this policy attached
+    # operations: CRUD
+    # required: exclusive
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_address_subnet_list_ip_prefix:
+    type: string
+    description: ip_prefix for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_address_subnet_list_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_port_start_port:
+    type: number
+    description: start_port for the VirtualMachineInterface
+    # operations: CRUD
+    # required: true
+  vrf_assign_table_vrf_assign_rule_match_condition_dst_port_end_port:
+    type: number
+    description: end_port for the VirtualMachineInterface
+    # operations: CRUD
+    # required: true
+  vrf_assign_table_vrf_assign_rule_match_condition_ethertype:
+    type: string
+    description: ethertype for the VirtualMachineInterface
+    # operations: CRUD
+    # required: true
+  vrf_assign_table_vrf_assign_rule_vlan_tag:
+    type: number
+    description: vlan_tag for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_routing_instance:
+    type: string
+    description: routing_instance for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  vrf_assign_table_vrf_assign_rule_ignore_acl:
+    type: boolean
+    description: ignore_acl for the VirtualMachineInterface
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_service_interface_type:
+    type: string
+    description: This interface belongs to Service Instance and is tagged as left, right or other
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_interface_mirror_traffic_direction:
+    type: string
+    description: Specifies direction of traffic to mirror, Ingress, Egress or both
+    # operations: CRUD
+    # required: true
+  virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_name:
+    type: string
+    description: Name of service instance used as analyzer
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_interface_mirror_mirror_to_encapsulation:
+    type: string
+    description: Encapsulation for Mirrored packet, not used currently
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_ip_address:
+    type: string
+    description: ip address of interface to which mirrored packets are sent
+    # operations: CRUD
+    # required: true
+  virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_mac_address:
+    type: string
+    description: mac address of interface to which mirrored packets are sent
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_interface_mirror_mirror_to_routing_instance:
+    type: string
+    description: Internal use only, should be set to -1
+    # operations: CRUD
+    # required: true
+  virtual_machine_interface_properties_interface_mirror_mirror_to_udp_port:
+    type: number
+    description: ip udp port used in contrail default encapsulation for mirroring
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_interface_mirror_mirror_to_juniper_header:
+    type: boolean
+    description: This flag is used to determine with/without juniper-header
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_interface_mirror_mirror_to_nh_mode:
+    type: string
+    description: This mode used to determine static or dynamic nh
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vtep_dst_ip_address:
+    type: string
+    description: ip address of destination vtep
+    # operations: CRUD
+    # required: true
+  virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vtep_dst_mac_address:
+    type: string
+    description: mac address of destination vtep
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vni:
+    type: number
+    description: Vni of vtep
+    # operations: CRUD
+    # required: true
+  virtual_machine_interface_properties_local_preference:
+    type: number
+    description: BGP route local preference for routes representing this interface, higher value is higher preference
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_properties_sub_interface_vlan_tag:
+    type: number
+    description: 802.1Q VLAN tag to be used if this interface is sub-interface for some other interface.
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  # service_health_check_refs:
+  #   type: string
+  #   description: Refernce to health check object attached to this interface.
+  #   # required: optional
+  routing_instance_refs_data_direction:
+    type: string
+    description: direction for the VirtualMachineInterface
+    # required: optional
+  routing_instance_refs_data_vlan_tag:
+    type: number
+    description: vlan_tag for the VirtualMachineInterface
+    # required: optional
+  routing_instance_refs_data_src_mac:
+    type: string
+    description: src_mac for the VirtualMachineInterface
+    # required: optional
+  routing_instance_refs_data_dst_mac:
+    type: string
+    description: dst_mac for the VirtualMachineInterface
+    # required: optional
+  routing_instance_refs_data_mpls_label:
+    type: number
+    description: mpls_label for the VirtualMachineInterface
+    # required: optional
+  routing_instance_refs_data_service_chain_address:
+    type: string
+    description: service_chain_address for the VirtualMachineInterface
+    # required: optional
+  routing_instance_refs_data_ipv6_service_chain_address:
+    type: string
+    description: ipv6_service_chain_address for the VirtualMachineInterface
+    # required: optional
+  routing_instance_refs_data_protocol:
+    type: string
+    description: protocol for the VirtualMachineInterface
+    # required: optional
+  # physical_interface_refs:
+  #   type: string
+  #   description: Reference to the physical interface of service appliance this service interface represents.
+  #   # required: optional
+  # port_tuple_refs:
+  #   type: string
+  #   description: Ordered set of references to the interfaces in this port tuple.
+  #   # required: optional
+  # interface_route_table_refs:
+  #   type: string
+  #   description: Reference to the interface route table attached to this interface.
+  #   # required: optional
+  # qos_config_refs:
+  #   type: string
+  #   description: Reference to QoS config for this virtual machine interface.
+  #   # required: optional
+  project:
+    type: string
+    description: project for the VirtualMachineInterface
+    # required: optional
+
+resources:
+  VirtualMachine:
+    type: OS::ContrailV2::VirtualMachine
+
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      project: { get_param: project }
+
+  VirtualMachineInterface:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      virtual_network_refs: [{ get_resource: VirtualNetwork }]
+      project: { get_param: project }
+
+  RoutingInstance:
+    type: OS::ContrailV2::RoutingInstance
+    properties:
+      name: Something
+      virtual_network: { get_resource: VirtualNetwork }
+
+  SecurityGroup:
+    type: OS::ContrailV2::SecurityGroup
+    properties:
+      project: { get_param: project }
+
+  template_VirtualMachineInterface:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      ecmp_hashing_include_fields:
+        {
+          ecmp_hashing_include_fields_hashing_configured: { get_param: ecmp_hashing_include_fields_hashing_configured },
+          ecmp_hashing_include_fields_source_ip: { get_param: ecmp_hashing_include_fields_source_ip },
+          ecmp_hashing_include_fields_destination_ip: { get_param: ecmp_hashing_include_fields_destination_ip },
+          ecmp_hashing_include_fields_ip_protocol: { get_param: ecmp_hashing_include_fields_ip_protocol },
+          ecmp_hashing_include_fields_source_port: { get_param: ecmp_hashing_include_fields_source_port },
+          ecmp_hashing_include_fields_destination_port: { get_param: ecmp_hashing_include_fields_destination_port },
+        }
+      virtual_machine_interface_host_routes:
+        {
+          virtual_machine_interface_host_routes_route:
+            [{
+              virtual_machine_interface_host_routes_route_prefix: { get_param: virtual_machine_interface_host_routes_route_prefix },
+              virtual_machine_interface_host_routes_route_next_hop: { get_param: virtual_machine_interface_host_routes_route_next_hop },
+              virtual_machine_interface_host_routes_route_next_hop_type: { get_param: virtual_machine_interface_host_routes_route_next_hop_type },
+              virtual_machine_interface_host_routes_route_community_attributes:
+                {
+                  virtual_machine_interface_host_routes_route_community_attributes_community_attribute: [{ get_param: virtual_machine_interface_host_routes_route_community_attributes_community_attribute }],
+                },
+            }],
+        }
+      virtual_machine_interface_mac_addresses:
+        {
+          virtual_machine_interface_mac_addresses_mac_address: [{ get_param: virtual_machine_interface_mac_addresses_mac_address }],
+        }
+      virtual_machine_interface_dhcp_option_list:
+        {
+          virtual_machine_interface_dhcp_option_list_dhcp_option:
+            [{
+              virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_name: { get_param: virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_name },
+              virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_value: { get_param: virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_value },
+              virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_value_bytes: { get_param: virtual_machine_interface_dhcp_option_list_dhcp_option_dhcp_option_value_bytes },
+            }],
+        }
+      virtual_machine_interface_bindings:
+        {
+          virtual_machine_interface_bindings_key_value_pair:
+            [{
+              virtual_machine_interface_bindings_key_value_pair_key: { get_param: virtual_machine_interface_bindings_key_value_pair_key },
+              virtual_machine_interface_bindings_key_value_pair_value: { get_param: virtual_machine_interface_bindings_key_value_pair_value },
+            }],
+        }
+      virtual_machine_interface_disable_policy: { get_param: virtual_machine_interface_disable_policy }
+      virtual_machine_interface_allowed_address_pairs:
+        {
+          virtual_machine_interface_allowed_address_pairs_allowed_address_pair:
+            [{
+              virtual_machine_interface_allowed_address_pairs_allowed_address_pair_ip:
+                {
+                  virtual_machine_interface_allowed_address_pairs_allowed_address_pair_ip_ip_prefix: { get_param: virtual_machine_interface_allowed_address_pairs_allowed_address_pair_ip_ip_prefix },
+                  virtual_machine_interface_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len: { get_param: virtual_machine_interface_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len },
+                },
+              virtual_machine_interface_allowed_address_pairs_allowed_address_pair_mac: { get_param: virtual_machine_interface_allowed_address_pairs_allowed_address_pair_mac },
+              virtual_machine_interface_allowed_address_pairs_allowed_address_pair_address_mode: { get_param: virtual_machine_interface_allowed_address_pairs_allowed_address_pair_address_mode },
+            }],
+        }
+      virtual_machine_interface_fat_flow_protocols:
+        {
+          virtual_machine_interface_fat_flow_protocols_fat_flow_protocol:
+            [{
+              virtual_machine_interface_fat_flow_protocols_fat_flow_protocol_protocol: { get_param: virtual_machine_interface_fat_flow_protocols_fat_flow_protocol_protocol },
+              virtual_machine_interface_fat_flow_protocols_fat_flow_protocol_port: { get_param: virtual_machine_interface_fat_flow_protocols_fat_flow_protocol_port },
+            }],
+        }
+      virtual_machine_interface_device_owner: { get_param: virtual_machine_interface_device_owner }
+      virtual_machine_interface_properties:
+        {
+          virtual_machine_interface_properties_service_interface_type: { get_param: virtual_machine_interface_properties_service_interface_type },
+          virtual_machine_interface_properties_interface_mirror:
+            {
+              virtual_machine_interface_properties_interface_mirror_traffic_direction: { get_param: virtual_machine_interface_properties_interface_mirror_traffic_direction },
+              virtual_machine_interface_properties_interface_mirror_mirror_to:
+                {
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_name: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_name },
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_encapsulation: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_encapsulation },
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_ip_address: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_ip_address },
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_mac_address: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_analyzer_mac_address },
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_routing_instance: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_routing_instance },
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_udp_port: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_udp_port },
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_juniper_header: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_juniper_header },
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_nh_mode: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_nh_mode },
+                  virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header:
+                    {
+                      virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vtep_dst_ip_address: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vtep_dst_ip_address },
+                      virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vtep_dst_mac_address: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vtep_dst_mac_address },
+                      virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vni: { get_param: virtual_machine_interface_properties_interface_mirror_mirror_to_static_nh_header_vni },
+                    },
+                },
+            },
+          virtual_machine_interface_properties_local_preference: { get_param: virtual_machine_interface_properties_local_preference },
+          virtual_machine_interface_properties_sub_interface_vlan_tag: { get_param: virtual_machine_interface_properties_sub_interface_vlan_tag },
+        }
+      display_name: { get_param: display_name }
+      # service_health_check_refs: [{ get_param: service_health_check_refs }]
+      routing_instance_refs: [{ get_resource: RoutingInstance }]
+      routing_instance_refs_data:
+        [{
+          routing_instance_refs_data_direction: { get_param: routing_instance_refs_data_direction },
+          routing_instance_refs_data_vlan_tag: { get_param: routing_instance_refs_data_vlan_tag },
+          routing_instance_refs_data_src_mac: { get_param: routing_instance_refs_data_src_mac },
+          routing_instance_refs_data_dst_mac: { get_param: routing_instance_refs_data_dst_mac },
+          routing_instance_refs_data_mpls_label: { get_param: routing_instance_refs_data_mpls_label },
+          routing_instance_refs_data_service_chain_address: { get_param: routing_instance_refs_data_service_chain_address },
+          routing_instance_refs_data_ipv6_service_chain_address: { get_param: routing_instance_refs_data_ipv6_service_chain_address },
+          routing_instance_refs_data_protocol: { get_param: routing_instance_refs_data_protocol },
+        }]
+      security_group_refs: [{ get_resource: SecurityGroup }]
+      # physical_interface_refs: [{ get_param: physical_interface_refs }]
+      # port_tuple_refs: [{ get_param: port_tuple_refs }]
+      # interface_route_table_refs: [{ get_param: interface_route_table_refs }]
+      virtual_machine_interface_refs: [{ get_resource: VirtualMachineInterface }]
+      virtual_network_refs: [{ get_resource: VirtualNetwork }]
+      virtual_machine_refs: [{ get_resource: VirtualMachine }]
+      # qos_config_refs: [{ get_param: qos_config_refs }]
+      virtual_machine: { get_resource: VirtualMachine }
+      project: { get_param: project }
+

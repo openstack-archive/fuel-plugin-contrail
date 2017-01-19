@@ -1,0 +1,244 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a AccessControlList:
+
+parameters:
+  name:
+    type: string
+    description: name for the AccessControlList
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the AccessControlList
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_dynamic:
+    type: boolean
+    description: For Internal use only
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_protocol:
+    type: string
+    description: Layer 4 protocol in ip packet
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_match_condition_src_address_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the AccessControlList
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_src_address_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the AccessControlList
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_src_address_virtual_network:
+    type: string
+    description: Any address that belongs to this virtul network
+    # operations: CRUD
+    # required: exclusive
+  access_control_list_entries_acl_rule_match_condition_src_address_security_group:
+    type: string
+    description: Any address that belongs to interface with this security-group
+    # operations: CRUD
+    # required: exclusive
+  access_control_list_entries_acl_rule_match_condition_src_address_network_policy:
+    type: string
+    description: Any adddress that belongs to virtul network which has this policy attached
+    # operations: CRUD
+    # required: exclusive
+  access_control_list_entries_acl_rule_match_condition_src_address_subnet_list_ip_prefix:
+    type: string
+    description: ip_prefix for the AccessControlList
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_src_address_subnet_list_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the AccessControlList
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_src_port_start_port:
+    type: number
+    description: start_port for the AccessControlList
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_match_condition_src_port_end_port:
+    type: number
+    description: end_port for the AccessControlList
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_match_condition_dst_address_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the AccessControlList
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_dst_address_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the AccessControlList
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_dst_address_virtual_network:
+    type: string
+    description: Any address that belongs to this virtul network
+    # operations: CRUD
+    # required: exclusive
+  access_control_list_entries_acl_rule_match_condition_dst_address_security_group:
+    type: string
+    description: Any address that belongs to interface with this security-group
+    # operations: CRUD
+    # required: exclusive
+  access_control_list_entries_acl_rule_match_condition_dst_address_network_policy:
+    type: string
+    description: Any adddress that belongs to virtul network which has this policy attached
+    # operations: CRUD
+    # required: exclusive
+  access_control_list_entries_acl_rule_match_condition_dst_address_subnet_list_ip_prefix:
+    type: string
+    description: ip_prefix for the AccessControlList
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_dst_address_subnet_list_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the AccessControlList
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_match_condition_dst_port_start_port:
+    type: number
+    description: start_port for the AccessControlList
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_match_condition_dst_port_end_port:
+    type: number
+    description: end_port for the AccessControlList
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_match_condition_ethertype:
+    type: string
+    description: ethertype for the AccessControlList
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_action_list_simple_action:
+    type: string
+    description: Simple allow(pass) or deny action for traffic matching this rule
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_action_list_gateway_name:
+    type: string
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_apply_service:
+    type: string
+    description: Ordered list of service instances in service chain applied to traffic matching the rule
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_mirror_to_analyzer_name:
+    type: string
+    description: Name of service instance used as analyzer
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_mirror_to_encapsulation:
+    type: string
+    description: Encapsulation for Mirrored packet, not used currently
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_mirror_to_analyzer_ip_address:
+    type: string
+    description: ip address of interface to which mirrored packets are sent
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_action_list_mirror_to_analyzer_mac_address:
+    type: string
+    description: mac address of interface to which mirrored packets are sent
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_mirror_to_routing_instance:
+    type: string
+    description: Internal use only, should be set to -1
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_action_list_mirror_to_udp_port:
+    type: number
+    description: ip udp port used in contrail default encapsulation for mirroring
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_mirror_to_juniper_header:
+    type: boolean
+    description: This flag is used to determine with/without juniper-header
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_mirror_to_nh_mode:
+    type: string
+    description: This mode used to determine static or dynamic nh
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_mirror_to_static_nh_header_vtep_dst_ip_address:
+    type: string
+    description: ip address of destination vtep
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_action_list_mirror_to_static_nh_header_vtep_dst_mac_address:
+    type: string
+    description: mac address of destination vtep
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_mirror_to_static_nh_header_vni:
+    type: number
+    description: Vni of vtep
+    # operations: CRUD
+    # required: true
+  access_control_list_entries_acl_rule_action_list_assign_routing_instance:
+    type: string
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_log:
+    type: boolean
+    description: Flow records for traffic matching this rule are sent at higher priority
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_alert:
+    type: boolean
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_action_list_qos_action:
+    type: string
+    description: FQN of Qos configuration object for QoS marking
+    # operations: CRUD
+    # required: optional
+  access_control_list_entries_acl_rule_rule_uuid:
+    type: string
+    description: Rule UUID is identifier used in flow records to identify rule
+    # operations: CRUD
+    # required: optional
+  project:
+    type: string
+    description: project for the VirtualNetwork
+    # required: optional
+
+resources:
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      project: { get_param: project }
+
+  SecurityGroup:
+    type: OS::ContrailV2::SecurityGroup
+    properties:
+      project: { get_param: project }
+
+  template_AccessControlList:
+    type: OS::ContrailV2::AccessControlList
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      virtual_network: { get_resource: VirtualNetwork }
+      security_group: { get_resource: SecurityGroup }
+

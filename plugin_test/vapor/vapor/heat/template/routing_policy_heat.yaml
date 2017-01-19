@@ -1,0 +1,162 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a RoutingPolicy:
+
+parameters:
+  name:
+    type: string
+    description: name for the RoutingPolicy
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the RoutingPolicy
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_match_condition_protocol:
+    type: string
+    description: protocol for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_match_condition_community:
+    type: string
+    description: community for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_match_condition_prefix_prefix:
+    type: string
+    description: prefix for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_match_condition_prefix_prefix_type:
+    type: string
+    description: prefix_type for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_action_list_update_community_add_community:
+    type: string
+    description: community for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_action_list_update_community_remove_community:
+    type: string
+    description: community for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_action_list_update_community_set_community:
+    type: string
+    description: community for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_action_list_update_local_pref:
+    type: number
+    description: local_pref for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_action_list_update_med:
+    type: number
+    description: med for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  routing_policy_entries_term_term_action_list_action:
+    type: string
+    description: action for the RoutingPolicy
+    # operations: CRUD
+    # required: optional
+  service_instance_refs_data_left_sequence:
+    type: string
+    description: left_sequence for the RoutingPolicy
+    # required: optional
+  service_instance_refs_data_right_sequence:
+    type: string
+    description: right_sequence for the RoutingPolicy
+    # required: optional
+  routing_instance_refs_data_sequence:
+    type: string
+    description: sequence for the RoutingPolicy
+    # required: optional
+  project:
+    type: string
+    description: project for the RoutingPolicy
+    # required: optional
+
+resources:
+  ServiceInstance:
+    type: OS::ContrailV2::ServiceInstance
+    properties:
+      project: { get_param: project }
+
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      project: { get_param: project }
+
+  RoutingInstance:
+    type: OS::ContrailV2::RoutingInstance
+    properties:
+      name: Something
+      virtual_network: { get_resource: VirtualNetwork }
+
+  template_RoutingPolicy:
+    type: OS::ContrailV2::RoutingPolicy
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      routing_policy_entries:
+        {
+          routing_policy_entries_term:
+            [{
+              routing_policy_entries_term_term_match_condition:
+                {
+                  routing_policy_entries_term_term_match_condition_protocol: [{ get_param: routing_policy_entries_term_term_match_condition_protocol }],
+                  routing_policy_entries_term_term_match_condition_community: { get_param: routing_policy_entries_term_term_match_condition_community },
+                  routing_policy_entries_term_term_match_condition_prefix:
+                    [{
+                      routing_policy_entries_term_term_match_condition_prefix_prefix: { get_param: routing_policy_entries_term_term_match_condition_prefix_prefix },
+                      routing_policy_entries_term_term_match_condition_prefix_prefix_type: { get_param: routing_policy_entries_term_term_match_condition_prefix_prefix_type },
+                    }],
+                },
+              routing_policy_entries_term_term_action_list:
+                {
+                  routing_policy_entries_term_term_action_list_update:
+                    {
+                      routing_policy_entries_term_term_action_list_update_community:
+                        {
+                          routing_policy_entries_term_term_action_list_update_community_add:
+                            {
+                              routing_policy_entries_term_term_action_list_update_community_add_community: [{ get_param: routing_policy_entries_term_term_action_list_update_community_add_community }],
+                            },
+                          routing_policy_entries_term_term_action_list_update_community_remove:
+                            {
+                              routing_policy_entries_term_term_action_list_update_community_remove_community: [{ get_param: routing_policy_entries_term_term_action_list_update_community_remove_community }],
+                            },
+                          routing_policy_entries_term_term_action_list_update_community_set:
+                            {
+                              routing_policy_entries_term_term_action_list_update_community_set_community: [{ get_param: routing_policy_entries_term_term_action_list_update_community_set_community }],
+                            },
+                        },
+                      routing_policy_entries_term_term_action_list_update_local_pref: { get_param: routing_policy_entries_term_term_action_list_update_local_pref },
+                      routing_policy_entries_term_term_action_list_update_med: { get_param: routing_policy_entries_term_term_action_list_update_med },
+                    },
+                  routing_policy_entries_term_term_action_list_action: { get_param: routing_policy_entries_term_term_action_list_action },
+                },
+            }],
+        }
+      service_instance_refs: [{ get_resource: ServiceInstance }]
+      service_instance_refs_data:
+        [{
+          service_instance_refs_data_left_sequence: { get_param: service_instance_refs_data_left_sequence },
+          service_instance_refs_data_right_sequence: { get_param: service_instance_refs_data_right_sequence },
+        }]
+      routing_instance_refs: [{ get_resource: RoutingInstance }]
+      routing_instance_refs_data:
+        [{
+          routing_instance_refs_data_sequence: { get_param: routing_instance_refs_data_sequence },
+        }]
+      project: { get_param: project }
+

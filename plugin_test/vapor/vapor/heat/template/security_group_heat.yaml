@@ -1,0 +1,339 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a SecurityGroup:
+
+parameters:
+  name:
+    type: string
+    description: name for the SecurityGroup
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the SecurityGroup
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  configured_security_group_id:
+    type: number
+    description: configured_security_group_id for the SecurityGroup
+    # operations: CRUDUNIQUE 32 BIT USER DEFINED ID ASSIGNED TO THIS SECURITY GROUP [1, 8M].
+    # required: optional
+  security_group_entries_policy_rule_rule_sequence_major:
+    type: number
+    description: major for the SecurityGroup
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_rule_sequence_minor:
+    type: number
+    description: minor for the SecurityGroup
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_rule_uuid:
+    type: string
+    description: Rule UUID is identifier used in flow records to identify rule
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_direction:
+    type: string
+    description: direction for the SecurityGroup
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_protocol:
+    type: string
+    description: Layer 4 protocol in ip packet
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_src_addresses_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the SecurityGroup
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_src_addresses_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the SecurityGroup
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_src_addresses_virtual_network:
+    type: string
+    description: Any address that belongs to this virtul network
+    # operations: CRUD
+    # required: exclusive
+  security_group_entries_policy_rule_src_addresses_security_group:
+    type: string
+    description: Any address that belongs to interface with this security-group
+    # operations: CRUD
+    # required: exclusive
+  security_group_entries_policy_rule_src_addresses_network_policy:
+    type: string
+    description: Any adddress that belongs to virtul network which has this policy attached
+    # operations: CRUD
+    # required: exclusive
+  security_group_entries_policy_rule_src_addresses_subnet_list_ip_prefix:
+    type: string
+    description: ip_prefix for the SecurityGroup
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_src_addresses_subnet_list_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the SecurityGroup
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_src_ports_start_port:
+    type: number
+    description: start_port for the SecurityGroup
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_src_ports_end_port:
+    type: number
+    description: end_port for the SecurityGroup
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_application:
+    type: string
+    description: Optionally application can be specified instead of protcol and port. not currently implemented
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_dst_addresses_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the SecurityGroup
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_dst_addresses_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the SecurityGroup
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_dst_addresses_virtual_network:
+    type: string
+    description: Any address that belongs to this virtul network
+    # operations: CRUD
+    # required: exclusive
+  security_group_entries_policy_rule_dst_addresses_network_policy:
+    type: string
+    description: Any adddress that belongs to virtul network which has this policy attached
+    # operations: CRUD
+    # required: exclusive
+  security_group_entries_policy_rule_dst_addresses_subnet_list_ip_prefix:
+    type: string
+    description: ip_prefix for the SecurityGroup
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_dst_addresses_subnet_list_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the SecurityGroup
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_dst_ports_start_port:
+    type: number
+    description: start_port for the SecurityGroup
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_dst_ports_end_port:
+    type: number
+    description: end_port for the SecurityGroup
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_action_list_simple_action:
+    type: string
+    description: Simple allow(pass) or deny action for traffic matching this rule
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_action_list_gateway_name:
+    type: string
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_apply_service:
+    type: string
+    description: Ordered list of service instances in service chain applied to traffic matching the rule
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_mirror_to_analyzer_name:
+    type: string
+    description: Name of service instance used as analyzer
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_mirror_to_encapsulation:
+    type: string
+    description: Encapsulation for Mirrored packet, not used currently
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_mirror_to_analyzer_ip_address:
+    type: string
+    description: ip address of interface to which mirrored packets are sent
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_action_list_mirror_to_analyzer_mac_address:
+    type: string
+    description: mac address of interface to which mirrored packets are sent
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_mirror_to_routing_instance:
+    type: string
+    description: Internal use only, should be set to -1
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_action_list_mirror_to_udp_port:
+    type: number
+    description: ip udp port used in contrail default encapsulation for mirroring
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_mirror_to_juniper_header:
+    type: boolean
+    description: This flag is used to determine with/without juniper-header
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_mirror_to_nh_mode:
+    type: string
+    description: This mode used to determine static or dynamic nh
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_ip_address:
+    type: string
+    description: ip address of destination vtep
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_mac_address:
+    type: string
+    description: mac address of destination vtep
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vni:
+    type: number
+    description: Vni of vtep
+    # operations: CRUD
+    # required: true
+  security_group_entries_policy_rule_action_list_assign_routing_instance:
+    type: string
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_log:
+    type: boolean
+    description: Flow records for traffic matching this rule are sent at higher priority
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_alert:
+    type: boolean
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_action_list_qos_action:
+    type: string
+    description: FQN of Qos configuration object for QoS marking
+    # operations: CRUD
+    # required: optional
+  security_group_entries_policy_rule_ethertype:
+    type: string
+    description: ethertype for the SecurityGroup
+    # operations: CRUD
+    # required: true
+  project:
+    type: string
+    description: project for the SecurityGroup
+    # required: optional
+
+resources:
+  SecurityGroup:
+    type: OS::ContrailV2::SecurityGroup
+    properties:
+      project: { get_param: project }
+
+  template_SecurityGroup:
+    type: OS::ContrailV2::SecurityGroup
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      configured_security_group_id: { get_param: configured_security_group_id }
+      security_group_entries:
+        {
+          security_group_entries_policy_rule:
+            [{
+              security_group_entries_policy_rule_rule_sequence:
+                {
+                  security_group_entries_policy_rule_rule_sequence_major: { get_param: security_group_entries_policy_rule_rule_sequence_major },
+                  security_group_entries_policy_rule_rule_sequence_minor: { get_param: security_group_entries_policy_rule_rule_sequence_minor },
+                },
+              security_group_entries_policy_rule_rule_uuid: { get_param: security_group_entries_policy_rule_rule_uuid },
+              security_group_entries_policy_rule_direction: { get_param: security_group_entries_policy_rule_direction },
+              security_group_entries_policy_rule_protocol: { get_param: security_group_entries_policy_rule_protocol },
+              security_group_entries_policy_rule_src_addresses:
+                [{
+                  security_group_entries_policy_rule_src_addresses_subnet:
+                    {
+                      security_group_entries_policy_rule_src_addresses_subnet_ip_prefix: { get_param: security_group_entries_policy_rule_src_addresses_subnet_ip_prefix },
+                      security_group_entries_policy_rule_src_addresses_subnet_ip_prefix_len: { get_param: security_group_entries_policy_rule_src_addresses_subnet_ip_prefix_len },
+                    },
+                  security_group_entries_policy_rule_src_addresses_virtual_network: { get_param: security_group_entries_policy_rule_src_addresses_virtual_network },
+                  security_group_entries_policy_rule_src_addresses_security_group: { get_param: security_group_entries_policy_rule_src_addresses_security_group },
+                  security_group_entries_policy_rule_src_addresses_network_policy: { get_param: security_group_entries_policy_rule_src_addresses_network_policy },
+                  security_group_entries_policy_rule_src_addresses_subnet_list:
+                    [{
+                      security_group_entries_policy_rule_src_addresses_subnet_list_ip_prefix: { get_param: security_group_entries_policy_rule_src_addresses_subnet_list_ip_prefix },
+                      security_group_entries_policy_rule_src_addresses_subnet_list_ip_prefix_len: { get_param: security_group_entries_policy_rule_src_addresses_subnet_list_ip_prefix_len },
+                    }],
+                }],
+              security_group_entries_policy_rule_src_ports:
+                [{
+                  security_group_entries_policy_rule_src_ports_start_port: { get_param: security_group_entries_policy_rule_src_ports_start_port },
+                  security_group_entries_policy_rule_src_ports_end_port: { get_param: security_group_entries_policy_rule_src_ports_end_port },
+                }],
+              security_group_entries_policy_rule_application: [{ get_param: security_group_entries_policy_rule_application }],
+              security_group_entries_policy_rule_dst_addresses:
+                [{
+                  security_group_entries_policy_rule_dst_addresses_subnet:
+                    {
+                      security_group_entries_policy_rule_dst_addresses_subnet_ip_prefix: { get_param: security_group_entries_policy_rule_dst_addresses_subnet_ip_prefix },
+                      security_group_entries_policy_rule_dst_addresses_subnet_ip_prefix_len: { get_param: security_group_entries_policy_rule_dst_addresses_subnet_ip_prefix_len },
+                    },
+                  security_group_entries_policy_rule_dst_addresses_virtual_network: { get_param: security_group_entries_policy_rule_dst_addresses_virtual_network },
+                  security_group_entries_policy_rule_dst_addresses_security_group: { get_resource: SecurityGroup },
+                  security_group_entries_policy_rule_dst_addresses_network_policy: { get_param: security_group_entries_policy_rule_dst_addresses_network_policy },
+                  security_group_entries_policy_rule_dst_addresses_subnet_list:
+                    [{
+                      security_group_entries_policy_rule_dst_addresses_subnet_list_ip_prefix: { get_param: security_group_entries_policy_rule_dst_addresses_subnet_list_ip_prefix },
+                      security_group_entries_policy_rule_dst_addresses_subnet_list_ip_prefix_len: { get_param: security_group_entries_policy_rule_dst_addresses_subnet_list_ip_prefix_len },
+                    }],
+                }],
+              security_group_entries_policy_rule_dst_ports:
+                [{
+                  security_group_entries_policy_rule_dst_ports_start_port: { get_param: security_group_entries_policy_rule_dst_ports_start_port },
+                  security_group_entries_policy_rule_dst_ports_end_port: { get_param: security_group_entries_policy_rule_dst_ports_end_port },
+                }],
+              security_group_entries_policy_rule_action_list:
+                {
+                  security_group_entries_policy_rule_action_list_simple_action: { get_param: security_group_entries_policy_rule_action_list_simple_action },
+                  security_group_entries_policy_rule_action_list_gateway_name: { get_param: security_group_entries_policy_rule_action_list_gateway_name },
+                  security_group_entries_policy_rule_action_list_apply_service: [{ get_param: security_group_entries_policy_rule_action_list_apply_service }],
+                  security_group_entries_policy_rule_action_list_mirror_to:
+                    {
+                      security_group_entries_policy_rule_action_list_mirror_to_analyzer_name: { get_param: security_group_entries_policy_rule_action_list_mirror_to_analyzer_name },
+                      security_group_entries_policy_rule_action_list_mirror_to_encapsulation: { get_param: security_group_entries_policy_rule_action_list_mirror_to_encapsulation },
+                      security_group_entries_policy_rule_action_list_mirror_to_analyzer_ip_address: { get_param: security_group_entries_policy_rule_action_list_mirror_to_analyzer_ip_address },
+                      security_group_entries_policy_rule_action_list_mirror_to_analyzer_mac_address: { get_param: security_group_entries_policy_rule_action_list_mirror_to_analyzer_mac_address },
+                      security_group_entries_policy_rule_action_list_mirror_to_routing_instance: { get_param: security_group_entries_policy_rule_action_list_mirror_to_routing_instance },
+                      security_group_entries_policy_rule_action_list_mirror_to_udp_port: { get_param: security_group_entries_policy_rule_action_list_mirror_to_udp_port },
+                      security_group_entries_policy_rule_action_list_mirror_to_juniper_header: { get_param: security_group_entries_policy_rule_action_list_mirror_to_juniper_header },
+                      security_group_entries_policy_rule_action_list_mirror_to_nh_mode: { get_param: security_group_entries_policy_rule_action_list_mirror_to_nh_mode },
+                      security_group_entries_policy_rule_action_list_mirror_to_static_nh_header:
+                        {
+                          security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_ip_address: { get_param: security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_ip_address },
+                          security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_mac_address: { get_param: security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_mac_address },
+                          security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vni: { get_param: security_group_entries_policy_rule_action_list_mirror_to_static_nh_header_vni },
+                        },
+                    },
+                  security_group_entries_policy_rule_action_list_assign_routing_instance: { get_param: security_group_entries_policy_rule_action_list_assign_routing_instance },
+                  security_group_entries_policy_rule_action_list_log: { get_param: security_group_entries_policy_rule_action_list_log },
+                  security_group_entries_policy_rule_action_list_alert: { get_param: security_group_entries_policy_rule_action_list_alert },
+                  security_group_entries_policy_rule_action_list_qos_action: { get_param: security_group_entries_policy_rule_action_list_qos_action },
+                },
+              security_group_entries_policy_rule_ethertype: { get_param: security_group_entries_policy_rule_ethertype },
+            }],
+        }
+      project: { get_param: project }
+

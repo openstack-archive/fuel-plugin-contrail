@@ -1,0 +1,104 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a ServiceHealthCheck:
+
+parameters:
+  name:
+    type: string
+    description: name for the ServiceHealthCheck
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the ServiceHealthCheck
+    # required: optional
+  service_health_check_properties_enabled:
+    type: boolean
+    description: Administratively enable or disable this health check.
+    # operations: CRUD
+    # required: optional
+  service_health_check_properties_health_check_type:
+    type: string
+    description: Health check type, currently only link-local and end-to-end are supported
+    # operations: CRUD
+    # required: true
+  service_health_check_properties_monitor_type:
+    type: string
+    description: Protocol used to monitor health, currently only HTTP and ICMP(ping) is supported
+    # operations: CRUD
+    # required: true
+  service_health_check_properties_delay:
+    type: number
+    description: Time in seconds  at which health check is repeated
+    # operations: CRUD
+    # required: true
+  service_health_check_properties_timeout:
+    type: number
+    description: Time in seconds to wait for response
+    # operations: CRUD
+    # required: true
+  service_health_check_properties_max_retries:
+    type: number
+    description: Number of failures before declaring health bad
+    # operations: CRUD
+    # required: true
+  service_health_check_properties_http_method:
+    type: string
+    description: In case monitor protocol is HTTP, type of http method used like GET, PUT, POST etc
+    # operations: CRUD
+    # required: optional
+  service_health_check_properties_url_path:
+    type: string
+    description: In case monitor protocol is HTTP, URL to be used. In case of ICMP, ip address
+    # operations: CRUD
+    # required: optional
+  service_health_check_properties_expected_codes:
+    type: string
+    description: In case monitor protocol is HTTP, expected return code for HTTP operations like 200 ok.
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  service_instance_refs_data_interface_type:
+    type: string
+    description: interface_type for the ServiceHealthCheck
+    # required: optional
+  project:
+    type: string
+    description: project for the ServiceHealthCheck
+    # required: optional
+
+resources:
+  ServiceInstance:
+    type: OS::ContrailV2::ServiceInstance
+    properties:
+      project: { get_param: project }
+
+  template_ServiceHealthCheck:
+    type: OS::ContrailV2::ServiceHealthCheck
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      service_health_check_properties:
+        {
+          service_health_check_properties_enabled: { get_param: service_health_check_properties_enabled },
+          service_health_check_properties_health_check_type: { get_param: service_health_check_properties_health_check_type },
+          service_health_check_properties_monitor_type: { get_param: service_health_check_properties_monitor_type },
+          service_health_check_properties_delay: { get_param: service_health_check_properties_delay },
+          service_health_check_properties_timeout: { get_param: service_health_check_properties_timeout },
+          service_health_check_properties_max_retries: { get_param: service_health_check_properties_max_retries },
+          service_health_check_properties_http_method: { get_param: service_health_check_properties_http_method },
+          service_health_check_properties_url_path: { get_param: service_health_check_properties_url_path },
+          service_health_check_properties_expected_codes: { get_param: service_health_check_properties_expected_codes },
+        }
+      display_name: { get_param: display_name }
+      service_instance_refs: [{ get_resource: ServiceInstance }]
+      service_instance_refs_data:
+        [{
+          service_instance_refs_data_interface_type: { get_param: service_instance_refs_data_interface_type },
+        }]
+      project: { get_param: project }
+

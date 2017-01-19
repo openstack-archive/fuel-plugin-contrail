@@ -1,0 +1,142 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a GlobalSystemConfig:
+
+parameters:
+  name:
+    type: string
+    description: name for the GlobalSystemConfig
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the GlobalSystemConfig
+    # required: optional
+  alarm_enable:
+    type: boolean
+    description: Flag to enable/disable alarms configured under global-system-config. True, if not set.
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  graceful_restart_params_graceful_restart_time:
+    type: number
+    description: graceful_restart_time for the GlobalSystemConfig
+    # operations: CRUD
+    # required: optional
+  graceful_restart_params_long_lived_graceful_restart_time:
+    type: number
+    description: long_lived_graceful_restart_time for the GlobalSystemConfig
+    # operations: CRUD
+    # required: optional
+  graceful_restart_params_end_of_rib_receive_time:
+    type: number
+    description: end_of_rib_receive_time for the GlobalSystemConfig
+    # operations: CRUD
+    # required: optional
+  plugin_tuning_plugin_property_property:
+    type: string
+    description: property for the GlobalSystemConfig
+    # operations: CRUD
+    # required: optional
+  plugin_tuning_plugin_property_value:
+    type: string
+    description: value for the GlobalSystemConfig
+    # operations: CRUD
+    # required: optional
+  ibgp_auto_mesh:
+    type: boolean
+    description: When true, system will automatically create BGP peering mesh with all control-nodes that have same
+    # operations: CRUD
+    # required: optional
+  user_defined_log_statistics_statlist_name:
+    type: string
+    description: Name of the stat
+    # operations: CRUD
+    # required: true
+  user_defined_log_statistics_statlist_pattern:
+    type: string
+    description: Perl type regular expression pattern to match
+    # operations: CRUD
+    # required: true
+  ip_fabric_subnets_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the GlobalSystemConfig
+    # operations: CRUD
+    # required: optional
+  ip_fabric_subnets_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the GlobalSystemConfig
+    # operations: CRUD
+    # required: optional
+  autonomous_system:
+    type: number
+    description: 16 bit BGP Autonomous System number for the cluster.
+    # operations: CRUD
+    # required: required
+  project:
+    type: string
+    description: project for the VirtualNetwork
+    # required: optional
+
+resources:
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      project: { get_param: project }
+
+  RoutingInstance:
+    type: OS::ContrailV2::RoutingInstance
+    properties:
+      name: Something
+      virtual_network: { get_resource: VirtualNetwork }
+
+  BgpRouter:
+    type: OS::ContrailV2::BgpRouter
+    properties:
+      routing_instance: { get_resource: RoutingInstance }
+
+  template_GlobalSystemConfig:
+    type: OS::ContrailV2::GlobalSystemConfig
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      alarm_enable: { get_param: alarm_enable }
+      display_name: { get_param: display_name }
+      graceful_restart_params:
+        {
+          graceful_restart_params_graceful_restart_time: { get_param: graceful_restart_params_graceful_restart_time },
+          graceful_restart_params_long_lived_graceful_restart_time: { get_param: graceful_restart_params_long_lived_graceful_restart_time },
+          graceful_restart_params_end_of_rib_receive_time: { get_param: graceful_restart_params_end_of_rib_receive_time },
+        }
+      plugin_tuning:
+        {
+          plugin_tuning_plugin_property:
+            [{
+              plugin_tuning_plugin_property_property: { get_param: plugin_tuning_plugin_property_property },
+              plugin_tuning_plugin_property_value: { get_param: plugin_tuning_plugin_property_value },
+            }],
+        }
+      ibgp_auto_mesh: { get_param: ibgp_auto_mesh }
+      user_defined_log_statistics:
+        {
+          user_defined_log_statistics_statlist:
+            [{
+              user_defined_log_statistics_statlist_name: { get_param: user_defined_log_statistics_statlist_name },
+              user_defined_log_statistics_statlist_pattern: { get_param: user_defined_log_statistics_statlist_pattern },
+            }],
+        }
+      ip_fabric_subnets:
+        {
+          ip_fabric_subnets_subnet:
+            [{
+              ip_fabric_subnets_subnet_ip_prefix: { get_param: ip_fabric_subnets_subnet_ip_prefix },
+              ip_fabric_subnets_subnet_ip_prefix_len: { get_param: ip_fabric_subnets_subnet_ip_prefix_len },
+            }],
+        }
+      autonomous_system: { get_param: autonomous_system }
+      bgp_router_refs: [{ get_resource: BgpRouter }]
+

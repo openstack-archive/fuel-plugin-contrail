@@ -1,0 +1,95 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a VirtualIp:
+
+parameters:
+  name:
+    type: string
+    description: name for the VirtualIp
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the VirtualIp
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  virtual_ip_properties_admin_state:
+    type: boolean
+    description: Administrative up or down.
+    # operations: CRUD
+    # required: optional
+  virtual_ip_properties_protocol:
+    type: string
+    description: IP protocol string like http, https or tcp.
+    # operations: CRUD
+    # required: required
+  virtual_ip_properties_protocol_port:
+    type: number
+    description: Layer 4 protocol destination port.
+    # operations: CRUD
+    # required: required
+  virtual_ip_properties_connection_limit:
+    type: number
+    description: Maximum number of concurrent connections
+    # operations: CRUD
+    # required: optional
+  virtual_ip_properties_subnet_id:
+    type: string
+    description: UUID of subnet in which to allocate the Virtual IP.
+    # operations: CRUD
+    # required: required
+  virtual_ip_properties_persistence_cookie_name:
+    type: string
+    description: Set this string if the relation of client and server(pool member) need to persist.
+    # operations: CRUD
+    # required: optional
+  virtual_ip_properties_persistence_type:
+    type: string
+    description: Method for persistence. HTTP_COOKIE, SOURCE_IP or APP_COOKIE.
+    # operations: CRUD
+    # required: optional
+  # loadbalancer_pool_refs:
+  #   type: string
+  #   description: Reference to the load balancer pool that this virtual ip represent. Applicable only to LBaaS V1
+  #   # required: optional
+  project:
+    type: string
+    description: project for the VirtualIp
+    # required: optional
+
+resources:
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      project: { get_param: project }
+
+  VirtualMachineInterface:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      virtual_network_refs: [{ get_resource: VirtualNetwork }]
+      project: { get_param: project }
+
+  template_VirtualIp:
+    type: OS::ContrailV2::VirtualIp
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      virtual_ip_properties:
+        {
+          virtual_ip_properties_admin_state: { get_param: virtual_ip_properties_admin_state },
+          virtual_ip_properties_protocol: { get_param: virtual_ip_properties_protocol },
+          virtual_ip_properties_protocol_port: { get_param: virtual_ip_properties_protocol_port },
+          virtual_ip_properties_connection_limit: { get_param: virtual_ip_properties_connection_limit },
+          virtual_ip_properties_subnet_id: { get_param: virtual_ip_properties_subnet_id },
+          virtual_ip_properties_persistence_cookie_name: { get_param: virtual_ip_properties_persistence_cookie_name },
+          virtual_ip_properties_persistence_type: { get_param: virtual_ip_properties_persistence_type },
+        }
+      virtual_machine_interface_refs: [{ get_resource: VirtualMachineInterface }]
+      # loadbalancer_pool_refs: [{ get_param: loadbalancer_pool_refs }]
+      project: { get_param: project }
+

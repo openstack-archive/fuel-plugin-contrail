@@ -1,0 +1,38 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a VirtualMachine:
+
+parameters:
+  name:
+    type: string
+    description: name for the VirtualMachine
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the VirtualMachine
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  project:
+    type: string
+    description: project for the VirtualNetwork
+    # required: optional
+
+resources:
+  ServiceInstance:
+    type: OS::ContrailV2::ServiceInstance
+    properties:
+      project: { get_param: project }
+
+  template_VirtualMachine:
+    type: OS::ContrailV2::VirtualMachine
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      service_instance_refs: [{ get_resource: ServiceInstance }]
+

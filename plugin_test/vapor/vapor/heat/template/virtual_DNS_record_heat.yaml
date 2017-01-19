@@ -1,0 +1,88 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a VirtualDnsRecord:
+
+parameters:
+  name:
+    type: string
+    description: name for the VirtualDnsRecord
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the VirtualDnsRecord
+    # required: optional
+  virtual_DNS_record_data_record_name:
+    type: string
+    description: DNS name to be resolved
+    # operations: CRUD
+    # required: true
+  virtual_DNS_record_data_record_type:
+    type: string
+    description: DNS record type can be A, AAAA, CNAME, PTR, NS and MX
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_record_data_record_class:
+    type: string
+    description: DNS record class supported is IN
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_record_data_record_data:
+    type: string
+    description: DNS record data is either ip address or string depending on type
+    # operations: CRUD
+    # required: true
+  virtual_DNS_record_data_record_ttl_seconds:
+    type: number
+    description: Time To Live for this DNS record
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_record_data_record_mx_preference:
+    type: number
+    description: record_mx_preference for the VirtualDnsRecord
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  domain:
+    type: string
+    description: domain for the VirtualDns
+    # required: optional
+
+resources:
+  VirtualDns:
+    type: OS::ContrailV2::VirtualDns
+    properties:
+      name: Something
+      virtual_dns_data:
+        {
+          virtual_dns_data_domain_name: Something,
+          virtual_dns_data_dynamic_records_from_client: True,
+          virtual_dns_data_record_order: fixed,
+          virtual_dns_data_default_ttl_seconds: 50,
+          virtual_dns_data_next_virtual_dns: 8.8.8.8,
+          virtual_dns_data_floating_ip_record: 'dashed-ip',
+          virtual_dns_data_external_visible: True,
+          virtual_dns_data_reverse_resolution: True,
+        }
+      domain: { get_param: domain }
+
+  template_VirtualDnsRecord:
+    type: OS::ContrailV2::VirtualDnsRecord
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      virtual_dns_record_data:
+        {
+          virtual_dns_record_data_record_name: { get_param: virtual_DNS_record_data_record_name },
+          virtual_dns_record_data_record_type: { get_param: virtual_DNS_record_data_record_type },
+          virtual_dns_record_data_record_class: { get_param: virtual_DNS_record_data_record_class },
+          virtual_dns_record_data_record_data: { get_param: virtual_DNS_record_data_record_data },
+          virtual_dns_record_data_record_ttl_seconds: { get_param: virtual_DNS_record_data_record_ttl_seconds },
+          virtual_dns_record_data_record_mx_preference: { get_param: virtual_DNS_record_data_record_mx_preference },
+        }
+      display_name: { get_param: display_name }
+      virtual_dns: { get_resource: VirtualDns }

@@ -1,0 +1,38 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a ConfigNode:
+
+parameters:
+  name:
+    type: string
+    description: name for the ConfigNode
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the ConfigNode
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  config_node_ip_address:
+    type: string
+    description: Ip address of the config node, set while provisioning.
+    # operations: CRUD
+    # required: admin-only
+
+resources:
+  GlobalSystemConfig:
+    type: OS::ContrailV2::GlobalSystemConfig
+
+  template_ConfigNode:
+    type: OS::ContrailV2::ConfigNode
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      config_node_ip_address: { get_param: config_node_ip_address }
+      global_system_config: { get_resource: GlobalSystemConfig }
+
