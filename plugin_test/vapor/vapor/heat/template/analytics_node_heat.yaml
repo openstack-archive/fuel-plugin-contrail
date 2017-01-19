@@ -1,0 +1,39 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a AnalyticsNode:
+
+parameters:
+  name:
+    type: string
+    description: name for the AnalyticsNode
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the AnalyticsNode
+    # required: optional
+  analytics_node_ip_address:
+    type: string
+    description: Ip address of the analytics node, set while provisioning.
+    # operations: CRUD
+    # required: admin-only
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  global_system_config:
+    type: string
+    description: global_system_config for the AnalyticsNode
+    # required: optional
+
+resources:
+  template_AnalyticsNode:
+    type: OS::ContrailV2::AnalyticsNode
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      analytics_node_ip_address: { get_param: analytics_node_ip_address }
+      display_name: { get_param: display_name }
+      global_system_config: { get_param: global_system_config }
+

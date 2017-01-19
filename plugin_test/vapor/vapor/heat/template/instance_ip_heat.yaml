@@ -1,0 +1,100 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a InstanceIp:
+
+parameters:
+  name:
+    type: string
+    description: name for the InstanceIp
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the InstanceIp
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  secondary_ip_tracking_ip_ip_prefix:
+    type: string
+    description: ip_prefix for the InstanceIp
+    # operations: CRUD
+    # required: optional
+  secondary_ip_tracking_ip_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the InstanceIp
+    # operations: CRUD
+    # required: optional
+  instance_ip_address:
+    type: string
+    description: Ip address value for instance ip.
+    # operations: CRUD
+    # required: required
+  instance_ip_mode:
+    type: string
+    description: Ip address HA mode in case this instance ip is used in more than one interface, active-Active or
+    # operations: CRUD
+    # required: optional
+  subnet_uuid:
+    type: string
+    description: This instance ip was allocated from this Subnet(UUID).
+    # operations: CR
+    # required: optional
+  instance_ip_family:
+    type: string
+    description: Ip address family for instance ip, IPv4(v4) or IPv6(v6).
+    # operations: CRUD
+    # required: optional
+  instance_ip_local_ip:
+    type: boolean
+    description: This instance ip is local to compute and will not be exported to other nodes.
+    # operations: CRUD
+    # required: optional
+  instance_ip_secondary:
+    type: boolean
+    description: This instance ip is secondary ip of the interface.
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_refs:
+    type: string
+    description: Reference to virtual machine interface to which this instance ip is attached.
+    # required: optional
+  virtual_network_refs:
+    type: string
+    description: Reference to virtual network of this instance ip.
+    # required: optional
+  global_system_config:
+    type: string
+    description: global_system_config for the PhysicalRouter
+    # required: optional
+
+resources:
+  PhysicalRouter:
+    type: OS::ContrailV2::PhysicalRouter
+    properties:
+      name: Something
+      global_system_config: { get_param: global_system_config }
+
+  template_InstanceIp:
+    type: OS::ContrailV2::InstanceIp
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      secondary_ip_tracking_ip:
+        {
+          secondary_ip_tracking_ip_ip_prefix: { get_param: secondary_ip_tracking_ip_ip_prefix },
+          secondary_ip_tracking_ip_ip_prefix_len: { get_param: secondary_ip_tracking_ip_ip_prefix_len },
+        }
+      instance_ip_address: { get_param: instance_ip_address }
+      instance_ip_mode: { get_param: instance_ip_mode }
+      subnet_uuid: { get_param: subnet_uuid }
+      instance_ip_family: { get_param: instance_ip_family }
+      instance_ip_local_ip: { get_param: instance_ip_local_ip }
+      instance_ip_secondary: { get_param: instance_ip_secondary }
+      physical_router_refs: [{ get_resource: PhysicalRouter }]
+      virtual_machine_interface_refs: [{ get_param: virtual_machine_interface_refs }]
+      virtual_network_refs: [{ get_param: virtual_network_refs }]
+

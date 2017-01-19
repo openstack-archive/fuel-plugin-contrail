@@ -1,0 +1,333 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a NetworkPolicy:
+
+parameters:
+  name:
+    type: string
+    description: name for the NetworkPolicy
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the NetworkPolicy
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_rule_sequence_major:
+    type: number
+    description: major for the NetworkPolicy
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_rule_sequence_minor:
+    type: number
+    description: minor for the NetworkPolicy
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_rule_uuid:
+    type: string
+    description: Rule UUID is identifier used in flow records to identify rule
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_direction:
+    type: string
+    description: direction for the NetworkPolicy
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_protocol:
+    type: string
+    description: Layer 4 protocol in ip packet
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_src_addresses_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the NetworkPolicy
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_src_addresses_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the NetworkPolicy
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_src_addresses_virtual_network:
+    type: string
+    description: Any address that belongs to this virtul network 
+    # operations: CRUD
+    # required: exclusive
+  network_policy_entries_policy_rule_src_addresses_security_group:
+    type: string
+    description: Any address that belongs to interface with this security-group
+    # operations: CRUD
+    # required: exclusive
+  network_policy_entries_policy_rule_src_addresses_network_policy:
+    type: string
+    description: Any adddress that belongs to virtul network which has this policy attached
+    # operations: CRUD
+    # required: exclusive
+  network_policy_entries_policy_rule_src_addresses_subnet_list_ip_prefix:
+    type: string
+    description: ip_prefix for the NetworkPolicy
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_src_addresses_subnet_list_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the NetworkPolicy
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_src_ports_start_port:
+    type: number
+    description: start_port for the NetworkPolicy
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_src_ports_end_port:
+    type: number
+    description: end_port for the NetworkPolicy
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_application:
+    type: string
+    description: Optionally application can be specified instead of protcol and port. not currently implemented
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_dst_addresses_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the NetworkPolicy
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_dst_addresses_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the NetworkPolicy
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_dst_addresses_virtual_network:
+    type: string
+    description: Any address that belongs to this virtul network 
+    # operations: CRUD
+    # required: exclusive
+  network_policy_entries_policy_rule_dst_addresses_security_group:
+    type: string
+    description: Any address that belongs to interface with this security-group
+    # operations: CRUD
+    # required: exclusive
+  network_policy_entries_policy_rule_dst_addresses_network_policy:
+    type: string
+    description: Any adddress that belongs to virtul network which has this policy attached
+    # operations: CRUD
+    # required: exclusive
+  network_policy_entries_policy_rule_dst_addresses_subnet_list_ip_prefix:
+    type: string
+    description: ip_prefix for the NetworkPolicy
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_dst_addresses_subnet_list_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the NetworkPolicy
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_dst_ports_start_port:
+    type: number
+    description: start_port for the NetworkPolicy
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_dst_ports_end_port:
+    type: number
+    description: end_port for the NetworkPolicy
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_action_list_simple_action:
+    type: string
+    description: Simple allow(pass) or deny action for traffic matching this rule
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_action_list_gateway_name:
+    type: string
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_apply_service:
+    type: string
+    description: Ordered list of service instances in service chain applied to traffic matching the rule
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_mirror_to_analyzer_name:
+    type: string
+    description: Name of service instance used as analyzer
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_mirror_to_encapsulation:
+    type: string
+    description: Encapsulation for Mirrored packet, not used currently
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_mirror_to_analyzer_ip_address:
+    type: string
+    description: ip address of interface to which mirrored packets are sent
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_action_list_mirror_to_analyzer_mac_address:
+    type: string
+    description: mac address of interface to which mirrored packets are sent 
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_mirror_to_routing_instance:
+    type: string
+    description: Internal use only, should be set to -1
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_action_list_mirror_to_udp_port:
+    type: number
+    description: ip udp port used in contrail default encapsulation for mirroring
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_mirror_to_juniper_header:
+    type: boolean
+    description: This flag is used to determine with/without juniper-header
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_mirror_to_nh_mode:
+    type: string
+    description: This mode used to determine static or dynamic nh 
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_ip_address:
+    type: string
+    description: ip address of destination vtep
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_mac_address:
+    type: string
+    description: mac address of destination vtep
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vni:
+    type: number
+    description: Vni of vtep
+    # operations: CRUD
+    # required: true
+  network_policy_entries_policy_rule_action_list_assign_routing_instance:
+    type: string
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_log:
+    type: boolean
+    description: Flow records for traffic matching this rule are sent at higher priority
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_alert:
+    type: boolean
+    description: For internal use only
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_action_list_qos_action:
+    type: string
+    description: FQN of Qos configuration object for QoS marking
+    # operations: CRUD
+    # required: optional
+  network_policy_entries_policy_rule_ethertype:
+    type: string
+    description: ethertype for the NetworkPolicy
+    # operations: CRUD
+    # required: true
+  project:
+    type: string
+    description: project for the NetworkPolicy
+    # required: optional
+
+resources:
+  template_NetworkPolicy:
+    type: OS::ContrailV2::NetworkPolicy
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      network_policy_entries:
+        {
+          network_policy_entries_policy_rule:
+            [{
+              network_policy_entries_policy_rule_rule_sequence:
+                {
+                  network_policy_entries_policy_rule_rule_sequence_major: { get_param: network_policy_entries_policy_rule_rule_sequence_major },
+                  network_policy_entries_policy_rule_rule_sequence_minor: { get_param: network_policy_entries_policy_rule_rule_sequence_minor },
+                },
+              network_policy_entries_policy_rule_rule_uuid: { get_param: network_policy_entries_policy_rule_rule_uuid },
+              network_policy_entries_policy_rule_direction: { get_param: network_policy_entries_policy_rule_direction },
+              network_policy_entries_policy_rule_protocol: { get_param: network_policy_entries_policy_rule_protocol },
+              network_policy_entries_policy_rule_src_addresses:
+                [{
+                  network_policy_entries_policy_rule_src_addresses_subnet:
+                    {
+                      network_policy_entries_policy_rule_src_addresses_subnet_ip_prefix: { get_param: network_policy_entries_policy_rule_src_addresses_subnet_ip_prefix },
+                      network_policy_entries_policy_rule_src_addresses_subnet_ip_prefix_len: { get_param: network_policy_entries_policy_rule_src_addresses_subnet_ip_prefix_len },
+                    },
+                  network_policy_entries_policy_rule_src_addresses_virtual_network: { get_param: network_policy_entries_policy_rule_src_addresses_virtual_network },
+                  network_policy_entries_policy_rule_src_addresses_security_group: { get_param: network_policy_entries_policy_rule_src_addresses_security_group },
+                  network_policy_entries_policy_rule_src_addresses_network_policy: { get_param: network_policy_entries_policy_rule_src_addresses_network_policy },
+                  network_policy_entries_policy_rule_src_addresses_subnet_list:
+                    [{
+                      network_policy_entries_policy_rule_src_addresses_subnet_list_ip_prefix: { get_param: network_policy_entries_policy_rule_src_addresses_subnet_list_ip_prefix },
+                      network_policy_entries_policy_rule_src_addresses_subnet_list_ip_prefix_len: { get_param: network_policy_entries_policy_rule_src_addresses_subnet_list_ip_prefix_len },
+                    }],
+                }],
+              network_policy_entries_policy_rule_src_ports:
+                [{
+                  network_policy_entries_policy_rule_src_ports_start_port: { get_param: network_policy_entries_policy_rule_src_ports_start_port },
+                  network_policy_entries_policy_rule_src_ports_end_port: { get_param: network_policy_entries_policy_rule_src_ports_end_port },
+                }],
+              network_policy_entries_policy_rule_application: [{ get_param: network_policy_entries_policy_rule_application }],
+              network_policy_entries_policy_rule_dst_addresses:
+                [{
+                  network_policy_entries_policy_rule_dst_addresses_subnet:
+                    {
+                      network_policy_entries_policy_rule_dst_addresses_subnet_ip_prefix: { get_param: network_policy_entries_policy_rule_dst_addresses_subnet_ip_prefix },
+                      network_policy_entries_policy_rule_dst_addresses_subnet_ip_prefix_len: { get_param: network_policy_entries_policy_rule_dst_addresses_subnet_ip_prefix_len },
+                    },
+                  network_policy_entries_policy_rule_dst_addresses_virtual_network: { get_param: network_policy_entries_policy_rule_dst_addresses_virtual_network },
+                  network_policy_entries_policy_rule_dst_addresses_security_group: { get_param: network_policy_entries_policy_rule_dst_addresses_security_group },
+                  network_policy_entries_policy_rule_dst_addresses_network_policy: { get_param: network_policy_entries_policy_rule_dst_addresses_network_policy },
+                  network_policy_entries_policy_rule_dst_addresses_subnet_list:
+                    [{
+                      network_policy_entries_policy_rule_dst_addresses_subnet_list_ip_prefix: { get_param: network_policy_entries_policy_rule_dst_addresses_subnet_list_ip_prefix },
+                      network_policy_entries_policy_rule_dst_addresses_subnet_list_ip_prefix_len: { get_param: network_policy_entries_policy_rule_dst_addresses_subnet_list_ip_prefix_len },
+                    }],
+                }],
+              network_policy_entries_policy_rule_dst_ports:
+                [{
+                  network_policy_entries_policy_rule_dst_ports_start_port: { get_param: network_policy_entries_policy_rule_dst_ports_start_port },
+                  network_policy_entries_policy_rule_dst_ports_end_port: { get_param: network_policy_entries_policy_rule_dst_ports_end_port },
+                }],
+              network_policy_entries_policy_rule_action_list:
+                {
+                  network_policy_entries_policy_rule_action_list_simple_action: { get_param: network_policy_entries_policy_rule_action_list_simple_action },
+                  network_policy_entries_policy_rule_action_list_gateway_name: { get_param: network_policy_entries_policy_rule_action_list_gateway_name },
+                  network_policy_entries_policy_rule_action_list_apply_service: [{ get_param: network_policy_entries_policy_rule_action_list_apply_service }],
+                  network_policy_entries_policy_rule_action_list_mirror_to:
+                    {
+                      network_policy_entries_policy_rule_action_list_mirror_to_analyzer_name: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_analyzer_name },
+                      network_policy_entries_policy_rule_action_list_mirror_to_encapsulation: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_encapsulation },
+                      network_policy_entries_policy_rule_action_list_mirror_to_analyzer_ip_address: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_analyzer_ip_address },
+                      network_policy_entries_policy_rule_action_list_mirror_to_analyzer_mac_address: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_analyzer_mac_address },
+                      network_policy_entries_policy_rule_action_list_mirror_to_routing_instance: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_routing_instance },
+                      network_policy_entries_policy_rule_action_list_mirror_to_udp_port: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_udp_port },
+                      network_policy_entries_policy_rule_action_list_mirror_to_juniper_header: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_juniper_header },
+                      network_policy_entries_policy_rule_action_list_mirror_to_nh_mode: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_nh_mode },
+                      network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header:
+                        {
+                          network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_ip_address: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_ip_address },
+                          network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_mac_address: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vtep_dst_mac_address },
+                          network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vni: { get_param: network_policy_entries_policy_rule_action_list_mirror_to_static_nh_header_vni },
+                        },
+                    },
+                  network_policy_entries_policy_rule_action_list_assign_routing_instance: { get_param: network_policy_entries_policy_rule_action_list_assign_routing_instance },
+                  network_policy_entries_policy_rule_action_list_log: { get_param: network_policy_entries_policy_rule_action_list_log },
+                  network_policy_entries_policy_rule_action_list_alert: { get_param: network_policy_entries_policy_rule_action_list_alert },
+                  network_policy_entries_policy_rule_action_list_qos_action: { get_param: network_policy_entries_policy_rule_action_list_qos_action },
+                },
+              network_policy_entries_policy_rule_ethertype: { get_param: network_policy_entries_policy_rule_ethertype },
+            }],
+        }
+      project: { get_param: project }
+

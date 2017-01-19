@@ -1,0 +1,49 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a Domain:
+
+parameters:
+  name:
+    type: string
+    description: name for the Domain
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the Domain
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  domain_limits_project_limit:
+    type: number
+    description: Maximum number of projects allowed in this domian
+    # operations: CRUD
+    # required: optional
+  domain_limits_virtual_network_limit:
+    type: number
+    description: Maximum number of virtual networks allowed in this domian
+    # operations: CRUD
+    # required: optional
+  domain_limits_security_group_limit:
+    type: number
+    description: Maximum number of security groups allowed in this domian
+    # operations: CRUD
+    # required: optional
+
+resources:
+  template_Domain:
+    type: OS::ContrailV2::Domain
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      domain_limits:
+        {
+          domain_limits_project_limit: { get_param: domain_limits_project_limit },
+          domain_limits_virtual_network_limit: { get_param: domain_limits_virtual_network_limit },
+          domain_limits_security_group_limit: { get_param: domain_limits_security_group_limit },
+        }
+

@@ -1,0 +1,54 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a CustomerAttachment:
+
+parameters:
+  name:
+    type: string
+    description: name for the CustomerAttachment
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the CustomerAttachment
+    # required: optional
+  attachment_address:
+    type: json
+    description: attachment_address for the CustomerAttachment
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_refs:
+    type: string
+    description: Not in Use.
+    # required: optional
+  floating_ip_pool:
+    type: string
+    description: floating_ip_pool for the FloatingIp
+    # required: optional
+  project_refs:
+    type: string
+    description: Reference to project is which this floating ip was allocated.
+    # required: optional
+
+resources:
+  FloatingIp:
+    type: OS::ContrailV2::FloatingIp
+    properties:
+      floating_ip_pool: { get_param: floating_ip_pool }
+      project_refs: [{ get_param: project_refs }]
+
+  template_CustomerAttachment:
+    type: OS::ContrailV2::CustomerAttachment
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      attachment_address: { get_param: attachment_address }
+      display_name: { get_param: display_name }
+      floating_ip_refs: [{ get_resource: FloatingIp }]
+      virtual_machine_interface_refs: [{ get_param: virtual_machine_interface_refs }]
+

@@ -1,0 +1,33 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a AliasIpPool:
+
+parameters:
+  name:
+    type: string
+    description: name for the AliasIpPool
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the AliasIpPool
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  virtual_network:
+    type: string
+    description: virtual_network for the AliasIpPool
+    # required: optional
+
+resources:
+  template_AliasIpPool:
+    type: OS::ContrailV2::AliasIpPool
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      virtual_network: { get_param: virtual_network }
+

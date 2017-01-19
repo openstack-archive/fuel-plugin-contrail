@@ -1,0 +1,147 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a RoutingInstance:
+
+parameters:
+  name:
+    type: string
+    description: name for the RoutingInstance
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the RoutingInstance
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  service_chain_information_routing_instance:
+    type: string
+    description: routing_instance for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  service_chain_information_prefix:
+    type: string
+    description: prefix for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  service_chain_information_service_chain_address:
+    type: string
+    description: service_chain_address for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  service_chain_information_service_instance:
+    type: string
+    description: service_instance for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  service_chain_information_source_routing_instance:
+    type: string
+    description: source_routing_instance for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  ipv6_service_chain_information_routing_instance:
+    type: string
+    description: routing_instance for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  ipv6_service_chain_information_prefix:
+    type: string
+    description: prefix for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  ipv6_service_chain_information_service_chain_address:
+    type: string
+    description: service_chain_address for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  ipv6_service_chain_information_service_instance:
+    type: string
+    description: service_instance for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  ipv6_service_chain_information_source_routing_instance:
+    type: string
+    description: source_routing_instance for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  static_route_entries_route_prefix:
+    type: string
+    description: prefix for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  static_route_entries_route_next_hop:
+    type: string
+    description: next_hop for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  static_route_entries_route_route_target:
+    type: string
+    description: route_target for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  static_route_entries_route_community:
+    type: string
+    description: community for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  default_ce_protocol_bgp:
+    type: json
+    description: bgp for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  default_ce_protocol_ospf_area:
+    type: number
+    description: area for the RoutingInstance
+    # operations: CRUD
+    # required: optional
+  routing_instance_refs:
+    type: string
+    description: routing_instance_refs for the RoutingInstance
+    # required: optional
+  routing_instance_refs_data_destination_instance:
+    type: string
+    description: destination_instance for the RoutingInstance
+    # required: optional
+  route_target_refs:
+    type: string
+    description: route_target_refs for the RoutingInstance
+    # required: optional
+  route_target_refs_data_import_export:
+    type: string
+    description: import_export for the RoutingInstance
+    # required: optional
+  virtual_network:
+    type: string
+    description: virtual_network for the RoutingInstance
+    # required: optional
+
+resources:
+  template_RoutingInstance:
+    type: OS::ContrailV2::RoutingInstance
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      default_ce_protocol:
+        {
+          default_ce_protocol_bgp: { get_param: default_ce_protocol_bgp },
+          default_ce_protocol_ospf:
+            {
+              default_ce_protocol_ospf_area: { get_param: default_ce_protocol_ospf_area },
+            },
+        }
+      routing_instance_refs: [{ get_param: routing_instance_refs }]
+      routing_instance_refs_data:
+        [{
+          routing_instance_refs_data_destination_instance: { get_param: routing_instance_refs_data_destination_instance },
+        }]
+      route_target_refs: [{ get_param: route_target_refs }]
+      route_target_refs_data:
+        [{
+          route_target_refs_data_import_export: { get_param: route_target_refs_data_import_export },
+        }]
+      virtual_network: { get_param: virtual_network }
+

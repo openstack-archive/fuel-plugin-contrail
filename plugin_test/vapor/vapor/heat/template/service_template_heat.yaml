@@ -1,0 +1,128 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a ServiceTemplate:
+
+parameters:
+  name:
+    type: string
+    description: name for the ServiceTemplate
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the ServiceTemplate
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  service_template_properties_version:
+    type: number
+    description: Version of service template.
+    # operations: CRUD
+    # required: optional
+  service_template_properties_service_mode:
+    type: string
+    description: Service instance mode decides how packets are forwarded across the service
+    # operations: CRUD
+    # required: true
+  service_template_properties_service_type:
+    type: string
+    description: Service instance mode decides how routing happens across the service
+    # operations: CRUD
+    # required: true
+  service_template_properties_image_name:
+    type: string
+    description: Glance image name for the service virtual machine, Version 1 only
+    # operations: CRUD
+    # required: optional
+  service_template_properties_service_scaling:
+    type: boolean
+    description: Enable scaling of service virtual machines, Version 1 only
+    # operations: CRUD
+    # required: optional
+  service_template_properties_interface_type_service_interface_type:
+    type: string
+    description: Type of service interface supported by this template left, right or other.
+    # operations: CRUD
+    # required: true
+  service_template_properties_interface_type_shared_ip:
+    type: boolean
+    description: Shared ip is required on this interface when service instance is scaled out (Only V1)
+    # operations: CRUD
+    # required: optional
+  service_template_properties_interface_type_static_route_enable:
+    type: boolean
+    description: Static routes configured required on this interface of service instance (Only V1)
+    # operations: CRUD
+    # required: optional
+  service_template_properties_flavor:
+    type: string
+    description: Nova flavor used for service virtual machines, Version 1 only
+    # operations: CRUD
+    # required: optional
+  service_template_properties_ordered_interfaces:
+    type: boolean
+    description: Deprecated
+    # operations: CRUD
+    # required: optional
+  service_template_properties_service_virtualization_type:
+    type: string
+    description: Service virtualization type decides how individual service instances are instatiated
+    # operations: CRUD
+    # required: optional
+  service_template_properties_availability_zone_enable:
+    type: boolean
+    description: Enable availability zone for verion 1 service instances
+    # operations: CRUD
+    # required: optional
+  service_template_properties_vrouter_instance_type:
+    type: string
+    description: Mechanism used to spawn service instance, when vrouter is spawning instances.Allowed values libvirt-qemu, docker or netns
+    # operations: CRUD
+    # required: optional
+  service_template_properties_instance_data:
+    type: string
+    description: Opaque string (typically in json format) used to spawn a vrouter-instance.
+    # operations: CRUD
+    # required: optional
+  service_appliance_set_refs:
+    type: string
+    description: Reference to the service apliance set represented by this service template.
+    # required: optional
+  domain:
+    type: string
+    description: domain for the ServiceTemplate
+    # required: optional
+
+resources:
+  template_ServiceTemplate:
+    type: OS::ContrailV2::ServiceTemplate
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      service_template_properties:
+        {
+          service_template_properties_version: { get_param: service_template_properties_version },
+          service_template_properties_service_mode: { get_param: service_template_properties_service_mode },
+          service_template_properties_service_type: { get_param: service_template_properties_service_type },
+          service_template_properties_image_name: { get_param: service_template_properties_image_name },
+          service_template_properties_service_scaling: { get_param: service_template_properties_service_scaling },
+          service_template_properties_interface_type:
+            [{
+              service_template_properties_interface_type_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type },
+              service_template_properties_interface_type_shared_ip: { get_param: service_template_properties_interface_type_shared_ip },
+              service_template_properties_interface_type_static_route_enable: { get_param: service_template_properties_interface_type_static_route_enable },
+            }],
+          service_template_properties_flavor: { get_param: service_template_properties_flavor },
+          service_template_properties_ordered_interfaces: { get_param: service_template_properties_ordered_interfaces },
+          service_template_properties_service_virtualization_type: { get_param: service_template_properties_service_virtualization_type },
+          service_template_properties_availability_zone_enable: { get_param: service_template_properties_availability_zone_enable },
+          service_template_properties_vrouter_instance_type: { get_param: service_template_properties_vrouter_instance_type },
+          service_template_properties_instance_data: { get_param: service_template_properties_instance_data },
+        }
+      service_appliance_set_refs: [{ get_param: service_appliance_set_refs }]
+      domain: { get_param: domain }
+

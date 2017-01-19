@@ -1,0 +1,207 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a PhysicalRouter:
+
+parameters:
+  name:
+    type: string
+    description: name for the PhysicalRouter
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the PhysicalRouter
+    # required: optional
+  physical_router_management_ip:
+    type: string
+    description: Management ip for this physical router. It is used by the device manager to perform netconf and by
+    # operations: CRUD
+    # required: required
+  physical_router_snmp_credentials_version:
+    type: number
+    description: version for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_local_port:
+    type: number
+    description: local_port for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_retries:
+    type: number
+    description: retries for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_timeout:
+    type: number
+    description: timeout for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v2_community:
+    type: string
+    description: v2_community for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_security_name:
+    type: string
+    description: v3_security_name for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_security_level:
+    type: string
+    description: v3_security_level for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_security_engine_id:
+    type: string
+    description: v3_security_engine_id for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_context:
+    type: string
+    description: v3_context for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_context_engine_id:
+    type: string
+    description: v3_context_engine_id for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_authentication_protocol:
+    type: string
+    description: v3_authentication_protocol for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_authentication_password:
+    type: string
+    description: v3_authentication_password for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_privacy_protocol:
+    type: string
+    description: v3_privacy_protocol for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_privacy_password:
+    type: string
+    description: v3_privacy_password for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_engine_id:
+    type: string
+    description: v3_engine_id for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_engine_boots:
+    type: number
+    description: v3_engine_boots for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_snmp_credentials_v3_engine_time:
+    type: number
+    description: v3_engine_time for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  physical_router_vendor_name:
+    type: string
+    description: Vendor name of the physical router (e.g juniper). Used by the device manager to select driver.
+    # operations: CRUD
+    # required: required
+  physical_router_product_name:
+    type: string
+    description: Model name of the physical router (e.g juniper). Used by the device manager to select driver.
+    # operations: CRUD
+    # required: required
+  physical_router_user_credentials_username:
+    type: string
+    description: username for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_user_credentials_password:
+    type: string
+    description: password for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  physical_router_vnc_managed:
+    type: boolean
+    description: This physical router is enabled to be configured by device manager.
+    # operations: CRUD
+    # required: optional
+  physical_router_dataplane_ip:
+    type: string
+    description: This is ip address in the ip-fabric(underlay) network that can be used in data palne by physical
+    # operations: CRUD
+    # required: optional
+  physical_router_junos_service_ports_service_port:
+    type: string
+    description: service_port for the PhysicalRouter
+    # operations: CRUD
+    # required: optional
+  virtual_router_refs:
+    type: string
+    description: Referance to vrouter responsible for this physical router. Currently only pplicable for vrouters
+    # required: optional
+  bgp_router_refs:
+    type: string
+    description: Referance to BGP peer representing this physical router.
+    # required: optional
+  virtual_network_refs:
+    type: string
+    description: Reference to virtual network, whose VRF is present on this physical router, Applicable when only VRF
+    # required: optional
+  global_system_config:
+    type: string
+    description: global_system_config for the PhysicalRouter
+    # required: optional
+
+resources:
+  template_PhysicalRouter:
+    type: OS::ContrailV2::PhysicalRouter
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      physical_router_management_ip: { get_param: physical_router_management_ip }
+      physical_router_snmp_credentials:
+        {
+          physical_router_snmp_credentials_version: { get_param: physical_router_snmp_credentials_version },
+          physical_router_snmp_credentials_local_port: { get_param: physical_router_snmp_credentials_local_port },
+          physical_router_snmp_credentials_retries: { get_param: physical_router_snmp_credentials_retries },
+          physical_router_snmp_credentials_timeout: { get_param: physical_router_snmp_credentials_timeout },
+          physical_router_snmp_credentials_v2_community: { get_param: physical_router_snmp_credentials_v2_community },
+          physical_router_snmp_credentials_v3_security_name: { get_param: physical_router_snmp_credentials_v3_security_name },
+          physical_router_snmp_credentials_v3_security_level: { get_param: physical_router_snmp_credentials_v3_security_level },
+          physical_router_snmp_credentials_v3_security_engine_id: { get_param: physical_router_snmp_credentials_v3_security_engine_id },
+          physical_router_snmp_credentials_v3_context: { get_param: physical_router_snmp_credentials_v3_context },
+          physical_router_snmp_credentials_v3_context_engine_id: { get_param: physical_router_snmp_credentials_v3_context_engine_id },
+          physical_router_snmp_credentials_v3_authentication_protocol: { get_param: physical_router_snmp_credentials_v3_authentication_protocol },
+          physical_router_snmp_credentials_v3_authentication_password: { get_param: physical_router_snmp_credentials_v3_authentication_password },
+          physical_router_snmp_credentials_v3_privacy_protocol: { get_param: physical_router_snmp_credentials_v3_privacy_protocol },
+          physical_router_snmp_credentials_v3_privacy_password: { get_param: physical_router_snmp_credentials_v3_privacy_password },
+          physical_router_snmp_credentials_v3_engine_id: { get_param: physical_router_snmp_credentials_v3_engine_id },
+          physical_router_snmp_credentials_v3_engine_boots: { get_param: physical_router_snmp_credentials_v3_engine_boots },
+          physical_router_snmp_credentials_v3_engine_time: { get_param: physical_router_snmp_credentials_v3_engine_time },
+        }
+      display_name: { get_param: display_name }
+      physical_router_vendor_name: { get_param: physical_router_vendor_name }
+      physical_router_product_name: { get_param: physical_router_product_name }
+      physical_router_user_credentials:
+        {
+          physical_router_user_credentials_username: { get_param: physical_router_user_credentials_username },
+          physical_router_user_credentials_password: { get_param: physical_router_user_credentials_password },
+        }
+      physical_router_vnc_managed: { get_param: physical_router_vnc_managed }
+      physical_router_dataplane_ip: { get_param: physical_router_dataplane_ip }
+      physical_router_junos_service_ports:
+        {
+          physical_router_junos_service_ports_service_port: [{ get_param: physical_router_junos_service_ports_service_port }],
+        }
+      virtual_router_refs: [{ get_param: virtual_router_refs }]
+      bgp_router_refs: [{ get_param: bgp_router_refs }]
+      virtual_network_refs: [{ get_param: virtual_network_refs }]
+      global_system_config: { get_param: global_system_config }
+

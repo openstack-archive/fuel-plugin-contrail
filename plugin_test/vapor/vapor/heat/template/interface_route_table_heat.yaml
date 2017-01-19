@@ -1,0 +1,79 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a InterfaceRouteTable:
+
+parameters:
+  name:
+    type: string
+    description: name for the InterfaceRouteTable
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the InterfaceRouteTable
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  interface_route_table_routes_route_prefix:
+    type: string
+    description: Ip prefix/len format prefix
+    # operations: CRUD
+    # required: optional
+  interface_route_table_routes_route_next_hop:
+    type: string
+    description: Ip address or service instance name.
+    # operations: CRUD
+    # required: optional
+  interface_route_table_routes_route_next_hop_type:
+    type: string
+    description: next_hop_type for the InterfaceRouteTable
+    # operations: CRUD
+    # required: optional
+  interface_route_table_routes_route_community_attributes_community_attribute:
+    type: string
+    description: community_attribute for the InterfaceRouteTable
+    # operations: CRUD
+    # required: optional
+  service_instance_refs:
+    type: string
+    description: Reference to interface route table attached to (service instance, interface), This is used to add
+    # required: optional
+  service_instance_refs_data_interface_type:
+    type: string
+    description: interface_type for the InterfaceRouteTable
+    # required: optional
+  project:
+    type: string
+    description: project for the InterfaceRouteTable
+    # required: optional
+
+resources:
+  template_InterfaceRouteTable:
+    type: OS::ContrailV2::InterfaceRouteTable
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      interface_route_table_routes:
+        {
+          interface_route_table_routes_route:
+            [{
+              interface_route_table_routes_route_prefix: { get_param: interface_route_table_routes_route_prefix },
+              interface_route_table_routes_route_next_hop: { get_param: interface_route_table_routes_route_next_hop },
+              interface_route_table_routes_route_next_hop_type: { get_param: interface_route_table_routes_route_next_hop_type },
+              interface_route_table_routes_route_community_attributes:
+                {
+                  interface_route_table_routes_route_community_attributes_community_attribute: [{ get_param: interface_route_table_routes_route_community_attributes_community_attribute }],
+                },
+            }],
+        }
+      service_instance_refs: [{ get_param: service_instance_refs }]
+      service_instance_refs_data:
+        [{
+          service_instance_refs_data_interface_type: { get_param: service_instance_refs_data_interface_type },
+        }]
+      project: { get_param: project }
+

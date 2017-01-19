@@ -1,0 +1,33 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a GlobalQosConfig:
+
+parameters:
+  name:
+    type: string
+    description: name for the GlobalQosConfig
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the GlobalQosConfig
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  global_system_config:
+    type: string
+    description: global_system_config for the GlobalQosConfig
+    # required: optional
+
+resources:
+  template_GlobalQosConfig:
+    type: OS::ContrailV2::GlobalQosConfig
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      global_system_config: { get_param: global_system_config }
+

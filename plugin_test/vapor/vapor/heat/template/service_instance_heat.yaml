@@ -1,0 +1,216 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a ServiceInstance:
+
+parameters:
+  name:
+    type: string
+    description: name for the ServiceInstance
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the ServiceInstance
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  service_instance_bindings_key_value_pair_key:
+    type: string
+    description: key for the ServiceInstance
+    # operations: CRUD
+    # required: optional
+  service_instance_bindings_key_value_pair_value:
+    type: string
+    description: value for the ServiceInstance
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_availability_zone:
+    type: string
+    description: Availability zone used to spawn VM(s) for this service instance, used in version 1 (V1) only
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_management_virtual_network:
+    type: string
+    description: Deprecated
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_left_virtual_network:
+    type: string
+    description: Deprecated
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_left_ip_address:
+    type: string
+    description: Deprecated
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_right_virtual_network:
+    type: string
+    description: Deprecated
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_right_ip_address:
+    type: string
+    description: Deprecated
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_virtual_network:
+    type: string
+    description: Interface belongs to this virtual network.
+    # operations: CRUD
+    # required: true
+  service_instance_properties_interface_list_ip_address:
+    type: string
+    description: Shared ip for this interface (Only V1)
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_static_routes_route_prefix:
+    type: string
+    description: Ip prefix/len format prefix
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_static_routes_route_next_hop:
+    type: string
+    description: Ip address or service instance name.
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_static_routes_route_next_hop_type:
+    type: string
+    description: next_hop_type for the ServiceInstance
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_static_routes_route_community_attributes_community_attribute:
+    type: string
+    description: community_attribute for the ServiceInstance
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix:
+    type: string
+    description: ip_prefix for the ServiceInstance
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the ServiceInstance
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_mac:
+    type: string
+    description: mac for the ServiceInstance
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_address_mode:
+    type: string
+    description: Address-mode active-backup is used for VRRP address.                           Address-mode active-active is used for ECMP.
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_scale_out_max_instances:
+    type: number
+    description: Maximum number of scale out factor(virtual machines). can be changed dynamically
+    # operations: CRUD
+    # required: true
+  service_instance_properties_scale_out_auto_scale:
+    type: boolean
+    description: Automatically change the number of virtual machines. Not implemented
+    # operations: CRUD
+    # required: true
+  service_instance_properties_ha_mode:
+    type: string
+    description: When scale-out is greater than one, decides if active-active or active-backup, used in version 1 (V1) only
+    # operations: CRUD
+    # required: optional
+  service_instance_properties_virtual_router_id:
+    type: string
+    description: UUID of a virtual-router on which this service instance need to spwan. Used to spawn services on CPE device when Nova is not present
+    # operations: CRUD
+    # required: optional
+  service_template_refs:
+    type: string
+    description: Reference to the service template of this service instance.
+    # required: optional
+  instance_ip_refs:
+    type: string
+    description: Reference to ip address, which is used as nexthop pointing to (service instance, service interface).
+    # required: optional
+  instance_ip_refs_data_interface_type:
+    type: string
+    description: interface_type for the ServiceInstance
+    # required: optional
+  project:
+    type: string
+    description: project for the ServiceInstance
+    # required: optional
+
+resources:
+  template_ServiceInstance:
+    type: OS::ContrailV2::ServiceInstance
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      service_instance_bindings:
+        {
+          service_instance_bindings_key_value_pair:
+            [{
+              service_instance_bindings_key_value_pair_key: { get_param: service_instance_bindings_key_value_pair_key },
+              service_instance_bindings_key_value_pair_value: { get_param: service_instance_bindings_key_value_pair_value },
+            }],
+        }
+      service_instance_properties:
+        {
+          service_instance_properties_availability_zone: { get_param: service_instance_properties_availability_zone },
+          service_instance_properties_management_virtual_network: { get_param: service_instance_properties_management_virtual_network },
+          service_instance_properties_left_virtual_network: { get_param: service_instance_properties_left_virtual_network },
+          service_instance_properties_left_ip_address: { get_param: service_instance_properties_left_ip_address },
+          service_instance_properties_right_virtual_network: { get_param: service_instance_properties_right_virtual_network },
+          service_instance_properties_right_ip_address: { get_param: service_instance_properties_right_ip_address },
+          service_instance_properties_interface_list:
+            [{
+              service_instance_properties_interface_list_virtual_network: { get_param: service_instance_properties_interface_list_virtual_network },
+              service_instance_properties_interface_list_ip_address: { get_param: service_instance_properties_interface_list_ip_address },
+              service_instance_properties_interface_list_static_routes:
+                {
+                  service_instance_properties_interface_list_static_routes_route:
+                    [{
+                      service_instance_properties_interface_list_static_routes_route_prefix: { get_param: service_instance_properties_interface_list_static_routes_route_prefix },
+                      service_instance_properties_interface_list_static_routes_route_next_hop: { get_param: service_instance_properties_interface_list_static_routes_route_next_hop },
+                      service_instance_properties_interface_list_static_routes_route_next_hop_type: { get_param: service_instance_properties_interface_list_static_routes_route_next_hop_type },
+                      service_instance_properties_interface_list_static_routes_route_community_attributes:
+                        {
+                          service_instance_properties_interface_list_static_routes_route_community_attributes_community_attribute: [{ get_param: service_instance_properties_interface_list_static_routes_route_community_attributes_community_attribute }],
+                        },
+                    }],
+                },
+              service_instance_properties_interface_list_allowed_address_pairs:
+                {
+                  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair:
+                    [{
+                      service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip:
+                        {
+                          service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix },
+                          service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len },
+                        },
+                      service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_mac: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_mac },
+                      service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_address_mode: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_address_mode },
+                    }],
+                },
+            }],
+          service_instance_properties_scale_out:
+            {
+              service_instance_properties_scale_out_max_instances: { get_param: service_instance_properties_scale_out_max_instances },
+              service_instance_properties_scale_out_auto_scale: { get_param: service_instance_properties_scale_out_auto_scale },
+            },
+          service_instance_properties_ha_mode: { get_param: service_instance_properties_ha_mode },
+          service_instance_properties_virtual_router_id: { get_param: service_instance_properties_virtual_router_id },
+        }
+      service_template_refs: [{ get_param: service_template_refs }]
+      instance_ip_refs: [{ get_param: instance_ip_refs }]
+      instance_ip_refs_data:
+        [{
+          instance_ip_refs_data_interface_type: { get_param: instance_ip_refs_data_interface_type },
+        }]
+      project: { get_param: project }
+
