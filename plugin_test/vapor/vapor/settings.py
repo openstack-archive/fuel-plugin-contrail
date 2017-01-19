@@ -126,3 +126,6 @@ CONTRAIL_ANALYTIC_PROCESSES = {
         'contrail-analytics-nodemgr',
     ],
 }
+
+BASE_DIR = os.path.dirname(__file__)
+HEAT_TEMPLATES_PATH = os.path.join(BASE_DIR, 'heat')

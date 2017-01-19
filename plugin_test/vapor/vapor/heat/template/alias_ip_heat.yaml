@@ -1,0 +1,104 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a AliasIp:
+
+parameters:
+  name:
+    type: string
+    description: name for the AliasIp
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the AliasIp
+    # required: optional
+  alias_ip_address:
+    type: string
+    description: Alias ip address.
+    # operations: CR
+    # required: required
+  alias_ip_address_family:
+    type: string
+    description: Ip address family of the alias ip, IpV4 or IpV6
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  project_refs:
+    type: string
+    description: Reference to project from which this alias ip was allocated.
+    # required: optional
+  domain:
+    type: string
+    description: domain for the VirtualDns
+    # required: optional
+
+resources:
+  VirtualDns:
+    type: OS::ContrailV2::VirtualDns
+    properties:
+      name: Something
+      virtual_dns_data:
+        {
+          virtual_dns_data_domain_name: Something,
+          virtual_dns_data_dynamic_records_from_client: True,
+          virtual_dns_data_record_order: fixed,
+          virtual_dns_data_default_ttl_seconds: 1,
+          virtual_dns_data_next_virtual_dns: 8.8.8.8,
+          virtual_dns_data_floating_ip_record: 'dashed-ip',
+          virtual_dns_data_external_visible: True,
+          virtual_dns_data_reverse_resolution: True,
+        }
+      domain: { get_param: domain }
+
+  NetworkIpam:
+    type: OS::ContrailV2::NetworkIpam
+    properties:
+      name: Something
+      virtual_dns_refs: [{ get_resource: VirtualDns }]
+      project: { get_param: project_refs }
+
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      project: { get_param: project_refs }
+      network_ipam_refs: [{ get_resource: NetworkIpam }]
+      network_ipam_refs_data:
+        [{
+          network_ipam_refs_data_ipam_subnets:
+            [{
+              network_ipam_refs_data_ipam_subnets_subnet:
+                {
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix: 10.0.0.0,
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: 24,
+                },
+            }],
+        }]
+
+  VirtualMachineInterface:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      virtual_network_refs: [{ get_resource: VirtualNetwork }]
+      project: { get_param: project_refs }
+
+  AliasIpPool:
+    type: OS::ContrailV2::AliasIpPool
+    properties:
+      name: 'Something'
+      virtual_network: { get_resource: VirtualNetwork }
+
+  template_AliasIp:
+    type: OS::ContrailV2::AliasIp
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      alias_ip_address: { get_param: alias_ip_address }
+      alias_ip_address_family: { get_param: alias_ip_address_family }
+      display_name: { get_param: display_name }
+      project_refs: [{ get_param: project_refs }]
+      virtual_machine_interface_refs: [{ get_resource: VirtualMachineInterface }]
+      alias_ip_pool: { get_resource: AliasIpPool }
+

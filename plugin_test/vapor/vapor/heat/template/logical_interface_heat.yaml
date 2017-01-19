@@ -1,0 +1,73 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a LogicalInterface:
+
+parameters:
+  name:
+    type: string
+    description: name for the LogicalInterface
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the LogicalInterface
+    # required: optional
+  logical_interface_vlan_tag:
+    type: number
+    description: VLAN tag (.1Q) classifier for this logical interface.
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  logical_interface_type:
+    type: string
+    description: Logical interface type can be L2 or L3.
+    # operations: CRUD
+    # required: optional
+  project:
+    type: string
+    description: project for the VirtualNetwork
+    # required: optional
+
+resources:
+  GlobalSystemConfig:
+    type: OS::ContrailV2::GlobalSystemConfig
+
+  PhysicalRouter:
+    type: OS::ContrailV2::PhysicalRouter
+    properties:
+      name: Something
+      global_system_config: { get_resource: GlobalSystemConfig }
+
+  PhysicalInterface:
+    type: OS::ContrailV2::PhysicalInterface
+    properties:
+      name: Something
+      physical_router: { get_resource: PhysicalRouter }
+
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      project: { get_param: project }
+
+  VirtualMachineInterface:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      virtual_network_refs: [{ get_resource: VirtualNetwork }]
+      project: { get_param: project }
+
+  template_LogicalInterface:
+    type: OS::ContrailV2::LogicalInterface
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      logical_interface_vlan_tag: { get_param: logical_interface_vlan_tag }
+      display_name: { get_param: display_name }
+      logical_interface_type: { get_param: logical_interface_type }
+      virtual_machine_interface_refs: [{ get_resource: VirtualMachineInterface }]
+      physical_router: { get_resource: PhysicalRouter }
+      physical_interface: { get_resource: PhysicalInterface }
+

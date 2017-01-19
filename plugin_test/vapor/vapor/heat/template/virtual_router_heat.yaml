@@ -1,0 +1,58 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a VirtualRouter:
+
+parameters:
+  name:
+    type: string
+    description: name for the VirtualRouter
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the VirtualRouter
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  virtual_router_ip_address:
+    type: string
+    description: Ip address of the virtual router.
+    # operations: CRUD
+    # required: required
+  virtual_router_dpdk_enabled:
+    type: boolean
+    description: This vrouter's data path is using DPDK librarry, Virtual machines interfaces scheduled on this
+    # operations: CRUD
+    # required: optional
+  virtual_router_type:
+    type: string
+    description: Different types of the vrouters in the system.
+    # operations: CRD
+    # required: optional
+
+resources:
+  GlobalSystemConfig:
+    type: OS::ContrailV2::GlobalSystemConfig
+    properties:
+      name: Something
+
+  VirtualMachine:
+    type: OS::ContrailV2::VirtualMachine
+    properties:
+      name: Something
+
+  template_VirtualRouter:
+    type: OS::ContrailV2::VirtualRouter
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      virtual_router_ip_address: { get_param: virtual_router_ip_address }
+      virtual_router_dpdk_enabled: { get_param: virtual_router_dpdk_enabled }
+      virtual_router_type: { get_param: virtual_router_type }
+      virtual_machine_refs: [{ get_resource: VirtualMachine }]
+      global_system_config: { get_resource: GlobalSystemConfig }
+

@@ -1,0 +1,56 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a FloatingIpPool:
+
+parameters:
+  name:
+    type: string
+    description: name for the FloatingIpPool
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the FloatingIpPool
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  floating_ip_pool_prefixes_subnet_ip_prefix:
+    type: string
+    description: ip_prefix for the FloatingIpPool
+    # operations: CRUD
+    # required: optional
+  floating_ip_pool_prefixes_subnet_ip_prefix_len:
+    type: number
+    description: ip_prefix_len for the FloatingIpPool
+    # operations: CRUD
+    # required: optional
+  project:
+    type: string
+    description: project for the VirtualNetwork
+    # required: optional
+
+resources:
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      project: { get_param: project }
+
+  template_FloatingIpPool:
+    type: OS::ContrailV2::FloatingIpPool
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      floating_ip_pool_prefixes:
+        {
+          floating_ip_pool_prefixes_subnet:
+            [{
+              floating_ip_pool_prefixes_subnet_ip_prefix: { get_param: floating_ip_pool_prefixes_subnet_ip_prefix },
+              floating_ip_pool_prefixes_subnet_ip_prefix_len: { get_param: floating_ip_pool_prefixes_subnet_ip_prefix_len },
+            }],
+        }
+      virtual_network: { get_resource: VirtualNetwork }
+

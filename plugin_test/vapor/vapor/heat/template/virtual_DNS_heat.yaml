@@ -1,0 +1,84 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a VirtualDns:
+
+parameters:
+  name:
+    type: string
+    description: name for the VirtualDns
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the VirtualDns
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_data_domain_name:
+    type: string
+    description: Default domain name for this virtual DNS server
+    # operations: CRUD
+    # required: true
+  virtual_DNS_data_dynamic_records_from_client:
+    type: boolean
+    description: Allow automatic addition of records on VM launch, default is True
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_data_record_order:
+    type: string
+    description: Order of DNS load balancing, fixed, random, round-robin
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_data_default_ttl_seconds:
+    type: number
+    description: Default Time To Live for DNS records
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_data_next_virtual_DNS:
+    type: string
+    description: Next virtual DNS server to lookup if record is not found. Default is proxy to infrastructure DNS
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_data_floating_ip_record:
+    type: string
+    description: Decides how floating ip records are added
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_data_external_visible:
+    type: boolean
+    description: Currently this option is not supported
+    # operations: CRUD
+    # required: optional
+  virtual_DNS_data_reverse_resolution:
+    type: boolean
+    description: Allow reverse DNS resolution, ip to name mapping
+    # operations: CRUD
+    # required: optional
+  domain:
+    type: string
+    description: domain for the VirtualDns
+    # required: optional
+
+resources:
+  template_VirtualDns:
+    type: OS::ContrailV2::VirtualDns
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      virtual_dns_data:
+        {
+          virtual_dns_data_domain_name: { get_param: virtual_DNS_data_domain_name },
+          virtual_dns_data_dynamic_records_from_client: { get_param: virtual_DNS_data_dynamic_records_from_client },
+          virtual_dns_data_record_order: { get_param: virtual_DNS_data_record_order },
+          virtual_dns_data_default_ttl_seconds: { get_param: virtual_DNS_data_default_ttl_seconds },
+          virtual_dns_data_next_virtual_dns: { get_param: virtual_DNS_data_next_virtual_DNS },
+          virtual_dns_data_floating_ip_record: { get_param: virtual_DNS_data_floating_ip_record },
+          virtual_dns_data_external_visible: { get_param: virtual_DNS_data_external_visible },
+          virtual_dns_data_reverse_resolution: { get_param: virtual_DNS_data_reverse_resolution },
+        }
+      domain: { get_param: domain }
+
