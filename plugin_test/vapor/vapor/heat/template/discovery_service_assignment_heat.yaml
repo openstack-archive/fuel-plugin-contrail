@@ -1,0 +1,28 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a DiscoveryServiceAssignment:
+
+parameters:
+  name:
+    type: string
+    description: name for the DiscoveryServiceAssignment
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the DiscoveryServiceAssignment
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+
+resources:
+  template_DiscoveryServiceAssignment:
+    type: OS::ContrailV2::DiscoveryServiceAssignment
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+

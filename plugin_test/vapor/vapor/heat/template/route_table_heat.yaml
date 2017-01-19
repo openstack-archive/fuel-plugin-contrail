@@ -1,0 +1,66 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a RouteTable:
+
+parameters:
+  name:
+    type: string
+    description: name for the RouteTable
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the RouteTable
+    # required: optional
+  routes_route_prefix:
+    type: string
+    description: Ip prefix/len format prefix
+    # operations: CRUD
+    # required: optional
+  routes_route_next_hop:
+    type: string
+    description: Ip address or service instance name.
+    # operations: CRUD
+    # required: optional
+  routes_route_next_hop_type:
+    type: string
+    description: next_hop_type for the RouteTable
+    # operations: CRUD
+    # required: optional
+  routes_route_community_attributes_community_attribute:
+    type: string
+    description: community_attribute for the RouteTable
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  project:
+    type: string
+    description: project for the RouteTable
+    # required: optional
+
+resources:
+  template_RouteTable:
+    type: OS::ContrailV2::RouteTable
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      routes:
+        {
+          routes_route:
+            [{
+              routes_route_prefix: { get_param: routes_route_prefix },
+              routes_route_next_hop: { get_param: routes_route_next_hop },
+              routes_route_next_hop_type: { get_param: routes_route_next_hop_type },
+              routes_route_community_attributes:
+                {
+                  routes_route_community_attributes_community_attribute: [{ get_param: routes_route_community_attributes_community_attribute }],
+                },
+            }],
+        }
+      display_name: { get_param: display_name }
+      project: { get_param: project }
+

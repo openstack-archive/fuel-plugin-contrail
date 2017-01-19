@@ -1,0 +1,62 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a LogicalInterface:
+
+parameters:
+  name:
+    type: string
+    description: name for the LogicalInterface
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the LogicalInterface
+    # required: optional
+  logical_interface_vlan_tag:
+    type: number
+    description: VLAN tag (.1Q) classifier for this logical interface.
+    # operations: CRUD
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  logical_interface_type:
+    type: string
+    description: Logical interface type can be L2 or L3.
+    # operations: CRUD
+    # required: optional
+  virtual_machine_interface_refs:
+    type: string
+    description: References to virtual machine interfaces that represent end points that are reacheable by this
+    # required: optional
+  global_system_config:
+    type: string
+    description: global_system_config for the PhysicalRouter
+
+resources:
+  PhysicalRouter:
+    type: OS::ContrailV2::PhysicalRouter
+    properties:
+      name: Something
+      global_system_config: { get_param: global_system_config }
+
+  PhysicalInterface:
+    type: OS::ContrailV2::PhysicalInterface
+    properties:
+      name: Something
+      physical_router: { get_resource: PhysicalRouter }
+
+  template_LogicalInterface:
+    type: OS::ContrailV2::LogicalInterface
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      logical_interface_vlan_tag: { get_param: logical_interface_vlan_tag }
+      display_name: { get_param: display_name }
+      logical_interface_type: { get_param: logical_interface_type }
+      virtual_machine_interface_refs: [{ get_param: virtual_machine_interface_refs }]
+      physical_router: { get_resource: PhysicalRouter }
+      physical_interface: { get_resource: PhysicalInterface }
+

@@ -1,0 +1,234 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a BgpRouter:
+
+parameters:
+  name:
+    type: string
+    description: name for the BgpRouter
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the BgpRouter
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_admin_down:
+    type: boolean
+    description: Administratively up or down.
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_vendor:
+    type: string
+    description: Vendor name for this BGP router, contrail, juniper or cisco etc.
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_autonomous_system:
+    type: number
+    description: Autonomus System number for this BGP router. Currently only 16 bit AS number is supported. For contrail control nodes this has to be equal to global AS number.
+    # operations: CRUD
+    # required: true
+  bgp_router_parameters_identifier:
+    type: string
+    description: Router ID for this BGP router. Dotted ip notation. For contrail control-nodes System will automatically assign value of address field.
+    # operations: CRUD
+    # required: true
+  bgp_router_parameters_address:
+    type: string
+    description: Ip addres used to reach this BGP router by the system.
+    # operations: CRUD
+    # required: true
+  bgp_router_parameters_port:
+    type: number
+    description: TCP port number on which BGP protocol connections are accepted. default is based on standareds.
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_hold_time:
+    type: number
+    description: BGP hold time in seconds [0-65535], Max time to detect liveliness to peer. Value 0 will result in default value of 90 seconds
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_address_families_family:
+    type: string
+    description: BGP address families supported by contrail.
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_auth_data_key_type:
+    type: string
+    description: Authentication type for this session. Currently only MD5 is supported.
+    # operations: CRUD
+    # required: true
+  bgp_router_parameters_auth_data_key_items_key_id:
+    type: number
+    description: key_id for the BgpRouter
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_auth_data_key_items_key:
+    type: string
+    description: key for the BgpRouter
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_local_autonomous_system:
+    type: number
+    description: Only for contrail control nodes, Autonomus System number if different then global AS number. Used when clusters of control nodes in same contrail system are in differnt locations. Currently only 16 bit AS number is supported.
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_router_type:
+    type: string
+    description: BGP router type.
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_gateway_address:
+    type: string
+    description: gateway-address field is used only for router-type bgpaas-client. It holds the ipv4 gateway address for the ipv4 subnet from which the client has IP address. The value is used as nexthop when advertising routes to the client via bgp.
+    # operations: CRUD
+    # required: optional
+  bgp_router_parameters_ipv6_gateway_address:
+    type: string
+    description: The ipv6-gateway-addreess field is used only for router-type bgpaas-client. It holds ipv6 gateway address for ipv6 subnet from which the client has IP address. The value is used as nexthop when advertising routes to the client via bgp.  Note that the ipv6-gateway-address can be a regular ipv6 address or a ipv4-mapped-ipv6 adddress.
+    # operations: CRUD
+    # required: optional
+  bgp_router_refs:
+    type: string
+    description: References to peer BGP router, property of the reference has BGP peering attributes.
+    # required: optional
+  bgp_router_refs_data_session_uuid:
+    type: string
+    description: When multiple sessions are present, each session must have an unique id.
+    # required: true
+  bgp_router_refs_data_session_attributes_bgp_router:
+    type: string
+    description: When the parameters are uni-directional the bgp-router element specifies to which node the configuration applies. If missing the attributes apply to both ends of the session.
+    # required: optional
+  bgp_router_refs_data_session_attributes_admin_down:
+    type: boolean
+    description: Administratively mark this session down.
+    # required: optional
+  bgp_router_refs_data_session_attributes_passive:
+    type: boolean
+    description: This is passive session. It will not initiated connection. This is not relavent when session attributes represent common part. It is recomended that it should not be set to true in current release.
+    # required: optional
+  bgp_router_refs_data_session_attributes_as_override:
+    type: boolean
+    description: To Be Added
+    # required: optional
+  bgp_router_refs_data_session_attributes_hold_time:
+    type: number
+    description: A non-zero hold-time overrides the hold-time inherited from the bgp-router configuration. BGP hold time in seconds [0-65535], Max time to detect liveliness of peer.
+    # required: optional
+  bgp_router_refs_data_session_attributes_loop_count:
+    type: number
+    description: For routing loop detection, loop-count is the number of times the local bgp-routers AS is             allowed in the AS_PATH attribute.
+    # required: optional
+  bgp_router_refs_data_session_attributes_address_families_family:
+    type: string
+    description: BGP address families supported by contrail.
+    # required: optional
+  bgp_router_refs_data_session_attributes_auth_data_key_type:
+    type: string
+    description: Authentication type for this session. Currently only MD5 is supported.
+    # required: true
+  bgp_router_refs_data_session_attributes_auth_data_key_items_key_id:
+    type: number
+    description: key_id for the BgpRouter
+    # required: optional
+  bgp_router_refs_data_session_attributes_auth_data_key_items_key:
+    type: string
+    description: key for the BgpRouter
+    # required: optional
+  bgp_router_refs_data_session_attributes_family_attributes_address_family:
+    type: string
+    description: Address family for which these parameters are applied.
+    # required: true
+  bgp_router_refs_data_session_attributes_family_attributes_loop_count:
+    type: number
+    description: For routing loop detection, loop-count is the number of times the local bgp-routers AS is             allowed in the AS_PATH attribute.
+    # required: optional
+  bgp_router_refs_data_session_attributes_family_attributes_prefix_limit_maximum:
+    type: number
+    description: maximum for the BgpRouter
+    # required: optional
+  routing_instance:
+    type: string
+    description: routing_instance for the BgpRouter
+    # required: optional
+
+resources:
+  template_BgpRouter:
+    type: OS::ContrailV2::BgpRouter
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      bgp_router_parameters:
+        {
+          bgp_router_parameters_admin_down: { get_param: bgp_router_parameters_admin_down },
+          bgp_router_parameters_vendor: { get_param: bgp_router_parameters_vendor },
+          bgp_router_parameters_autonomous_system: { get_param: bgp_router_parameters_autonomous_system },
+          bgp_router_parameters_identifier: { get_param: bgp_router_parameters_identifier },
+          bgp_router_parameters_address: { get_param: bgp_router_parameters_address },
+          bgp_router_parameters_port: { get_param: bgp_router_parameters_port },
+          bgp_router_parameters_hold_time: { get_param: bgp_router_parameters_hold_time },
+          bgp_router_parameters_address_families:
+            {
+              bgp_router_parameters_address_families_family: [{ get_param: bgp_router_parameters_address_families_family }],
+            },
+          bgp_router_parameters_auth_data:
+            {
+              bgp_router_parameters_auth_data_key_type: { get_param: bgp_router_parameters_auth_data_key_type },
+              bgp_router_parameters_auth_data_key_items:
+                [{
+                  bgp_router_parameters_auth_data_key_items_key_id: { get_param: bgp_router_parameters_auth_data_key_items_key_id },
+                  bgp_router_parameters_auth_data_key_items_key: { get_param: bgp_router_parameters_auth_data_key_items_key },
+                }],
+            },
+          bgp_router_parameters_local_autonomous_system: { get_param: bgp_router_parameters_local_autonomous_system },
+          bgp_router_parameters_router_type: { get_param: bgp_router_parameters_router_type },
+          bgp_router_parameters_gateway_address: { get_param: bgp_router_parameters_gateway_address },
+          bgp_router_parameters_ipv6_gateway_address: { get_param: bgp_router_parameters_ipv6_gateway_address },
+        }
+      bgp_router_refs: [{ get_param: bgp_router_refs }]
+      bgp_router_refs_data:
+        [{
+          bgp_router_refs_data_session:
+            [{
+              bgp_router_refs_data_session_uuid: { get_param: bgp_router_refs_data_session_uuid },
+              bgp_router_refs_data_session_attributes:
+                [{
+                  bgp_router_refs_data_session_attributes_bgp_router: { get_param: bgp_router_refs_data_session_attributes_bgp_router },
+                  bgp_router_refs_data_session_attributes_admin_down: { get_param: bgp_router_refs_data_session_attributes_admin_down },
+                  bgp_router_refs_data_session_attributes_passive: { get_param: bgp_router_refs_data_session_attributes_passive },
+                  bgp_router_refs_data_session_attributes_as_override: { get_param: bgp_router_refs_data_session_attributes_as_override },
+                  bgp_router_refs_data_session_attributes_hold_time: { get_param: bgp_router_refs_data_session_attributes_hold_time },
+                  bgp_router_refs_data_session_attributes_loop_count: { get_param: bgp_router_refs_data_session_attributes_loop_count },
+                  bgp_router_refs_data_session_attributes_address_families:
+                    {
+                      bgp_router_refs_data_session_attributes_address_families_family: [{ get_param: bgp_router_refs_data_session_attributes_address_families_family }],
+                    },
+                  bgp_router_refs_data_session_attributes_auth_data:
+                    {
+                      bgp_router_refs_data_session_attributes_auth_data_key_type: { get_param: bgp_router_refs_data_session_attributes_auth_data_key_type },
+                      bgp_router_refs_data_session_attributes_auth_data_key_items:
+                        [{
+                          bgp_router_refs_data_session_attributes_auth_data_key_items_key_id: { get_param: bgp_router_refs_data_session_attributes_auth_data_key_items_key_id },
+                          bgp_router_refs_data_session_attributes_auth_data_key_items_key: { get_param: bgp_router_refs_data_session_attributes_auth_data_key_items_key },
+                        }],
+                    },
+                  bgp_router_refs_data_session_attributes_family_attributes:
+                    [{
+                      bgp_router_refs_data_session_attributes_family_attributes_address_family: { get_param: bgp_router_refs_data_session_attributes_family_attributes_address_family },
+                      bgp_router_refs_data_session_attributes_family_attributes_loop_count: { get_param: bgp_router_refs_data_session_attributes_family_attributes_loop_count },
+                      bgp_router_refs_data_session_attributes_family_attributes_prefix_limit:
+                        {
+                          bgp_router_refs_data_session_attributes_family_attributes_prefix_limit_maximum: { get_param: bgp_router_refs_data_session_attributes_family_attributes_prefix_limit_maximum },
+                        },
+                    }],
+                }],
+            }],
+        }]
+      routing_instance: { get_param: routing_instance }
+

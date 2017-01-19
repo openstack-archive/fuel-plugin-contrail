@@ -1,0 +1,80 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a LogicalRouter:
+
+parameters:
+  name:
+    type: string
+    description: name for the LogicalRouter
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the LogicalRouter
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  configured_route_target_list_route_target:
+    type: string
+    description: route_target for the LogicalRouter
+    # operations: CRUD
+    # required: optional
+  virtual_network_refs:
+    type: string
+    description: Refernce to virtual network used as external gateway for this logical network. This link will cause
+    # required: optional
+  service_instance_refs:
+    type: string
+    description: Refernce to service instance doing SNAT functionality for external gateway.
+    # required: optional
+  route_table_refs:
+    type: string
+    description: Reference to the route table attached to this logical router. By attaching route table, system will
+    # required: optional
+  virtual_machine_interface_refs:
+    type: string
+    description: Refernce to the interface attached to this logical router. By attaching a interface to logical
+    # required: optional
+  route_target_refs:
+    type: string
+    description: Route target that represent this logical router.
+    # required: optional
+  project:
+    type: string
+    description: project for the LogicalRouter
+    # required: optional
+
+resources:
+  VirtualNetwork:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      name: Something
+      project: { get_param: project }
+
+  VirtualMachineInterface:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      name: Something
+      virtual_network_refs: [{ get_resource: VirtualNetwork }]
+      project: { get_param: project }
+
+  template_LogicalRouter:
+    type: OS::ContrailV2::LogicalRouter
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      configured_route_target_list:
+        {
+          configured_route_target_list_route_target: [{ get_param: configured_route_target_list_route_target }],
+        }
+      virtual_network_refs: [{ get_param: virtual_network_refs }]
+      service_instance_refs: [{ get_param: service_instance_refs }]
+      route_table_refs: [{ get_param: route_table_refs }]
+      virtual_machine_interface_refs: [{ get_resource: VirtualMachineInterface }]
+      route_target_refs: [{ get_param: route_target_refs }]
+      project: { get_param: project }
+

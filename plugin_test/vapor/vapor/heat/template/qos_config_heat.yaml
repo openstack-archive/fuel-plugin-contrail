@@ -1,0 +1,111 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a QosConfig:
+
+parameters:
+  name:
+    type: string
+    description: name for the QosConfig
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the QosConfig
+    # required: optional
+  qos_config_type:
+    type: string
+    description: qos_config_type for the QosConfig
+    # operations: SPECIFIES IF QOS-CONFIG IS FOR VHOST, FABRIC OR FOR PROJECT.
+    # required: CRUD
+  vlan_priority_entries_qos_id_forwarding_class_pair_key:
+    type: number
+    description: QoS bit value (DSCP or Vlan priority or EXP bit value
+    # operations: MAP OF .1P PRIORITY CODE TO APPLICABLE FORWARDING CLASS FOR PACKET.
+    # required: optional
+  vlan_priority_entries_qos_id_forwarding_class_pair_forwarding_class_id:
+    type: number
+    description: forwarding_class_id for the QosConfig
+    # operations: MAP OF .1P PRIORITY CODE TO APPLICABLE FORWARDING CLASS FOR PACKET.
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  default_forwarding_class_id:
+    type: number
+    description: default_forwarding_class_id for the QosConfig
+    # operations: DEFAULT FORWARDING CLASS USED FOR ALL NON-SPECIFIED QOS BITS
+    # required: CRUD
+  mpls_exp_entries_qos_id_forwarding_class_pair_key:
+    type: number
+    description: QoS bit value (DSCP or Vlan priority or EXP bit value
+    # operations: MAP OF MPLS EXP VALUES TO APPLICABLE FORWARDING CLASS FOR PACKET.
+    # required: optional
+  mpls_exp_entries_qos_id_forwarding_class_pair_forwarding_class_id:
+    type: number
+    description: forwarding_class_id for the QosConfig
+    # operations: MAP OF MPLS EXP VALUES TO APPLICABLE FORWARDING CLASS FOR PACKET.
+    # required: optional
+  dscp_entries_qos_id_forwarding_class_pair_key:
+    type: number
+    description: QoS bit value (DSCP or Vlan priority or EXP bit value
+    # operations: MAP OF DSCP MATCH CONDITION AND APPLICABLE FORWARDING CLASS FOR PACKET.
+    # required: optional
+  dscp_entries_qos_id_forwarding_class_pair_forwarding_class_id:
+    type: number
+    description: forwarding_class_id for the QosConfig
+    # operations: MAP OF DSCP MATCH CONDITION AND APPLICABLE FORWARDING CLASS FOR PACKET.
+    # required: optional
+  global_system_config_refs:
+    type: string
+    description: global_system_config_refs for GlobalQosConfig and QosConfig
+    # required: optional
+  project:
+    type: string
+    description: project for the QosConfig
+    # required: optional
+
+resources:
+  GlobalQosConfig:
+    type: OS::ContrailV2::GlobalQosConfig
+    properties:
+      name: Something
+      global_system_config: { get_param: global_system_config_refs }
+
+  template_QosConfig:
+    type: OS::ContrailV2::QosConfig
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      qos_config_type: { get_param: qos_config_type }
+      vlan_priority_entries:
+        {
+          vlan_priority_entries_qos_id_forwarding_class_pair:
+            [{
+              vlan_priority_entries_qos_id_forwarding_class_pair_key: { get_param: vlan_priority_entries_qos_id_forwarding_class_pair_key },
+              vlan_priority_entries_qos_id_forwarding_class_pair_forwarding_class_id: { get_param: vlan_priority_entries_qos_id_forwarding_class_pair_forwarding_class_id },
+            }],
+        }
+      display_name: { get_param: display_name }
+      default_forwarding_class_id: { get_param: default_forwarding_class_id }
+      mpls_exp_entries:
+        {
+          mpls_exp_entries_qos_id_forwarding_class_pair:
+            [{
+              mpls_exp_entries_qos_id_forwarding_class_pair_key: { get_param: mpls_exp_entries_qos_id_forwarding_class_pair_key },
+              mpls_exp_entries_qos_id_forwarding_class_pair_forwarding_class_id: { get_param: mpls_exp_entries_qos_id_forwarding_class_pair_forwarding_class_id },
+            }],
+        }
+      dscp_entries:
+        {
+          dscp_entries_qos_id_forwarding_class_pair:
+            [{
+              dscp_entries_qos_id_forwarding_class_pair_key: { get_param: dscp_entries_qos_id_forwarding_class_pair_key },
+              dscp_entries_qos_id_forwarding_class_pair_forwarding_class_id: { get_param: dscp_entries_qos_id_forwarding_class_pair_forwarding_class_id },
+            }],
+        }
+      global_system_config_refs: [{ get_param: global_system_config_refs }]
+      global_qos_config: { get_resource: GlobalQosConfig }
+      project: { get_param: project }
+

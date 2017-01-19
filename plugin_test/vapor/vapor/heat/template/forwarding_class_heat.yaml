@@ -1,0 +1,76 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a ForwardingClass:
+
+parameters:
+  name:
+    type: string
+    description: name for the ForwardingClass
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the ForwardingClass
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  forwarding_class_vlan_priority:
+    type: number
+    description: 802.1p value to be written on outgoing packet for this forwarding-class.
+    # operations: CRUD
+    # required: required
+  forwarding_class_mpls_exp:
+    type: number
+    description: MPLS exp value to be written on outgoing packet for this forwarding-class.
+    # operations: CRUD
+    # required: required
+  forwarding_class_id:
+    type: number
+    description: Unique ID for this forwarding class.
+    # operations: CRUD
+    # required: required
+  forwarding_class_dscp:
+    type: number
+    description: DSCP value to be written on outgoing packet for this forwarding-class.
+    # operations: CRUD
+    # required: required
+  qos_queue_refs:
+    type: string
+    description: Qos queue to be used for this forwarding class.
+    # required: optional
+  global_system_config:
+    type: string
+    description: global_system_config for the GlobalQosConfig
+    # required: optional
+
+resources:
+  GlobalQosConfig:
+    type: OS::ContrailV2::GlobalQosConfig
+    properties:
+      name: Something
+      global_system_config: { get_param: global_system_config }
+
+  QosQueue:
+    type: OS::ContrailV2::QosQueue
+    properties:
+      name: Something
+      max_bandwidth: 1
+      min_bandwidth: 1
+      global_qos_config: { get_resource: GlobalQosConfig }
+
+  template_ForwardingClass:
+    type: OS::ContrailV2::ForwardingClass
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      forwarding_class_vlan_priority: { get_param: forwarding_class_vlan_priority }
+      forwarding_class_mpls_exp: { get_param: forwarding_class_mpls_exp }
+      forwarding_class_id: { get_param: forwarding_class_id }
+      forwarding_class_dscp: { get_param: forwarding_class_dscp }
+      qos_queue_refs: [{ get_resource: QosQueue }]
+      global_qos_config: { get_resource: GlobalQosConfig }
+
