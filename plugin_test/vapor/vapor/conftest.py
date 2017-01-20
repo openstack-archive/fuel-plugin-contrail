@@ -8,6 +8,7 @@ from stepler.nova.fixtures import *  # noqa
 
 from vapor.fixtures.contrail import *  # noqa
 from vapor.fixtures.contrail_resources import *  # noqa
+from vapor.fixtures.ipams import *  # noqa
 from vapor.fixtures.different_tenants_resources import *  # noqa
 from vapor.fixtures.networks import *  # noqa
 from vapor.fixtures.nodes import *  # noqa
