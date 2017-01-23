@@ -1,0 +1,10 @@
+Code-Review+1: Denis Deryabin <dderyabin@mirantis.com>
+Code-Review+2: okosse <okosse@mirantis.com>
+Verified+1: Plugins CI <plugins.ci@mirantis.com>
+Workflow+1: okosse <okosse@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 23 Jan 2017 13:48:31 +0000
+Reviewed-on: https://review.openstack.org/417850
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/master
