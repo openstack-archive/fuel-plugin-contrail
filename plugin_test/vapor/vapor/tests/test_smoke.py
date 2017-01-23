@@ -121,6 +121,35 @@ def test_update_network_policy(contrail_api_client, contrail_network_policy):
     assert_that(policy_data, has_property('display_name', new_display_name))
 
 
+@pytest.mark.usefixtures('contrail_ipams_cleanup')
+def test_add_network_ipam(contrail_api_client):
+    network_ipam_name, = utils.generate_ids()
+    network_ipam = types.NetworkIpam(network_ipam_name)
+    contrail_api_client.network_ipam_create(network_ipam)
+    ipams = contrail_api_client.network_ipams_list()
+    assert_that(ipams['network-ipams'],
+                has_item(has_entry('uuid', network_ipam.uuid)))
+
+
+@pytest.mark.usefixtures('contrail_ipams_cleanup')
+def test_delete_network_ipam(contrail_api_client, contrail_ipam):
+    contrail_api_client.network_ipam_delete(id=contrail_ipam.uuid)
+    ipams = contrail_api_client.network_ipams_list()
+    assert_that(
+        ipams['network-ipams'],
+        is_not(has_item(has_entry('uuid', contrail_ipam.uuid))))
+
+
+@pytest.mark.usefixtures('contrail_ipams_cleanup')
+def test_update_network_ipam(contrail_api_client, contrail_ipam):
+    new_display_name, = utils.generate_ids()
+    contrail_ipam.display_name = new_display_name
+    contrail_api_client.network_ipam_update(contrail_ipam)
+    ipam_data = contrail_api_client.network_ipam_read(
+        id=contrail_ipam.uuid)
+    assert_that(ipam_data, has_property('display_name', new_display_name))
+
+
 def test_contrail_alarms_is_empty(client_contrail_analytics):
     alarms = client_contrail_analytics.get_alarms()
     assert_that(alarms, empty())
