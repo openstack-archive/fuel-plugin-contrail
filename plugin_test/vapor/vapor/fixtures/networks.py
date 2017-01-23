@@ -1,3 +1,4 @@
+from pycontrail import exceptions
 import pycontrail.types as types
 import pytest
 from stepler.third_party import utils
@@ -40,8 +41,13 @@ def contrail_network(contrail_api_client):
     network_name, = utils.generate_ids()
     net = types.VirtualNetwork(network_name)
     contrail_api_client.virtual_network_create(net)
+
     yield net
-    contrail_api_client.virtual_network_delete(id=net.uuid)
+
+    try:
+        contrail_api_client.virtual_network_delete(id=net.uuid)
+    except exceptions.NoIdError:
+        pass
 
 
 @pytest.fixture
