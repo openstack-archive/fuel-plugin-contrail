@@ -164,10 +164,15 @@ def default_project(contrail_api_client):
 
 
 @pytest.fixture
+def default_domain(contrail_api_client):
+    domain_id = contrail_api_client.domain_get_default_id()
+    return contrail_api_client.domain_read(id=domain_id)
+
+
+@pytest.fixture
 def contrail_current_project(contrail_api_client, current_project):
     project_id = str(uuid.UUID(current_project.id))
     return contrail_api_client.project_read(id=project_id)
-
 
 
 @pytest.fixture

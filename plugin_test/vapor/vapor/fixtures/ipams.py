@@ -36,12 +36,18 @@ def contrail_ipams_cleanup(contrail_api_client):
 
 
 @pytest.fixture
-def contrail_ipam(contrail_api_client):
+def contrail_ipam(contrail_api_client, contrail_current_project):
     name, = utils.generate_ids()
-    ipam = types.NetworkIpam(name)
+    ipam = types.NetworkIpam(name, parent_obj=contrail_current_project)
     contrail_api_client.network_ipam_create(ipam)
     yield ipam
     try:
         contrail_api_client.network_ipam_delete(id=ipam.uuid)
     except exceptions.NoIdError:
         pass
+
+
+@pytest.fixture
+def contrail_default_ipam(contrail_api_client):
+    ipam_id = contrail_api_client.network_ipam_get_default_id()
+    return contrail_api_client.network_ipam_read(id=ipam_id)
