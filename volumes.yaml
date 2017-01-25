@@ -13,15 +13,22 @@ volumes:
         size:
           generator: "calc_total_vg"
           generator_args: ["contrail-db"]
+
   - id: "crashes"
-    type: "partition"
-    name: "Crash dumps"
+    type: "vg"
     min_size:
       generator: "calc_gb_to_mb"
       generator_args: [10]
-    label: "Crash_dumps"
-    mount: "/var/crashes"
-    file_system: "xfs"
+    label: "Crash dumps"
+    volumes:
+      - mount: "/var/crashes"
+        type: "lv"
+        name: "crashes"
+        size:
+          generator: "calc_total_vg"
+          generator_args: ["crashes"]
+        file_system: "ext4"
+
 volumes_roles_mapping:
   contrail-db:
     - {allocate_size: "min", id: "os"}
