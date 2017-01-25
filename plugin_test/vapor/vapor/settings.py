@@ -39,6 +39,9 @@ FLOATING_IP_BIND_TIMEOUT = 30
 # Time to applying new password on keystone
 PASSWORD_CHANGE_TIMEOUT = 30
 
+# Time to wait for success ping
+PING_SUCESS_TIMEOUT = 60 * 2
+
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
