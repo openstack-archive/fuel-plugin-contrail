@@ -16,3 +16,4 @@ notice('MODULAR: contrail/contrail-compute-nova.pp')
 
 include contrail
 include contrail::compute::nova
+include contrail::clean
