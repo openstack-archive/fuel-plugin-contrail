@@ -39,6 +39,9 @@ FLOATING_IP_BIND_TIMEOUT = 30
 # Time to applying new password on keystone
 PASSWORD_CHANGE_TIMEOUT = 30
 
+# Time to wait for success ping
+PING_SUCESS_TIMEOUT = 60 * 2
+
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
@@ -129,3 +132,6 @@ CONTRAIL_ANALYTIC_PROCESSES = {
 
 BASE_DIR = os.path.dirname(__file__)
 HEAT_TEMPLATES_PATH = os.path.join(BASE_DIR, 'heat')
+
+
+VROUTER_HEADLESS_MODE_CMD = "grep -iP '^headless_mode\s*=\s*true' /etc/contrail/contrail-vrouter-agent.conf"  # noqa

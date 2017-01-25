@@ -14,4 +14,9 @@ from vapor.fixtures.networks import *  # noqa
 from vapor.fixtures.nodes import *  # noqa
 from vapor.fixtures.policies import *  # noqa
 from vapor.fixtures.security_groups import *  # noqa
+from vapor.fixtures.skip import *  # noqa
 from vapor.fixtures.subnets import *  # noqa
+
+pytest_plugins = [
+    'stepler.third_party.destructive_dispatcher'
+]
