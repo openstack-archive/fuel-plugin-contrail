@@ -20,6 +20,7 @@ from pycontrail import exceptions
 import pycontrail.types as types
 import pytest
 from stepler import config as stepler_config
+from stepler.third_party import ping
 from stepler.third_party import utils
 from stepler.third_party import waiter
 
@@ -297,3 +298,42 @@ def test_change_login_and_password(session, current_project,
         expected_exceptions=exceptions.AuthenticationFailed,
         timeout_seconds=settings.PASSWORD_CHANGE_TIMEOUT)
     assert_that(net_list, is_not(empty()))
+
+
+def test_connectivity_from_server_without_floating(
+        cirros_image, flavor, net_subnet_router, security_group, server_steps):
+    """Check connectivity via external Contrail network without floating IP.
+
+    Steps:
+        #. Create network, subnet and router
+        #. Launch new instance in created network
+        #. Check ping from instance to external IP (8.8.8.8)
+    """
+    start, done = utils.generate_ids(count=2)
+    userdata = '\n'.join([
+        '#!/bin/sh',
+        'echo {start}',
+        'ping -w30 -c4 {ip}',
+        'echo {done}',
+    ]).format(
+        ip=stepler_config.GOOGLE_DNS_IP, start=start, done=done)
+    network, _, _ = net_subnet_router
+
+    # Boot server
+    server = server_steps.create_servers(
+        image=cirros_image,
+        flavor=flavor,
+        networks=[network],
+        security_groups=[security_group],
+        userdata=userdata)[0]
+    server_steps.check_server_log_contains_record(
+        server, done, timeout=stepler_config.USERDATA_EXECUTING_TIMEOUT)
+
+    # Check server console
+    console = server.get_console_output()
+    console = console.split(done)[0]
+    console = console.split(start)[-1]
+    console = console.strip()
+    ping_result = ping.PingResult()
+    ping_result.stdout = console
+    assert_that(ping_result.loss, equal_to(0), console)
