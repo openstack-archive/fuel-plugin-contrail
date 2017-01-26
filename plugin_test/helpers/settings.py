@@ -28,6 +28,9 @@ VSRX_CONFIG_PATH = os.environ.get(
 VSRX_USER = os.environ.get('VSRX_USER', False)
 VSRX_PASS = os.environ.get('VSRX_PASS', False)
 
+NEW_CONTRAIL_PLUGIN_PATH = os.environ.get('NEW_CONTRAIL_PLUGIN_PATH', '5.0.1')
+NEW_CONTRAIL_PLUGIN_VERSION = os.environ.get('NEW_CONTRAIL_PLUGIN_VERSION')
+
 BAREMETAL = {
     # Target Baremetal host
     'ipmi_user': os.environ.get('BM_IPMI_USER'),

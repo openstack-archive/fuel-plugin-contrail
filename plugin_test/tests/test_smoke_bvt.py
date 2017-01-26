@@ -168,6 +168,7 @@ class ContrailPlugin(TestBasic):
             4. Add a node with controller role
             5. Add a node with compute role
             6. Deploy cluster with plugin
+            7. Update plugin
 
         Duration 90 min
 
@@ -191,6 +192,8 @@ class ContrailPlugin(TestBasic):
         self.show_step(6)
         openstack.deploy_cluster(self)
         TestContrailCheck(self).cloud_check(['contrail'])
+        self.show_step(7)
+        plugin.update_plugin(self)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_bvt"])
