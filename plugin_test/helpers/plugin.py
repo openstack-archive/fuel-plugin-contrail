@@ -21,6 +21,8 @@ from fuelweb_test.helpers import utils
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PATH
 from proboscis.asserts import assert_true
 from settings import CONTRAIL_PLUGIN_VERSION
+from settings import NEW_CONTRAIL_PLUGIN_PATH
+from settings import NEW_CONTRAIL_PLUGIN_VERSION
 import openstack
 
 
@@ -156,3 +158,18 @@ def activate_dpdk(obj, **kwargs):
     if kwargs:
         opts.update(kwargs)
     activate_plugin(obj, **opts)
+
+
+def update_plugin(obj):
+    """Upload and install new version of plugin"""
+
+    # copy plugin to the master node
+    utils.upload_tarball(
+        obj.ssh_manager.admin_ip,
+        NEW_CONTRAIL_PLUGIN_PATH, '/var')
+    
+    parsed = NEW_CONTRAIL_PLUGIN_PATH.split("/")
+    rpm_name = parsed[-1]
+    command = "fuel plugins --update /var/{}".format(rpm_name)
+    admin_node = obj.env.d_env.get_admin_remote()
+    admin_node.execute(command)
