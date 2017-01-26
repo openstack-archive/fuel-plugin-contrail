@@ -24,17 +24,19 @@ from fuelweb_test.helpers.decorators import log_snapshot_after_test
 from fuelweb_test.settings import CONTRAIL_PLUGIN_PACK_UB_PATH
 from fuelweb_test.tests.base_test_case import SetupEnvironment
 from fuelweb_test.tests.base_test_case import TestBasic
+from fuelweb_test.tests.tests_upgrade.tests_install_mu.test_install_mu_base import MUInstallBase
 
 from helpers import openstack
 from helpers import plugin
 from helpers import vsrx
 from helpers.settings import CONTRAIL_PLUGIN_VERSION
 from helpers.settings import OSTF_RUN_TIMEOUT
+from helpers.settings import UPDATE_PLUGIN
 from tests.test_contrail_check import TestContrailCheck
 
 
 @test(groups=["plugins"])
-class ContrailPlugin(TestBasic):
+class ContrailPlugin(MUInstallBase):
     """ContrailPlugin."""  # TODO(unknown) documentation
 
     pack_copy_path = '/var/www/nailgun/plugins/contrail-5.0'
@@ -168,6 +170,9 @@ class ContrailPlugin(TestBasic):
             4. Add a node with controller role
             5. Add a node with compute role
             6. Deploy cluster with plugin
+            7. Update plugin
+            8. Prepare environment for update
+            9. Update environment
 
         Duration 90 min
 
@@ -191,6 +196,18 @@ class ContrailPlugin(TestBasic):
         self.show_step(6)
         openstack.deploy_cluster(self)
         TestContrailCheck(self).cloud_check(['contrail'])
+
+        if UPDATE_PLUGIN:
+            self.show_step(7)
+            plugin.update_plugin(self)
+            self.show_step(8)
+            self.check_env_var()
+            self._prepare_cluster_for_mu()
+            self.show_step(9)
+            self._check_for_potential_updates(self.cluster_id)
+            self._install_mu(self.cluster_id, repos=self.repos)
+            self._check_for_potential_updates(self.cluster_id, updated=True)
+            self.fuel_web.verify_network(self.cluster_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_bvt"])
