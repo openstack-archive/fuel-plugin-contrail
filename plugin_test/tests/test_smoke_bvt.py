@@ -28,8 +28,10 @@ from fuelweb_test.tests.base_test_case import TestBasic
 from helpers import openstack
 from helpers import plugin
 from helpers import vsrx
+from helpers.update_env import MUInstall92
 from helpers.settings import CONTRAIL_PLUGIN_VERSION
 from helpers.settings import OSTF_RUN_TIMEOUT
+from helpers.settings import UPDATE_PLUGIN
 from tests.test_contrail_check import TestContrailCheck
 
 
@@ -168,6 +170,7 @@ class ContrailPlugin(TestBasic):
             4. Add a node with controller role
             5. Add a node with compute role
             6. Deploy cluster with plugin
+            7. Update plugin
 
         Duration 90 min
 
@@ -191,6 +194,12 @@ class ContrailPlugin(TestBasic):
         self.show_step(6)
         openstack.deploy_cluster(self)
         TestContrailCheck(self).cloud_check(['contrail'])
+        self.show_step(7)
+
+        if UPDATE_PLUGIN:
+            plugin.update_plugin(self)
+            MUInstall92.prepare_env_for_update(self)
+            MUInstall92.install_update(self, self.cluster_id)
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_bvt"])
