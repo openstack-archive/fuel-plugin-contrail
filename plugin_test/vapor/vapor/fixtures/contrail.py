@@ -174,6 +174,7 @@ def contrail_current_project(contrail_api_client, current_project):
     project_id = str(uuid.UUID(current_project.id))
     return contrail_api_client.project_read(id=project_id)
 
+
 @pytest.fixture
 def iface_route_table_create(contrail_api_client):
     """Callable fixture to create interface router table during test.

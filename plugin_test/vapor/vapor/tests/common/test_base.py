@@ -10,8 +10,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from hamcrest import (assert_that, calling, raises, contains_string,
-                      has_item, has_entry, is_not, empty)  # noqa H301
+from hamcrest import (assert_that, calling, raises, contains_string, has_item,
+                      has_entry, is_not, empty)  # noqa H301
 from stepler import config as stepler_config
 from pycontrail import exceptions
 import pycontrail.types as contrail_types
@@ -60,7 +60,7 @@ def test_delete_vm_with_associated_vn(contrail_network, contrail_subnet,
     Pass criteria:
         The attempt to delete VN should fail.
     """
-    servers = server_steps.create_servers(
+    server_steps.create_servers(
         image=cirros_image, flavor=tiny_flavor,
         nics=[{'net-id': contrail_network.uuid}])
     net = network_steps.get_network(id=contrail_network.uuid)
