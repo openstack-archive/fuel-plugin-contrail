@@ -18,6 +18,13 @@ class contrail::compute::vrouter {
 
   if $contrail::compute_dpdk_enabled {
 
+    if !defined(File['/var/crashes']) {
+      file { '/var/crashes':
+        ensure => directory,
+        mode   => '1777',
+      }
+    }
+
     # in case of bonds, MAC address should be set permanently, because slave interfaces
     # may start in random order during the boot process
     if ( 'bond' in $raw_phys_dev) {

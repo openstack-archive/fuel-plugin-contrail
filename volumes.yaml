@@ -27,6 +27,10 @@ volumes_roles_mapping:
     - {allocate_size: "min", id: "os"}
     - {allocate_size: "min", id: "crashes"}
     - {allocate_size: "min", id: "contrail-db"}
+  contrail-analytics:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
+    - {allocate_size: "all", id: "logs"}
   contrail-analytics-db:
     - {allocate_size: "min", id: "os"}
     - {allocate_size: "min", id: "crashes"}
@@ -41,6 +45,14 @@ volumes_roles_mapping:
     - {allocate_size: "min", id: "crashes"}
     - {allocate_size: "all", id: "logs"}
   contrail-control:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
+    - {allocate_size: "all", id: "logs"}
+  dpdk:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
+    - {allocate_size: "all", id: "logs"}
+  contrail-vmware:
     - {allocate_size: "min", id: "os"}
     - {allocate_size: "min", id: "crashes"}
     - {allocate_size: "all", id: "logs"}

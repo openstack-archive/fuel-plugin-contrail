@@ -24,6 +24,13 @@ class contrail::analytics {
     group   => 'contrail',
   }
 
+  if !defined(File['/var/crashes']) {
+    file { '/var/crashes':
+      ensure => directory,
+      mode   => '1777',
+    }
+  }
+
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
   tweaks::ubuntu_service_override { 'contrail-openstack-analytics':

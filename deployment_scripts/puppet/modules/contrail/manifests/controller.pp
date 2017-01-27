@@ -49,6 +49,13 @@ class contrail::controller {
     require => Package['neutron-plugin-contrail'],
   }
 
+  if !defined(File['/var/crashes']) {
+    file { '/var/crashes':
+      ensure => directory,
+      mode   => '1777',
+    }
+  }
+
   # Packages
   if !defined(Package['neutron-server']) {
     package { 'neutron-server': }
