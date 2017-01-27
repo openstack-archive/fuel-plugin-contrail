@@ -17,7 +17,6 @@ from hamcrest import (assert_that, has_length, has_items, has_entries,
                       equal_to, is_not, empty)
 import pycontrail.client as client
 from pycontrail import exceptions
-import pycontrail.types as types
 import pytest
 from stepler import config as stepler_config
 from stepler.third_party import utils
@@ -25,6 +24,7 @@ from stepler.third_party import waiter
 
 from vapor.helpers import contrail_steps
 from vapor.helpers import nodes_steps
+from vapor.helpers import policy
 from vapor import settings
 
 
@@ -223,20 +223,9 @@ def test_network_connectivity_with_policy(
     with pytest.raises(Exception):
         server_steps.check_ping_between_servers_via_floating(resources.servers)
 
-    # Create policy
-    address = types.AddressType(virtual_network='any')
-    port = types.PortType(start_port=-1, end_port=-1)
-    action = types.ActionListType(simple_action='pass')
-    rule = types.PolicyRuleType(
-        protocol='any',
-        direction='<>',
-        src_addresses=[address],
-        src_ports=[port],
-        dst_addresses=[address],
-        dst_ports=[port],
-        action_list=action)
-    policy_entries = types.PolicyEntriesType(policy_rule=[rule])
-    contrail_network_policy.network_policy_entries = policy_entries
+    # Update policy
+    contrail_network_policy.network_policy_entries = (
+        policy.allow_all_policy_entry)
     contrail_api_client.network_policy_update(contrail_network_policy)
 
     # Bind policy to networks

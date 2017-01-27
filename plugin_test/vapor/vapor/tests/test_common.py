@@ -10,14 +10,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from hamcrest import (assert_that, calling, raises, contains_string,
-                      has_item, has_entry, is_not, empty)  # noqa H301
+from hamcrest import (assert_that, calling, raises, contains_string, has_item,
+                      has_entry, is_not, empty, equal_to)  # noqa H301
 from stepler import config as stepler_config
+from stepler.third_party import utils
+from stepler.third_party import ping
 from pycontrail import exceptions
 import pycontrail.types as contrail_types
 from neutronclient.common import exceptions as neutron_exceptions
 
 from vapor.helpers import contrail_status
+from vapor.helpers import policy
+from vapor.helpers import connectivity
 from vapor import settings
 
 
@@ -169,3 +173,67 @@ def test_restart_control_service(os_faults_steps):
         'contrail-control',
         'active',
         timeout=settings.SERVICE_STATUS_CHANGE_TIMEOUT)
+
+
+def test_security_group_and_policy(
+        contrail_network_policy, create_security_group, security_group_steps,
+        flavor, cirros_image, public_network, create_floating_ip, server_steps,
+        port_steps, contrail_api_client, create_network, create_subnet,
+        set_network_policy):
+    """Verify that policy that allows all are override security group.
+
+    Steps:
+        #. Create network policy and allow all traffic
+        #. Create security group and allow all TCP traffic only
+        #. Create 2 networks with policy
+        #. Boot 2 servers with created security group, each - in its own
+            network
+        #. Add floating IP to one of server
+        #. Check that TCP traffic between servers is allowed
+        #. Check that ICMP traffic between servers is denied
+    """
+
+    # Update policy
+    contrail_network_policy.network_policy_entries = (
+        policy.allow_all_policy_entry)
+    contrail_api_client.network_policy_update(contrail_network_policy)
+
+    # Create security group
+    security_group = create_security_group(next(utils.generate_ids()))
+    security_group_steps.add_group_rules(
+        security_group, stepler_config.SECURITY_GROUP_SSH_RULES)
+
+    servers = []
+    for i, name in enumerate(utils.generate_ids(count=2)):
+        # Create network, subnet
+        network = create_network(name)
+        create_subnet(name, network=network, cidr='10.0.{}.0/24'.format(i))
+        contrail_net = contrail_api_client.virtual_network_read(
+            id=network['id'])
+        set_network_policy(contrail_net, contrail_network_policy)
+
+        # Boot server
+        server = server_steps.create_servers(
+            image=cirros_image,
+            flavor=flavor,
+            networks=[network],
+            security_groups=[security_group],
+            username=stepler_config.CIRROS_USERNAME,
+            password=stepler_config.CIRROS_PASSWORD)[0]
+        servers.append(server)
+
+    # Assign floating IP
+    server1_port = port_steps.get_port(
+        device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
+        device_id=servers[0].id)
+    floating_ip = create_floating_ip(public_network, port=server1_port)
+    server2_ip = server_steps.get_fixed_ip(servers[1])
+
+    with server_steps.get_server_ssh(
+            server, ip=floating_ip['floating_ip_address']) as server_ssh:
+        connectivity.check_tcp_connection_status(
+            server2_ip,
+            remote=server_ssh,
+            timeout=stepler_config.UBUNTU_BOOT_COMPLETE_TIMEOUT)
+        ping_result = ping.Pinger(server2_ip, remote=server_ssh).ping()
+        assert_that(ping_result.received, equal_to(0))
