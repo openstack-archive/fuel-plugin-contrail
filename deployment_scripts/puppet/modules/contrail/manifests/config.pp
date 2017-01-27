@@ -31,6 +31,13 @@ class contrail::config {
     group   => 'contrail',
   }
 
+  if !defined(File['/var/crashes']) {
+    file { '/var/crashes':
+      ensure => directory,
+      mode   => '1777',
+    }
+  }
+
   tweaks::ubuntu_service_override { 'contrail-openstack-config':
     package_name => 'contrail-openstack-config',
     service_name => 'supervisor-config',
