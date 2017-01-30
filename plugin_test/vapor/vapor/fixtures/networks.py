@@ -37,9 +37,10 @@ def neutron_network_cleanup(network_steps):
 
 
 @pytest.fixture
-def contrail_network(contrail_api_client):
+def contrail_network(contrail_api_client, contrail_current_project):
     network_name, = utils.generate_ids()
-    net = types.VirtualNetwork(network_name)
+    net = types.VirtualNetwork(
+        network_name, parent_obj=contrail_current_project)
     contrail_api_client.virtual_network_create(net)
 
     yield net

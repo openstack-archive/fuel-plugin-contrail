@@ -15,15 +15,32 @@ import pytest
 
 
 @pytest.fixture
-def contrail_subnet(contrail_api_client, contrail_network):
-    ipam_id = contrail_api_client.network_ipam_get_default_id()
-    ipam = contrail_api_client.network_ipam_read(id=ipam_id)
-    subnet_type = types.SubnetType(ip_prefix='10.0.0.0', ip_prefix_len=24)
-    vn_sub = types.VnSubnetsType([types.IpamSubnetType(subnet=subnet_type)])
-    contrail_network.add_network_ipam(ipam, vn_sub)
-    contrail_api_client.virtual_network_update(contrail_network)
+def contrail_create_subnet(contrail_api_client):
 
-    yield
+    networks = []
 
-    contrail_network.del_network_ipam(ipam)
-    contrail_api_client.virtual_network_update(contrail_network)
+    def _contrail_create_subnet(network,
+                                ipam=None,
+                                ip_prefix='10.0.0.0',
+                                ip_prefix_len=24):
+        networks.append((network, ipam))
+        subnet_type = types.SubnetType(
+            ip_prefix=ip_prefix, ip_prefix_len=ip_prefix_len)
+        vn_sub = types.VnSubnetsType(
+            [types.IpamSubnetType(subnet=subnet_type)])
+        network.add_network_ipam(ipam, vn_sub)
+        contrail_api_client.virtual_network_update(network)
+
+        return
+
+    yield _contrail_create_subnet
+
+    for network, ipam in networks:
+        network.del_network_ipam(ipam)
+        contrail_api_client.virtual_network_update(network)
+
+
+@pytest.fixture
+def contrail_subnet(contrail_create_subnet, contrail_default_ipam,
+                    contrail_network):
+    return contrail_create_subnet(contrail_network, contrail_default_ipam)
