@@ -1,4 +1,4 @@
-git+https://github.com/Mirantis/stepler.git
+git+https://github.com/Mirantis/stepler.git#egg=stepler[libvirt]
 git+https://github.com/morganfainberg/positional.git
 git+https://github.com/gdyuldin/contrail-python-api@R3.0
 dpath
