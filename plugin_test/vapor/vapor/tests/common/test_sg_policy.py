@@ -12,6 +12,7 @@
 
 import functools
 
+import attrdict
 from hamcrest import assert_that, equal_to  # noqa H301
 import pytest
 from stepler import config as stepler_config
@@ -21,6 +22,7 @@ from stepler.third_party import waiter
 
 from vapor.helpers import policy
 from vapor.helpers import connectivity
+from vapor import settings
 
 SG_RULES = {
     'tcp_all': [{
@@ -60,10 +62,15 @@ check_tcp_ssh = functools.partial(
 check_udp = functools.partial(
     connectivity.check_connection_status, port=UDP_PORT)
 
+tcp_all_policy = policy.make_policy_entry(
+    protocol='tcp', src_ports_range=(-1, -1), dst_ports_range=(-1, -1))
+tcp_ssh_policy = policy.make_policy_entry(
+    protocol='tcp', src_ports_range=(-1, -1), dst_ports_range=(22, 22))
+
 
 def check_icmp(ip, remote, must_available=True, timeout=0):
     def predicate():
-        ping_result = ping.Pinger(ip, remote=remote).ping()
+        ping_result = ping.Pinger(ip, remote=remote).ping(count=3)
         if must_available:
             value = ping_result.loss
         else:
@@ -73,54 +80,35 @@ def check_icmp(ip, remote, must_available=True, timeout=0):
     return waiter.wait(predicate, timeout_seconds=timeout)
 
 
-@pytest.mark.parametrize(
-    ['sg_rules', 'checks'], [
-        (SG_RULES['tcp_all'], {
-            check_tcp: True,
-            check_tcp_ssh: True,
-            check_udp: False,
-            check_icmp: False
-        }),
-        (SG_RULES['tcp_ssh'], {
-            check_tcp: False,
-            check_tcp_ssh: True,
-            check_udp: False,
-            check_icmp: False
-        }),
-        (SG_RULES['tcp_all'] + SG_RULES['udp_all'], {
-            check_tcp: True,
-            check_tcp_ssh: True,
-            check_udp: False,
-            check_icmp: False
-        }),
-    ],
-    ids=['tcp_all', 'tcp_ssh', 'tcp_udp_all'])
-def test_security_group_and_allow_all_policy(
-        contrail_network_policy, create_security_group, security_group_steps,
-        floating_ip_steps, flavor, cirros_image, public_network,
-        create_floating_ip, server_steps, port_steps, contrail_api_client,
-        create_network, create_subnet, set_network_policy, sg_rules, checks):
-    """Verify that policy that allows all are override security group.
+@pytest.fixture
+def security_group(create_security_group, security_group_steps):
+    group_name = next(utils.generate_ids('security-group'))
+    group = create_security_group(group_name)
 
-    Steps:
-        #. Create network policy and allow all traffic
-        #. Create security group and allow `sg_rules` traffic only
-        #. Create 2 networks with policy
-        #. Boot 2 servers with created security group, each - in its own
-            network
-        #. Add floating IP to one of server
-        #. Check that security group rules are works as expected
+    security_group_steps.add_group_rules(group, SG_RULES['tcp_ssh'])
+    return group
+
+
+@pytest.fixture
+def connectivity_test_resources(
+        cirros_image,
+        flavor,
+        security_group,
+        public_network,
+        contrail_network_policy,
+        contrail_api_client,
+        create_network,
+        create_subnet,
+        create_floating_ip,
+        set_network_policy,
+        server_steps,
+        port_steps,
+        floating_ip_steps, ):
+    """This fixture creates 2 netwotks, boot 2 servers with network listeners.
+
+    It returns attrdict with client and server instaces, and server's listening
+    ports.
     """
-
-    # Update policy
-    contrail_network_policy.network_policy_entries = (
-        policy.allow_all_policy_entry)
-    contrail_api_client.network_policy_update(contrail_network_policy)
-
-    # Create security group
-    security_group = create_security_group(next(utils.generate_ids()))
-    security_group_steps.add_group_rules(security_group, sg_rules)
-
     servers = []
     floating_ips = []
     for i, name in enumerate(utils.generate_ids(count=2)):
@@ -146,22 +134,128 @@ def test_security_group_and_allow_all_policy(
             device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
             device_id=server.id)
         floating_ip = create_floating_ip(public_network, port=port)
+        server_steps.check_server_ip(
+            server,
+            floating_ip['floating_ip_address'],
+            timeout=settings.FLOATING_IP_BIND_TIMEOUT)
         floating_ips.append(floating_ip)
 
+    server, client = servers
     # Start listeners
     tcp_server_cmd = 'nc -v -l -p {0} -e echo Reply'.format(TCP_PORT)
     udp_server_cmd = 'nc -v -u -l -p {0} -e echo Reply'.format(UDP_PORT)
 
-    with server_steps.get_server_ssh(servers[0]) as server_ssh:
+    with server_steps.get_server_ssh(server) as server_ssh:
         server_ssh.background_call(tcp_server_cmd)
         server_ssh.background_call(udp_server_cmd)
 
     # Detach 1st server floating IP
     floating_ip_steps.detach_floating_ip(floating_ips[0])
+    return attrdict.AttrDict(server=server, client=client)
 
-    server1_ip = server_steps.get_fixed_ip(servers[0])
 
-    with server_steps.get_server_ssh(servers[1]) as server_ssh:
+@pytest.mark.parametrize(
+    ['sg_rules', 'checks'], [
+        ([], {
+            check_tcp: False,
+            check_tcp_ssh: True,
+            check_udp: False,
+            check_icmp: False
+        }),
+        (SG_RULES['tcp_all'], {
+            check_tcp: True,
+            check_tcp_ssh: True,
+            check_udp: False,
+            check_icmp: False
+        }),
+        (SG_RULES['tcp_all'] + SG_RULES['udp_all'], {
+            check_tcp: True,
+            check_tcp_ssh: True,
+            check_udp: False,
+            check_icmp: False
+        }),
+    ],
+    ids=['tcp_ssh', 'tcp_all', 'tcp_udp_all'])
+def test_security_group_and_allow_all_policy(
+        security_group, connectivity_test_resources, contrail_network_policy,
+        security_group_steps, server_steps, contrail_api_client, sg_rules,
+        checks):
+    """Verify traffic restrictions by security group with policy.
+
+    Steps:
+        #. Create network policy and allow all traffic
+        #. Create security group and allow `sg_rules` traffic only
+        #. Create 2 networks with policy
+        #. Boot 2 servers with created security group, each - in its own
+            network
+        #. Add floating IP to one of server
+        #. Check that security group rules are works as expected
+    """
+
+    # Update policy
+    contrail_network_policy.network_policy_entries = (
+        policy.allow_all_policy_entry)
+    contrail_api_client.network_policy_update(contrail_network_policy)
+
+    # Update security group
+    security_group_steps.add_group_rules(security_group, sg_rules)
+
+    server1_ip = server_steps.get_fixed_ip(connectivity_test_resources.server)
+
+    with server_steps.get_server_ssh(
+            connectivity_test_resources.client) as server_ssh:
+        for check, available in checks.items():
+            check(
+                ip=server1_ip,
+                remote=server_ssh,
+                must_available=available,
+                timeout=60)
+
+
+@pytest.mark.parametrize(
+    ['policy_entries', 'checks'], [
+        (tcp_all_policy, {
+            check_tcp: True,
+            check_tcp_ssh: True,
+            check_udp: False,
+            check_icmp: False
+        }),
+        (tcp_ssh_policy, {
+            check_tcp: False,
+            check_tcp_ssh: True,
+            check_udp: False,
+            check_icmp: False
+        }),
+    ],
+    ids=['tcp_all', 'tcp_port'])
+def test_allow_all_security_group_and_policies(
+        contrail_network_policy, security_group, security_group_steps,
+        connectivity_test_resources, server_steps, contrail_api_client,
+        policy_entries, checks):
+    """Verify traffic restrictions by policy with security group.
+
+    Steps:
+        #. Create network policy with `policy_entries`
+        #. Create security group and allow all traffic
+        #. Create 2 networks with policy
+        #. Boot 2 servers with created security group, each - in its own
+            network
+        #. Add floating IP to one of server
+        #. Check that policy rules are works as expected
+    """
+    # Update policy
+    contrail_network_policy.network_policy_entries = policy_entries
+    contrail_api_client.network_policy_update(contrail_network_policy)
+
+    # Update security group
+    security_group_steps.add_group_rules(
+        security_group,
+        SG_RULES['tcp_all'] + SG_RULES['udp_all'] + SG_RULES['icmp_all'])
+
+    server1_ip = server_steps.get_fixed_ip(connectivity_test_resources.server)
+
+    with server_steps.get_server_ssh(
+            connectivity_test_resources.client) as server_ssh:
         for check, available in checks.items():
             check(
                 ip=server1_ip,

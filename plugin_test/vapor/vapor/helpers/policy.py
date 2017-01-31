@@ -10,23 +10,26 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-
 import pycontrail.types as types
 
 
-def make_allow_all_policy_entry():
+def make_policy_entry(protocol, src_ports_range, dst_ports_range):
     address = types.AddressType(virtual_network='any')
-    port = types.PortType(start_port=-1, end_port=-1)
+    src_port = types.PortType(
+        start_port=src_ports_range[0], end_port=src_ports_range[1])
+    dst_port = types.PortType(
+        start_port=dst_ports_range[0], end_port=dst_ports_range[1])
     action = types.ActionListType(simple_action='pass')
     rule = types.PolicyRuleType(
-        protocol='any',
+        protocol=protocol,
         direction='<>',
         src_addresses=[address],
-        src_ports=[port],
+        src_ports=[src_port],
         dst_addresses=[address],
-        dst_ports=[port],
+        dst_ports=[dst_port],
         action_list=action)
     return types.PolicyEntriesType(policy_rule=[rule])
 
 
-allow_all_policy_entry = make_allow_all_policy_entry()
+allow_all_policy_entry = make_policy_entry(
+    protocol='any', src_ports_range=(-1, -1), dst_ports_range=(-1, -1))
