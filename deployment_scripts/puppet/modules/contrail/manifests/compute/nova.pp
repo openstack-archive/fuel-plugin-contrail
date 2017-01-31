@@ -69,7 +69,9 @@ class contrail::compute::nova {
     }
   }
 
-  nova_config {'neutron/timeout' : value => '300' }
+  if !defined(Nova_config['neutron/timeout']) {
+    nova_config {'neutron/timeout' : value => '300' }
+  }
 
   # [LCM] Workaroud to fix duplicate declaration with nova_config recource
   # from class 'nova::compute' during catalog compilation.
