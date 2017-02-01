@@ -70,7 +70,7 @@ class contrail::compute::nova {
   }
 
   if !defined(Nova_config['neutron/timeout']) {
-    nova_config {'neutron/timeout' : value => '300' }
+    nova_config {'neutron/timeout' : value => '90' }
   }
 
   # [LCM] Workaroud to fix duplicate declaration with nova_config recource

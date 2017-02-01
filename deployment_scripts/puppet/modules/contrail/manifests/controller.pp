@@ -97,7 +97,7 @@ class contrail::controller {
   }
   if !defined(Nova_config['neutron/timeout']) {
     nova_config {
-      'neutron/timeout': value => '300',
+      'neutron/timeout': value => '90',
     }
   }
   if !defined(Nova_config['neutron/service_metadata_proxy']) {
