@@ -40,7 +40,10 @@ FLOATING_IP_BIND_TIMEOUT = 30
 PASSWORD_CHANGE_TIMEOUT = 30
 
 # Time to wait for success ping
-PING_SUCESS_TIMEOUT = 60 * 2
+PING_SUCCESS_TIMEOUT = 60 * 2
+
+# Security group apply timeout
+SECURITY_GROUP_APPLY_TIMEOUT = 20
 
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
@@ -91,13 +94,13 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
         'contrail-vrouter-nodemgr', )
 }
 
-CONRTAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
-    'CONRTAIL_ROLES_DISTRIBUTION_YAML',
+CONTRAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
+    'CONTRAIL_ROLES_DISTRIBUTION_YAML',
     os.path.join(
         os.path.dirname(__file__), '../roles_distribution_example.yaml'))
 
-with open(CONRTAIL_ROLES_DISTRIBUTION_YAML) as f:
-    CONRTAIL_ROLES_DISTRIBUTION = yaml.safe_load(f) or {}
+with open(CONTRAIL_ROLES_DISTRIBUTION_YAML) as f:
+    CONTRAIL_ROLES_DISTRIBUTION = yaml.safe_load(f) or {}
 
 CONTRAIL_CONNECTIONS = {
     ROLE_CONTRAIL_ANALYTICS: [
@@ -132,6 +135,5 @@ CONTRAIL_ANALYTIC_PROCESSES = {
 
 BASE_DIR = os.path.dirname(__file__)
 HEAT_TEMPLATES_PATH = os.path.join(BASE_DIR, 'heat')
-
 
 VROUTER_HEADLESS_MODE_CMD = "grep -iP '^headless_mode\s*=\s*true' /etc/contrail/contrail-vrouter-agent.conf"  # noqa

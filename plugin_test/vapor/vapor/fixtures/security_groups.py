@@ -7,18 +7,18 @@ from stepler.third_party import utils
 def contrail_security_groups_cleanup(contrail_api_client):
     """Cleanup created security_groups after test."""
 
-    def _get_secutiry_groups_uuids():
+    def _get_security_groups_uuids():
         return {
             security_group['uuid']
             for security_group in contrail_api_client.security_groups_list()[
                 'security-groups']
         }
 
-    before = _get_secutiry_groups_uuids()
+    before = _get_security_groups_uuids()
 
     yield
 
-    for net_uuid in _get_secutiry_groups_uuids() - before:
+    for net_uuid in _get_security_groups_uuids() - before:
         contrail_api_client.security_group_delete(id=net_uuid)
 
 
