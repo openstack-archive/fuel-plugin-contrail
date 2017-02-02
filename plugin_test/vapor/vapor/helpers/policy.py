@@ -31,5 +31,43 @@ def make_policy_entry(protocol, src_ports_range, dst_ports_range):
     return types.PolicyEntriesType(policy_rule=[rule])
 
 
-allow_all_policy_entry = make_policy_entry(
+ALLOW_ALL_POLICY_ENTRY = make_policy_entry(
     protocol='any', src_ports_range=(-1, -1), dst_ports_range=(-1, -1))
+
+CONTRAIL_SUBNET_ALL = types.SubnetType(
+    ip_prefix='0.0.0.0', ip_prefix_len=0)
+
+POLICY_ENTRY_ALLOW_INGRESS_SSH = types.PolicyEntriesType(policy_rule=[
+    types.PolicyRuleType(
+        direction='>',
+        protocol='tcp',
+        src_addresses=[types.AddressType(subnet=CONTRAIL_SUBNET_ALL)],
+        dst_addresses=[
+            types.AddressType(
+                subnet=CONTRAIL_SUBNET_ALL, security_group='local')
+        ],
+        dst_ports=[types.PortType(start_port=22, end_port=22)],
+        ethertype='IPv4')
+])
+POLICY_ENTRY_ALLOW_EGRESS_ALL = types.PolicyEntriesType(policy_rule=[
+    types.PolicyRuleType(
+        direction='>',
+        protocol='any',
+        src_addresses=[
+            types.AddressType(
+                subnet=CONTRAIL_SUBNET_ALL, security_group='local')
+        ],
+        dst_addresses=[types.AddressType(subnet=CONTRAIL_SUBNET_ALL)],
+        ethertype='IPv4')
+])
+POLICY_ENTRY_ALLOW_INGRESS_ICMP = types.PolicyEntriesType(policy_rule=[
+    types.PolicyRuleType(
+        direction='>',
+        protocol='icmp',
+        src_addresses=[types.AddressType(subnet=CONTRAIL_SUBNET_ALL)],
+        dst_addresses=[
+            types.AddressType(
+                subnet=CONTRAIL_SUBNET_ALL, security_group='local')
+        ],
+        ethertype='IPv4')
+])
