@@ -13,12 +13,27 @@ volumes:
         size:
           generator: "calc_total_vg"
           generator_args: ["contrail-db"]
+  - id: "crashes"
+    type: "partition"
+    name: "Crash dumps"
+    min_size:
+      generator: "calc_gb_to_mb"
+      generator_args: [100]
+    label: "Crash_dumps"
+    mount: "/var/crashes"
+    file_system: "xfs"
 volumes_roles_mapping:
   contrail-db:
     - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
     - {allocate_size: "min", id: "contrail-db"}
+  contrail-analytics:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
+    - {allocate_size: "all", id: "logs"}
   contrail-analytics-db:
     - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
     - {allocate_size: "all", id: "contrail-db"}
 
 # NOTE(gomarivera): It might be needed to specify the partitions
@@ -27,7 +42,17 @@ volumes_roles_mapping:
 
   contrail-config:
     - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
     - {allocate_size: "all", id: "logs"}
   contrail-control:
     - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
+    - {allocate_size: "all", id: "logs"}
+  dpdk:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
+    - {allocate_size: "all", id: "logs"}
+  contrail-vmware:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "crashes"}
     - {allocate_size: "all", id: "logs"}

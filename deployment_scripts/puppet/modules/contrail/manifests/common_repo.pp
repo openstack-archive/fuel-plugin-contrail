@@ -27,6 +27,15 @@ class contrail::common_repo {
       file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
         ensure => absent,
       }
+      # override packages pins to install tzdata, perl from ubuntu repo instead of
+      # contrail repo, version of packages in ubuntu repo is higher, so we dont want
+      # to downgrade.
+      apt::pin { 'contrail-pin-exclude':
+        explanation => 'Temporary fix to install some packages from ubuntu repos',
+        priority    => 1300,
+        packages    => ['tzdata', 'tzdata-java', 'libperl5.18', 'openjdk-7-jre-headless'],
+        release     => 'trusty',
+      }
     }
     default: {}
   }

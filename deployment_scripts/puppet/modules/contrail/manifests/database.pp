@@ -23,12 +23,16 @@ class contrail::database {
     owner   => root,
     group   => root,
   }
+
   tweaks::ubuntu_service_override { 'cassandra':
     package_name => 'cassandra',
   }
+
   tweaks::ubuntu_service_override { 'contrail-database':
-    package_name => 'contrail-database-common',
-    service_name => 'contrail-database',
+    package_name => 'contrail-openstack-database',
+  }
+  tweaks::ubuntu_service_override { 'zookeeper':
+    package_name => 'zookeeper',
   }
 
   if roles_include($contrail::contrail_db_roles) {
@@ -58,40 +62,51 @@ class contrail::database {
         File['/etc/zookeeper/conf/myid'],
         ],
     }
+
+    service { 'kafka':
+      ensure    => stopped,
+      enable    => false,
+    }
+
   } elsif roles_include($contrail::analytics_db_roles) {
       $cassandra_seeds = $contrail::primary_analytics_db_ip
       $cluster_name    = 'Analytics'
       $contrail_databases = 'analytics'
-  }
-# Kafka
-  package { 'kafka': } ->
-  file { '/tmp/kafka-logs':
-    ensure => 'directory',
-    mode   => '0755',
-  } ->
-  file { '/usr/share/kafka/config/log4j.properties':
-    source  => 'puppet:///modules/contrail/kafka-log4j.properties',
-    require => Package['kafka'],
-  } ->
-  file { '/usr/share/kafka/config/server.properties':
-    content => template('contrail/kafka-server.properties.erb'),
-    require => Package['kafka'],
-  } ->
-  file { '/tmp/kafka-logs/meta.properties':
-    content => inline_template("version=0\nbroker.id=<%= scope.lookupvar('contrail::uid') %>\n");
-  }
 
-  service { 'kafka':
-    ensure    => running,
-    enable    => true,
-    require   => Package['kafka'],
-    subscribe => [
-      File['/usr/share/kafka/config/log4j.properties'],
-      File['/usr/share/kafka/config/server.properties'],
-      File['/tmp/kafka-logs/meta.properties'],
-      ],
-  }
+      # Kafka
+      package { 'kafka': } ->
+      file { '/tmp/kafka-logs':
+        ensure => 'directory',
+        mode   => '0755',
+      } ->
+      file { '/usr/share/kafka/config/log4j.properties':
+        source  => 'puppet:///modules/contrail/kafka-log4j.properties',
+        require => Package['kafka'],
+      } ->
+      file { '/usr/share/kafka/config/server.properties':
+        content => template('contrail/kafka-server.properties.erb'),
+        require => Package['kafka'],
+      } ->
+      file { '/tmp/kafka-logs/meta.properties':
+        content => inline_template("version=0\nbroker.id=<%= scope.lookupvar('contrail::uid') %>\n");
+      }
 
+      service { 'kafka':
+        ensure    => running,
+        enable    => true,
+        require   => Package['kafka'],
+        subscribe => [
+          File['/usr/share/kafka/config/log4j.properties'],
+          File['/usr/share/kafka/config/server.properties'],
+          File['/tmp/kafka-logs/meta.properties'],
+          ],
+      }
+
+      service { 'zookeeper':
+        ensure    => stopped,
+        enable    => false,
+      }
+  }
 # Cassandra
   package { 'cassandra': } ->
   package { 'contrail-openstack-database': }
@@ -109,9 +124,13 @@ class contrail::database {
   } ->
   file { '/etc/cassandra/cassandra.yaml':
     content => template('contrail/cassandra.yaml.erb'),
+    owner   => 'cassandra',
+    group   => 'cassandra',
   } ->
   file { '/etc/cassandra/cassandra-env.sh':
     source  => 'puppet:///modules/contrail/cassandra-env.sh',
+    owner   => 'cassandra',
+    group   => 'cassandra',
   } ->
   file { '/etc/security/limits.d/cassandra.conf':
     content => template('contrail/cassandra_limits.conf.erb'),

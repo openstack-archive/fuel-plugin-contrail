@@ -41,7 +41,7 @@ class contrail::provision::config {
 --admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
 && touch /opt/contrail/prov_metadata_service-DONE",
       creates => '/opt/contrail/prov_metadata_service-DONE',
-    } ->
+    }
 
     contrail::provision::api_readiness::check{'/opt/contrail/prov_encap_type-DONE':} ->
     exec { 'prov_encap_type':
@@ -51,6 +51,7 @@ class contrail::provision::config {
 --admin_user ${contrail::admin_username} --admin_password '${contrail::admin_password}' \
 && touch /opt/contrail/prov_encap_type-DONE",
       creates => '/opt/contrail/prov_encap_type-DONE',
+      require => Exec['prov_metadata_services'],
     }
   }
 }

@@ -144,4 +144,14 @@ attributes:
     restrictions:
       - condition: "settings:common.use_vcenter.value == false"
         action: "hide"
-
+  aaa_mode:
+    type: "select"
+    weight: 340
+    value: "cloud-admin"
+    label: "AAA Mode"
+    description: "Authentication mode"
+    values:
+      - data: "rbac"
+        label: "Role Based Access Control"
+      - data: "cloud-admin"
+        label: "Cloud Admin"

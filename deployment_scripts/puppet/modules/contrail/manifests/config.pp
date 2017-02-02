@@ -29,11 +29,23 @@ class contrail::config {
     mode    => '0644',
     owner   => 'contrail',
     group   => 'contrail',
-    require => Package['contrail-openstack-config'],
   }
 
-  tweaks::ubuntu_service_override { 'supervisor-config':
+  if !defined(File['/var/crashes']) {
+    file { '/var/crashes':
+      ensure => directory,
+      mode   => '1777',
+    }
+  }
+
+  tweaks::ubuntu_service_override { 'contrail-openstack-config':
+    package_name => 'contrail-openstack-config',
+    service_name => 'supervisor-config',
+  }
+
+  tweaks::ubuntu_service_override { 'contrail-config':
     package_name => 'contrail-config',
+    service_name => 'supervisor-config',
   }
 
 # Packages
@@ -89,7 +101,8 @@ class contrail::config {
     'DEFAULTS/cassandra_server_list':     value => $contrail::contrail_db_list_9160;
     'DEFAULTS/listen_ip_addr':            value => '0.0.0.0';
     'DEFAULTS/listen_port':               value => '9100';
-    'DEFAULTS/multi_tenancy':             value => true;
+    'DEFAULTS/aaa_mode':                  value => $contrail::aaa_mode;
+    'DEFAULTS/cloud_admin_role':          value => 'admin';
     'DEFAULTS/log_file':                  value => '/var/log/contrail/contrail-api.log';
     'DEFAULTS/log_local':                 value => '1';
     'DEFAULTS/log_level':                 value => 'SYS_NOTICE';
@@ -163,7 +176,6 @@ class contrail::config {
     'KEYSTONE/auth_port':         value => '35357';
     'KEYSTONE/admin_user':        value => $contrail::neutron_user;
     'KEYSTONE/admin_password':    value => $contrail::service_token;
-    'KEYSTONE/admin_token':       value => $contrail::admin_token;
     'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
     'KEYSTONE/insecure':          value => true;
     'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';

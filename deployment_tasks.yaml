@@ -686,6 +686,7 @@
 # Set proper apt pin for Contrail repository
 - id: contrail-compute-vmware-repo
   type: puppet
+  version: 2.0.0
   groups: [compute-vmware]
   required_for: [tools]
   requires: [deploy_start, globals]
@@ -696,6 +697,7 @@
 
 - id: contrail-compute-vmware-pkg
   type: puppet
+  version: 2.0.0
   groups: [compute-vmware]
   required_for: [top-role-compute-vmware]
   requires: [deploy_start, globals, contrail-compute-vmware-repo, contrail-override-repository]
@@ -707,6 +709,7 @@
 # Deploy contrail vCenter plugin
 - id: contrail-compute-vmware
   type: puppet
+  version: 2.0.0
   groups: [compute-vmware]
   required_for: [post_deployment_end]
   requires: [post_deployment_start]

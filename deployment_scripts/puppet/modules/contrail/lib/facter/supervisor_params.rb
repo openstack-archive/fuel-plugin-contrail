@@ -16,14 +16,19 @@
 # It may be used to detect a version of contrail used in the environment.
 
 require 'hiera'
+require 'puppet'
+require 'puppet/util/inifile'
 
 Facter.add("supervisor_params") do
   setcode do
     res = []
-    vrouter_config = '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini'
+    vrouter_config  = '/etc/contrail/supervisord_vrouter_files/contrail-vrouter-dpdk.ini'
+    vrouter_section = 'program:contrail-vrouter-dpdk'
     mac_from_config = nil
     if File.exist?(vrouter_config)
-      config_vrouter_params = File.readlines(vrouter_config).find { |line| line.include?('command=')}.split('--no-daemon')[-1].strip
+      file  = Puppet::Util::IniConfig::PhysicalFile.new(vrouter_config)
+      file.read
+      config_vrouter_params = file.get_section(vrouter_section)['command'].split('--no-daemon')[-1].strip
       mac_from_config = config_vrouter_params.split.find { |param| param.include?('mac') }
       mac_from_config = mac_from_config.split(',').find { |param| param.include?('mac') }.split('=')
     end

@@ -35,7 +35,8 @@ class contrail {
   prepare_network_config($network_scheme)
   $interface         = pick(get_network_role_property('neutron/mesh', 'interface'), 'br-mesh')
 
-  $iface = pick($network_scheme['endpoints'][$interface], {})
+  #fallback to vhost0 for day2 scenario
+  $iface = pick($network_scheme['endpoints'][$interface], $network_scheme['endpoints']['vhost0'], {})
   $routes = pick($iface['routes'], false)
 
   if $routes {
@@ -54,8 +55,14 @@ class contrail {
   $raw_phys_dev      = regsubst($phys_dev, '\..*' , '')
   $dev_mac           = getvar("::macaddress_${raw_phys_dev}")
   $vrouter_core_mask = pick($settings['vrouter_core_mask'], '0x3')
+  #if user specify particular cpu's for vrouter - taskset command should differ
+  if $vrouter_core_mask =~ /^0x[0-9a-zA-Z]/ {
+    $taskset_command  = "taskset ${vrouter_core_mask}"
+  } else {
+    $taskset_command  = "taskset -c ${vrouter_core_mask}"
+  }
+
   $headless_mode     = pick($settings['headless_mode'], true)
-  $multi_tenancy     = pick($settings['multi_tenancy'], true)
   $vr_flow_entries   = pick($settings['vr_flow_entries'], '524288')
   $vr_mpls_labels    = pick($settings['vr_mpls_labels'], '5120')
   $log_flow          = pick($settings['log_flow'], '0')
@@ -258,6 +265,12 @@ class contrail {
   $supervisor_control_minfds   = pick($settings['supervisor_control_minfds'], '10240')
   $supervisor_analytics_minfds = pick($settings['supervisor_analytics_minfds'], '65535')
 
+  $aaa_mode = pick($settings['aaa_mode'], 'cloud-admin')
+
+  $analytics_config_audit_ttl = pick($settings['analytics_config_audit_ttl'], '2160')
+  $analytics_statistics_ttl   = pick($settings['analytics_statistics_ttl'], '24')
+  $analytics_flow_ttl         = pick($settings['analytics_flow_ttl'], '2')
+  $analytics_data_ttl         = pick($settings['analytics_data_ttl'], '48')
 }
 
 

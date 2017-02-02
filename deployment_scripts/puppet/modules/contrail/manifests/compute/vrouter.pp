@@ -18,6 +18,13 @@ class contrail::compute::vrouter {
 
   if $contrail::compute_dpdk_enabled {
 
+    if !defined(File['/var/crashes']) {
+      file { '/var/crashes':
+        ensure => directory,
+        mode   => '1777',
+      }
+    }
+
     # in case of bonds, MAC address should be set permanently, because slave interfaces
     # may start in random order during the boot process
     if ( 'bond' in $raw_phys_dev) {
@@ -33,7 +40,7 @@ class contrail::compute::vrouter {
     $delete_packages  = ['openvswitch-common','openvswitch-datapath-dkms','openvswitch-datapath-lts-saucy-dkms','openvswitch-switch','nova-network','nova-api']
 
     contrail_vrouter_dpdk_ini_config {
-      'program:contrail-vrouter-dpdk/command':                 value => "taskset ${contrail::vrouter_core_mask} /usr/bin/contrail-vrouter-dpdk --no-daemon ${::supervisor_params}";
+      'program:contrail-vrouter-dpdk/command':                 value => "${contrail::taskset_command} /usr/bin/contrail-vrouter-dpdk --no-daemon ${::supervisor_params}";
       'program:contrail-vrouter-dpdk/priority':                value => '410';
       'program:contrail-vrouter-dpdk/loglevel':                value => 'debug';
       'program:contrail-vrouter-dpdk/autostart':               value => true;

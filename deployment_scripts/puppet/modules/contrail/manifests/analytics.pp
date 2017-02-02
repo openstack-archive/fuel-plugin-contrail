@@ -22,13 +22,25 @@ class contrail::analytics {
     mode    => '0644',
     owner   => 'contrail',
     group   => 'contrail',
-    require => Package['contrail-openstack-analytics'],
+  }
+
+  if !defined(File['/var/crashes']) {
+    file { '/var/crashes':
+      ensure => directory,
+      mode   => '1777',
+    }
   }
 
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
-  tweaks::ubuntu_service_override { 'supervisor-analytics':
+  tweaks::ubuntu_service_override { 'contrail-openstack-analytics':
+    package_name => 'contrail-openstack-analytics',
+    service_name => 'supervisor-analytics',
+  }
+
+  tweaks::ubuntu_service_override { 'contrail-analytics':
     package_name => 'contrail-analytics',
+    service_name => 'supervisor-analytics',
   }
 
   # Packages
@@ -58,6 +70,7 @@ class contrail::analytics {
     'DEFAULTS/analytics_config_audit_ttl': value => '-1';
     'DEFAULTS/analytics_statistics_ttl':   value => '-1';
     'DEFAULTS/analytics_flow_ttl':         value => '-1';
+    'DEFAULTS/aaa_mode':                   value => 'no-auth';
     'DISCOVERY/disc_server_ip':            value => $contrail::contrail_private_vip;
     'DISCOVERY/disc_server_port':          value => '5998';
     'REDIS/redis_server_port':             value => '6379';
@@ -65,10 +78,10 @@ class contrail::analytics {
   }
 
   contrail_collector_config {
-    'DEFAULT/analytics_data_ttl':         value => '48';
-    'DEFAULT/analytics_config_audit_ttl': value => '2160';
-    'DEFAULT/analytics_statistics_ttl':   value => '24';
-    'DEFAULT/analytics_flow_ttl':         value => '2';
+    'DEFAULT/analytics_data_ttl':         value => $contrail::analytics_data_ttl;
+    'DEFAULT/analytics_config_audit_ttl': value => $contrail::analytics_config_audit_ttl;
+    'DEFAULT/analytics_statistics_ttl':   value => $contrail::analytics_statistics_ttl;
+    'DEFAULT/analytics_flow_ttl':         value => $contrail::analytics_flow_ttl;
     'DEFAULT/cassandra_server_list':      value => $contrail::analytics_db_list;
     'DEFAULT/hostip':                     value => $contrail::address;
     'DEFAULT/log_file':                   value => '/var/log/contrail/contrail-collector.log';
@@ -136,10 +149,8 @@ class contrail::analytics {
     'KEYSTONE/auth_port':         value => '35357';
     'KEYSTONE/admin_user':        value => $contrail::neutron_user;
     'KEYSTONE/admin_password':    value => $contrail::service_token;
-    'KEYSTONE/admin_token':       value => $contrail::admin_token;
     'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
     'KEYSTONE/insecure':          value => true;
-    'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
   }
 
   ini_setting { 'analytics-fdlimit':
@@ -154,6 +165,7 @@ class contrail::analytics {
   $keystone_auth_conf = '--conf_file /etc/contrail/contrail-keystone-auth.conf'
   $analytics_api_conf = '--conf_file /etc/contrail/contrail-analytics-api.conf'
   $alarm_gen_conf     = '--conf_file /etc/contrail/contrail-alarm-gen.conf'
+  $collector_conf     = '--conf_file /etc/contrail/contrail-collector.conf'
 
   ini_setting { 'supervisor-analytics-api':
     ensure  => present,
@@ -169,7 +181,7 @@ class contrail::analytics {
     path    => '/etc/contrail/supervisord_analytics_files/contrail-alarm-gen.ini',
     section => 'program:contrail-alarm-gen',
     setting => 'command',
-    value   => "/usr/bin/contrail-alarm-gen ${alarm_gen_conf}",
+    value   => "/usr/bin/contrail-alarm-gen ${alarm_gen_conf} ${keystone_auth_conf}",
     require => Package['contrail-analytics'],
   }
 
@@ -178,7 +190,7 @@ class contrail::analytics {
     path    => '/etc/contrail/supervisord_analytics_files/contrail-collector.ini',
     section => 'program:contrail-collector',
     setting => 'command',
-    value   => '/usr/bin/contrail-collector',
+    value   => "/usr/bin/contrail-collector ${collector_conf} ${keystone_auth_conf}",
     require => Package['contrail-analytics'],
   }
 
