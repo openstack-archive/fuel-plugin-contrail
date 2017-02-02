@@ -4,6 +4,8 @@ import os
 
 import yaml
 
+BASE_DIR = os.path.dirname(__file__)
+
 PATH_TO_CERT = '/tmp/cert.crt'
 VERIFY_SSL = False
 DISABLE_SSL = True
@@ -97,7 +99,7 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
 CONTRAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
     'CONTRAIL_ROLES_DISTRIBUTION_YAML',
     os.path.join(
-        os.path.dirname(__file__), '../roles_distribution_example.yaml'))
+        BASE_DIR, '../roles_distribution_example.yaml'))
 
 with open(CONTRAIL_ROLES_DISTRIBUTION_YAML) as f:
     CONTRAIL_ROLES_DISTRIBUTION = yaml.safe_load(f) or {}
@@ -133,7 +135,6 @@ CONTRAIL_ANALYTIC_PROCESSES = {
     ],
 }
 
-BASE_DIR = os.path.dirname(__file__)
 HEAT_TEMPLATES_PATH = os.path.join(BASE_DIR, 'heat')
 
-VROUTER_HEADLESS_MODE_CMD = "grep -iP '^headless_mode\s*=\s*true' /etc/contrail/contrail-vrouter-agent.conf"  # noqa
+VROUTER_HEADLESS_MODE_CMD = r"grep -iP '^headless_mode\s*=\s*true' /etc/contrail/contrail-vrouter-agent.conf"  # noqa
