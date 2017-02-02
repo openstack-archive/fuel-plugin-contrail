@@ -1,0 +1,9 @@
+Verified+1: Plugins CI <plugins.ci@mirantis.com>
+Code-Review+2: Illia Polliul <ipolliul@mirantis.com>
+Workflow+1: Illia Polliul <ipolliul@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 02 Feb 2017 17:48:52 +0000
+Reviewed-on: https://review.openstack.org/427952
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/3.1
