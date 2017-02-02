@@ -16,9 +16,7 @@ import attrdict
 from hamcrest import assert_that, equal_to  # noqa H301
 import pytest
 from stepler import config as stepler_config
-from stepler.third_party import ping
 from stepler.third_party import utils
-from stepler.third_party import waiter
 
 from vapor.helpers import policy
 from vapor.helpers import connectivity
@@ -61,6 +59,7 @@ check_tcp_ssh = functools.partial(
     connectivity.check_connection_status, port=TCP_SSH_PORT)
 check_udp = functools.partial(
     connectivity.check_connection_status, port=UDP_PORT)
+check_icmp = connectivity.check_icmp_connection_status
 
 tcp_all_policy = policy.make_policy_entry(
     protocol='tcp', src_ports_range=(-1, -1), dst_ports_range=(-1, -1))
@@ -68,20 +67,9 @@ tcp_ssh_policy = policy.make_policy_entry(
     protocol='tcp', src_ports_range=(-1, -1), dst_ports_range=(22, 22))
 
 
-def check_icmp(ip, remote, must_available=True, timeout=0):
-    def predicate():
-        ping_result = ping.Pinger(ip, remote=remote).ping(count=3)
-        if must_available:
-            value = ping_result.loss
-        else:
-            value = ping_result.received
-        return waiter.expect_that(value, equal_to(0))
-
-    return waiter.wait(predicate, timeout_seconds=timeout)
-
-
 @pytest.fixture
 def security_group(create_security_group, security_group_steps):
+    """Fixture that returns security group with SSH allow rules."""
     group_name = next(utils.generate_ids('security-group'))
     group = create_security_group(group_name)
 
@@ -104,10 +92,10 @@ def connectivity_test_resources(
         server_steps,
         port_steps,
         floating_ip_steps, ):
-    """This fixture creates 2 netwotks, boot 2 servers with network listeners.
+    """Fixture for create 2 networks, boot 2 servers with network listeners.
 
-    It returns attrdict with client and server instaces, and server's listening
-    ports.
+    It returns attrdict with client and server instances, and server's
+    listening ports.
     """
     servers = []
     floating_ips = []
@@ -194,7 +182,7 @@ def test_security_group_and_allow_all_policy(
 
     # Update policy
     contrail_network_policy.network_policy_entries = (
-        policy.allow_all_policy_entry)
+        policy.ALLOW_ALL_POLICY_ENTRY)
     contrail_api_client.network_policy_update(contrail_network_policy)
 
     # Update security group
