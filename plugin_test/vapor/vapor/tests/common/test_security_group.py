@@ -11,6 +11,7 @@
 # under the License.
 
 import attrdict
+from hamcrest import assert_that, equal_to  # noqa: H301
 import pytest
 from stepler import config as stepler_config
 from stepler.third_party import utils
@@ -264,3 +265,21 @@ def test_security_group_without_rules(connectivity_test_resources,
             port=UDP_PORT,
             udp=True,
             must_available=False)
+
+
+def test_security_group_rules_uuid_in_contrail_and_neutron(contrail_api_client,
+                                                           neutron_client):
+    """Check that neutron and contrail has same uuid for SG rules.
+
+    Steps:
+        #. Retrieve all SG rules with neutron API
+        #. Retrieve all SG rules with contrail API
+        #. Check that uuids' sets are equals
+    """
+    neutron_rules = neutron_client.security_group_rules.list()
+    neutron_rules_uuids = {x['id'] for x in neutron_rules}
+    contrail_rules_uuids = set()
+    for group in contrail_api_client.security_groups_list(detail=True):
+        for rule in group.security_group_entries.policy_rule:
+            contrail_rules_uuids.add(rule.rule_uuid)
+    assert_that(contrail_rules_uuids, equal_to(neutron_rules_uuids))
