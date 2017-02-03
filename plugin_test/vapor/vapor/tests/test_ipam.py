@@ -17,7 +17,7 @@ from stepler.third_party import utils
 
 
 def test_subnet_creating_with_custom_ipam(
-        contrail_api_client, contrail_ipam, contrail_network,
+        contrail_ipam, contrail_network,
         contrail_create_subnet, cirros_image, flavor, security_group,
         server_steps, port_steps, create_floating_ip, public_network):
     """Check creating subnet with custom IPAM.

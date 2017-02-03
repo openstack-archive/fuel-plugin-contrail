@@ -185,10 +185,91 @@ def test_outbound_traffic_without_egress_rule(
             server_ssh,
             must_available=False,
             timeout=settings.SECURITY_GROUP_APPLY_TIMEOUT)
-        # Add ingress rule
+        # Add egress rule
         client_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_EGRESS_ICMP)
         client_sg.security_group_entries = client_sg_entries
         contrail_api_client.security_group_update(client_sg)
+        connectivity.check_icmp_connection_status(
+            fixed_ip,
+            server_ssh,
+            timeout=settings.SECURITY_GROUP_APPLY_TIMEOUT)
+
+
+def test_security_group_without_rules(connectivity_test_resources,
+                                      server_steps, floating_ip_steps,
+                                      contrail_api_client, nova_client):
+    """Verify that security group without rules deny any traffic.
+
+    Steps:
+        #. Create 2 security groups
+        #. Create network with subnet
+        #. Boot 2 nova instances (client and server) in network
+        #. Add Floating IP to client
+        #. Add security group to client with allow all rules
+        #. Add security group to server without rules
+        #. Check that there are no success pings from client to server
+        #. Add egress ICMP rule to client's security group
+        #. Check that there are success pings from client to server
+    """
+    TCP_PORT = 7000
+    UDP_PORT = 7001
+
+    client, server = connectivity_test_resources.servers
+    client_sg, server_sg = connectivity_test_resources.security_groups
+    (client_floating_ip,
+     server_floating_ip) = connectivity_test_resources.floating_ips
+    client_sg_entries = client_sg.security_group_entries
+    server_sg_entries = server_sg.security_group_entries
+
+    # Start server listeners
+    with server_steps.get_server_ssh(
+            server, server_floating_ip['floating_ip_address']) as server_ssh:
+        connectivity.start_port_listener(server_ssh, TCP_PORT)
+        connectivity.start_port_listener(server_ssh, UDP_PORT, udp=True)
+
+    # Remove server floating ip
+    floating_ip_steps.detach_floating_ip(server_floating_ip)
+
+    # Setup client and server security groups
+    server_sg.security_group_entries = None
+    contrail_api_client.security_group_update(server_sg)
+
+    client_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_EGRESS_ALL)
+    client_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_INGRESS_ALL)
+    client_sg.security_group_entries = client_sg_entries
+    contrail_api_client.security_group_update(client_sg)
+
+    # Add security group to client
+    nova_client.servers.add_security_group(client, client_sg.name)
+
+    # Remove all and add clear security group server
+    for security_group in server.security_groups:
+        nova_client.servers.remove_security_group(server,
+                                                  security_group['name'])
+    nova_client.servers.add_security_group(server, server_sg.name)
+
+    fixed_ip = server_steps.get_fixed_ip(server)
+    with server_steps.get_server_ssh(
+            client,
+            ip=client_floating_ip['floating_ip_address']) as server_ssh:
+        # Check no icmp traffic
+        connectivity.check_icmp_connection_status(
+            fixed_ip, server_ssh, must_available=False)
+        # Check no tcp traffic
+        connectivity.check_connection_status(
+            fixed_ip, server_ssh, port=TCP_PORT, must_available=False)
+        # Check no udp traffic
+        connectivity.check_connection_status(
+            fixed_ip,
+            server_ssh,
+            port=UDP_PORT,
+            udp=True,
+            must_available=False)
+        # Add ingress rule
+        server_sg_entries.add_policy_rule(
+            policy.POLICY_RULE_ALLOW_INGRESS_ICMP)
+        server_sg.security_group_entries = server_sg_entries
+        contrail_api_client.security_group_update(server_sg)
         connectivity.check_icmp_connection_status(
             fixed_ip,
             server_ssh,

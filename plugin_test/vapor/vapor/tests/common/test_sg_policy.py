@@ -13,7 +13,6 @@
 import functools
 
 import attrdict
-from hamcrest import assert_that, equal_to  # noqa H301
 import pytest
 from stepler import config as stepler_config
 from stepler.third_party import utils
@@ -56,9 +55,9 @@ UDP_PORT = 7001
 check_tcp = functools.partial(
     connectivity.check_connection_status, port=TCP_PORT)
 check_tcp_ssh = functools.partial(
-    connectivity.check_connection_status, port=TCP_SSH_PORT)
+    connectivity.check_connection_status, port=TCP_SSH_PORT, answer='SSH')
 check_udp = functools.partial(
-    connectivity.check_connection_status, port=UDP_PORT)
+    connectivity.check_connection_status, port=UDP_PORT, udp=True)
 check_icmp = connectivity.check_icmp_connection_status
 
 tcp_all_policy = policy.make_policy_entry(
@@ -129,13 +128,11 @@ def connectivity_test_resources(
         floating_ips.append(floating_ip)
 
     server, client = servers
-    # Start listeners
-    tcp_server_cmd = 'nc -v -l -p {0} -e echo Reply'.format(TCP_PORT)
-    udp_server_cmd = 'nc -v -u -l -p {0} -e echo Reply'.format(UDP_PORT)
 
+    # Start listeners
     with server_steps.get_server_ssh(server) as server_ssh:
-        server_ssh.background_call(tcp_server_cmd)
-        server_ssh.background_call(udp_server_cmd)
+        connectivity.start_port_listener(server_ssh, TCP_PORT)
+        connectivity.start_port_listener(server_ssh, UDP_PORT, udp=True)
 
     # Detach 1st server floating IP
     floating_ip_steps.detach_floating_ip(floating_ips[0])
@@ -159,7 +156,7 @@ def connectivity_test_resources(
         (SG_RULES['tcp_all'] + SG_RULES['udp_all'], {
             check_tcp: True,
             check_tcp_ssh: True,
-            check_udp: False,
+            check_udp: True,
             check_icmp: False
         }),
     ],
