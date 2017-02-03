@@ -3,6 +3,7 @@ import uuid
 
 import pycontrail.client as client
 import pytest
+import six
 from six.moves import configparser
 from six.moves.urllib import parse
 
@@ -120,9 +121,13 @@ def contrail_services_http_introspect_ports(os_faults_steps, contrail_nodes):
             port = default_ports[service_name]
             temp_file = os_faults_steps.download_file(node, path)
             parser = configparser.SafeConfigParser()
+            # Strip leading spaces in .conf file
+            buf = six.BytesIO()
             with open(temp_file) as f:
-                parser.readfp(f)
+                for line in f:
+                    buf.write(line.strip())
             os.unlink(temp_file)
+            parser.readfp(buf)
             try:
                 service_config = dict(parser.items('DEFAULT'))
                 port = service_config.get('http_server_port', port)
