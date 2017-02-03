@@ -165,7 +165,7 @@ def test_create_and_terminate_networks(contrail_api_client, network_steps):
 
     # Create new network
     net_name, = utils.generate_ids()
-    new_network = network_steps.create(name)
+    new_network = network_steps.create(net_name)
 
     # Check that created network is present in Contrail
     contrail_networks = contrail_api_client.virtual_networks_list()
