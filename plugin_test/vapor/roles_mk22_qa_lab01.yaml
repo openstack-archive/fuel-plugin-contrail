@@ -1,0 +1,20 @@
+# Example:
+contrail-controller:
+  - ctl01.mk22-qa-lab01.local
+  - ctl02.mk22-qa-lab01.local
+  - ctl03.mk22-qa-lab01.local
+contrail-config:
+  - ctl01.mk22-qa-lab01.local
+  - ctl02.mk22-qa-lab01.local
+  - ctl03.mk22-qa-lab01.local
+contrail-analytics:
+  - ctl01.mk22-qa-lab01.local
+  - ctl02.mk22-qa-lab01.local
+  - ctl03.mk22-qa-lab01.local
+contrail-db:
+  - ctl01.mk22-qa-lab01.local
+  - ctl02.mk22-qa-lab01.local
+  - ctl03.mk22-qa-lab01.local
+contrail-compute:
+  - cmp01.mk22-qa-lab01.local
+  - cmp02.mk22-qa-lab01.local
