@@ -13,7 +13,7 @@
 import sys
 
 from hamcrest import (assert_that, calling, raises, contains_string, has_item,
-                      has_entry, is_not, empty)  # noqa H301
+                      has_entry, is_not, empty, all_of)  # noqa: H301
 from neutronclient.common import exceptions as neutron_exceptions
 from stepler import config as stepler_config
 from stepler.third_party import utils
@@ -224,3 +224,61 @@ def test_create_server_on_exhausted_subnet(cirros_image, flavor, network,
     assert_that(
         calling(server_steps.create_servers).with_args(**create_server_args),
         raises(AssertionError, 'No valid host was found'))
+
+
+def test_various_type_of_subnets_associated_with_vn(
+        cirros_image,
+        flavor,
+        security_group,
+        contrail_network,
+        contrail_current_project,
+        contrail_create_subnet,
+        create_virtual_interface,
+        contrail_create_instance_ip,
+        server_steps,
+        create_floating_ip,
+        public_network):
+    """Validate that 2 subnets with different CIDR on single VN works.
+
+    Steps:
+        #. Create network
+        #. Create subnet_1
+        #. Create subnet 2 with different CIDR
+        #. Create 2 ports on VN for each subnet
+        #. Boot nova server with created ports
+        #. Execute `sudo cirros-dhcpd up <iface>` for all interfaces on server
+        #. Check that server gets correct IP addresses on all interfaces
+    """
+    ip1 = '10.0.0.10'
+    ip2 = '10.10.0.10'
+    iface_names = ('eth0', 'eth1')
+    contrail_create_subnet(
+        contrail_network, ip_prefix='10.0.0.0', ip_prefix_len=24)
+    contrail_create_subnet(
+        contrail_network, ip_prefix='10.10.0.0', ip_prefix_len=16)
+
+    iface1 = create_virtual_interface(contrail_network)
+    iface2 = create_virtual_interface(contrail_network)
+
+    ip1 = contrail_create_instance_ip(contrail_network, iface1, ip1)
+    ip2 = contrail_create_instance_ip(contrail_network, iface2, ip2)
+    server = server_steps.create_servers(
+        image=cirros_image,
+        flavor=flavor,
+        nics=[{
+            'port-id': iface1.uuid,
+        }, {
+            'port-id': iface2.uuid
+        }],
+        security_groups=[security_group],
+        username=stepler_config.CIRROS_USERNAME,
+        password=stepler_config.CIRROS_PASSWORD)[0]
+    floating_ip = create_floating_ip(public_network, port={'id': iface1.uuid})
+    with server_steps.get_server_ssh(
+            server, floating_ip['floating_ip_address']) as server_ssh:
+        with server_ssh.sudo():
+            for name in iface_names:
+                server_ssh.check_call('/sbin/cirros-dhcpc up {}'.format(name))
+        result = server_ssh.check_call('ip a')
+    assert_that(result.stdout,
+                all_of(*[contains_string(name) for name in iface_names]))
