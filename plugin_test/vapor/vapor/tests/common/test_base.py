@@ -12,10 +12,12 @@
 
 from hamcrest import (assert_that, calling, raises, contains_string, has_item,
                       has_entry, is_not, empty)  # noqa H301
+from neutronclient.common import exceptions as neutron_exceptions
 from stepler import config as stepler_config
+from stepler.third_party import utils
 from pycontrail import exceptions
 import pycontrail.types as contrail_types
-from neutronclient.common import exceptions as neutron_exceptions
+import pytest
 
 from vapor.helpers import contrail_status
 from vapor import settings
@@ -169,3 +171,20 @@ def test_restart_control_service(os_faults_steps):
         'contrail-control',
         'active',
         timeout=settings.SERVICE_STATUS_CHANGE_TIMEOUT)
+
+
+@pytest.mark.usefixtures('contrail_network_cleanup')
+def test_vn_name_with_special_characters(contrail_api_client, contrail_current_project):
+    """Validate creating virtual network with special characters in name.
+
+    Steps:
+        #. Create VN with special characters in name
+        #. Check that VN created successfully and is present in networks list
+    """
+    network_name, = utils.generate_ids(use_unicode=True)
+    net = contrail_types.VirtualNetwork(
+        network_name, parent_obj=contrail_current_project)
+    contrail_api_client.virtual_network_create(net)
+    networks = contrail_api_client.virtual_networks_list()
+    assert_that(networks['virtual-networks'],
+                has_item(has_entry('uuid', net.uuid)))
