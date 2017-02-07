@@ -44,3 +44,13 @@ def contrail_create_subnet(contrail_api_client):
 def contrail_subnet(contrail_create_subnet, contrail_default_ipam,
                     contrail_network):
     return contrail_create_subnet(contrail_network, contrail_default_ipam)
+
+
+@pytest.fixture
+def update_port(port_steps):
+    def _update_port(subnet_id, **kwargs):
+        subnet = port_steps._client.update(subnet_id, **kwargs)
+        return subnet['subnet']
+    return _update_port
+
+

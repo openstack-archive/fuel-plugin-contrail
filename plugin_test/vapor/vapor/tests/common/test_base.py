@@ -10,15 +10,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import time
+import itertools
 from hamcrest import (assert_that, calling, raises, contains_string, has_item,
                       has_entry, is_not, empty)  # noqa H301
 from stepler import config as stepler_config
+from stepler.third_party import utils
 from pycontrail import exceptions
 import pycontrail.types as contrail_types
 from neutronclient.common import exceptions as neutron_exceptions
 
-from vapor.helpers import contrail_status
 from vapor import settings
+from vapor.helpers import contrail_status, nodes_steps
 
 
 def test_network_deleting_with_server(network, server, contrail_api_client):
@@ -169,3 +172,57 @@ def test_restart_control_service(os_faults_steps):
         'contrail-control',
         'active',
         timeout=settings.SERVICE_STATUS_CHANGE_TIMEOUT)
+
+
+
+def test_vm_associated_2vn(server_steps,
+                           cirros_image, flavor, security_group,
+                           contrail_2_networks):
+    """Test to validate a VM associated with two VNs.
+    Test steps:
+        1. Create 2 VNs.
+        2. Launch a VM such that it has address from both the VNs.
+    Pass criteria:
+        VM should get both the IPs.
+    """
+    server_steps.create_servers(
+        count=1,
+        image=cirros_image,
+        flavor=flavor,
+        networks=contrail_2_networks.networks,
+        security_groups=[security_group])
+
+
+def test_update_vm_ip(server_steps, security_group, create_network,
+                      create_subnet, cirros_image, flavor, update_port,
+                      port_steps):
+    """Test to validate that updating the IP address of the VM fails.
+    Test steps:
+        1. Create a VM in a VN.
+        2. Try to update the IP of the VM.
+    Pass criteria:
+        Modification of fixed IP will not be allowed.
+        Proper error should be observed.
+    """
+    name_net = next(utils.generate_ids(count=1))
+    name_subnet = name_net + '__subnet'
+    cidr = '10.0.0.0/24'
+    fixed_ip = '10.0.0.5'
+    fixed_ip_new = '10.0.0.10'
+    network = create_network(name_net)
+    subnet = create_subnet(name_subnet, network=network, cidr=cidr)
+    server = server_steps.create_servers(image=cirros_image,
+                                         flavor=flavor,
+                                         nics=[{'net-id': network['id'],
+                                                'v4-fixed-ip': fixed_ip}],
+                                         security_groups=[security_group])[0]
+    server_port = port_steps.get_port(
+        device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
+        device_id=server.id)
+    port_dict = {
+        'fixed_ips': [{'subnet_id': subnet['id'], 'ip_address': fixed_ip_new}]
+    }
+    assert_that(
+        calling(update_port).with_args(server_port['id'], **port_dict),
+        raises(neutron_exceptions.BadRequest))
+
