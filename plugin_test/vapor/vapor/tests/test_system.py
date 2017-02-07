@@ -185,7 +185,7 @@ def test_networks_connectivity_with_router(
         #. Create 2 networks
         #. Launch 2 instances in different network on different computes.
         #. Check that there is no ping between instances.
-        #. Create a router betwheen networks.
+        #. Create a router between networks.
         #. Check ping between instances.
 
     """
@@ -226,7 +226,7 @@ def test_network_connectivity_with_policy(
 
     # Update policy
     contrail_network_policy.network_policy_entries = (
-        policy.allow_all_policy_entry)
+        policy.ALLOW_ALL_POLICY_ENTRY)
     contrail_api_client.network_policy_update(contrail_network_policy)
 
     # Bind policy to networks

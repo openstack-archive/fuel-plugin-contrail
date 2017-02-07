@@ -23,8 +23,24 @@ def contrail_security_groups_cleanup(contrail_api_client):
 
 
 @pytest.fixture
-def contrail_security_group(contrail_api_client):
-    security_group_name, = utils.generate_ids()
-    security_group = types.SecurityGroup(security_group_name)
-    contrail_api_client.security_group_create(security_group)
-    return security_group
+def create_contrail_security_group(contrail_api_client,
+                                   contrail_security_groups_cleanup,
+                                   contrail_current_project):
+    """Callable fixture to create contrail security group."""
+
+    def _create_sg(name=None):
+        name = name or next(utils.generate_ids())
+        security_group = types.SecurityGroup(
+            name,
+            security_group_entries=types.PolicyEntriesType(),
+            parent_obj=contrail_current_project)
+        contrail_api_client.security_group_create(security_group)
+        return security_group
+
+    return _create_sg
+
+
+@pytest.fixture
+def contrail_security_group(create_contrail_security_group):
+    """Fixture to create contrail security group."""
+    return create_contrail_security_group()

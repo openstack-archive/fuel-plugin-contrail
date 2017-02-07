@@ -11,6 +11,7 @@
 # under the License.
 
 from hamcrest import is_
+from stepler.third_party import ping
 from stepler.third_party import waiter
 
 
@@ -51,3 +52,16 @@ def check_connection_status(ip,
         return waiter.expect_that(result.exit_code == 0, is_(must_available))
 
     return waiter.wait(_predicate, timeout_seconds=timeout, sleep_seconds=2)
+
+
+def check_icmp_connection_status(ip, remote, must_available=True, timeout=0):
+    """Check that icmp connection to ip is `must_available`."""
+    def predicate():
+        ping_result = ping.Pinger(ip, remote=remote).ping(count=3)
+        if must_available:
+            value = ping_result.loss
+        else:
+            value = ping_result.received
+        return waiter.expect_that(value, is_(0))
+
+    return waiter.wait(predicate, timeout_seconds=timeout)
