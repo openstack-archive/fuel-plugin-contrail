@@ -26,7 +26,7 @@ class Predicates(skip.Predicates):
     def vrouter_headless_mode(self):
         """Define whether vrouter headless mode enabled."""
         os_faults_steps = self._get_fixture('os_faults_steps')
-        fqdns = settings.CONRTAIL_ROLES_DISTRIBUTION[settings.
+        fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[settings.
                                                      ROLE_CONTRAIL_COMPUTE]
         actual_nodes = os_faults_steps.get_nodes_by_cmd(
             settings.VROUTER_HEADLESS_MODE_CMD)

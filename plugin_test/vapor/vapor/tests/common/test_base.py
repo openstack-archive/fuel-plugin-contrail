@@ -142,7 +142,7 @@ def test_metadata_service(security_group, port_steps,
 
 def test_restart_control_service(os_faults_steps):
     """Validate restart of control node services."""
-    control_nodes_fqdns = settings.CONRTAIL_ROLES_DISTRIBUTION[
+    control_nodes_fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
         settings.ROLE_CONTRAIL_CONTROLLER]
     control_nodes = os_faults_steps.get_nodes(fqdns=control_nodes_fqdns)
 

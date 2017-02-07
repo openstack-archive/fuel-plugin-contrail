@@ -42,7 +42,7 @@ def get_contrail_nodes_fixture(role):
     @pytest.fixture(scope='module')
     def nodes_fixture(os_faults_steps):
         return os_faults_steps.get_nodes(
-            fqdns=settings.CONRTAIL_ROLES_DISTRIBUTION[role])
+            fqdns=settings.CONTRAIL_ROLES_DISTRIBUTION[role])
 
     return nodes_fixture
 

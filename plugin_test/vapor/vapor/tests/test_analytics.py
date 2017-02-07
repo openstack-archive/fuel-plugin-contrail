@@ -44,7 +44,7 @@ def test_vrouter_uve_xmpp_connections(session, client_contrail_analytics,
                                       contrail_services_http_introspect_ports,
                                       nodes_ips):
 
-    contrail_controllers_fqdns = settings.CONRTAIL_ROLES_DISTRIBUTION[
+    contrail_controllers_fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
         settings.ROLE_CONTRAIL_CONTROLLER]
 
     vrouter_generators = filter(
@@ -80,9 +80,9 @@ def test_peer_count_in_bgp_router_uve(client_contrail_analytics,
                                       contrail_services_http_introspect_ports,
                                       nodes_ips):
     # count of xmpp peer and bgp peer verification in bgp-router uve
-    contrail_computes_fqdns = settings.CONRTAIL_ROLES_DISTRIBUTION[
+    contrail_computes_fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
         settings.ROLE_CONTRAIL_COMPUTE]
-    contrail_controllers_fqdns = settings.CONRTAIL_ROLES_DISTRIBUTION[
+    contrail_controllers_fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
         settings.ROLE_CONTRAIL_CONTROLLER]
     total_agent_connections = 0
     factor = min(2, len(contrail_controllers_fqdns))
@@ -180,7 +180,7 @@ def test_hrefs_to_all_uves_of_a_given_uve_type(client_contrail_analytics, role,
                                                method_name):
     func = getattr(client_contrail_analytics, method_name)
     actual_hostnames = set(func())
-    expected_hostnames = set(settings.CONRTAIL_ROLES_DISTRIBUTION[role])
+    expected_hostnames = set(settings.CONTRAIL_ROLES_DISTRIBUTION[role])
     assert_that(actual_hostnames, equal_to(expected_hostnames))
 
 
@@ -191,7 +191,7 @@ def test_hrefs_to_all_uves_of_a_given_uve_type(client_contrail_analytics, role,
 def test_uve_module_states(client_contrail_analytics, role, method_name):
     expected_process_list = settings.CONTRAIL_ANALYTIC_PROCESSES[role]
     func = getattr(client_contrail_analytics, method_name)
-    for node in settings.CONRTAIL_ROLES_DISTRIBUTION[role]:
+    for node in settings.CONTRAIL_ROLES_DISTRIBUTION[role]:
         data = func(node)
         process_list = jmespath.search(
             'NodeStatus.process_info[].process_name', data)

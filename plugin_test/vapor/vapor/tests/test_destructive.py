@@ -42,7 +42,7 @@ def test_connectivity_after_restart_compute(server, public_network,
         server, ip, timeout=settings.FLOATING_IP_BIND_TIMEOUT)
 
     # Check ping to Floating IP
-    server_steps.check_ping_for_ip(ip, timeout=settings.PING_SUCESS_TIMEOUT)
+    server_steps.check_ping_for_ip(ip, timeout=settings.PING_SUCCESS_TIMEOUT)
 
     # Restart compute
     compute_host = getattr(server, stepler_config.SERVER_ATTR_HOST)
@@ -56,7 +56,7 @@ def test_connectivity_after_restart_compute(server, public_network,
     os_faults_steps.poweron_nodes(compute_node)
 
     # Check ping again
-    server_steps.check_ping_for_ip(ip, timeout=settings.PING_SUCESS_TIMEOUT)
+    server_steps.check_ping_for_ip(ip, timeout=settings.PING_SUCCESS_TIMEOUT)
 
 
 @pytest.mark.requires("vrouter_headless_mode")
@@ -86,10 +86,10 @@ def test_connectivity_during_restart_controllers(
     # Check ping to Floating IP
     for i in range(30):
         server_steps.check_ping_for_ip(
-            ip, timeout=settings.PING_SUCESS_TIMEOUT)
+            ip, timeout=settings.PING_SUCCESS_TIMEOUT)
 
     # Get contrail controller nodes
-    controlles_fqdns = settings.CONRTAIL_ROLES_DISTRIBUTION[
+    controlles_fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
         settings.ROLE_CONTRAIL_CONTROLLER]
     controllers = os_faults_steps.get_nodes(fqdns=controlles_fqdns)
 
@@ -99,7 +99,7 @@ def test_connectivity_during_restart_controllers(
         os_faults_steps.poweroff_nodes(controllers)
         os_faults_steps.poweron_nodes(controllers)
         server_steps.check_ping_for_ip(
-            ip, timeout=settings.PING_SUCESS_TIMEOUT)
+            ip, timeout=settings.PING_SUCCESS_TIMEOUT)
 
 
 def test_connectivity_after_contrail_services_restart(
@@ -126,7 +126,7 @@ def test_connectivity_after_contrail_services_restart(
         server, ip, timeout=settings.FLOATING_IP_BIND_TIMEOUT)
 
     # Check ping to Floating IP
-    server_steps.check_ping_for_ip(ip, timeout=settings.PING_SUCESS_TIMEOUT)
+    server_steps.check_ping_for_ip(ip, timeout=settings.PING_SUCCESS_TIMEOUT)
 
     cmd = ("PIDS=$(ps aux | awk '/awk/ {next} /contrail/{print $2}')\n"
            "if [ $PIDS ]; then kill $PIDS; fi")
@@ -134,7 +134,7 @@ def test_connectivity_after_contrail_services_restart(
     os_faults_steps.execute_cmd(nodes, cmd)
 
     # Check ping again
-    server_steps.check_ping_for_ip(ip, timeout=settings.PING_SUCESS_TIMEOUT)
+    server_steps.check_ping_for_ip(ip, timeout=settings.PING_SUCCESS_TIMEOUT)
 
     # Verify network creation
     network = request.getfixturevalue('contrail_network')

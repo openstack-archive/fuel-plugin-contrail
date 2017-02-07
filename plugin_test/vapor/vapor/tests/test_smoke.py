@@ -25,12 +25,12 @@ def test_contrail_node_services_status(os_faults_steps):
 
 
 @pytest.mark.parametrize('role',
-                         settings.CONRTAIL_ROLES_DISTRIBUTION)
+                         settings.CONTRAIL_ROLES_DISTRIBUTION)
 def test_contrail_service_distribution(os_faults_steps, role):
     statuses = contrail_status.get_services_statuses(os_faults_steps)
     statuses = {node: services.keys() for node, services in statuses.items()}
     services = settings.CONTRAIL_ROLES_SERVICES_MAPPING[role]
-    nodes = settings.CONRTAIL_ROLES_DISTRIBUTION[role]
+    nodes = settings.CONTRAIL_ROLES_DISTRIBUTION[role]
     entries = {node: has_items(*services) for node in nodes}
     assert_that(statuses, has_entries(**entries))
 
