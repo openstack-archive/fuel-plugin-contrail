@@ -14,11 +14,14 @@ from hamcrest import is_
 from stepler.third_party import ping
 from stepler.third_party import waiter
 
+CONNECTED = 'CONNECTED'
+
 
 def check_connection_status(ip,
                             remote,
                             port=22,
                             udp=False,
+                            answer=CONNECTED,
                             must_available=True,
                             timeout=0):
     """Check TCP/UDP port connection availability (or not).
@@ -47,15 +50,22 @@ def check_connection_status(ip,
 
     def _predicate():
         result = remote.execute(
-            'echo "QUIT" | nc {proto} -w1 {ip} {port}'.format(
-                ip=ip, port=port, proto=proto_flag))
-        return waiter.expect_that(result.exit_code == 0, is_(must_available))
+            'echo "" | nc {proto} -w1 {ip} {port} | grep {answer}'.format(
+                ip=ip, port=port, proto=proto_flag, answer=answer))
+        msg = ("Expected that {proto} connection for {port}"
+               " will be {status}").format(
+                   proto='UDP' if udp else 'TCP',
+                   port=port,
+                   status='available' if must_available else 'unavailable')
+        return waiter.expect_that(result.exit_code == 0,
+                                  is_(must_available), msg)
 
     return waiter.wait(_predicate, timeout_seconds=timeout, sleep_seconds=2)
 
 
 def check_icmp_connection_status(ip, remote, must_available=True, timeout=0):
     """Check that icmp connection to ip is `must_available`."""
+
     def predicate():
         ping_result = ping.Pinger(ip, remote=remote).ping(count=3)
         if must_available:
@@ -65,3 +75,18 @@ def check_icmp_connection_status(ip, remote, must_available=True, timeout=0):
         return waiter.expect_that(value, is_(0))
 
     return waiter.wait(predicate, timeout_seconds=timeout)
+
+
+def start_port_listener(server_ssh, port, udp=False, answer=CONNECTED):
+    """Start background netcat listener on remote server.
+
+    Note:
+        Netcat call syntax is valid only for cirros.
+    """
+    proto = '-u' if udp else ''
+    listener_cmd = 'nc {proto} -l -p {port} -e echo "{answer}"'.format(
+        proto=proto, port=port, answer=answer)
+
+    loop_cmd = "while true; do {}; done".format(listener_cmd)
+
+    server_ssh.background_call(loop_cmd)

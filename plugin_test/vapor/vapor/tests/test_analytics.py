@@ -76,9 +76,7 @@ def test_vrouter_uve_xmpp_connections(session, client_contrail_analytics,
         assert actual_connections_count == expected_connection_count
 
 
-def test_peer_count_in_bgp_router_uve(client_contrail_analytics,
-                                      contrail_services_http_introspect_ports,
-                                      nodes_ips):
+def test_peer_count_in_bgp_router_uve(client_contrail_analytics, nodes_ips):
     # count of xmpp peer and bgp peer verification in bgp-router uve
     contrail_computes_fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
         settings.ROLE_CONTRAIL_COMPUTE]
