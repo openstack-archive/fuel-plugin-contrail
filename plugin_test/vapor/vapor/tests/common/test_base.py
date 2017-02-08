@@ -13,6 +13,7 @@
 from hamcrest import (assert_that, calling, raises, contains_string, has_item,
                       has_entry, is_not, empty, all_of)  # noqa: H301
 from neutronclient.common import exceptions as neutron_exceptions
+from novaclient import exceptions as nova_exceptions
 from stepler import config as stepler_config
 from stepler.third_party import utils
 from pycontrail import exceptions
@@ -247,3 +248,20 @@ def test_various_type_of_subnets_associated_with_vn(
         result = server_ssh.check_call('ip a')
     assert_that(result.stdout,
                 all_of(*[contains_string(name) for name in iface_names]))
+
+
+def test_create_server_on_network_without_subnet(
+        cirros_image,
+        flavor,
+        contrail_network,
+        server_steps, ):
+    """Creating server on network without subnet should raise an exception."""
+    assert_that(
+        calling(server_steps.create_servers).with_args(
+            image=cirros_image,
+            flavor=flavor,
+            networks=[{
+                'id': contrail_network.uuid
+            }],
+            check=False),
+        raises(nova_exceptions.BadRequest, 'requires a subnet'))
