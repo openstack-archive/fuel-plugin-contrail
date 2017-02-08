@@ -138,3 +138,20 @@ CONTRAIL_ANALYTIC_PROCESSES = {
 HEAT_TEMPLATES_PATH = os.path.join(BASE_DIR, 'heat')
 
 VROUTER_HEADLESS_MODE_CMD = r"grep -iP '^headless_mode\s*=\s*true' /etc/contrail/contrail-vrouter-agent.conf"  # noqa
+
+ZOOKEEPER_PORT = 2181
+
+EXPECTED_ZNODES_LIST = ["api-server",
+                        "consumers",
+                        "svc-monitor",
+                        "device-manager",
+                        "controller_epoch",
+                        "id",
+                        "fq-name-to-uuid",
+                        "admin",
+                        "zookeeper",
+                        "api-server-election",
+                        "config",
+                        "controller",
+                        "schema-transformer",
+                        "brokers"]
