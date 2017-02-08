@@ -18,6 +18,7 @@ from vapor.fixtures.policies import *  # noqa
 from vapor.fixtures.security_groups import *  # noqa
 from vapor.fixtures.skip import *  # noqa
 from vapor.fixtures.subnets import *  # noqa
+from vapor.fixtures.system_services.py import * # noqa
 
 pytest_plugins = [
     'stepler.third_party.destructive_dispatcher',
