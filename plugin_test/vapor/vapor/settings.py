@@ -99,7 +99,7 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
 CONTRAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
     'CONTRAIL_ROLES_DISTRIBUTION_YAML',
     os.path.join(
-        BASE_DIR, '../roles_distribution_example.yaml'))
+        BASE_DIR, '../roles_mk22_qa_lab01.yaml'))
 
 with open(CONTRAIL_ROLES_DISTRIBUTION_YAML) as f:
     CONTRAIL_ROLES_DISTRIBUTION = yaml.safe_load(f) or {}
@@ -138,3 +138,23 @@ CONTRAIL_ANALYTIC_PROCESSES = {
 HEAT_TEMPLATES_PATH = os.path.join(BASE_DIR, 'heat')
 
 VROUTER_HEADLESS_MODE_CMD = r"grep -iP '^headless_mode\s*=\s*true' /etc/contrail/contrail-vrouter-agent.conf"  # noqa
+
+ZOOKEEPER_PORT = 2181
+
+ZOOKEEPER_NODES = ["api-server",
+                   "consumers",
+                   "svc-monitor",
+                   "contrail_cs",
+                   "device-manager",
+                   "controller_epoch",
+                   "lockpath",
+                   "id",
+                   "fq-name-to-uuid",
+                   "admin",
+                   "zookeeper",
+                   "api-server-election",
+                   "config",
+                   "controller",
+                   "schema-transformer",
+                   "brokers"]
+
