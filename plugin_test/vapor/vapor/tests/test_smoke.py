@@ -153,3 +153,7 @@ def test_update_network_ipam(contrail_api_client, contrail_ipam):
 def test_contrail_alarms_is_empty(client_contrail_analytics):
     alarms = client_contrail_analytics.get_alarms()
     assert_that(alarms, empty())
+
+def test_zookeeper_status(get_znodes_list):
+    expected_znodes_list = settings.EXPECTED_ZNODES_LIST
+    assert_that(get_znodes_list, contains_inanyorder(expected_zn_list))
