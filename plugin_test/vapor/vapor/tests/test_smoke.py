@@ -11,8 +11,7 @@
 # under the License.
 
 from hamcrest import (assert_that, has_item, has_entry, is_not, empty,
-                      has_property, has_items,
-                      contains_inanyorder)  # noqa: H301
+                      has_property, contains_inanyorder)  # noqa: H301
 import jmespath
 import pycontrail.types as types
 import pytest
@@ -20,6 +19,7 @@ from stepler.third_party import utils
 
 from vapor.helpers import contrail_status
 from vapor.helpers import asserts
+from vapor.helpers.asserts import is_superset_of
 from vapor import settings
 
 
@@ -38,7 +38,7 @@ def test_contrail_service_distribution(os_faults_steps, role):
             if node not in nodes:
                 continue
             services = [x.service for x in services]
-            collector.check(services, has_items(*expected_services))
+            collector.check(services, is_superset_of(expected_services))
 
 
 @pytest.mark.usefixtures('contrail_network_cleanup')
