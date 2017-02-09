@@ -13,6 +13,7 @@
 # under the License.
 
 from hamcrest import assert_that
+from hamcrest.core.base_matcher import BaseMatcher
 
 
 class ManyAssertionsErrors(AssertionError):
@@ -52,3 +53,59 @@ class AssertsCollector(object):
 
     def __exit__(self, *args):
         return self.report()
+
+
+class BaseSequencesMatcher(BaseMatcher):
+
+    def __init__(self, sequence):
+        self.sequence = sequence
+
+    @staticmethod
+    def _get_extra_items(sequence, other):
+        extra = []
+        for item in sequence:
+            if item not in other:
+                extra.append(item)
+        return extra
+
+    def _get_wrong_items(self, item):
+        raise NotImplementedError
+
+    def _matches(self, item):
+        return not self._get_wrong_items(item)
+
+
+class IsSubsetOf(BaseSequencesMatcher):
+
+    def _get_wrong_items(self, item):
+        return self._get_extra_items(item, self.sequence)
+
+    def describe_to(self, description):
+        description.append_text('a subset of ').append_text(self.sequence)
+
+    def describe_mismatch(self, item, mismatch_description):
+        super(IsSubsetOf, self).describe_mismatch(item, mismatch_description)
+        mismatch_description.append_text(' with unexpected items ') \
+            .append_description_of(self._get_wrong_items(item))
+
+
+class IsSupersetOf(BaseSequencesMatcher):
+
+    def _get_wrong_items(self, item):
+        return self._get_extra_items(self.sequence, item)
+
+    def describe_to(self, description):
+        description.append_text('a superset of ').append_text(self.sequence)
+
+    def describe_mismatch(self, item, mismatch_description):
+        super(IsSupersetOf, self).describe_mismatch(item, mismatch_description)
+        mismatch_description.append_text(' without expected items ') \
+            .append_description_of(self._get_wrong_items(item))
+
+
+def is_subset_of(sequence):
+    return IsSubsetOf(sequence)
+
+
+def is_superset_of(sequence):
+    return IsSupersetOf(sequence)
