@@ -174,7 +174,8 @@ def test_restart_control_service(os_faults_steps):
 
 
 @pytest.mark.usefixtures('contrail_network_cleanup')
-def test_vn_name_with_special_characters(contrail_api_client, contrail_current_project):
+def test_vn_name_with_special_characters(contrail_api_client,
+                                         contrail_current_project):
     """Validate creating virtual network with special characters in name.
 
     Steps:

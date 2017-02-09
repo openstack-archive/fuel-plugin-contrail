@@ -10,9 +10,10 @@
 # License for the specific language governing permissions and limitations
 # under the License
 
-from kazoo.client import KazooClient
+from kazoo import client
 from vapor import settings
 import pytest
+
 
 @pytest.fixture
 def znodes_list(nodes_ips):
@@ -21,10 +22,10 @@ def znodes_list(nodes_ips):
         settings.ROLE_CONTRAIL_CONTROLLER]
     for name in nodes_ips:
         if name in contrail_controllers_fqdns:
-            hosts_list+="{}:{},".format(nodes_ips[name][0],
-                                        settings.ZOOKEEPER_PORT)
+            hosts_list += "{}:{},".format(nodes_ips[name][0],
+                                          settings.ZOOKEEPER_PORT)
     hosts_list = hosts_list[:-1]
-    zk = KazooClient(hosts=hosts_list)
+    zk = client.KazooClient(hosts=hosts_list)
     zk.start()
     znodes_list_ = zk.get_children("/")
     zk.stop()
