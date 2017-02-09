@@ -11,6 +11,8 @@ export OS_FAULTS_CLOUD_DRIVER_ADDRESS=192.168.10.100
 export OS_FAULTS_CLOUD_DRIVER_KEYFILE=/home/jenkins/cloud.key
 export CLOUD_DRIVER_USERNAME=root
 
+export CONTRAIL_ROLES_DISTRIBUTION_YAML=roles_distribution_example.yaml
+
 #export OS_PROJECT_DOMAIN_NAME=default
 #export OS_USER_DOMAIN_NAME=default
 #export OS_PROJECT_NAME=admin

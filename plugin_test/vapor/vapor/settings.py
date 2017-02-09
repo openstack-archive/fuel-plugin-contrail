@@ -54,15 +54,17 @@ ROLE_CONTRAIL_COMPUTE = 'contrail-compute'
 ROLE_CONTRAIL_CONFIG = 'contrail-config'
 
 CONTRAIL_ROLES_SERVICES_MAPPING = {
+    ROLE_CONTRAIL_CONFIG: (
+        'supervisor-config',
+        'contrail-config-nodemgr',
+    ),
     ROLE_CONTRAIL_CONTROLLER: (
         'supervisor-control',
         'contrail-control',
         'contrail-control-nodemgr',
         'contrail-dns',
         'contrail-named',
-        'supervisor-config',
         'contrail-api',
-        'contrail-config-nodemgr',
         'contrail-device-manager',
         'contrail-discovery',
         'contrail-schema',
