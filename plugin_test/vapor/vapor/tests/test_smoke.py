@@ -12,6 +12,7 @@
 
 from hamcrest import (assert_that, has_item, has_entry, is_not, empty,
                       has_property, has_entries, has_items)  # noqa H301
+import jmespath
 import pycontrail.types as types
 import pytest
 from stepler.third_party import utils
@@ -24,11 +25,13 @@ def test_contrail_node_services_status(os_faults_steps):
     contrail_status.check_services_statuses(os_faults_steps)
 
 
-@pytest.mark.parametrize('role',
-                         settings.CONTRAIL_ROLES_DISTRIBUTION)
+@pytest.mark.parametrize('role', settings.CONTRAIL_ROLES_DISTRIBUTION)
 def test_contrail_service_distribution(os_faults_steps, role):
-    statuses = contrail_status.get_services_statuses(os_faults_steps)
-    statuses = {node: services.keys() for node, services in statuses.items()}
+    services_statuses = contrail_status.get_services_statuses(os_faults_steps)
+    statuses = {
+        node: service.service
+        for node, services in services_statuses.items() for service in services
+    }
     services = settings.CONTRAIL_ROLES_SERVICES_MAPPING[role]
     nodes = settings.CONTRAIL_ROLES_DISTRIBUTION[role]
     entries = {node: has_items(*services) for node in nodes}
@@ -152,4 +155,7 @@ def test_update_network_ipam(contrail_api_client, contrail_ipam):
 
 def test_contrail_alarms_is_empty(client_contrail_analytics):
     alarms = client_contrail_analytics.get_alarms()
-    assert_that(alarms, empty())
+    query = ('*[?@.value.*.alarms[?ack!=`True`]][].'
+             '{Node: @.name, Type: @.value.*.alarms[].type}')
+    not_ack_alarms = jmespath.search(query, alarms)
+    assert_that(not_ack_alarms, empty())
