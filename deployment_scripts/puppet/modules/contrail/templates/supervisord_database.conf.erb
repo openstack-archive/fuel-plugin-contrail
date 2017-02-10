@@ -1,38 +1,33 @@
-; Sample supervisor config file.
+; contrail database (cassandra) supervisor config file.
 ;
-; For more information on the config file, please see:
-; http://supervisord.org/configuration.html
-;
-; Note: shell expansion ("~" or "$HOME") is not supported.  Environment
-; variables can be expanded using this syntax: "%(ENV_HOME)s".
+; For more example, check supervisord_analytics.conf
 
 [unix_http_server]
-file=/var/run/supervisord_config.sock   ; (the path to the socket file)
+file=/var/run/supervisord_database.sock   ; (the path to the socket file)
 chmod=0700                 ; socket file mode (default 0700)
 ;chown=nobody:nogroup       ; socket file uid:gid owner
 ;username=user              ; (default is no username (open server))
 ;password=123               ; (default is no password (open server))
 
 ;[inet_http_server]         ; inet (TCP) server disabled by default
-;port=127.0.0.1:9001        ; Port for analytics (ip_address:port specifier, *:port for all iface)
+;port=localhost:9007        ; (ip_address:port specifier, *:port for all i/f)
 ;username=user              ; (default is no username (open server))
 ;password=123               ; (default is no password (open server))
 
 [supervisord]
-logfile=/var/log/contrail/supervisord-config.log ; (main log file;default $CWD/supervisord.log)
-logfile_maxbytes=50MB        ; (max main logfile bytes b4 rotation;default 50MB)
-logfile_backups=3            ; (num of main logfile rotation backups;default 10)
+logfile=/var/log/contrail/supervisord_contrail_database.log  ; (main log file;default $CWD/supervisord.log)
+logfile_maxbytes=10MB        ; (max main logfile bytes b4 rotation;default 50MB)
+logfile_backups=5           ; (num of main logfile rotation backups;default 10)
 loglevel=info                ; (log level;default info; others: debug,warn,trace)
-pidfile=/var/run/supervisord-config.pid   ; (supervisord pidfile;default supervisord.pid)
+pidfile=/var/run/supervisord_contrail_database.pid  ; (supervisord pidfile;default supervisord.pid)
 nodaemon=false               ; (start in foreground if true;default false)
-minfds=<%=scope.lookupvar('contrail::supervisor_config_minfds')-%>                 ; (min. avail startup file descriptors;default 1024)
 minprocs=200                 ; (min. avail process descriptors;default 200)
 ;umask=022                   ; (process file creation umask;default 022)
 ;user=chrism                 ; (default is current user, required if root)
 ;identifier=supervisor       ; (supervisord identifier, default is 'supervisor')
 ;directory=/tmp              ; (default is not to cd during start)
 nocleanup=true              ; (don't clean up tempfiles at start;default false)
-childlogdir=/var/log/contrail ; ('AUTO' child log dir, default $TEMP)
+;childlogdir=/tmp            ; ('AUTO' child log dir, default $TEMP)
 ;environment=KEY=value       ; (key value pairs to add to environment)
 ;strip_ansi=false            ; (strip ansi escape codes in logs; def. false)
 
@@ -43,8 +38,8 @@ childlogdir=/var/log/contrail ; ('AUTO' child log dir, default $TEMP)
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [supervisorctl]
-serverurl=unix:///var/run/supervisord_config.sock ; use a unix:// URL  for a unix socket
-;serverurl=http://127.0.0.1:9004 ; use an http:// url to specify an inet socket
+serverurl=unix:///var/run/supervisord_database.sock ; use a unix:// URL  for a unix socket
+;serverurl=http://127.0.0.1:9001 ; use an http:// url to specify an inet socket
 ;username=chris              ; should be same as http_username if set
 ;password=123                ; should be same as http_password if set
 ;prompt=mysupervisor         ; cmd line prompt (default "supervisor")
@@ -54,19 +49,25 @@ serverurl=unix:///var/run/supervisord_config.sock ; use a unix:// URL  for a uni
 ; create one or more 'real' program: sections to be able to control them under
 ; supervisor.
 
+[program:kafka]
+command=/usr/share/kafka/bin/kafka-server-start.sh /usr/share/kafka/config/server.properties
+autostart=false                ; start at supervisord start (default: true)
+killasgroup=false             ; SIGKILL the UNIX process group (def false)
+environment=LOG_DIR=/var/log/kafka
+
 ;[program:theprogramname]
-;command=/bin/cat              ; the program (relative uses PATH, can take args)
+;command=/bin/cat
 ;process_name=%(program_name)s ; process_name expr (default %(program_name)s)
 ;numprocs=1                    ; number of processes copies to start (def 1)
 ;directory=/tmp                ; directory to cwd to before exec (def no cwd)
 ;umask=022                     ; umask for process (default None)
-;priority=999                  ; the relative start priority (default 999)
+;priority=300                  ; the relative start priority (default 999)
 ;autostart=true                ; start at supervisord start (default: true)
 ;autorestart=unexpected        ; whether/when to restart (default: unexpected)
 ;startsecs=1                   ; number of secs prog must stay running (def. 1)
 ;startretries=3                ; max # of serial start failures (default 3)
 ;exitcodes=0,2                 ; 'expected' exit codes for process (default 0,2)
-;stopsignal=QUIT               ; signal used to kill process (default TERM)
+;stopsignal=KILL               ; signal used to kill process (default TERM)
 ;stopwaitsecs=10               ; max num secs to wait b4 SIGKILL (default 10)
 ;stopasgroup=false             ; send stop signal to the UNIX process group (default false)
 ;killasgroup=false             ; SIGKILL the UNIX process group (def false)
@@ -100,5 +101,5 @@ serverurl=unix:///var/run/supervisord_config.sock ; use a unix:// URL  for a uni
 ; include files themselves.
 
 [include]
-files = /etc/contrail/supervisord_config_files/*.ini
+files = /etc/contrail/supervisord_database_files/*.ini
 
