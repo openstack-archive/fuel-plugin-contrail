@@ -146,12 +146,9 @@ class contrail::analytics {
     'KEYSTONE/insecure':          value => $contrail::keystone_insecure;
   }
 
-  ini_setting { 'analytics-fdlimit':
-    ensure  => present,
-    path    => '/etc/contrail/supervisord_analytics.conf',
-    section => 'supervisord',
-    setting => 'minfds',
-    value   => $contrail::supervisor_analytics_minfds,
+  # Supervisor-config
+  file { '/etc/contrail/supervisord_analytics.conf':
+    content => template('contrail/supervisord_analytics.conf.erb'),
     require => Package['contrail-analytics'],
   }
 
@@ -196,12 +193,12 @@ class contrail::analytics {
   }
 
   service { 'supervisor-analytics':
-    ensure    => $contrail::service_ensure,
-    enable    => true,
-    require   => [
+    ensure  => $contrail::service_ensure,
+    enable  => true,
+    require => [
       Package['contrail-openstack-analytics'],
       Service['redis-server'],
-      Ini_setting['analytics-fdlimit'],
+      File['/etc/contrail/supervisord_analytics.conf'],
       Ini_setting['supervisor-analytics-api'],
       Ini_setting['supervisor-alarm-gen'],
       Ini_setting['supervisor-collector'],

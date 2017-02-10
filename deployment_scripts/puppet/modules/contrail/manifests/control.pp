@@ -78,24 +78,24 @@ class contrail::control {
     }
 
     file { '/etc/contrail/ssl/xmpp_wildcard.crt':
-      content  => $contrail::tls_xmpp_wildcard_crt,
-      owner    => 'contrail',
-      group    => 'contrail',
-      tag      => 'tls_xmpp',
+      content => $contrail::tls_xmpp_wildcard_crt,
+      owner   => 'contrail',
+      group   => 'contrail',
+      tag     => 'tls_xmpp',
     }
 
     file { '/etc/contrail/ssl/xmpp_wildcard.key':
-      content  => $contrail::tls_xmpp_wildcard_key,
-      owner    => 'contrail',
-      group    => 'contrail',
-      tag      => 'tls_xmpp',
+      content => $contrail::tls_xmpp_wildcard_key,
+      owner   => 'contrail',
+      group   => 'contrail',
+      tag     => 'tls_xmpp',
     }
 
     file { '/etc/contrail/ssl/xmpp_ca.crt':
-      content  => $contrail::tls_xmpp_ca_crt,
-      owner    => 'contrail',
-      group    => 'contrail',
-      tag      => 'tls_xmpp',
+      content => $contrail::tls_xmpp_ca_crt,
+      owner   => 'contrail',
+      group   => 'contrail',
+      tag     => 'tls_xmpp',
     }
 
     contrail_control_config {
@@ -115,14 +115,11 @@ class contrail::control {
     Package['contrail-control'] -> File<| tag == 'tls_xmpp' |>  ->  Contrail_control_config <||> ~> Service['supervisor-control']
     Package['contrail-dns'] -> File<| tag == 'tls_xmpp' |>  ->  Contrail_dns_config <||> ~> Service['supervisor-control']
   }
-  ini_setting { 'control-fdlimit':
-    ensure  => present,
-    path    => '/etc/contrail/supervisord_control.conf',
-    section => 'supervisord',
-    setting => 'minfds',
-    value   => $contrail::supervisor_control_minfds,
+
+  # Supervisor-config
+  file { '/etc/contrail/supervisord_control.conf':
+    content => template('contrail/supervisord_control.conf.erb'),
     require => Package['contrail-control'],
-    notify  => Service['supervisor-control'],
   }
 
   contrail_control_nodemgr_config {
@@ -131,19 +128,20 @@ class contrail::control {
   }
 
   service { 'contrail-dns':
-    ensure    => running,
-    require   => Package['contrail-dns'],
+    ensure  => running,
+    require => Package['contrail-dns'],
   }
 
   service { 'contrail-named':
-    ensure    => running,
-    require   => Service['contrail-dns']
+    ensure  => running,
+    require => Service['contrail-dns']
   }
 
   service { 'supervisor-control':
     ensure  => $contrail::service_ensure,
     enable  => true,
     require => [
+      File['/etc/contrail/supervisord_control.conf'],
       Package['contrail-openstack-control'],
       Package['contrail-control']
       ],

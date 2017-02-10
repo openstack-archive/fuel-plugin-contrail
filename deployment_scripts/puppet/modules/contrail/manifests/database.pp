@@ -66,12 +66,9 @@ class contrail::database {
         ],
     }
 
-    ini_setting { 'disable_kafka':
-      ensure  => present,
-      path    => '/etc/contrail/supervisord_database.conf',
-      section => 'program:kafka',
-      setting => 'autostart',
-      value   => false,
+    #Supervisor-config
+    file { '/etc/contrail/supervisord_database.conf':
+      content => template('contrail/supervisord_database.conf.erb'),
       before  => Service['supervisor-database'],
     }
 
@@ -118,8 +115,8 @@ class contrail::database {
 
       package { 'zookeeper': } ->
       service { 'zookeeper':
-        ensure    => stopped,
-        enable    => false,
+        ensure => stopped,
+        enable => false,
       }
   }
 # Cassandra
@@ -143,9 +140,9 @@ class contrail::database {
     group   => 'cassandra',
   } ->
   file { '/etc/cassandra/cassandra-env.sh':
-    source  => 'puppet:///modules/contrail/cassandra-env.sh',
-    owner   => 'cassandra',
-    group   => 'cassandra',
+    source => 'puppet:///modules/contrail/cassandra-env.sh',
+    owner  => 'cassandra',
+    group  => 'cassandra',
   } ->
   file { '/etc/security/limits.d/cassandra.conf':
     content => template('contrail/cassandra_limits.conf.erb'),
