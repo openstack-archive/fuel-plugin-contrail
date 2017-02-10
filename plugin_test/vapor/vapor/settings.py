@@ -69,7 +69,6 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
         'contrail-discovery',
         'contrail-schema',
         'contrail-svc-monitor',
-        'ifmap',
         'supervisor-webui',
         'contrail-webui',
         'contrail-webui-middleware',
@@ -159,3 +158,5 @@ ZOOKEEPER_NODES = ["api-server",
                    "controller",
                    "schema-transformer",
                    "brokers"]
+
+SERVER_ATTR_HYPERVISOR_HOSTNAME = 'OS-EXT-SRV-ATTR:hypervisor_hostname'
