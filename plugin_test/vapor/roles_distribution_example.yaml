@@ -11,3 +11,6 @@
 #   - node-1.test.domain.local
 # contrail-compute:
 #   - node-4.test.domain.local
+# contrail-ui: // This is optional role
+#   - node-2.test.domain.local
+#   - node-3.test.domain.local

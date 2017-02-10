@@ -41,6 +41,14 @@ def test_contrail_service_distribution(os_faults_steps, role):
             collector.check(services, is_superset_of(expected_services))
 
 
+def test_ifmap_service(os_faults_steps):
+    """Verify ifmap service."""
+    fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
+        settings.ROLE_CONTRAIL_CONTROLLER]
+    nodes = os_faults_steps.get_nodes(fqdns)
+    os_faults_steps.execute_cmd(nodes, 'ifmap-view visual visual')
+
+
 @pytest.mark.usefixtures('contrail_network_cleanup')
 def test_add_virtual_network(contrail_api_client):
     network_name, = utils.generate_ids()
