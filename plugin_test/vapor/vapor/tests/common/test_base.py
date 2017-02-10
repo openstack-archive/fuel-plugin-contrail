@@ -10,6 +10,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import sys
+
 from hamcrest import (assert_that, calling, raises, contains_string, has_item,
                       has_entry, is_not, empty)  # noqa H301
 from neutronclient.common import exceptions as neutron_exceptions
@@ -189,3 +191,36 @@ def test_vn_name_with_special_characters(contrail_api_client,
     networks = contrail_api_client.virtual_networks_list()
     assert_that(networks['virtual-networks'],
                 has_item(has_entry('uuid', net.uuid)))
+
+
+def test_create_server_on_exhausted_subnet(cirros_image, flavor, network,
+                                           create_subnet, create_port,
+                                           server_steps):
+    """Validate that a VMs cannot be created after the IP-Block is exhausted.
+
+    Steps:
+        #. Create network
+        #. Create subnet with CIDR 10.0.0.0/28
+        #. Create server in network
+        #. Check that server reaches active status
+        #. Create as many ports on network as possible
+        #. Create another server in network
+        #. Check that second server reaches error status
+    """
+    name, = utils.generate_ids()
+    create_subnet(name, network, cidr='10.0.0.0/28')
+    create_server_args = dict(
+        image=cirros_image, flavor=flavor, networks=[network])
+    server_steps.create_servers(**create_server_args)
+    while True:
+        try:
+            create_port(network)
+        except neutron_exceptions.BadRequest:
+            if 'exhausted' in str(sys.exc_value):
+                break
+            else:
+                raise
+
+    assert_that(
+        calling(server_steps.create_servers).with_args(**create_server_args),
+        raises(AssertionError, 'No valid host was found'))
