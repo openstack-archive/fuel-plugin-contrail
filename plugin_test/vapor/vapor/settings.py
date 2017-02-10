@@ -52,12 +52,12 @@ ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
 ROLE_CONTRAIL_COMPUTE = 'contrail-compute'
 ROLE_CONTRAIL_CONFIG = 'contrail-config'
+ROLE_CONTRAIL_UI = 'contrail-ui'
 
 CONTRAIL_ROLES_SERVICES_MAPPING = {
     ROLE_CONTRAIL_CONFIG: (
         'supervisor-config',
-        'contrail-config-nodemgr',
-    ),
+        'contrail-config-nodemgr', ),
     ROLE_CONTRAIL_CONTROLLER: (
         'supervisor-control',
         'contrail-control',
@@ -69,15 +69,10 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
         'contrail-discovery',
         'contrail-schema',
         'contrail-svc-monitor',
-        'ifmap',
-        'supervisor-webui',
-        'contrail-webui',
-        'contrail-webui-middleware',
         'contrail-database',
         'supervisor-database',
         'contrail-database-nodemgr',
-        'kafka',
-        'supervisor-support-service', ),
+        'kafka', ),
     ROLE_CONTRAIL_ANALYTICS: (
         'supervisor-analytics',
         'contrail-alarm-gen',
@@ -95,7 +90,12 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
     ROLE_CONTRAIL_COMPUTE: (
         'contrail-vrouter-agent',
         'supervisor-vrouter',
-        'contrail-vrouter-nodemgr', )
+        'contrail-vrouter-nodemgr', ),
+    ROLE_CONTRAIL_UI: (
+        'supervisor-webui',
+        'contrail-webui',
+        'contrail-webui-middleware',
+        'supervisor-support-service', ),
 }
 
 CONTRAIL_ROLES_DISTRIBUTION_YAML = os.environ.get(
@@ -159,3 +159,5 @@ ZOOKEEPER_NODES = ["api-server",
                    "controller",
                    "schema-transformer",
                    "brokers"]
+
+SERVER_ATTR_HYPERVISOR_HOSTNAME = 'OS-EXT-SRV-ATTR:hypervisor_hostname'

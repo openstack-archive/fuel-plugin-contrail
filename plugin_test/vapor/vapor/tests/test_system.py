@@ -62,7 +62,7 @@ def test_no_connectivity_between_vms_in_different_tenants(
     # Get interfaces list again
     after_interfaces = nodes_steps.get_nodes_interfaces(os_faults_steps)
     compute_fqdn = getattr(resources[0].server,
-                           stepler_config.SERVER_ATTR_HOST)
+                           settings.SERVER_ATTR_HYPERVISOR_HOSTNAME)
 
     # Check that there is 2 interfaces on compute - one for each VM
     assert_that(
