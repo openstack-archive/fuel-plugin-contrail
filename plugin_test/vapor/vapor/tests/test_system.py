@@ -289,6 +289,36 @@ def test_change_login_and_password(session, current_project,
     assert_that(net_list, is_not(empty()))
 
 
+def test_admin_user_can_get_user_token_info(current_project, token_steps,
+                                            role_steps, create_user,
+                                            keystone_client,
+                                            client_contrail_analytics):
+    """Check cloud admin user can get user token info.
+
+    Steps:
+        #. Create user with member role
+        #. From admin user request token info of member user
+        #. Check that there are not errors in contrail-analytics-api
+    """
+    alarms = client_contrail_analytics.get_alarms()
+    username, password = utils.generate_ids(count=2)
+    user = create_user(username, password)
+    role_type = stepler_config.ROLE_MEMBER
+    role = role_steps.get_role(name=role_type)
+    role_steps.grant_role(role, user, project=current_project)
+
+    token = keystone_client.get_raw_token_from_identity_service(
+        auth_url=keystone_client.auth_url,
+        username=username,
+        password=password,
+        user_domain_name=stepler_config.USER_DOMAIN_NAME)
+    token_info = token_steps.get_token_data(token['auth_token'], check=False)
+    assert_that(
+        token_info['token'], has_entries(user=has_entries(name=username)))
+    new_alarms = client_contrail_analytics.get_alarms()
+    assert_that(new_alarms, equal_to(alarms))
+
+
 def test_connectivity_from_server_without_floating(
         cirros_image, flavor, net_subnet_router, security_group, server_steps):
     """Check connectivity via external Contrail network without floating IP.
