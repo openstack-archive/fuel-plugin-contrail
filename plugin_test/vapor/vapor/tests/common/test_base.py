@@ -25,6 +25,7 @@ import pytest
 from vapor.helpers import asserts
 from vapor.helpers import contrail_status
 from vapor import settings
+from vapor.settings import logger
 
 
 def test_network_deleting_with_server(network, server, contrail_api_client):
@@ -379,3 +380,37 @@ def test_create_server_on_network_without_subnet(
             }],
             check=False),
         raises(nova_exceptions.BadRequest, 'requires a subnet'))
+
+
+@pytest.mark.parametrize('different_tenants_resources',
+                         [dict(ips=('10.0.0.10', '10.0.0.20'))],
+                         indirect=True)
+def test_diff_proj_same_vn_vm_add_delete(different_tenants_resources,
+                                         client_contrail_vrouter_agent):
+    """Test to validate that a VN and VM with the same name and same subnet
+    can be created in two different projects.
+
+    Test steps:
+        #. Create 2 different projects.
+        #. Create a VN with the same name and subnet under each project.
+        #. Launch a VM under the VN in both the projects.
+
+    Pass criteria:
+        The label allocated to the VM's should be different.
+    """
+    resources = different_tenants_resources
+
+    itfs = client_contrail_vrouter_agent.get_itfs()['ItfResp'][
+        'itf_list']
+
+    s1_net_label = next(vrif['label'] for vrif in itfs
+                        if vrif['vm_uuid'] == resources[0].server.id)
+
+    s2_net_label = next(vrif['label'] for vrif in itfs
+                        if vrif['vm_uuid'] == resources[1].server.id)
+
+    logger.debug('label1 = {}; label2 = {}'.format(s1_net_label,
+                                                   s2_net_label))
+
+    assert_that(s1_net_label, is_not(equal_to(s2_net_label)))
+
