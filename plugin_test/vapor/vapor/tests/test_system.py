@@ -47,9 +47,11 @@ def test_no_connectivity_between_vms_in_different_tenants(
     # Store nodes interfaces
     before_interfaces = nodes_steps.get_nodes_interfaces(os_faults_steps)
 
-    resources = request.getfixturevalue('different_tenants_resources')
+    resources_fixture = request.getfixturevalue('different_tenants_resources')
+    resources = []
     # Check that there is no ping between tenants
-    for resources1, resources2 in itertools.permutations(resources):
+    for resources1, resources2 in resources_fixture():
+        resources = [resources1, resources2]
         ip_to_ping = resources1.server_steps.get_fixed_ip(resources1.server)
         server_steps = resources2.server_steps
         floating_ip = resources2.floating_ip['floating_ip_address']
