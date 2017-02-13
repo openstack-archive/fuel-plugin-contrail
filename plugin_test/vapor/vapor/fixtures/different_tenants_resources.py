@@ -149,34 +149,35 @@ def different_tenants_resources(
     Returns:
         list: list of AttrDict with created resources
     """
-    hypervisor = sorted_hypervisors[0]
+    @contextlib.contextmanager
+    def _different_tenants_resources(subnet_cidr='10.0.0.0/24',
+                                     base_name=next(utils.generate_ids()),
+                                     ips=('10.0.0.10', '10.0.0.20')):
+        hypervisor = sorted_hypervisors[0]
 
-    host = next(
-        host for host in nova_availability_zone_hosts
-        if hypervisor.hypervisor_hostname.startswith(host))
+        host = next(
+            host for host in nova_availability_zone_hosts
+            if hypervisor.hypervisor_hostname.startswith(host))
 
-    subnet_cidr = '10.0.0.0/24'
-    base_name = next(utils.generate_ids())
+        with contextlib.ExitStack() as stack:
 
-    with contextlib.ExitStack() as stack:
+            mrg = ResourceManager(stack, base_name, get_network_steps,
+                                  get_subnet_steps, port_steps,
+                                  get_floating_ip_steps, get_server_steps,
+                                  get_security_group_steps, public_network)
 
-        mrg = ResourceManager(stack, base_name, get_network_steps,
-                              get_subnet_steps, port_steps,
-                              get_floating_ip_steps, get_server_steps,
-                              get_security_group_steps, public_network)
+            projects_resources = []
 
-        projects_resources = []
-
-        project_resources = mrg.create(subnet_cidr, '10.0.0.10', cirros_image,
-                                       public_flavor, host)
-
-        projects_resources.append(project_resources)
-
-        with credentials.change(project_2):
-
-            project_resources = mrg.create(subnet_cidr, '10.0.0.20',
-                                           cirros_image, public_flavor, host)
+            project_resources = mrg.create(subnet_cidr, ips[0], cirros_image,
+                                           public_flavor, host)
 
             projects_resources.append(project_resources)
 
-        yield projects_resources
+            with credentials.change(project_2):
+
+                project_resources = mrg.create(subnet_cidr, ips[1],
+                                               cirros_image, public_flavor,
+                                               host)
+                projects_resources.append(project_resources)
+                yield projects_resources
+    return _different_tenants_resources

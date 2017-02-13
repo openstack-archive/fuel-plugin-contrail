@@ -13,7 +13,7 @@
 import sys
 
 from hamcrest import (assert_that, calling, raises, contains_string, has_item,
-                      has_entry, is_not, empty)  # noqa H301
+                      has_entry, is_not, empty, equal_to)  # noqa H301
 from neutronclient.common import exceptions as neutron_exceptions
 from stepler import config as stepler_config
 from stepler.third_party import utils
@@ -23,6 +23,7 @@ import pytest
 
 from vapor.helpers import contrail_status
 from vapor import settings
+from vapor.settings import logger
 
 
 def test_network_deleting_with_server(network, server, contrail_api_client):
@@ -224,3 +225,36 @@ def test_create_server_on_exhausted_subnet(cirros_image, flavor, network,
     assert_that(
         calling(server_steps.create_servers).with_args(**create_server_args),
         raises(AssertionError, 'No valid host was found'))
+
+
+def test_diff_proj_same_vn_vm_add_delete(request,
+                                         client_contrail_vrouter_agent,
+                                         different_tenants_resources):
+    """Test to validate that a VN and VM with the same name and same subnet
+    can be created in two different projects.
+
+    Test steps:
+        #. Create 2 different projects.
+        #. Create a VN with the same name and subnet under each project.
+        #. Launch a VM under the VN in both the projects.
+
+    Pass criteria:
+        The label allocated to the VM's should be different.
+    """
+    # resources_fixture = request.getfixturevalue('')
+    with different_tenants_resources(
+            subnet_cidr='10.0.0.0/24',
+            ips=('10.0.0.10', '10.0.0.10')) as resources:
+        itfs = client_contrail_vrouter_agent.get_itfs()['ItfResp'][
+            'itf_list']
+
+        s1_net_label = next(vrif['label'] for vrif in itfs
+                            if vrif['vm_uuid'] == resources[0].server.id)
+
+        s2_net_label = next(vrif['label'] for vrif in itfs
+                            if vrif['vm_uuid'] == resources[1].server.id)
+
+        logger.debug('label1 = {}; label2 = {}'.format(s1_net_label,
+                                                       s2_net_label))
+
+        assert_that(s1_net_label, is_not(equal_to(s2_net_label)))

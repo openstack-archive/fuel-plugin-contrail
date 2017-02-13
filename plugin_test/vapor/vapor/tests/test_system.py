@@ -47,43 +47,44 @@ def test_no_connectivity_between_vms_in_different_tenants(
     # Store nodes interfaces
     before_interfaces = nodes_steps.get_nodes_interfaces(os_faults_steps)
 
-    resources = request.getfixturevalue('different_tenants_resources')
-    # Check that there is no ping between tenants
-    for resources1, resources2 in itertools.permutations(resources):
-        ip_to_ping = resources1.server_steps.get_fixed_ip(resources1.server)
-        server_steps = resources2.server_steps
-        floating_ip = resources2.floating_ip['floating_ip_address']
-        with server_steps.get_server_ssh(
-                resources2.server, ip=floating_ip) as server_ssh:
-            with server_steps.check_no_ping_context(
-                    ip_to_ping, server_ssh=server_ssh):
-                time.sleep(5)
+    resources_fixture = request.getfixturevalue('different_tenants_resources')
+    with resources_fixture() as resources:
+        # Check that there is no ping between tenants
+        for resources1, resources2 in itertools.permutations(resources):
+            ip_to_ping = resources1.server_steps.get_fixed_ip(resources1.server)
+            server_steps = resources2.server_steps
+            floating_ip = resources2.floating_ip['floating_ip_address']
+            with server_steps.get_server_ssh(
+                    resources2.server, ip=floating_ip) as server_ssh:
+                with server_steps.check_no_ping_context(
+                        ip_to_ping, server_ssh=server_ssh):
+                    time.sleep(5)
 
-    # Get interfaces list again
-    after_interfaces = nodes_steps.get_nodes_interfaces(os_faults_steps)
-    compute_fqdn = getattr(resources[0].server,
-                           settings.SERVER_ATTR_HYPERVISOR_HOSTNAME)
+        # Get interfaces list again
+        after_interfaces = nodes_steps.get_nodes_interfaces(os_faults_steps)
+        compute_fqdn = getattr(resources[0].server,
+                               settings.SERVER_ATTR_HYPERVISOR_HOSTNAME)
 
-    # Check that there is 2 interfaces on compute - one for each VM
-    assert_that(
-        after_interfaces[compute_fqdn] - before_interfaces[compute_fqdn],
-        has_length(2))
+        # Check that there is 2 interfaces on compute - one for each VM
+        assert_that(
+            after_interfaces[compute_fqdn] - before_interfaces[compute_fqdn],
+            has_length(2))
 
-    # Check that networks are present in contrail
-    contrail_networks = contrail_api_client.virtual_networks_list()
-    networks_matchers = [
-        has_entries(uuid=res.network['id']) for res in resources
-    ]
-    assert_that(contrail_networks['virtual-networks'],
-                has_items(*networks_matchers))
+        # Check that networks are present in contrail
+        contrail_networks = contrail_api_client.virtual_networks_list()
+        networks_matchers = [
+            has_entries(uuid=res.network['id']) for res in resources
+        ]
+        assert_that(contrail_networks['virtual-networks'],
+                    has_items(*networks_matchers))
 
-    # Check that VMs attached to different networks
-    networks_uuid = set()
-    for resource in resources:
-        iface = contrail_api_client.virtual_machine_interface_read(
-            id=resource.port['id'])
-        networks_uuid.add(iface.get_virtual_network_refs()[0]['uuid'])
-    assert_that(networks_uuid, has_length(2))
+        # Check that VMs attached to different networks
+        networks_uuid = set()
+        for resource in resources:
+            iface = contrail_api_client.virtual_machine_interface_read(
+                id=resource.port['id'])
+            networks_uuid.add(iface.get_virtual_network_refs()[0]['uuid'])
+        assert_that(networks_uuid, has_length(2))
 
 
 def test_create_network_with_contrail(
