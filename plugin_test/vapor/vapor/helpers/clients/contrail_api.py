@@ -1,4 +1,5 @@
 from . import base
+import urllib
 
 
 class ContrailClient(base.ContrailBaseClient):
@@ -91,3 +92,42 @@ class ContrailClient(base.ContrailBaseClient):
         :return dictionary
         """
         return self._get('/bgp-router/{0}'.format(bgp_id))
+
+    def get_virtual_routers(self, detail=False):
+        url = '/virtual-routers?{0}'.format(
+            urllib.urlencode({'detail': detail}))
+        return self._get(url)
+
+    def get_virtual_router_by_id(self, vrouter_id):
+        return self._get('/virtual-router/{0}'.format(vrouter_id))
+
+    def get_virtual_machines(self):
+        return self._get('/virtual-machines')
+
+    def get_virtual_machine_by_id(self, machine_id):
+        return self._get('/virtual-machine/{0}'.format(machine_id))
+
+    def get_virtual_machine_interfaces(self):
+        return self._get('/virtual-machine-interfaces')
+
+    def get_virtual_machine_interface_by_id(self, interface_id):
+        return self._get('/virtual-machine-interface/{0}'.format(interface_id))
+
+    def get_routing_instances(self):
+        return self._get('/routing-instances')
+
+    def get_routing_instances_by_id(self, routing_interface_id):
+        return self._get('/routing-instance/{0}'.format(routing_interface_id))
+
+    def get_virtual_networks(self):
+        return self._get('/virtual-networks')
+
+    def get_virtual_network_by_id(self, vnetwork_id):
+        return self._get('/virtual-network/{0}'.format(vnetwork_id))
+
+    def get_logical_interfaces(self):
+        return self._get('/logical-interfaces')
+
+    def get_logical_interface_by_id(self, interface_id):
+        return self._get('/logical-interface/{0}'.format(interface_id))
+

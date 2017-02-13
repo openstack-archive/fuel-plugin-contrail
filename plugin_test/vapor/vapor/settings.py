@@ -1,8 +1,18 @@
 # Project, contrail and OpenStack settings
 
 import os
-
+import sys
 import yaml
+import logbook
+
+LOG_FILENAME = './vapor.log'
+logger = logbook.Logger(__name__)
+logger.handlers.append(logbook.FileHandler(LOG_FILENAME,
+                                           level='DEBUG',
+                                           bubble=True))
+logger.handlers.append(logbook.StreamHandler(sys.stderr,
+                                             level='DEBUG',
+                                             bubble=True))
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -17,10 +27,11 @@ KEYSTONE_CREDS = {
 
 CONTRAIL_CREDS = {'controller_addr': '192.168.1.127'}
 
-CONTAIL_API_PORT = 8082
-CONTAIL_ANALYTICS_PORT = 8081
+CONTRAIL_ANALYTICS_PORT = 8081
 
-NEUTRON_CONTRAIL_PLUGIN_CONFIG_PATH = '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini'  # noqa
+NEUTRON_CONTRAIL_PLUGIN_CONFIG_PATH = (
+    '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini')
+
 CONTRAIL_CONFIG_PATH = '/etc/contrail/'
 
 # Time between poweroff and start contrail controller node
@@ -64,7 +75,9 @@ CONTRAIL_ROLES_SERVICES_MAPPING = {
         'contrail-control-nodemgr',
         'contrail-dns',
         'contrail-named',
+        'supervisor-config',
         'contrail-api',
+        'contrail-config-nodemgr',
         'contrail-device-manager',
         'contrail-discovery',
         'contrail-schema',
@@ -159,3 +172,4 @@ ZOOKEEPER_NODES = ["api-server",
                    "controller",
                    "schema-transformer",
                    "brokers"]
+
