@@ -67,14 +67,14 @@ class ResourceManager(object):
             security_group, stepler_config.SECURITY_GROUP_SSH_PING_RULES)
         return security_group
 
-    def _create_server(self, image, flavor, compute_hostname, network, ip,
+    def _create_server(self, image, flavor, nova_host, network, ip,
                        security_group):
         # Create server
         server_steps = self.get_server_steps()
         server = server_steps.create_servers(
             image=image,
             flavor=flavor,
-            availability_zone='nova:{}'.format(compute_hostname),
+            availability_zone='nova:{}'.format(nova_host),
             nics=[{
                 'net-id': network['id'],
                 'v4-fixed-ip': ip
@@ -92,7 +92,7 @@ class ResourceManager(object):
         self._add_fin(self.get_floating_ip_steps, 'delete', floating_ip)
         return floating_ip
 
-    def create(self, subnet_cidr, server_ip, image, flavor, compute_hostname):
+    def create(self, subnet_cidr, server_ip, image, flavor, nova_host):
         try:
             network = self._create_network()
             self._create_subnet(network, subnet_cidr)
@@ -100,7 +100,7 @@ class ResourceManager(object):
             server = self._create_server(
                 image=image,
                 flavor=flavor,
-                compute_hostname=compute_hostname,
+                nova_host=nova_host,
                 network=network,
                 ip=server_ip,
                 security_group=security_group)
@@ -139,7 +139,8 @@ def different_tenants_resources(
         project_2, credentials, create_user_with_project, cirros_image,
         sorted_hypervisors, get_network_steps, get_subnet_steps,
         get_server_steps, port_steps, get_floating_ip_steps, public_flavor,
-        public_network, get_security_group_steps):
+        public_network, get_security_group_steps,
+        nova_availability_zone_hosts):
     """Fixture to create network, subnet and server on each of 2 projects.
 
     Created subnets has same CIDR.
@@ -149,6 +150,11 @@ def different_tenants_resources(
         list: list of AttrDict with created resources
     """
     hypervisor = sorted_hypervisors[0]
+
+    host = next(
+        host for host in nova_availability_zone_hosts
+        if hypervisor.hypervisor_hostname.startswith(host))
+
     subnet_cidr = '10.0.0.0/24'
     base_name = next(utils.generate_ids())
 
@@ -162,16 +168,14 @@ def different_tenants_resources(
         projects_resources = []
 
         project_resources = mrg.create(subnet_cidr, '10.0.0.10', cirros_image,
-                                       public_flavor,
-                                       hypervisor.hypervisor_hostname)
+                                       public_flavor, host)
 
         projects_resources.append(project_resources)
 
         with credentials.change(project_2):
 
             project_resources = mrg.create(subnet_cidr, '10.0.0.20',
-                                           cirros_image, public_flavor,
-                                           hypervisor.hypervisor_hostname)
+                                           cirros_image, public_flavor, host)
 
             projects_resources.append(project_resources)
 
