@@ -275,6 +275,9 @@ class contrail {
 
   $aaa_mode = pick($settings['aaa_mode'], 'cloud-admin')
 
+  #Sandesh settings
+  $sandesh_send_rate_limit = pick($settings['sandesh_send_rate_limit', '100'])
+
   $analytics_config_audit_ttl = pick($settings['analytics_config_audit_ttl'], '2160')
   $analytics_statistics_ttl   = pick($settings['analytics_statistics_ttl'], '24')
   $analytics_flow_ttl         = pick($settings['analytics_flow_ttl'], '2')
