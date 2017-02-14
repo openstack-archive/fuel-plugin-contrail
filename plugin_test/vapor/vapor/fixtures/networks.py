@@ -37,18 +37,32 @@ def neutron_network_cleanup(network_steps):
 
 
 @pytest.fixture
-def contrail_network(contrail_api_client, contrail_current_project):
-    network_name, = utils.generate_ids()
-    net = types.VirtualNetwork(
-        network_name, parent_obj=contrail_current_project)
-    contrail_api_client.virtual_network_create(net)
+def create_contrail_network(contrail_api_client, contrail_current_project):
+    """Callable fixture to create contrail network."""
 
-    yield net
+    networks = []
 
-    try:
-        contrail_api_client.virtual_network_delete(id=net.uuid)
-    except exceptions.NoIdError:
-        pass
+    def _create_network(name=None, parent_obj=None, **kwargs):
+        if name is None:
+            name, = utils.generate_ids()
+        parent_obj = parent_obj or contrail_current_project
+        net = types.VirtualNetwork(name, parent_obj=contrail_current_project,
+                                   **kwargs)
+        contrail_api_client.virtual_network_create(net)
+        return net
+
+    yield _create_network
+
+    for net in reversed(networks):
+        try:
+            contrail_api_client.virtual_network_delete(id=net.uuid)
+        except exceptions.NoIdError:
+            pass
+
+
+@pytest.fixture
+def contrail_network(create_contrail_network):
+    return create_contrail_network()
 
 
 @pytest.fixture
