@@ -45,15 +45,16 @@ class contrail::control {
   package { 'contrail-openstack-control': }
 
   contrail_control_config {
-    'DEFAULT/hostip':    value => $contrail::address;
-    'DEFAULT/hostname':  value => $::fqdn;
-    'DEFAULT/log_file':  value => '/var/log/contrail/contrail-control.log';
-    'DEFAULT/log_level': value => 'SYS_NOTICE';
-    'DEFAULT/log_local': value => '1';
-    'DISCOVERY/server':  value => $contrail::contrail_private_vip;
-    'IFMAP/certs_store': value => ' ';
-    'IFMAP/password':    value => $contrail::address;
-    'IFMAP/user':        value => $contrail::address;
+    'DEFAULT/hostip':                  value => $contrail::address;
+    'DEFAULT/hostname':                value => $::fqdn;
+    'DEFAULT/log_file':                value => '/var/log/contrail/contrail-control.log';
+    'DEFAULT/log_level':               value => 'SYS_NOTICE';
+    'DEFAULT/log_local':               value => '1';
+    'DEFAULT/sandesh_send_rate_limit': value => $contrail::sandesh_send_rate_limit;
+    'DISCOVERY/server':                value => $contrail::contrail_private_vip;
+    'IFMAP/certs_store':               value => ' ';
+    'IFMAP/password':                  value => $contrail::address;
+    'IFMAP/user':                      value => $contrail::address;
   }
 
   contrail_dns_config {
