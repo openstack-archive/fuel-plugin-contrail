@@ -11,14 +11,12 @@
 # under the License.
 
 
-def get_nodes_interfaces(os_faults_steps):
-    """Returns dict with all nodes interfaces names."""
-    nodes = os_faults_steps.get_nodes()
+def get_nodes_interfaces(os_faults_steps, nodes=None):
+    """Return dict with all nodes interfaces names."""
+    nodes = nodes or os_faults_steps.get_nodes()
     results = os_faults_steps.execute_cmd(nodes, "ip -o a | awk '{print $2}'")
     ifaces = {}
     for node_result in results:
-        for node in nodes:
-            if node.ip == node_result.host:
-                break
+        node = next(node for node in nodes if node.ip == node_result.host)
         ifaces[node.fqdn] = set(node_result.payload['stdout_lines'])
     return ifaces
