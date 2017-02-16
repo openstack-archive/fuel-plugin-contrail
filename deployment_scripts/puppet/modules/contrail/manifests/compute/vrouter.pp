@@ -104,10 +104,14 @@ class contrail::compute::vrouter {
     }
   }
 
-  file { '/var/crashes':
-    ensure => directory,
-    mode   => '0777',
-  } ->
+  if !defined(File['/var/crashes']) {
+    file { '/var/crashes':
+      ensure  => directory,
+      mode    => '0777',
+      before  => Class['contrail::package'],
+    }
+  }
+
   class { 'contrail::package':
     install => [$install_packages],
     remove  => [$delete_packages],

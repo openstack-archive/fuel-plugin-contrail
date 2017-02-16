@@ -130,10 +130,6 @@ class contrail::database {
     group   => 'cassandra',
     require => Package['cassandra'],
   } ->
-  file { '/var/crashes':
-    ensure => directory,
-    mode   => '0777',
-  } ->
   file { '/etc/cassandra/cassandra.yaml':
     content => template('contrail/cassandra.yaml.erb'),
     owner   => 'cassandra',
@@ -146,6 +142,15 @@ class contrail::database {
   } ->
   file { '/etc/security/limits.d/cassandra.conf':
     content => template('contrail/cassandra_limits.conf.erb'),
+  }
+
+  if !defined(File['/var/crashes']) {
+    file { '/var/crashes':
+      ensure  => directory,
+      mode    => '0777',
+      require => File[$contrail::cassandra_path],
+      before  => File['/etc/cassandra/cassandra.yaml']
+    }
   }
 
 # Supervisor-database

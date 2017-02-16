@@ -74,10 +74,13 @@ class contrail::contrail_vmware {
       content => 'manual',
     }
 
-    file {'/var/crashes':
-      ensure => directory,
-      mode   => '1777',
-    } ->
+    if !defined(File['/var/crashes']) {
+      file {'/var/crashes':
+        ensure => directory,
+        mode   => '1777',
+        before => File_line['use_kdump'],
+      }
+    }
 
     file_line { 'use_kdump':
       path  => '/etc/default/kdump-tools',
