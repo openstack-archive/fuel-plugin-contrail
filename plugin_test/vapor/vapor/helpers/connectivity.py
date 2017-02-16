@@ -10,8 +10,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import contextlib
+import time
+
 from hamcrest import is_
 from stepler.third_party import ping
+from stepler.third_party import tcpdump
 from stepler.third_party import waiter
 
 CONNECTED = 'CONNECTED'
@@ -77,16 +81,65 @@ def check_icmp_connection_status(ip, remote, must_available=True, timeout=0):
     return waiter.wait(predicate, timeout_seconds=timeout)
 
 
-def start_port_listener(server_ssh, port, udp=False, answer=CONNECTED):
+def start_port_listener(server_ssh,
+                        port,
+                        udp=False,
+                        answer=CONNECTED,
+                        socat=False):
     """Start background netcat listener on remote server.
 
     Note:
-        Netcat call syntax is valid only for cirros.
+        Netcat call syntax is valid only for cirros. For ubuntu use socat.
     """
+    if socat:
+        if not server_ssh.execute('which socat').is_ok:
+            raise RuntimeError('socat is not installed on remote server')
+        proto = 'UDP4' if udp else 'TCP4'
+        cmd = "socat {proto}-LISTEN:{port},fork EXEC:'echo {answer}'".format(
+            proto=proto, port=port, answer=answer)
+    else:
+        proto = '-u' if udp else ''
+        listener_cmd = 'nc {proto} -l -p {port} -e echo "{answer}"'.format(
+            proto=proto, port=port, answer=answer)
+
+        cmd = "while true; do {}; done".format(listener_cmd)
+
+    server_ssh.background_call(cmd)
+
+
+@contextlib.contextmanager
+def calc_packets_count(os_faults_steps, nodes, iface, filters):
+    """CM to calc packages count on nodes' iface.
+
+    Returns dict: fqdn -> captured packets count.
+    """
+    tcpdump_base_path = os_faults_steps.start_tcpdump(
+        nodes, '-i {0} {1}'.format(iface, filters))
+    result = {node.fqdn: 0 for node in nodes}
+    yield result
+    os_faults_steps.stop_tcpdump(nodes, tcpdump_base_path)
+
+    for fqdn, pcap in os_faults_steps.download_tcpdump_results(
+            nodes, tcpdump_base_path).items():
+        packets = list(tcpdump.read_pcap(pcap))
+        result[fqdn] = len(packets)
+
+
+def start_iperf_pair(client_ssh, server_ssh, ip, port, udp=False, timeout=10):
+    """Start iperf client/server."""
+    if not server_ssh.execute('which iperf').is_ok:
+        raise RuntimeError('iperf is not installed on server')
+    if not client_ssh.execute('which iperf').is_ok:
+        raise RuntimeError('iperf is not installed on server')
+
     proto = '-u' if udp else ''
-    listener_cmd = 'nc {proto} -l -p {port} -e echo "{answer}"'.format(
-        proto=proto, port=port, answer=answer)
+    server_cmd = "iperf {proto} -s -p {port}"
+    client_cmd = "iperf {proto} -c {ip} -p {port} -t {time}"
 
-    loop_cmd = "while true; do {}; done".format(listener_cmd)
+    server_ssh.background_call(server_cmd.format(proto=proto, port=port))
 
-    server_ssh.background_call(loop_cmd)
+    if not udp:
+        time.sleep(10)
+
+    client_ssh.background_call(
+        client_cmd.format(proto=proto, ip=ip, port=port, time=timeout))
