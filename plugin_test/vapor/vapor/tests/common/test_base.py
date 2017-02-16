@@ -303,3 +303,45 @@ def test_file_transfer_with_scp(
                 actual_size = server2_ssh.check_call(
                     'stat -c %s {}'.format(path)).stdout
                 collector.check(actual_size, equal_to(str(size)))
+
+
+def test_vm_multi_intf_in_same_vn_chk_ping(network,
+                                           subnet,
+                                           cirros_image,
+                                           flavor,
+                                           security_group,
+                                           server_steps,
+                                           port_steps,
+                                           create_floating_ip,
+                                           public_network):
+    """Test to validate that a multiple interfaces of the same VM can be
+    associated to the same VN and ping is successful.
+    """
+    userdata = (
+        u'#!/bin/sh\n'
+        u"/sbin/ifconfig -a\n"
+        u"/sbin/cirros-dhcpc up eth1\n")
+
+    server = server_steps.create_servers(
+        userdata=userdata,
+        image=cirros_image,
+        flavor=flavor,
+        security_groups=[security_group],
+        networks=[network, network],
+        username=stepler_config.CIRROS_USERNAME,
+        password=stepler_config.CIRROS_PASSWORD)[0]
+
+    server_ports = port_steps.get_ports(
+        device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
+        device_id=server.id)
+
+    server_port = server_ports[0]
+    floating_ip = create_floating_ip(public_network, port=server_port)
+    server_steps.check_server_ip(server,
+                                 floating_ip['floating_ip_address'],
+                                 timeout=settings.FLOATING_IP_BIND_TIMEOUT)
+
+    server_steps.check_ping_between_servers_via_floating(
+        [server, server],
+        ip_types=(stepler_config.FIXED_IP,))
+
