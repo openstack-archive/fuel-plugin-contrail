@@ -13,7 +13,7 @@
 import sys
 
 from hamcrest import (assert_that, calling, raises, contains_string, has_item,
-                      has_entry, is_not, empty)  # noqa H301
+                      has_entry, is_not, empty, equal_to)  # noqa H301
 from neutronclient.common import exceptions as neutron_exceptions
 from stepler import config as stepler_config
 from stepler.third_party import utils
@@ -21,6 +21,7 @@ from pycontrail import exceptions
 import pycontrail.types as contrail_types
 import pytest
 
+from vapor.helpers import asserts
 from vapor.helpers import contrail_status
 from vapor import settings
 
@@ -224,3 +225,81 @@ def test_create_server_on_exhausted_subnet(cirros_image, flavor, network,
     assert_that(
         calling(server_steps.create_servers).with_args(**create_server_args),
         raises(AssertionError, 'No valid host was found'))
+
+
+def test_file_transfer_with_scp(
+        ubuntu_image, keypair, flavor, create_floating_ip, public_network,
+        network, subnet, security_group, server_steps, port_steps):
+    """Validate File Transfer using scp between VMs.
+
+    Steps:
+        #. Create network
+        #. Create 2 servers
+        #. Create file on server1
+        #. Transfer file to server2 with scp
+        #. Verify transfered file size
+        #. Repeat transfer for next file sizes:
+            1000,1101,1202,1303,1373, 1374,2210, 2845, 3000, 10000, 10000003
+    """
+    sizes = [
+        1000, 1101, 1202, 1303, 1373, 1374, 2210, 2845, 3000, 10000, 10000003
+    ]
+    username = stepler_config.UBUNTU_USERNAME
+    path = '/home/{}/file'.format(username)
+    key_content = keypair.private_key
+    key_path = '/home/{}/key'.format(username)
+    userdata = '\n'.join([
+        "#!/bin/bash -v",
+        "echo '{content}' > {path}",
+        "chown {user} {path}",
+        "chmod 600 {path}",
+    ]).format(
+        content=key_content, path=key_path, user=username)
+
+    ssh_opts = ('-o UserKnownHostsFile=/dev/null '
+                '-o StrictHostKeyChecking=no')
+
+    # Boot servers
+    servers = server_steps.create_servers(
+        count=2,
+        image=ubuntu_image,
+        flavor=flavor,
+        networks=[network],
+        security_groups=[security_group],
+        keypair=keypair,
+        userdata=userdata,
+        username=username)
+
+    # Assign floating ips
+    floating_ips = []
+    for server in servers:
+        port = port_steps.get_port(
+            device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
+            device_id=server.id)
+        floating_ip = create_floating_ip(public_network, port=port)
+        floating_ips.append(floating_ip)
+
+    ip = server_steps.get_fixed_ip(servers[1])
+    with asserts.AssertsCollector() as collector:
+        for size in sizes:
+            # Transfer file
+            with server_steps.get_server_ssh(
+                    servers[0],
+                    floating_ips[0]['floating_ip_address']) as server1_ssh:
+                server1_ssh.check_call(
+                    'fallocate -l {size} {path}'.format(size=size, path=path))
+                server1_ssh.check_call(
+                    'scp -i {key} {ssh_opts} {path} {user}@{ip}:{path}'.format(
+                        key=key_path,
+                        path=path,
+                        user=username,
+                        ip=ip,
+                        ssh_opts=ssh_opts))
+
+            # Check file size
+            with server_steps.get_server_ssh(
+                    servers[1],
+                    floating_ips[1]['floating_ip_address']) as server2_ssh:
+                actual_size = server2_ssh.check_call(
+                    'stat -c %s {}'.format(path)).stdout
+                collector.check(actual_size, equal_to(str(size)))
