@@ -40,23 +40,23 @@ proceed to step 4.
 
    .. code-block:: console
 
-      scp contrail-5.0-5.0.0-1.noarch.rpm <Fuel Master node ip>:/tmp/
+      scp contrail-5.0-5.1.0-1.noarch.rpm <Fuel Master node ip>:/tmp/
 
 #. Log in to the Fuel Master node and upgrade the plugin:
 
    .. code-block:: console
 
       ssh <the Fuel Master node ip>
-      fuel plugins --update /tmp/contrail-5.0-5.0.0-1.noarch.rpm
+      fuel plugins --update /tmp/contrail-5.0-5.1.0-1.noarch.rpm
 
 #. Copy the latest Juniper Contrail installation package to the Fuel Master node and run the installation
    script to unpack the vendor package and populate the plugin repository with up-to-date packages:
 
    .. code-block:: console
 
-      scp contrail-install-packages_3.1.0.0-25~Ubuntu-14.04.4-mitaka_all.deb \
-          <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-5.0/
-      ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-5.0/install.sh
+      scp contrail-install-packages_3.2.0.0-19~mitaka_all.deb \
+          <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-5.1/
+      ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-5.1/install.sh
 
 .. raw:: latex
 
@@ -78,7 +78,7 @@ starts. The Neutron service will be restarted in case if contrail core plugin wi
    .. code-block:: console
 
       ssh <the Fuel Master node ip>
-      cd /var/www/nailgun/plugins/contrail-5.0/
+      cd /var/www/nailgun/plugins/contrail-5.1/
 
 #. Check ID of contrail plugin:
 
@@ -164,3 +164,4 @@ during the vRouter upgrade, this can take up to 5 min.
 
 #. Log in to compute nodes and verify output of the ``contrail-status`` command.
    You can verify the version of the vRouter package by running ``contrail-version`` command.
+

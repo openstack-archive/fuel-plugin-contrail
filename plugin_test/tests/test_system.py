@@ -58,7 +58,7 @@ class SystemTests(TestBasic):
     Contrail API without gaps in dataflow.
     """
 
-    pack_copy_path = '/var/www/nailgun/plugins/contrail-5.0'
+    pack_copy_path = '/var/www/nailgun/plugins/contrail-5.1'
     add_package = \
         '/var/www/nailgun/plugins/contrail-5.0/' \
         'repositories/ubuntu/contrail-setup*'
