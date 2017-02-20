@@ -26,7 +26,7 @@
 
 set -ex
 
-PLUGIN_PATH="/var/www/nailgun/plugins/contrail-5.0"
+PLUGIN_PATH="/var/www/nailgun/plugins/contrail-5.1"
 #Now uses the latest package file
 UBUNTU_PKG=$(find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.deb' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4)
 CENTOS_PKG=$(find $PLUGIN_PATH -maxdepth 1 -name 'contrail-install-packages*.rpm' -exec stat -c "%y %n" {} + | sort -r | head -n 1 | cut -d' ' -f 4)
