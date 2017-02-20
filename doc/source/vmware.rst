@@ -52,7 +52,7 @@ To install environment with Contrail and VMWware support you should proceed with
 
     ::
 
-      [root@nailgun ~]# cd /var/www/nailgun/plugins/contrail-5.0/deployment_scripts/
+      [root@nailgun ~]# cd /var/www/nailgun/plugins/contrail-5.1/deployment_scripts/
       [root@nailgun deployment_scripts]# ./spawner.py --env_id 1 --spawn
 
 #. Wait a few minutes when ContrailVM's node will be arrived
@@ -150,7 +150,7 @@ Add and delete ESXi hosts
 
     ::
 
-      [root@nailgun ~]# cd /var/www/nailgun/plugins/contrail-5.0/deployment_scripts/
+      [root@nailgun ~]# cd /var/www/nailgun/plugins/contrail-5.1/deployment_scripts/
       [root@nailgun deployment_scripts]# ./spawner.py --env_id 1 --spawn
 
 #. Wait a few minutes when ContrailVM's node will be arrived

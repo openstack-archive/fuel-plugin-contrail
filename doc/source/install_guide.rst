@@ -18,13 +18,13 @@ To install the Contrail plugin:
 #.  Copy the rpm package downloaded at the previous step to the Fuel Master node and install the plugin
     ::
 
-        scp contrail-5.0-5.0.1-1.noarch.rpm  <Fuel Master node ip>:/tmp/
+        scp contrail-5.1-5.1.0-1.noarch.rpm  <Fuel Master node ip>:/tmp/
 
 #.  Log into the Fuel Master node and install the plugin
     ::
 
         ssh <the Fuel Master node ip>
-        fuel plugins --install contrail-5.0-5.0.1-1.noarch.rpm
+        fuel plugins --install contrail-5.1-5.1.0-1.noarch.rpm
 
     You should get the following output
     ::
@@ -42,15 +42,15 @@ To install the Contrail plugin:
 
     ::
 
-        scp contrail-install-packages_3.0.2.1-4~liberty_all.deb \
-        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-5.0/
-        ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-5.0/install.sh
+        scp contrail-install-packages_3.2.0.0-19~mitaka_all.deb \
+        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-5.1/
+        ssh <Fuel Master node ip> /var/www/nailgun/plugins/contrail-5.1/install.sh
 
 #.  In case if vmware integration expected, before running *install.sh* copy vcenter plugin package to contrail plugin folder
     ::
 
-        scp contrail-install-vcenter-plugin_3.0.0.0-2723_all.deb \
-        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-3.0/
+        scp contrail-install-vcenter-plugin_3.2.0.0-19_all.deb \
+        <Fuel Master node ip>:/var/www/nailgun/plugins/contrail-5.1/
 
 .. raw:: latex
 
