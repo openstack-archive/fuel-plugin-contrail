@@ -9,7 +9,7 @@ export OS_AUTH_URL=http://127.0.0.1:5000/v3
 export OS_FAULTS_CLOUD_DRIVER=tcpcloud
 export OS_FAULTS_CLOUD_DRIVER_ADDRESS=192.168.10.100
 export OS_FAULTS_CLOUD_DRIVER_KEYFILE=/home/jenkins/cloud.key
-export CLOUD_DRIVER_USERNAME=root
+export OS_FAULTS_CLOUD_DRIVER_USERNAME=root
 
 export CONTRAIL_ROLES_DISTRIBUTION_YAML=roles_distribution_example.yaml
 
