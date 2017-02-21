@@ -1,0 +1,5 @@
+.git/*
+.tox/*
+doc/*
+**/*.pyc
+**/__pycache__
