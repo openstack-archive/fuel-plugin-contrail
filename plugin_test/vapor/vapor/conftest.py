@@ -21,7 +21,5 @@ from vapor.fixtures.subnets import *  # noqa
 from vapor.fixtures.system_services import * # noqa
 
 pytest_plugins = [
-    'stepler.third_party.destructive_dispatcher',
-    'stepler.third_party.idempotent_id',
     'vapor.plugins.xfail',
 ]
