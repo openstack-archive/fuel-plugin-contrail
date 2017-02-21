@@ -10,15 +10,26 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import time
+
 import attrdict
-from hamcrest import assert_that, equal_to  # noqa: H301
+from hamcrest import assert_that, equal_to, greater_than  # noqa: H301
+from pycontrail import types
 import pytest
 from stepler import config as stepler_config
 from stepler.third_party import utils
 
-from vapor.helpers import connectivity
-from vapor.helpers import policy
 from vapor import settings
+from vapor.helpers import connectivity, policy, nodes_steps
+
+try:
+    import contextlib2 as contextlib
+except ImportError:
+    import contextlib
+
+
+TCP_PORT = 7000
+UDP_PORT = 7001
 
 
 @pytest.fixture
@@ -212,8 +223,6 @@ def test_security_group_without_rules(connectivity_test_resources,
         #. Add egress ICMP rule to client's security group
         #. Check that there are success pings from client to server
     """
-    TCP_PORT = 7000
-    UDP_PORT = 7001
 
     client, server = connectivity_test_resources.servers
     client_sg, server_sg = connectivity_test_resources.security_groups
@@ -293,3 +302,152 @@ def test_security_group_rules_uuid_in_contrail_and_neutron(contrail_api_client,
         for rule in group.security_group_entries.policy_rule:
             contrail_rules_uuids.add(rule.rule_uuid)
     assert_that(contrail_rules_uuids, equal_to(neutron_rules_uuids))
+
+
+@pytest.mark.parametrize(
+    'contrail_2_servers_different_networks', [dict(ubuntu=True)],
+    indirect=True,
+    ids=['ubuntu'])
+def test_add_remove_security_group_with_active_flow(
+        contrail_2_servers_diff_nets_with_floating,
+        security_group,
+        contrail_api_client,
+        contrail_network_policy,
+        set_network_policy,
+        os_faults_steps,
+        port_steps,
+        server_steps, ):
+    """Add/remove SG from VM when flow is active and traffic from both ends.
+
+    Steps:
+        #. Create GS with allow all rules
+        #. Create 2 networks
+        #. Create 2 servers on different computes with created security group
+        #. Generate iperf workload with TCP from server1 to server2
+        #. Generate iperf workload with UDP from server2 to server1
+        #. Check that TCP and UDP incoming traffics are present on both server1
+            and server2
+        #. Remove security group from server1
+        #. Check that TCP and UDP incoming traffics are not present on both
+            server1 and server2
+        #. Add security group to server1
+        #. Check that TCP and UDP incoming traffics are present on both server1
+           and server2
+    """
+    # Update policy
+    contrail_network_policy.network_policy_entries = (
+        policy.ALLOW_ALL_POLICY_ENTRY)
+    contrail_api_client.network_policy_update(contrail_network_policy)
+
+    # Add policy to networks
+    for network in contrail_2_servers_diff_nets_with_floating.networks:
+        network = contrail_api_client.virtual_network_read(id=network['id'])
+        set_network_policy(network, contrail_network_policy)
+
+    # Add rule to group
+    contrail_sg = contrail_api_client.security_group_read(id=security_group.id)
+    sg_entries = contrail_sg.security_group_entries
+    rules = [
+        types.PolicyRuleType(
+            direction='>',
+            protocol='any',
+            action_list=types.ActionListType(simple_action='pass'),
+            src_addresses=[
+                types.AddressType(security_group=contrail_sg.get_fq_name_str())
+            ],
+            src_ports=[types.PortType()],
+            dst_addresses=[types.AddressType(security_group='local')],
+            dst_ports=[types.PortType()], ),
+    ]
+    sg_entries.policy_rule.extend(rules)
+    contrail_sg.security_group_entries = sg_entries
+    contrail_api_client.security_group_update(contrail_sg)
+    server1, server2 = contrail_2_servers_diff_nets_with_floating.servers
+
+    # Get ips, nodes, interfaces information
+    ips = []
+    computes = []
+    ifaces = []
+    for server in server1, server2:
+        port = port_steps.get_port(
+            device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
+            device_id=server.id)
+
+        ips += [server_steps.get_fixed_ip(server)]
+
+        node_name = getattr(server, settings.SERVER_ATTR_HYPERVISOR_HOSTNAME)
+        node = os_faults_steps.get_node(fqdns=[node_name])
+        computes.append(node)
+
+        expected_name = 'tap{}'.format(port['id'])
+        interfaces = nodes_steps.get_nodes_interfaces(os_faults_steps,
+                                                      node)[node_name]
+        iface = next(x for x in interfaces if expected_name.startswith(x))
+        ifaces.append(iface)
+
+        # install iperf
+        with server_steps.get_server_ssh(server) as server_ssh:
+            with server_ssh.sudo():
+                server_ssh.check_call('apt-get install iperf -q -y')
+
+    ip1, ip2 = ips
+
+    udp_filter = "'(udp and src host {} and dst host {})'".format(ip1, ip2)
+    tcp_filter = "'(tcp and src host {} and dst host {})'".format(ip2, ip1)
+
+    with contextlib.ExitStack() as stack:
+        enter = stack.enter_context
+        server1_ssh = enter(server_steps.get_server_ssh(server1))
+        server2_ssh = enter(server_steps.get_server_ssh(server2))
+
+        # Start TCP and UDP traffic
+        connectivity.start_iperf_pair(
+            client_ssh=server1_ssh,
+            server_ssh=server2_ssh,
+            ip=ip2,
+            port=UDP_PORT,
+            udp=True,
+            timeout=60 * 1000)
+        connectivity.start_iperf_pair(
+            client_ssh=server2_ssh,
+            server_ssh=server1_ssh,
+            ip=ip1,
+            port=TCP_PORT,
+            timeout=60 * 1000)
+
+        # Check that some packets are captured
+        with connectivity.calc_packets_count(os_faults_steps, computes[0],
+                                             ifaces[0],
+                                             tcp_filter) as tcp_counts:
+            with connectivity.calc_packets_count(os_faults_steps, computes[1],
+                                                 ifaces[1],
+                                                 udp_filter) as udp_counts:
+                time.sleep(1)
+        assert_that(next(iter(tcp_counts.values())), greater_than(0))
+        assert_that(next(iter(udp_counts.values())), greater_than(0))
+
+        # Remove security group from server1
+        server1.remove_security_group(security_group.id)
+
+        with connectivity.calc_packets_count(os_faults_steps, computes[0],
+                                             ifaces[0],
+                                             tcp_filter) as tcp_counts:
+            with connectivity.calc_packets_count(os_faults_steps, computes[1],
+                                                 ifaces[1],
+                                                 udp_filter) as udp_counts:
+                time.sleep(1)
+        assert_that(next(iter(tcp_counts.values())), equal_to(0))
+        assert_that(next(iter(udp_counts.values())), equal_to(0))
+
+        # Add security group from server1
+        server1.add_security_group(security_group.id)
+
+        with connectivity.calc_packets_count(os_faults_steps, computes[0],
+                                             ifaces[0],
+                                             tcp_filter) as tcp_counts:
+            with connectivity.calc_packets_count(os_faults_steps, computes[1],
+                                                 ifaces[1],
+                                                 udp_filter) as udp_counts:
+                time.sleep(1)
+        assert_that(next(iter(tcp_counts.values())), greater_than(0))
+        assert_that(next(iter(udp_counts.values())), greater_than(0))

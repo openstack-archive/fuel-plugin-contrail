@@ -39,12 +39,10 @@ def contrail_2_networks(create_network, create_subnet):
 @pytest.fixture
 def contrail_2_servers_different_networks(
         request,
-        cirros_image,
         flavor,
         security_group,
         sorted_hypervisors,
         contrail_2_networks,
-        hypervisor_steps,
         server_steps):
     """Function fixture to prepare environment with 2 servers.
 
@@ -53,31 +51,49 @@ def contrail_2_servers_different_networks(
 
     All created resources are to be deleted after test.
 
-    Can be parametrized with 'same_host'.
+    Can be parametrized with dict.
 
     Example:
-        @pytest.mark.parametrize('neutron_2_servers_different_networks',
-                                 ['same_host'],
+        @pytest.mark.parametrize('contrail_2_servers_different_networks',
+                                 [dict(same_host=True)],
                                  indirect=True)
-        def test_foo(neutron_2_servers_different_networks):
+        def test_foo(contrail_2_servers_different_networks):
             # Instances will be created on the same compute
     """
-
+    params = dict(
+        same_host=False,
+        ubuntu=False
+    )
     hypervisors = sorted_hypervisors[:2]
-    if getattr(request, 'param', None) == 'same_host':
+    new_params = getattr(request, 'param', {})
+    params.update(new_params)
+
+    if params['same_host']:
         hypervisors[1] = hypervisors[0]
+
+    if params['ubuntu']:
+        image = request.getfixturevalue('ubuntu_image')
+        keypair = request.getfixturevalue('keypair')
+        username = stepler_config.UBUNTU_USERNAME
+        password = None
+    else:
+        image = request.getfixturevalue('cirros_image')
+        keypair = None
+        username = stepler_config.CIRROS_USERNAME
+        password = stepler_config.CIRROS_PASSWORD
 
     servers = []
 
     for hypervisor, network in zip(hypervisors, contrail_2_networks.networks):
         server = server_steps.create_servers(
-            image=cirros_image,
+            image=image,
             flavor=flavor,
             networks=[network],
+            keypair=keypair,
             availability_zone='nova:{}'.format(hypervisor.service['host']),
             security_groups=[security_group],
-            username=stepler_config.CIRROS_USERNAME,
-            password=stepler_config.CIRROS_PASSWORD,
+            username=username,
+            password=password,
             check=False)[0]
         servers.append(server)
 
