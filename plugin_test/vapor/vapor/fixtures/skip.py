@@ -14,6 +14,7 @@ import pytest
 import six
 from stepler.fixtures import skip
 
+from vapor.helpers import sriov
 from vapor import settings
 
 
@@ -31,6 +32,14 @@ class Predicates(skip.Predicates):
         actual_nodes = os_faults_steps.get_nodes_by_cmd(
             settings.VROUTER_HEADLESS_MODE_CMD)
         return set(actual_nodes.get_fqdns()) == set(fqdns)
+
+    @property
+    @_store_call
+    def sriov_enabled(self):
+        """Define whether sriov enabled."""
+        agent_steps = self._get_fixture('agent_steps')
+        sriov_device_mappings = sriov.get_sriov_device_mapping(agent_steps)
+        return len(sriov_device_mappings) > 0
 
 
 @pytest.fixture
