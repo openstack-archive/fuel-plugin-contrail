@@ -104,7 +104,7 @@ class ContrailAnalyticsClient(base.ContrailBaseClient):
                    where=None,
                    limit=1,
                    async=False):
-        """Post a query to analitycs.
+        """Post a query to analytics.
 
         Example:
             client.post_query(
