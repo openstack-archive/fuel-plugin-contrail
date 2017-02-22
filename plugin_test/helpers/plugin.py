@@ -30,8 +30,8 @@ BOND_CONFIG = [
         'mode': 'balance-rr',
         'name': 'lnx-bond0',
         'slaves': [
-            {'name': 'enp0s6'},
-            {'name': 'enp0s7'},
+            {'name': 'ens6'},
+            {'name': 'ens7'},
         ],
         'state': None,
         'type': 'bond',
@@ -40,9 +40,9 @@ BOND_CONFIG = [
 ]
 
 INTERFACES = {
-    'enp0s3': ['fuelweb_admin', 'storage'],
-    'enp0s4': ['public'],
-    'enp0s5': ['management'],
+    'ens3': ['fuelweb_admin', 'storage'],
+    'ens4': ['public'],
+    'ens5': ['management'],
     'lnx-bond0': ['private']
 }
 
