@@ -283,16 +283,17 @@ class IntegrationTests(TestBasic):
         self.show_step(2)
         plugin.activate_plugin(self)
 
+        target_interface = 'ens6'
         interfaces = {
-            'enp0s3': ['fuelweb_admin'],
-            'enp0s4': ['public'],
-            'enp0s5': ['management'],
-            'enp0s6': ['private'],
-            'enp0s7': ['storage'],
+            'ens3': ['fuelweb_admin'],
+            'ens4': ['public'],
+            'ens5': ['management'],
+            'ens6': ['private'],
+            'ens7': ['storage'],
         }
 
         interfaces_update = [{
-            'name': 'enp0s6',
+            'name': target_interface,
             'interface_properties': {
                 'mtu': 9000,
                 'disable_offloading': False
@@ -335,10 +336,10 @@ class IntegrationTests(TestBasic):
             node = self.fuel_web.get_nailgun_node_by_name(node_name)
             with self.env.d_env.get_ssh_to_remote(node['ip']) as remote:
                 asserts.assert_true(
-                    jumbo.check_node_iface_mtu(remote, "enp0s6", 9000),
+                    jumbo.check_node_iface_mtu(remote, target_interface, 9000),
                     "MTU on {0} is not 9000. Actual value: {1}"
                     .format(remote.host,
-                            jumbo.get_node_iface(remote, "enp0s6")))
+                            jumbo.get_node_iface(remote, target_interface)))
 
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_bonding", "contrail_integration_tests"])
