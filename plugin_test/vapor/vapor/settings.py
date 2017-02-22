@@ -53,6 +53,9 @@ CONTRAIL_AGENT_CLEANUP_TIMEOUT = 20 * 60
 # Time to wait for contrail agent vna vm list to contain server uuid
 CONTRAIL_AGENT_VNA_VM_LIST_TIMEOUT = 3 * 60
 
+# Time to wait for contrail to be operable after reset node
+CONTRAIL_NODE_RESET_TIMEOUT = 5 * 60
+
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
