@@ -75,37 +75,57 @@ class BaseSequencesMatcher(BaseMatcher):
         return not self._get_wrong_items(item)
 
 
-class IsSubsetOf(BaseSequencesMatcher):
+class SubsetOf(BaseSequencesMatcher):
 
-    def _get_wrong_items(self, item):
-        return self._get_extra_items(item, self.sequence)
+    def _get_wrong_items(self, other):
+        return self._get_extra_items(other, self.sequence)
 
     def describe_to(self, description):
         description.append_text('a subset of ').append_text(self.sequence)
 
     def describe_mismatch(self, item, mismatch_description):
-        super(IsSubsetOf, self).describe_mismatch(item, mismatch_description)
+        super(SubsetOf, self).describe_mismatch(item, mismatch_description)
         mismatch_description.append_text(' with unexpected items ') \
             .append_description_of(self._get_wrong_items(item))
 
 
-class IsSupersetOf(BaseSequencesMatcher):
+class SupersetOf(BaseSequencesMatcher):
 
-    def _get_wrong_items(self, item):
-        return self._get_extra_items(self.sequence, item)
+    def _get_wrong_items(self, other):
+        return self._get_extra_items(self.sequence, other)
 
     def describe_to(self, description):
         description.append_text('a superset of ').append_text(self.sequence)
 
     def describe_mismatch(self, item, mismatch_description):
-        super(IsSupersetOf, self).describe_mismatch(item, mismatch_description)
+        super(SupersetOf, self).describe_mismatch(item, mismatch_description)
         mismatch_description.append_text(' without expected items ') \
             .append_description_of(self._get_wrong_items(item))
 
 
-def is_subset_of(sequence):
-    return IsSubsetOf(sequence)
+class IntersectsWith(BaseSequencesMatcher):
+
+    def _matches(self, other):
+        for item in self.sequence:
+            if item in other:
+                return True
+        return False
+
+    def describe_to(self, description):
+        description.append_text(
+            'a sequence which intersect with ').append_text(self.sequence)
 
 
-def is_superset_of(sequence):
-    return IsSupersetOf(sequence)
+def subset_of(other):
+    """Matches if sequence is subset of `other`."""
+    return SubsetOf(other)
+
+
+def superset_of(other):
+    """Matches if sequence is superset of `other`."""
+    return SupersetOf(other)
+
+
+def intersects_with(other):
+    """Matches if sequence has intersections with `other`."""
+    return IntersectsWith(other)
