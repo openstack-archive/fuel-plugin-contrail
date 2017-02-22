@@ -16,6 +16,7 @@ import jmespath
 import pycontrail.types as types
 import pytest
 from stepler.third_party import utils
+from stepler.third_party import waiter
 
 from vapor.helpers import contrail_status
 from vapor.helpers import asserts
@@ -175,3 +176,31 @@ def test_contrail_alarms_is_empty(client_contrail_analytics):
 def test_zookeeper_status(znodes_list):
     expected_znodes_list = settings.ZOOKEEPER_NODES
     assert_that(znodes_list, contains_inanyorder(*expected_znodes_list))
+
+
+@pytest.mark.requires('contrail_control_nodes_count >= 2')
+def test_contrail_services_status_after_restart_master_node(os_faults_steps):
+    """Verify contrail services status after master node restart.
+
+    Steps:
+        #. Restart node with contrail-schema (active)
+        #. Wait some time
+        #. Check that contrail services statuses is correct
+    """
+    services_statuses = contrail_status.get_services_statuses(os_faults_steps)
+    master_node_fqdn = None
+    for fqdn, services in services_statuses.items():
+        for service in services:
+            if (service['name'] == 'contrail-schema' and
+                    service['status'] == contrail_status.STATUS_ACTIVE):
+                master_node_fqdn = fqdn
+                break
+    assert master_node_fqdn is not None, "Can't find master node"
+    master_node = os_faults_steps.get_node(fqdns=[master_node_fqdn])
+    os_faults_steps.reset_nodes(master_node)
+
+    waiter.wait(
+        contrail_status.check_services_statuses,
+        args=(os_faults_steps),
+        expected_exceptions=AssertionError,
+        timeout=settings.CONTRAIL_NODE_RESET_TIMEOUT)
