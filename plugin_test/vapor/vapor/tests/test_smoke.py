@@ -19,7 +19,7 @@ from stepler.third_party import utils
 
 from vapor.helpers import contrail_status
 from vapor.helpers import asserts
-from vapor.helpers.asserts import is_superset_of
+from vapor.helpers.asserts import superset_of
 from vapor import settings
 
 
@@ -38,7 +38,7 @@ def test_contrail_service_distribution(os_faults_steps, role):
             if node not in nodes:
                 continue
             services = [x.service for x in services]
-            collector.check(services, is_superset_of(expected_services))
+            collector.check(services, superset_of(expected_services))
 
 
 def test_ifmap_service(os_faults_steps):

@@ -15,6 +15,8 @@ import pytest
 from stepler import config as stepler_config
 
 from vapor import settings
+from vapor.helpers.asserts import intersects_with
+from vapor.helpers import analytic_steps
 
 pytestmark = pytest.mark.destructive
 
@@ -139,3 +141,92 @@ def test_connectivity_after_contrail_services_restart(
     # Verify network creation
     network = request.getfixturevalue('contrail_network')
     assert_that(network.uuid, is_not(None))
+
+
+def test_agent_cleanup_with_control_node_stop(
+        session, nodes_ips, contrail_services_http_introspect_ports,
+        cirros_image, flavor, security_group, network, subnet, public_network,
+        create_floating_ip, stop_service, port_steps, server_steps,
+        os_faults_steps):
+    """Stop all the control node and verify the cleanup process in agent.
+
+    Steps:
+        #. Create network, subnet
+        #. Create 2 servers
+        #. Add floating IP addresses to servers
+        #. Check ping to servers' floating ips
+        #. Get servers' ids from contrail_vrouter_agent
+        #. Get contrail control nodes connected to this contrail_vrouter_agent
+        #. Stop `contrail-control` service on found nodes
+        #. Check that servers' ids list from contrail_vrouter_agent is not
+            contain servers ids after some time
+        #. Start `contrail-control` service on found nodes
+        #. Check that servers' ids list from contrail_vrouter_agent is contain
+            servers ids after some time
+        #. Check ping to servers' floating ips
+    """
+    # Create servers
+    servers = server_steps.create_servers(
+        count=2,
+        image=cirros_image,
+        flavor=flavor,
+        security_groups=[security_group],
+        networks=[network],
+        username=stepler_config.CIRROS_USERNAME,
+        password=stepler_config.CIRROS_PASSWORD)
+
+    # Create Floating IP
+    for server in servers:
+        server_port = port_steps.get_port(
+            device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
+            device_id=server.id)
+
+        floating_ip = create_floating_ip(public_network, port=server_port)
+        server_steps.check_server_ip(
+            server,
+            floating_ip['floating_ip_address'],
+            timeout=settings.FLOATING_IP_BIND_TIMEOUT)
+
+    for server in servers:
+        server_steps.check_ping_to_server_floating(
+            server, timeout=stepler_config.PING_CALL_TIMEOUT)
+
+    servers_ids = [s.id for s in servers]
+    compute_fqdn = getattr(servers[0],
+                           settings.SERVER_ATTR_HYPERVISOR_HOSTNAME)
+    agent_ip = nodes_ips[compute_fqdn][0]
+    agent_port = contrail_services_http_introspect_ports[
+        'contrail-vrouter-agent']['port']
+
+    analytic_steps.wait_vna_vm_list(
+        session, agent_ip, agent_port,
+        intersects_with(servers_ids),
+        settings.CONTRAIL_AGENT_VNA_VM_LIST_TIMEOUT)
+
+    # Collecting control nodes
+    controllers_fqdns = []
+    for entry in analytic_steps.get_vna_xmpp_connection_status(
+            session, agent_ip, agent_port):
+        ip = entry['controller_ip']
+        fqdn = next(fqnd for fqnd, ips in nodes_ips.items() if ip in ips)
+        controllers_fqdns.append(fqdn)
+    controller_nodes = os_faults_steps.get_nodes(fqdns=controllers_fqdns)
+
+    # Stop contrail-control service
+    stop_service(controller_nodes, 'contrail-control')
+
+    analytic_steps.wait_vna_vm_list(session, agent_ip, agent_port,
+                                    is_not(intersects_with(servers_ids)),
+                                    settings.CONTRAIL_AGENT_CLEANUP_TIMEOUT)
+
+    os_faults_steps.execute_cmd(controller_nodes,
+                                'service contrail-control start')
+
+    analytic_steps.wait_vna_vm_list(
+        session, agent_ip, agent_port,
+        intersects_with(servers_ids),
+        settings.CONTRAIL_AGENT_VNA_VM_LIST_TIMEOUT)
+
+    for server in servers:
+        server_steps.check_ping_to_server_floating(
+            server, timeout=stepler_config.PING_CALL_TIMEOUT)

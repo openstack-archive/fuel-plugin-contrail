@@ -47,6 +47,12 @@ PING_SUCCESS_TIMEOUT = 60 * 2
 # Security group apply timeout
 SECURITY_GROUP_APPLY_TIMEOUT = 20
 
+# Time to wait for contrail agent cleanup after stopping control node
+CONTRAIL_AGENT_CLEANUP_TIMEOUT = 20 * 60
+
+# Time to wait for contrail agent vna vm list to contain server uuid
+CONTRAIL_AGENT_VNA_VM_LIST_TIMEOUT = 3 * 60
+
 ROLE_CONTRAIL_CONTROLLER = 'contrail-controller'
 ROLE_CONTRAIL_ANALYTICS = 'contrail-analytics'
 ROLE_CONTRAIL_DB = 'contrail-db'
