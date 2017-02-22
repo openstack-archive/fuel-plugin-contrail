@@ -22,6 +22,7 @@ class contrail::analytics {
     mode    => '0644',
     owner   => 'contrail',
     group   => 'contrail',
+    require => Package['contrail-analytics'],
   }
 
   if !defined(File['/var/crashes']) {
