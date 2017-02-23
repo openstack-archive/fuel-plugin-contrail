@@ -254,6 +254,14 @@ class contrail {
   $kafka_broker_list          = inline_template("<%= scope.lookupvar('contrail::analytics_db_ips').map{ |ip| \"#{ip}:9092\" }.join(' ') %>")
   $zk_server_ip               = inline_template("<%= scope.lookupvar('contrail::contrail_db_ips').map{ |ip| \"#{ip}:2181\" }.join(',') %>")
 
+  $zk_ticktime                = pick($settings['zk_ticktime'], 2000)
+  $zk_initlimit               = pick($settings['zk_initlimit'], 10)
+  $zk_synclimit               = pick($settings['zk_synclimit'], 5)
+  $zk_datadir                 = pick($settings['zk_datadir'], '/var/lib/zookeeper')
+  $zk_clientport              = pick($settings['zk_clientport'], 2181)
+  $zk_maxsessiontimeout       = pick($settings['zk_maxsessiontimeout'], 120000)
+  $zk_autopurge_purgeinterval = pick($settings['zk_autopurge_purgeinterval'], '0')
+
   # Perfomance tuning
   $cassandra_rpc_max_threads = pick($settings['cassandra_rpc_max_threads'], false)
 
