@@ -1,9 +1,10 @@
-tickTime=2000
-initLimit=10
-syncLimit=5
-dataDir=/var/lib/zookeeper
-clientPort=2181
-maxSessionTimeout=120000
+tickTime=<%= scope.lookupvar('contrail::zk_ticktime')%>
+initLimit=<%= scope.lookupvar('contrail::zk_initlimit')%>
+syncLimit=<%= scope.lookupvar('contrail::zk_synclimit')%>
+dataDir=<%= scope.lookupvar('contrail::zk_datadir')%>
+clientPort=<%= scope.lookupvar('contrail::zk_clientport')%>
+maxSessionTimeout=<%= scope.lookupvar('contrail::zk_maxsessiontimeout')%>
+autopurge.purgeInterval=<%= scope.lookupvar('contrail::zk_autopurge_purgeinterval')%>
 <%-
 nodes=scope.lookupvar('contrail::contrail_controller_nodes_hash')
 nodes.each_pair do |node_name, node_props|
