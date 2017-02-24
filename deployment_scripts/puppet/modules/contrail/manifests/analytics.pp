@@ -22,13 +22,13 @@ class contrail::analytics {
     mode    => '0644',
     owner   => 'contrail',
     group   => 'contrail',
-    require => Package['contrail-analytics'],
   }
 
   if !defined(File['/var/crashes']) {
     file { '/var/crashes':
-      ensure => directory,
-      mode   => '1777',
+      ensure  => directory,
+      mode    => '1777',
+      require => Package['contrail-analytics'],
     }
   }
 
