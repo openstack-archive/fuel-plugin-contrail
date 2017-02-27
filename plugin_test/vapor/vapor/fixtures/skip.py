@@ -10,9 +10,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import itertools
+
 import pytest
 import six
 from stepler.fixtures import skip
+from stepler import config as stepler_config
 
 from vapor.helpers import sriov
 from vapor import settings
@@ -40,6 +43,37 @@ class Predicates(skip.Predicates):
         agent_steps = self._get_fixture('agent_steps')
         sriov_device_mappings = sriov.get_sriov_device_mapping(agent_steps)
         return len(sriov_device_mappings) > 0
+
+    @property
+    @_store_call
+    def dpdk_enabled(self):
+        """Define whether DPDK on computes enabled.
+
+        This method check that at least one interface uses DPDK-compatible
+        driver on each compute.
+        """
+        os_faults_steps = self._get_fixture('os_faults_steps')
+        fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
+            settings.ROLE_CONTRAIL_COMPUTE]
+        computes = os_faults_steps.get_nodes(fqdns)
+        result = os_faults_steps.execute_cmd(
+            computes, 'dpdk_nic_bind --status', check=False)
+        for node_result in result:
+            if node_result.status != stepler_config.STATUS_OK:
+                return False
+            statuses = {}
+            lines = node_result.payload['stdout_lines']
+            for empty, section in itertools.groupby(
+                    lines, key=lambda x: x.strip() == ''):
+                if empty:
+                    continue
+                section = tuple(section)
+                name = section[0]
+                ifaces = [x for x in section[2:] if x.strip() != '<none>']
+                statuses[name] = ifaces
+            if not statuses['Network devices using DPDK-compatible driver']:
+                return False
+        return True
 
 
 @pytest.fixture
