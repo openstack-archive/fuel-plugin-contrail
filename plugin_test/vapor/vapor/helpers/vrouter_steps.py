@@ -10,14 +10,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from vapor.helpers import nodes_steps
+
 
 def get_route_table(os_faults_steps, nodes):
     """Return route tables for each node."""
     result = os_faults_steps.execute_cmd(nodes, 'ip r')
     tables = {}
     for node_result in result:
-        for node in nodes:
-            if node.ip == node_result.host:
-                break
+        node = nodes_steps.get_node_by_result(node_result, os_faults_steps)
         tables[node.fqdn] = node_result.payload['stdout_lines']
     return tables

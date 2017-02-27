@@ -17,6 +17,16 @@ def get_nodes_interfaces(os_faults_steps, nodes=None):
     results = os_faults_steps.execute_cmd(nodes, "ip -o a | awk '{print $2}'")
     ifaces = {}
     for node_result in results:
-        node = next(node for node in nodes if node.ip == node_result.host)
+        node = get_node_by_result(node_result, os_faults_steps)
         ifaces[node.fqdn] = set(node_result.payload['stdout_lines'])
     return ifaces
+
+
+def get_node_by_result(node_result, os_faults_steps):
+    """Match os_faults node by AnsibleResult.
+
+    AnsibleResult contains only node ip. To determine os-faults node we compare
+    this ip with all nodes ips.
+    """
+    nodes = os_faults_steps.get_nodes()
+    return next(node for node in nodes if node.ip == node_result.host)
