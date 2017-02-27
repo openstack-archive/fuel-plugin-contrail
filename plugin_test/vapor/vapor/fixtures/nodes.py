@@ -1,5 +1,7 @@
 import pytest
 
+from vapor import settings
+
 
 @pytest.fixture
 def nodes_ips(os_faults_steps):
@@ -14,3 +16,11 @@ def nodes_ips(os_faults_steps):
         nodes_ips_[fqdn] = node_result.payload['stdout_lines']
 
     return nodes_ips_
+
+
+@pytest.fixture
+def computes(os_faults_steps):
+    """Return os-faults NodeCollection with only cloud computes."""
+    fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
+        settings.ROLE_CONTRAIL_COMPUTE]
+    return os_faults_steps.get_nodes(fqdns)
