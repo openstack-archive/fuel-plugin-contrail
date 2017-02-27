@@ -421,3 +421,24 @@ def test_vm_multi_intf_in_same_vn_chk_ping(network,
         [server, server],
         ip_types=(stepler_config.FIXED_IP,))
 
+
+@pytest.mark.parametrize('flavor', [dict(ram=128, disk=1)], indirect=True)
+def test_create_multiple_servers_on_many_networks(
+        cirros_image, flavor, create_network, create_subnet, server_steps):
+    """Validate creation of multiple VN with multiple subnet and VMs in it.
+
+    Steps:
+        #. Create 2 networks with subnets
+        #. Create 4 servers on each of network
+        #. Check that all servers reach ACTIVE state
+    """
+    networks = []
+    for name in utils.generate_ids(count=2):
+        network = create_network(name)
+        networks.append(network)
+        create_subnet(
+            name + '__subnet', network=network, cidr=stepler_config.LOCAL_CIDR)
+
+    for network in networks:
+        server_steps.create_servers(
+            count=4, flavor=flavor, image=cirros_image, networks=[network])
