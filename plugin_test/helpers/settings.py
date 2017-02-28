@@ -21,7 +21,7 @@ LIBVIRT_NET_PATH = os.environ.get('LIBVIRT_NET_PATH', False)
 
 OSTF_RUN_TIMEOUT = 60 * 60  # 60 minutes
 DEPLOY_CLUSTER_TIMEOUT = 25 * 60  # 25 minutes
-CONTRAIL_PLUGIN_VERSION = os.environ.get('CONTRAIL_PLUGIN_VERSION', '5.0.0')
+CONTRAIL_PLUGIN_VERSION = os.environ.get('CONTRAIL_PLUGIN_VERSION', '5.1.0')
 VSRX_CONFIG_PATH = os.environ.get(
     'VSRX_CONFIG_PATH', '/storage/contrail/config_2nodegroups.conf')
 

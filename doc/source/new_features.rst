@@ -1,7 +1,7 @@
-New features in plugin version 5.0-5.0.0-1
+New features in plugin version 5.1-5.1.0-1
 ==========================================
 
-* Fuel 9.1 with OpenStack Mitaka support
+* Fuel 9.2 with OpenStack Mitaka support
 
 * Dedicated Analytics and Analytics DB node roles
 
