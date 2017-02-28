@@ -5,10 +5,10 @@ import re
 import attrdict
 from hamcrest import (empty, has_entries, contains_inanyorder,
                       has_length)  # noqa: H301
-from six import moves
 from stepler.third_party import waiter
 
 from vapor.helpers import asserts
+from vapor.helpers import nodes_steps
 
 
 STATUS_ACTIVE = 'active'
@@ -61,7 +61,7 @@ def get_services_statuses(os_faults_steps):
     nodes = os_faults_steps.get_nodes_by_cmd('which ' + cmd)
     results = collections.defaultdict(list)
     for node_result in os_faults_steps.execute_cmd(nodes, cmd):
-        node = next(moves.filter(lambda x: x.ip == node_result.host, nodes))
+        node = nodes_steps.get_node_by_result(node_result, os_faults_steps)
         for service in parse_result(node_result.payload['stdout_lines']):
             results[node.fqdn].append(service)
 
