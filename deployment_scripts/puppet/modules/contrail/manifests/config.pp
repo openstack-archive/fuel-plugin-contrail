@@ -38,6 +38,12 @@ class contrail::config {
     }
   }
 
+  class { '::memcached':
+    listen_ip  => '127.0.0.1',
+    max_memory => '10%',
+    item_size  => '10m',
+  }
+
   tweaks::ubuntu_service_override { 'contrail-openstack-config':
     package_name => 'contrail-openstack-config',
     service_name => 'supervisor-config',
@@ -181,6 +187,17 @@ class contrail::config {
     'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
   }
 
+  if str2bool($contrail::memcached_enabled) {
+    contrail_keystone_auth_config {
+      'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
+    }
+  }
+  else {
+    contrail_keystone_auth_config { 'KEYSTONE/memcache_servers':
+      ensure => absent,
+    }
+  }
+
   contrail_schema_config {
     'DEFAULTS/ifmap_server_ip':       value => $contrail::address;
     'DEFAULTS/ifmap_server_port':     value => '8443';
@@ -278,7 +295,8 @@ class contrail::config {
     require   => [Package['contrail-openstack-config'],Package['contrail-config']],
     subscribe => [
       File['/etc/contrail/supervisord_config.conf'],
-      File['/etc/ifmap-server/basicauthusers.properties']
+      File['/etc/ifmap-server/basicauthusers.properties'],
+      Class['::memcached'],
       ],
   }
 
