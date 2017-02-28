@@ -79,40 +79,31 @@ class contrail::control {
     notify  => Service['supervisor-control'],
   }
 
-  file { '/etc/contrail/dns/contrail-named.conf':
-    content => template('contrail/contrail-named.conf.erb'),
-    require => Package['contrail-dns'],
-  }
-
-  file { '/etc/contrail/dns/contrail-rndc.conf':
-    source  => 'puppet:///modules/contrail/contrail-rndc.conf',
-    require => Package['contrail-dns'],
-  }
-
   contrail_control_nodemgr_config {
     'DISCOVERY/server': value => $contrail::contrail_private_vip;
     'DISCOVERY/port':   value => '5998';
   }
 
-# Control service
-  service { 'contrail-named':
+  service { 'contrail-dns':
     ensure    => running,
     require   => Package['contrail-dns'],
-    subscribe => [
-      File['/etc/contrail/dns/contrail-named.conf'],
-      File['/etc/contrail/dns/contrail-rndc.conf'],
-      ]
-  }
-    service { 'supervisor-control':
-      ensure  => $contrail::service_ensure,
-      enable  => true,
-      require => [
-        Package['contrail-openstack-control'],
-        Package['contrail-control']
-        ],
   }
 
-  Contrail_control_config <||> ~> Service['supervisor-control']
-  Contrail_dns_config <||> ~>     Service['supervisor-control']
+  service { 'contrail-named':
+    ensure    => running,
+    require   => Service['contrail-dns']
+  }
 
+  service { 'supervisor-control':
+    ensure  => $contrail::service_ensure,
+    enable  => true,
+    require => [
+      Package['contrail-openstack-control'],
+      Package['contrail-control']
+      ],
+  }
+
+  Contrail_control_config <||>  ~> Service['supervisor-control']
+  Contrail_dns_config <||>      ~> Service['supervisor-control']
+  Contrail_dns_config <||>      ~> Service['contrail-dns']
 }
