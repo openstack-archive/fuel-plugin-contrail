@@ -149,6 +149,9 @@ class contrail {
   $kafka_log_cleaner_threads        = pick($settings['kafka_log_cleaner_threads'], '1')
   $kafka_cleaner_dedupe_buffer_size = pick($settings['kafka_cleaner_dedupe_buffer_size'], '134217728')
 
+  # Memcached settings
+  $memcached_enabled = pick($settings['memcached_enabled'], true)
+
 
   $discovery_hc_max_miss       = pick($settings['discovery_hc_max_miss'], '3')
 
