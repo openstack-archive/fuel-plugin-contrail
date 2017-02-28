@@ -29,11 +29,16 @@ class contrail::config {
     mode    => '0644',
     owner   => 'contrail',
     group   => 'contrail',
-    require => Package['contrail-openstack-config'],
   }
 
-  tweaks::ubuntu_service_override { 'supervisor-config':
+  tweaks::ubuntu_service_override { 'contrail-openstack-config':
+    package_name => 'contrail-openstack-config',
+    service_name => 'supervisor-config',
+  }
+
+  tweaks::ubuntu_service_override { 'contrail-config':
     package_name => 'contrail-config',
+    service_name => 'supervisor-config',
   }
 
 # Memcache

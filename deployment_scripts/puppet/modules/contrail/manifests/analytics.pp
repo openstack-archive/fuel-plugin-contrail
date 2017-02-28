@@ -22,13 +22,18 @@ class contrail::analytics {
     mode    => '0644',
     owner   => root,
     group   => root,
-    require => Package['contrail-openstack-analytics'],
   }
 
   Exec { path => '/usr/bin:/usr/sbin:/bin:/sbin' }
 
-  tweaks::ubuntu_service_override { 'supervisor-analytics':
+  tweaks::ubuntu_service_override { 'contrail-openstack-analytics':
+    package_name => 'contrail-openstack-analytics',
+    service_name => 'supervisor-analytics',
+  }
+
+  tweaks::ubuntu_service_override { 'contrail-analytics':
     package_name => 'contrail-analytics',
+    service_name => 'supervisor-analytics',
   }
 
   # Packages
