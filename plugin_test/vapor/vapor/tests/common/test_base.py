@@ -22,6 +22,7 @@ from pycontrail import exceptions
 import pycontrail.types as contrail_types
 import pytest
 
+from vapor.helpers import agent_steps
 from vapor.helpers import asserts
 from vapor.helpers import contrail_status
 from vapor import settings
@@ -442,3 +443,42 @@ def test_create_multiple_servers_on_many_networks(
     for network in networks:
         server_steps.create_servers(
             count=4, flavor=flavor, image=cirros_image, networks=[network])
+
+
+def test_network_in_agent_with_server_add_delete(
+        contrail_api_client, session, contrail_services_http_introspect_ports,
+        network, server, server_steps):
+    """Validate network's existence and removal in agent.
+
+    Steps:
+        #. Create network, subnet
+        #. Launch server on it
+        #. Check that network is present on one of vrouter agent
+        #. Delete server
+        #. Check that network is not present on any of vrouter agent
+    """
+    contrail_network = contrail_api_client.virtual_network_read(
+        id=network['id'])
+    network_fq_name = contrail_network.get_fq_name_str()
+
+    nodes = contrail_services_http_introspect_ports['contrail-vrouter-agent']
+    port = nodes['port']
+    agent_networks = []
+    for ip in nodes['ips']:
+        agent_network = agent_steps.get_vna_vn(session, ip, port,
+                                               network_fq_name)
+        if agent_network:
+            agent_networks.append(agent_network)
+
+    assert_that(agent_networks, is_not(empty()))
+
+    server_steps.delete_servers([server])
+
+    agent_networks = []
+    for ip in nodes['ips']:
+        agent_network = agent_steps.get_vna_vn(session, ip, port,
+                                               network_fq_name)
+        if agent_network:
+            agent_networks.append(agent_network)
+
+    assert_that(agent_networks, empty())
