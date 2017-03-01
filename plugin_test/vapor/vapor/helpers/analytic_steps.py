@@ -65,6 +65,28 @@ def get_vna_xmpp_connection_status(session, ip, port):
     return result
 
 
+def get_vna_vm_list(session, ip, port):
+    """Return vna vm list."""
+    response = session.get(
+        'http://{ip}:{port}/Snh_VmListReq?uuid='.format(
+            ip=ip, port=port))
+    response.raise_for_status()
+    tree = ET.fromstring(response.content)
+    avn = tree.findall('.//list/VmSandeshData/uuid')
+    return [x.text for x in avn]
+
+
+def wait_vna_vm_list(session, ip, port, matcher, timeout):
+    """Wait until received vm_list will satisfy the macher."""
+
+    def predicate():
+        list_of_vm = get_vna_vm_list(session, ip, port)
+
+        return waiter.expect_that(list_of_vm, matcher)
+
+    waiter.wait(predicate, timeout_seconds=timeout)
+
+
 def get_processes_with_wrong_state(ops, module_id,
                                    expected_state='Functional'):
     """Return ops with wrong state for module_id."""

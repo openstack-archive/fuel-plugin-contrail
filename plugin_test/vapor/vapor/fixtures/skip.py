@@ -27,8 +27,8 @@ class Predicates(skip.Predicates):
     def vrouter_headless_mode(self):
         """Define whether vrouter headless mode enabled."""
         os_faults_steps = self._get_fixture('os_faults_steps')
-        fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[settings.
-                                                     ROLE_CONTRAIL_COMPUTE]
+        fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
+            settings.ROLE_CONTRAIL_COMPUTE]
         actual_nodes = os_faults_steps.get_nodes_by_cmd(
             settings.VROUTER_HEADLESS_MODE_CMD)
         return set(actual_nodes.get_fqdns()) == set(fqdns)
@@ -40,6 +40,13 @@ class Predicates(skip.Predicates):
         agent_steps = self._get_fixture('agent_steps')
         sriov_device_mappings = sriov.get_sriov_device_mapping(agent_steps)
         return len(sriov_device_mappings) > 0
+
+    @property
+    @_store_call
+    def contrail_control_nodes_count(self):
+        """Return contrail control nodes count."""
+        return len(settings.CONTRAIL_ROLES_DISTRIBUTION[
+            settings.ROLE_CONTRAIL_CONTROLLER])
 
 
 @pytest.fixture

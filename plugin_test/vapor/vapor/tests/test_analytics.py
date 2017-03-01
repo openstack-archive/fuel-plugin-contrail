@@ -7,7 +7,7 @@ from six.moves import filter
 
 from vapor.helpers import analytic_steps
 from vapor.helpers import asserts
-from vapor.helpers.asserts import is_superset_of
+from vapor.helpers.asserts import superset_of
 from vapor import settings
 
 
@@ -242,7 +242,7 @@ def test_uve_module_states(client_contrail_analytics, os_faults_steps, role,
                 'NodeStatus.process_info[].process_name', data)
             process_list = [x.split(':')[0] for x in process_list]
             collector.check(process_list,
-                            is_superset_of(expected_process_list),
+                            superset_of(expected_process_list),
                             'Processes are absent on {}'.format(node))
             wrong_processes = analytic_steps.get_process_info_with_wrong_state(
                 data)

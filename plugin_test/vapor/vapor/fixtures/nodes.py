@@ -24,3 +24,20 @@ def computes(os_faults_steps):
     fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
         settings.ROLE_CONTRAIL_COMPUTE]
     return os_faults_steps.get_nodes(fqdns)
+
+
+@pytest.fixture
+def stop_service(os_faults_steps):
+    """Callable fixture to stop service on nodes."""
+    stopped = []
+
+    def _stop_service(nodes, service):
+        cmd = "service {} stop".format(service)
+        os_faults_steps.execute_cmd(nodes, cmd)
+        stopped.append([nodes, service])
+
+    yield _stop_service
+
+    for nodes, service in reversed(stopped):
+        cmd = "service {} start".format(service)
+        os_faults_steps.execute_cmd(nodes, cmd)
