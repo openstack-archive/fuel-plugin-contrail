@@ -24,7 +24,7 @@ import pytest
 
 from vapor.helpers import agent_steps
 from vapor.helpers import asserts
-from vapor.helpers import contrail_status
+from vapor.helpers import contrail_status, policy, connectivity
 from vapor import settings
 
 
@@ -482,3 +482,56 @@ def test_network_in_agent_with_server_add_delete(
             agent_networks.append(agent_network)
 
     assert_that(agent_networks, empty())
+
+
+def test_policy_between_vns_diff_proj(different_tenants_resources,
+                                      server_steps,
+                                      contrail_api_client,
+                                      create_contrail_security_group):
+    """Test to validate that policy to deny and pass under different
+    projects should behave accordingly.
+
+    Test steps:
+        1. Create 2 different projects.
+        2. Launch 2 VNs and 2 VMs.
+        3. Configure a policy to allow ICMP in one of the projects, while
+        in the other configure a policy to deny ICMP between the projects.
+    """
+    project1, project2 = different_tenants_resources
+
+    client, server = project1.server, project2.server
+    client_floating_ip = project1.floating_ip
+    server_floating_ip = project2.floating_ip
+
+    prj1_conrail_sg = contrail_api_client.security_group_read(
+        id=project1.security_group.id)
+    prj2_conrail_sg = contrail_api_client.security_group_read(
+        id=project2.security_group.id)
+
+    client_sg_entries = prj1_conrail_sg.security_group_entries
+    server_sg_entries = prj2_conrail_sg.security_group_entries
+
+    # Add allow policy
+    client_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_EGRESS_ICMP)
+    client_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_INGRESS_ICMP)
+    prj1_conrail_sg.security_group_entries = client_sg_entries
+    contrail_api_client.security_group_update(prj1_conrail_sg)
+
+    with server_steps.get_server_ssh(
+            client,
+            ip=client_floating_ip['floating_ip_address']) as server_ssh:
+        connectivity.check_icmp_connection_status(
+            server_floating_ip['floating_ip_address'],
+            server_ssh,
+            must_available=False,
+            timeout=settings.SECURITY_GROUP_APPLY_TIMEOUT)
+
+        server_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_EGRESS_ICMP)
+        server_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_INGRESS_ICMP)
+        prj2_conrail_sg.security_group_entries = server_sg_entries
+        contrail_api_client.security_group_update(prj2_conrail_sg)
+
+        connectivity.check_icmp_connection_status(
+            server_floating_ip['floating_ip_address'],
+            server_ssh,
+            timeout=settings.SECURITY_GROUP_APPLY_TIMEOUT)
