@@ -569,7 +569,7 @@ batch_size_warn_threshold_in_kb: 5
 #
 # If your data directories are backed by SSD, you should increase this
 # to the number of cores.
-#concurrent_compactors: 1
+concurrent_compactors: 4
 
 # Throttles compaction to the given total throughput across the entire
 # system. The faster you insert data, the faster you need to compact in
@@ -577,7 +577,7 @@ batch_size_warn_threshold_in_kb: 5
 # 16 to 32 times the rate you are inserting data is more than sufficient.
 # Setting this to 0 disables throttling. Note that this account for all types
 # of compaction, including validation compaction.
-compaction_throughput_mb_per_sec: 16
+compaction_throughput_mb_per_sec: 192
 
 # Log a warning when compacting partitions larger than this value
 compaction_large_partition_warning_threshold_mb: 100
