@@ -15,7 +15,7 @@ Puppet::Parser::Functions::newfunction(:get_physdev_mtu, :type => :rvalue, :arit
   interfaces = cfg[:interfaces]
 
   transformations.each do |transform|
-    if (transform[:action] == 'add-bond') && (transform[:name] == physdev)
+    if transform[:name] == physdev
       mtu = transform[:mtu]
       return mtu if mtu
     end
