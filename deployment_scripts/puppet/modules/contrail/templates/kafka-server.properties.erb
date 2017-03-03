@@ -62,7 +62,7 @@ log.dirs=/tmp/kafka-logs
 # The default number of log partitions per topic. More partitions allow greater
 # parallelism for consumption, but this will also result in more files across
 # the brokers.
-num.partitions=1
+num.partitions=30
 
 # The number of threads per data directory to be used for log recovery at startup and flushing at shutdown.
 # This value is recommended to be increased for installations with data dirs located in RAID array.
@@ -93,14 +93,14 @@ num.recovery.threads.per.data.dir=1
 # from the end of the log.
 
 # The minimum age of a log file to be eligible for deletion
-log.retention.hours=168
+log.retention.hours=24
 
 # A size-based retention policy for logs. Segments are pruned from the log as long as the remaining
 # segments don't drop below log.retention.bytes.
-#log.retention.bytes=1073741824
+log.retention.bytes=268435456
 
 # The maximum size of a log segment file. When this size is reached a new log segment will be created.
-log.segment.bytes=1073741824
+log.segment.bytes=268435456
 
 # The interval at which log segments are checked to see if they can be deleted according
 # to the retention policies
@@ -109,9 +109,11 @@ log.retention.check.interval.ms=300000
 # By default the log cleaner is disabled and the log retention policy will default to just delete segments after their retention expires.
 # If log.cleaner.enable=true is set the cleaner will be enabled and individual logs can then be marked for log compaction.
 log.cleaner.enable=true
+log.cleaner.threads=2
+log.cleaner.dedupe.buffer.size=250000000
 
 #The default cleanup policy for segments beyond the retention window, must be either "delete" or "compact"
-log.cleanup.policy=compact
+log.cleanup.policy=delete
 
 #Topic deletion option is disabled by default. To enable it set the server config
 delete.topic.enable=true
