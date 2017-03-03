@@ -963,7 +963,7 @@
   parameters:
     puppet_manifest: puppet/manifests/contrail-rbac-settings.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 1200
 
 - id: rbac-push-hiera
   type: puppet
@@ -974,7 +974,7 @@
   parameters:
     puppet_manifest: puppet/manifests/contrail-rbac-hiera.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 1200
 
 - id: rbac-rule-setting
   type: puppet
@@ -985,6 +985,6 @@
   parameters:
     puppet_manifest: puppet/manifests/contrail-rbac.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 1200
 
 ############RBAC Setting End##################
