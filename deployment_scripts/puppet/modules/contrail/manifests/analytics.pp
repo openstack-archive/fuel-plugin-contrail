@@ -61,6 +61,7 @@ class contrail::analytics {
     'DEFAULTS/analytics_config_audit_ttl': value => '-1';
     'DEFAULTS/analytics_statistics_ttl':   value => '-1';
     'DEFAULTS/analytics_flow_ttl':         value => '-1';
+    'DEFAULTS/partitions':                 value => '30';
     'DISCOVERY/disc_server_ip':            value => $contrail::contrail_private_vip;
     'DISCOVERY/disc_server_port':          value => '5998';
     'REDIS/redis_server_port':             value => '6379';
@@ -80,6 +81,7 @@ class contrail::analytics {
     'DEFAULT/syslog_port':                value => '-1';
     'DEFAULT/http_server_port':           value => '8089';
     'DEFAULT/kafka_broker_list':          value => $contrail::kafka_broker_list;
+    'DEFAULTS/partitions':                 value => '30';
     'COLLECTOR/port':                     value => '8086';
     'DISCOVERY/server':                   value => $contrail::contrail_private_vip;
     'REDIS/port':                         value => '6379';
@@ -120,6 +122,7 @@ class contrail::analytics {
     'DEFAULTS/kafka_broker_list': value => $contrail::kafka_broker_list;
     'DEFAULTS/zk_list':           value => $contrail::zk_server_ip;
     'DISCOVERY/disc_server_ip':   value => $contrail::contrail_private_vip;
+    'DEFAULTS/partitions':        value => '30';
     'DISCOVERY/disc_server_port': value => '5998';
     'REDIS/redis_server_port':    value => '6379';
   }
