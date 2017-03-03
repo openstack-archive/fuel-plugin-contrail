@@ -410,7 +410,7 @@ class FunctionalTests(TestBasic):
         """
         # constants
         contrail_api_port = '18082'
-        contrail_route_target = '4294967295'
+        contrail_route_target = '4294967'
         contrail_gateways = '10.109.3.250'
         contrail_external = '10.10.1.0/24'
         contrail_asnum = '65534'
