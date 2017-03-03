@@ -57,10 +57,11 @@ class contrail::analytics {
     'DEFAULTS/log_level':                  value => 'SYS_NOTICE';
     'DEFAULTS/log_category':               value => ' ';
     'DEFAULTS/log_file':                   value => '/var/log/contrail/contrail-analytics-api.log';
-    'DEFAULTS/analytics_data_ttl':         value => '48';
-    'DEFAULTS/analytics_config_audit_ttl': value => '-1';
-    'DEFAULTS/analytics_statistics_ttl':   value => '-1';
-    'DEFAULTS/analytics_flow_ttl':         value => '-1';
+    'DEFAULTS/analytics_data_ttl':         value => $contrail::analytics_data_ttl;
+    'DEFAULTS/analytics_config_audit_ttl': value => $contrail::analytics_config_audit_ttl;
+    'DEFAULTS/analytics_statistics_ttl':   value => $contrail::analytics_statistics_ttl;
+    'DEFAULTS/analytics_flow_ttl':         value => $contrail::analytics_flow_ttl;
+    'DEFAULTS/partitions':                 value => '30';
     'DISCOVERY/disc_server_ip':            value => $contrail::contrail_private_vip;
     'DISCOVERY/disc_server_port':          value => '5998';
     'REDIS/redis_server_port':             value => '6379';
