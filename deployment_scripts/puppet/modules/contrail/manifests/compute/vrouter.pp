@@ -144,6 +144,12 @@ class contrail::compute::vrouter {
     'VIRTUAL-HOST-INTERFACE/physical_interface': value => $contrail::phys_dev;
     'SERVICE-INSTANCE/netns_command':            value => '/usr/bin/opencontrail-vrouter-netns';
   }
+
+  file { '/etc/contrail/supervisord_vrouter.conf.erb':
+    content => template('contrail/supervisord_vrouter.conf.erb'),
+    require => Class[Contrail::Package],
+  }
+
   if $::contrail::tls_xmpp_enable {
 
     file { '/etc/contrail/ssl/':
@@ -218,7 +224,8 @@ class contrail::compute::vrouter {
     subscribe => [
       Class[Contrail::Package],
       Exec['remove-ovs-modules'],
-      File['/etc/contrail/agent_param']
+      File['/etc/contrail/agent_param'],
+      File['/etc/contrail/supervisord_vrouter.conf.erb'],
       ],
   }
   Contrail_vrouter_nodemgr_config <||> ~> Service['supervisor-vrouter']
