@@ -26,6 +26,7 @@ class contrail::webui {
   }
 
 # Packages
+  package { 'redis-server': } ->
   package { 'nodejs': } ->
   package { 'contrail-web-core': } ->
   package { 'contrail-web-controller': } ->
@@ -40,7 +41,19 @@ class contrail::webui {
     content => template('contrail/contrail-webui-userauth.js.erb'),
   }
 
+  file { '/etc/redis/redis.conf':
+    source  => 'puppet:///modules/contrail/redis.conf',
+    require => Package['redis-server'],
+  }
+
 # Services
+  service { 'redis-server':
+    ensure    => running,
+    enable    => true,
+    require   => Package['redis-server'],
+    subscribe => File['/etc/redis/redis.conf'],
+  }
+
   service { 'supervisor-webui':
     ensure    => running,
     enable    => true,
