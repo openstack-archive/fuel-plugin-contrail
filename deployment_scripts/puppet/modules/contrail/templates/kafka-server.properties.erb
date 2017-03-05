@@ -17,7 +17,7 @@
 ############################# Server Basics #############################
 
 # The id of the broker. This must be set to a unique integer for each broker.
-broker.id=<%= scope.lookupvar('contrail::uid') %>
+broker.id=<%= scope.lookupvar('contrail::uid').to_i % 255 + 1 %>
 
 ############################# Socket Server Settings #############################
 
