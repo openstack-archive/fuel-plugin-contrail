@@ -287,20 +287,6 @@
 #8. Install and configure Contrail Analytics Node
 ###############
 #
-- id: primary-contrail-analytics-db-wait
-  type: puppet
-  version: 2.1.0
-  groups: [primary-contrail-analytics-db]
-  required_for: [deploy_end]
-  requires: [contrail-analytics-db, deploy_start]
-  cross-depends:
-  - name: primary-contrail-analytics-all
-  - name: /contrail-config(-primary|-all)/
-  - name: /contrail-config-provision(-primary|-all)/
-  parameters:
-    puppet_manifest: puppet/manifests/contrail-analytics-db-wait.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 1440
 
 - id: primary-contrail-analytics-all
   type: puppet
@@ -313,6 +299,21 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 1440
 
+- id: primary-contrail-analytics-db-wait
+  type: puppet
+  version: 2.1.0
+  groups: [primary-contrail-analytics-db]
+  required_for: [deploy_end]
+  requires: [contrail-analytics-db, deploy_start]
+  cross-depends:
+    - name: primary-contrail-analytics-all
+    - name: /contrail-config(-primary|-all)/
+    - name: /contrail-config-provision(-primary|-all)/
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-analytics-db-wait.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 1440
+
 - id: contrail-analytics-all
   type: puppet
   version: 2.1.0
@@ -320,10 +321,10 @@
   required_for: [deploy_end]
   requires: [contrail-utils, deploy_start]
   cross-depends:
-  - name: primary-contrail-analytics-db-wait
-  - name: primary-contrail-analytics-all
-  - name: /contrail-config(-primary|-all)/
-  - name: /contrail-config-provision(-primary|-all)/
+    - name: primary-contrail-analytics-db-wait
+    - name: primary-contrail-analytics-all
+    - name: /contrail-config(-primary|-all)/
+    - name: /contrail-config-provision(-primary|-all)/
   parameters:
     puppet_manifest: puppet/manifests/contrail-analytics.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -338,7 +339,12 @@
   version: 2.1.0
   groups: [primary-contrail-analytics,contrail-analytics]
   required_for: [deploy_end]
-  requires: [primary-contrail-analytics-all, contrail-analytics-all]
+  requires: []
+  cross-depends:
+    - name: primary-contrail-analytics-all
+    - name: contrail-analytics-all
+    - name: /contrail-config(-primary|-all)/
+    - name: /contrail-config-provision(-primary|-all)/
   parameters:
     puppet_manifest: puppet/manifests/contrail-analytics-provision.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
