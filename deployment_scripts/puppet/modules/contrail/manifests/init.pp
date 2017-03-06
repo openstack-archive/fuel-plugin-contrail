@@ -83,6 +83,7 @@ class contrail {
   $keystone_version   = 'v3'
   $auth_url           = "${keystone_protocol}://${keystone_address}:35357/${keystone_version}"
 
+  $access            = hiera_hash('access')
   $neutron_ssl      = get_ssl_property($ssl_hash, {}, 'neutron', 'admin', 'usage', false)
   $neutron_protocol = get_ssl_property($ssl_hash, {}, 'neutron', 'admin', 'protocol', 'http')
   $neutron_config   = hiera_hash('neutron_config', {})
@@ -90,9 +91,9 @@ class contrail {
   $private_net      = try_get_value($neutron_config, 'default_private_net', 'net04')
   $default_router   = try_get_value($neutron_config, 'default_router', 'router04')
   $nets             = $neutron_config['predefined_networks']
-  $neutron_user     = pick($neutron_config['keystone']['admin_user'], 'neutron')
+  $neutron_user     = pick(try_get_value($access['user']), 'neutron')
   $service_token    = $neutron_config['keystone']['admin_password']
-  $service_tenant   = pick($neutron_config['keystone']['admin_tenant'], 'services')
+  $service_tenant   = pick($nets['tenant'], 'services')
 
   $default_ceilometer_hash = { 'enabled' => false }
   $ceilometer_hash         = hiera_hash('ceilometer', $default_ceilometer_hash)
