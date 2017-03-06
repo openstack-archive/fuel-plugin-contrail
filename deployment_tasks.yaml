@@ -155,7 +155,7 @@
   version: 2.1.0
   groups: ["/(primary-)?contrail.*/"]
   required_for: [deploy_end]
-  requires: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start, dns-client, ntp-client]
+  requires: [hiera, globals, setup_repositories, tools, logging, netconfig, hosts, deploy_start]
   parameters:
     puppet_manifest: puppet/manifests/contrail-utils.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
