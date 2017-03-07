@@ -146,8 +146,10 @@ class contrail {
   $kafka_log_retention_bytes        = pick($settings['kafka_log_retention_bytes'], '1073741824')
   $kafka_log_segment_bytes          = pick($settings['kafka_log_segment_bytes'], '1073741824')
   $kafka_log_cleanup_policy         = pick($settings['kafka_log_cleanup_policy'], 'compact')
-  $kafka_log_cleaner_threads        = pick($settings['kafka_log_cleaner_threads'], '1')
-  $kafka_cleaner_dedupe_buffer_size = pick($settings['kafka_cleaner_dedupe_buffer_size'], '134217728')
+  $kafka_log_cleaner_threads        = pick($settings['kafka_log_cleaner_threads'], '2')
+  $kafka_cleaner_dedupe_buffer_size = pick($settings['kafka_cleaner_dedupe_buffer_size'], '250000000')
+  $kafka_partitions                 = pick($settings['kafka_partitions'], '30')
+  $kafka_retention_hours            = pick($settings['kafka_retention_hours'], '24')
 
   # Memcached settings
   $memcached_enabled = pick($settings['memcached_enabled'], true)
