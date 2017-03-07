@@ -96,7 +96,7 @@ class contrail::database {
     }
 
     file { '/tmp/kafka-logs/meta.properties':
-      content => inline_template("version=0\nbroker.id=<%= scope.lookupvar('contrail::uid') %>\n");
+      content => inline_template("version=0\nbroker.id=<%= scope.lookupvar('contrail::uid').to_i % 255 + 1  %>\n");
     }
 
     service { 'kafka':
