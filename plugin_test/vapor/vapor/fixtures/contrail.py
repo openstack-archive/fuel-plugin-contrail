@@ -1,14 +1,17 @@
 import os
+import six
 import uuid
+import pytest
+import logbook
 
 import pycontrail.client as client
-import pytest
-import six
 from six.moves import configparser
 from six.moves.urllib import parse
 
 from vapor import settings
 from vapor.helpers import clients
+
+LOGGER = logbook.Logger(__name__)
 
 
 @pytest.fixture
@@ -21,6 +24,15 @@ def client_contrail(session, contrail_api_endpoint):
 def client_contrail_analytics(session, contrail_analytics_endpoint):
     return clients.ContrailAnalyticsClient(session,
                                            contrail_analytics_endpoint)
+
+
+@pytest.fixture
+def client_contrail_vrouter_agent(contrail_vrouter_agent_endpoint):
+    LOGGER.debug('VRouter endpoint: {0}'.format(
+        contrail_vrouter_agent_endpoint))
+    return clients.ContrailVRouterAgentClient(
+        agent_ip=contrail_vrouter_agent_endpoint['ip'],
+        agent_port=contrail_vrouter_agent_endpoint['port'])
 
 
 def get_nodes_fixture(cmd, scope='function'):
@@ -77,7 +89,16 @@ def contrail_analytics_endpoint(contrail_api_endpoint):
     """Return contrail analytics endpoint."""
     parse_result = parse.urlparse(contrail_api_endpoint)
     return parse_result._replace(netloc="{}:{}".format(
-        parse_result.hostname, settings.CONTAIL_ANALYTICS_PORT)).geturl()
+        parse_result.hostname, settings.CONTRAIL_ANALYTICS_PORT)).geturl()
+
+
+@pytest.fixture(scope='module')
+def contrail_vrouter_agent_endpoint(contrail_services_http_introspect_ports):
+    """Return contrail agent endpoint."""
+    service_name = 'contrail-vrouter-agent'
+    ip = contrail_services_http_introspect_ports[service_name]['ips'][0]
+    port = contrail_services_http_introspect_ports[service_name]['port']
+    return {'ip': ip, 'port': port}
 
 
 @pytest.fixture(scope='module')

@@ -135,7 +135,7 @@ def project_2(create_user_with_project):
 
 
 @pytest.fixture
-def different_tenants_resources(
+def different_tenants_resources(request,
         project_2, credentials, create_user_with_project, cirros_image,
         sorted_hypervisors, get_network_steps, get_subnet_steps,
         get_server_steps, port_steps, get_floating_ip_steps, public_flavor,
@@ -149,14 +149,22 @@ def different_tenants_resources(
     Returns:
         list: list of AttrDict with created resources
     """
+    default_params = {
+        'subnet_cidr': '10.0.0.0/24',
+        'base_name': next(utils.generate_ids()),
+        'ips': ('10.0.0.11', '10.0.0.21',)
+    }
+    default_params.update(getattr(request, 'param', {}))
+
+    subnet_cidr = default_params['subnet_cidr']
+    base_name = default_params['base_name']
+    ips = default_params['ips']
+
     hypervisor = sorted_hypervisors[0]
 
     host = next(
         host for host in nova_availability_zone_hosts
         if hypervisor.hypervisor_hostname.startswith(host))
-
-    subnet_cidr = '10.0.0.0/24'
-    base_name = next(utils.generate_ids())
 
     with contextlib.ExitStack() as stack:
 
@@ -167,16 +175,15 @@ def different_tenants_resources(
 
         projects_resources = []
 
-        project_resources = mrg.create(subnet_cidr, '10.0.0.10', cirros_image,
+        project_resources = mrg.create(subnet_cidr, ips[0], cirros_image,
                                        public_flavor, host)
 
         projects_resources.append(project_resources)
 
         with credentials.change(project_2):
 
-            project_resources = mrg.create(subnet_cidr, '10.0.0.20',
-                                           cirros_image, public_flavor, host)
-
+            project_resources = mrg.create(subnet_cidr, ips[1],
+                                           cirros_image, public_flavor,
+                                           host)
             projects_resources.append(project_resources)
-
-        yield projects_resources
+            yield projects_resources
