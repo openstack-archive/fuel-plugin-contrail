@@ -46,10 +46,12 @@ class contrail::database {
     # it is not needed on contrail-analytics-db
 
     package { 'zookeeper': } ->
+    file {'/etc/zookeeper/conf':} ->
+
     file { '/etc/zookeeper/conf/myid':
       content => $contrail::uid,
       require => Package['zookeeper'],
-    }
+    } ->
 
     file { '/etc/zookeeper/conf/zoo.cfg':
       content => template('contrail/zoo.cfg.erb'),
