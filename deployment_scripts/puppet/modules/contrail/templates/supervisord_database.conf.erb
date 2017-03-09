@@ -49,11 +49,13 @@ serverurl=unix:///var/run/supervisord_database.sock ; use a unix:// URL  for a u
 ; create one or more 'real' program: sections to be able to control them under
 ; supervisor.
 
+<% if @enable_kafka %>
 [program:kafka]
 command=/usr/share/kafka/bin/kafka-server-start.sh /usr/share/kafka/config/server.properties
-autostart=false                ; start at supervisord start (default: true)
+autostart=true                ; start at supervisord start (default: true)
 killasgroup=false             ; SIGKILL the UNIX process group (def false)
 environment=LOG_DIR=/var/log/kafka
+<%end%>
 
 ;[program:theprogramname]
 ;command=/bin/cat
@@ -102,4 +104,3 @@ environment=LOG_DIR=/var/log/kafka
 
 [include]
 files = /etc/contrail/supervisord_database_files/*.ini
-

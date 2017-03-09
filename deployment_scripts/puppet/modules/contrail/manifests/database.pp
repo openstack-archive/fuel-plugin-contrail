@@ -41,6 +41,7 @@ class contrail::database {
     $cassandra_seeds = $contrail::primary_contrail_db_ip
     $cluster_name    = 'Contrail'
     $contrail_databases = 'config'
+    $enable_kafka = false
 
     # Zookeeper is created only on contrail-db nodes,
     # it is not needed on contrail-analytics-db
@@ -68,12 +69,6 @@ class contrail::database {
         ],
     }
 
-    #Supervisor-config
-    file { '/etc/contrail/supervisord_database.conf':
-      content => template('contrail/supervisord_database.conf.erb'),
-      before  => Service['supervisor-database'],
-    }
-
     package { 'kafka': } ->
     service { 'kafka':
       ensure    => stopped,
@@ -87,6 +82,7 @@ class contrail::database {
       $contrail_databases = 'analytics'
 
       # Kafka
+      $enable_kafka = true
       package { 'kafka': } ->
       file { '/tmp/kafka-logs':
         ensure => 'directory',
@@ -121,6 +117,12 @@ class contrail::database {
         enable => false,
       }
   }
+  # Supervisor-config
+  file { '/etc/contrail/supervisord_database.conf':
+    content => template('contrail/supervisord_database.conf.erb'),
+    before  => Service['supervisor-database'],
+  }
+
 # Cassandra
   package { 'cassandra': } ->
   package { 'contrail-openstack-database': }
