@@ -5,6 +5,8 @@ external_gw=scope.function_get_first_ip([external_cidr])
 floating_end=scope.function_get_last_ip([external_cidr])
 floating_start=scope.function_get_ip_from_range([external_gw,floating_end,external_netmask,'1','first'])
 %>
+neutron_advanced_configuration:
+  enable_lb: true
 neutron_config:
   default_floating_net: <%= scope.lookupvar('contrail::floating_net') %>
   default_private_net: <%= scope.lookupvar('contrail::private_net') %>
