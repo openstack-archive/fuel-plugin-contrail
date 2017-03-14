@@ -14,6 +14,15 @@
 
 class contrail::controller::aggregate {
 
+  # this section is here because of suitable task sequence
+  $horizon_config = '/etc/openstack-dashboard/local_settings.py'
+  file_line { 'Add Contrail overrides':
+    path  => $horizon_config,
+    line  => "HORIZON_CONFIG['customization_module'] = 'contrail_openstack_dashboard.overrides'",
+  } ~>
+  service { 'apache2': }
+
+
   if $contrail::global_dpdk_enabled {
 
     $nova_hash           = hiera_hash('nova', {})

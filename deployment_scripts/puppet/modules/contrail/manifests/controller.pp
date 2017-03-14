@@ -32,6 +32,7 @@ class contrail::controller {
   package { 'contrail-utils': } ->
   package { 'neutron-plugin-contrail': } ->
   package { 'contrail-heat': }
+  package { 'contrail-openstack-dashboard': }
 
 #Fix for certifi CA blocking self signed certificates
   if $contrail::public_ssl {

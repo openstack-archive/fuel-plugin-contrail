@@ -20,3 +20,14 @@ $plugin_version = regsubst($settings['metadata']['plugin_version'], '..$' , '')
 file { "/etc/apt/preferences.d/contrail-${plugin_version}.pref":
   ensure => absent,
 }
+
+if roles_include(['primary-controller','controller']) {
+
+  apt::pin { 'patched_neutronclient':
+    explanation => 'Horizon tab requires patched client',
+    packages    => 'python-neutronclient',
+    priority    => '1300',
+    label       => 'contrail',
+  }
+
+}
