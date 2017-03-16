@@ -19,7 +19,36 @@ class contrail::controller::aggregate {
   file_line { 'Add Contrail overrides':
     path  => $horizon_config,
     line  => "HORIZON_CONFIG['customization_module'] = 'contrail_openstack_dashboard.overrides'",
-  } ~>
+    notify => Service['apache2'],
+  }
+
+  file { 'enable_lbaas_dashboard':
+    ensure => link,
+    path   => '/usr/share/openstack-dashboard/openstack_dashboard/enabled/_1481_project_ng_loadbalancersv2_panel.py',
+    target => '/usr/lib/python2.7/dist-packages/neutron_lbaas_dashboard/enabled/_1481_project_ng_loadbalancersv2_panel.py',
+  }
+
+  exec { 'lbaas_collectstatic':
+    provider    => 'shell',
+    path        => '/sbin:/usr/sbin:/bin:/usr/bin',
+    tries       => 10,
+    try_sleep   => 2,
+    command     => '/usr/share/openstack-dashboard/manage.py collectstatic --noinput && touch /etc/lbaas_collectstatic_done',
+    creates     => '/etc/lbaas_collectstatic_done',
+    require     => File['enable_lbaas_dashboard'],
+  }
+
+  exec { 'lbaas_compress':
+    provider    => 'shell',
+    path        => '/sbin:/usr/sbin:/bin:/usr/bin',
+    tries       => 10,
+    try_sleep   => 2,
+    command     => '/usr/share/openstack-dashboard/manage.py compress --force && touch /etc/lbaas_compress_done',
+    creates     => '/etc/lbaas_compress_done',
+    require     => [File['enable_lbaas_dashboard'],Exec['lbaas_collectstatic']],
+    notify      => Service['apache2'],
+  }
+
   service { 'apache2': }
 
 
