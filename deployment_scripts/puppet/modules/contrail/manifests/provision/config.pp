@@ -53,6 +53,16 @@ class contrail::provision::config {
       creates => '/opt/contrail/prov_encap_type-DONE',
       require => Exec['prov_metadata_services'],
     }
+
+    exec { 'prov_alarms':
+      command => "python /opt/contrail/utils/provision_alarm.py \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
+--admin_user ${contrail::admin_username} --admin_password '${contrail::admin_password}' \
+--admin_tenant_name '${contrail::service_tenant}' \
+&& touch /opt/contrail/prov_alarms-DONE",
+      require => Exec['wait_for_api'],
+      creates => '/opt/contrail/prov_alarms-DONE',
+    }
   }
 }
 
