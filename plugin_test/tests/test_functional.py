@@ -720,7 +720,7 @@ class FunctionalTests(TestBasic):
     @test(depends_on=[SetupEnvironment.prepare_slaves_9],
           groups=["contrail_private_gateway"])
     @log_snapshot_after_test
-    def contrail_ostf_net_provisioning_disable(self):
+    def contrail_private_gateway(self):
         """Check gateway in private network for single nodegroup deployment
 
         Scenario:
