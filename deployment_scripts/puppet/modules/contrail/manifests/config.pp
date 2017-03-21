@@ -196,6 +196,8 @@ class contrail::config {
     'DEFAULTS/rabbit_port':           value => '5673';
     'DEFAULTS/rabbit_user':           value => 'nova';
     'DEFAULTS/rabbit_password':       value => $contrail::rabbit_password;
+    'DEFAULTS/bgpaas_port_start':     value => $contrail::bgpaas_port_start;
+    'DEFAULTS/bgpaas_port_end':       value => $contrail::bgpaas_port_end;
     'SECURITY/use_certs':             value => false;
     'SECURITY/keyfile':               value => '/etc/contrail/ssl/private_keys/schema_xfer_key.pem';
     'SECURITY/certfile':              value => '/etc/contrail/ssl/certs/schema_xfer.pem';

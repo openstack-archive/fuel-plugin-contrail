@@ -114,6 +114,10 @@ class contrail {
   $gateways         = split($settings['contrail_gateways'], ',')
   $vrouter_thread_count      = pick($settings['vrouter_thread_count'], '4')
 
+  # BGP settings
+  $bgpaas_port_start = pick($settings['bgpaas_port_start'], '50000')
+  $bgpaas_port_end   = pick($settings['bgpaas_port_end'], '52000')
+
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
   $compute_dpdk_enabled = $global_dpdk_enabled and roles_include('dpdk')
