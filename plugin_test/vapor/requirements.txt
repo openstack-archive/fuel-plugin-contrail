@@ -7,3 +7,4 @@ contextlib2==0.5.4; python_version < '3.2'
 kazoo==2.2.1
 logbook
 xmltodict
+pytest-html
