@@ -30,5 +30,5 @@ ENV OS_FAULTS_CLOUD_DRIVER_ADDRESS=192.168.10.100
 ENV OS_FAULTS_CLOUD_DRIVER_USERNAME=root
 ENV CONTRAIL_ROLES_DISTRIBUTION_YAML=roles_mk22_qa_lab01.yaml
 
-ENTRYPOINT ["py.test", "-v", "--junit-xml=test_reports/report.xml",
+ENTRYPOINT ["py.test", "-v", "--junit-xml=test_reports/report.xml", \
             "--html=test_reports/report.html"]
