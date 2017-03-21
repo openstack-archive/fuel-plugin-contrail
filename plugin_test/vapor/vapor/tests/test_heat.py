@@ -15,7 +15,7 @@ import pytest
 
 from vapor.helpers import heat_utils
 
-
+@pytest.mark.xfail(run=False) #Remove when contrail-heat wil be added
 @pytest.mark.parametrize('template_file', heat_utils.list_templates())
 def test_heat_templates(create_stack, template_file, contrail_current_project,
                         contrail_api_client):
