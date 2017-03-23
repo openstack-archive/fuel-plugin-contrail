@@ -126,6 +126,7 @@ class contrail {
   $default_ceilometer_hash = { 'enabled' => false }
   $ceilometer_hash         = hiera_hash('ceilometer', $default_ceilometer_hash)
   $ceilometer_ha_mode      = pick($ceilometer_hash['ha_mode'], true)
+  $ceilometer_interval     = pick($settings['ceilometer_interval'], '1200')
 
   $keystone        = hiera_hash('keystone', {})
   $admin_token     = $keystone['admin_token']
