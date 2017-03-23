@@ -18,7 +18,7 @@ class contrail::controller {
     'sources' => [
       {
         'name'      => 'contrail_source',
-        'interval'  => '600',
+        'interval'  => $ceilometer_interval,
         'meters'    => [
           'ip.floating.receive.packets',
           'ip.floating.transmit.packets',
