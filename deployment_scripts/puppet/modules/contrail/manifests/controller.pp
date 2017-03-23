@@ -14,11 +14,14 @@
 
 class contrail::controller {
 
+  $settings            = hiera_hash('contrail', {})
+  $ceilometer_interval = pick($settings['ceilometer_interval'], '1200')
+
   $custom_yaml_settings = {
     'sources' => [
       {
         'name'      => 'contrail_source',
-        'interval'  => '600',
+        'interval'  => $ceilometer_interval,
         'meters'    => [
           'ip.floating.receive.packets',
           'ip.floating.transmit.packets',
