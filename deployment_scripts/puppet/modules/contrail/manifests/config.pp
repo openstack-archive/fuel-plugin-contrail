@@ -176,6 +176,7 @@ class contrail::config {
     'KEYSTONE/admin_tenant_name': value => $contrail::service_tenant;
     'KEYSTONE/insecure':          value => true;
     'KEYSTONE/memcache_servers':  value => '127.0.0.1:11211';
+    'KEYSTONE/auth_url':          value => $contrail::auth_url;
   }
 
   contrail_schema_config {
