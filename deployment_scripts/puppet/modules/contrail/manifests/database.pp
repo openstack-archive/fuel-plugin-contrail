@@ -66,6 +66,7 @@ class contrail::database {
       subscribe => [
         File['/etc/zookeeper/conf/zoo.cfg'],
         File['/etc/zookeeper/conf/myid'],
+        Package['zookeeper'],
         ],
     }
 
@@ -108,6 +109,7 @@ class contrail::database {
           File['/usr/share/kafka/config/log4j.properties'],
           File['/usr/share/kafka/config/server.properties'],
           File['/tmp/kafka-logs/meta.properties'],
+          Package['kafka'],
           ],
       }
 
@@ -173,6 +175,7 @@ class contrail::database {
     subscribe => [
       File['/etc/cassandra/cassandra.yaml'],
       File['/etc/cassandra/cassandra-env.sh'],
+      Package['contrail-openstack-database'],
     ],
   }
 
@@ -180,7 +183,7 @@ class contrail::database {
     ensure    => running,
     enable    => true,
     require   => [Service['contrail-database'],Package['contrail-openstack-database']],
-    subscribe => File['/etc/cassandra/cassandra.yaml']
+    subscribe => [File['/etc/cassandra/cassandra.yaml'],Package['contrail-openstack-database']]
   }
 
   $cassandra_seed = $cassandra_seeds[0]

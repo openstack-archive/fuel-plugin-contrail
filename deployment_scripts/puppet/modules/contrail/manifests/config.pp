@@ -295,7 +295,7 @@ class contrail::config {
     subscribe => [
       File['/etc/contrail/supervisord_config.conf'],
       File['/etc/ifmap-server/basicauthusers.properties'],
-      Class['::memcached'],
+      Package['contrail-openstack-config'],
       ],
   }
 

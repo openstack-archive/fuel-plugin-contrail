@@ -200,13 +200,14 @@ class contrail::analytics {
     ensure    => running,
     enable    => true,
     require   => Package['redis-server'],
-    subscribe => File['/etc/redis/redis.conf'],
+    subscribe => [File['/etc/redis/redis.conf'], Package['redis-server']]
   }
 
   service { 'supervisor-analytics':
-    ensure  => $contrail::service_ensure,
-    enable  => true,
-    require => [
+    ensure    => $contrail::service_ensure,
+    enable    => true,
+    subscribe => Package['contrail-openstack-analytics'],
+    require   => [
       Package['contrail-openstack-analytics'],
       Service['redis-server'],
       File['/etc/contrail/supervisord_analytics.conf'],
