@@ -14,14 +14,11 @@
 
 class contrail::compute::compute_override {
 
-  $common_pkg  = ['iproute2', 'haproxy', 'libatm1', 'libxen-4.4']
-  $libvirt_pkg = ['libvirt-bin', 'libvirt0']
-  $qemu_pkg    = ['qemu','qemu-*']
-
-  $keep_config_files = '-o Dpkg::Options::="--force-confold"'
-  $force_overwrite   = '-o Dpkg::Options::="--force-overwrite"'
-  $allow_unsigned    = '-o APT::Get::AllowUnauthenticated=1'
-  $patch_path  = '/usr/lib/python2.7/dist-packages'
+  $common_pkg        = ['iproute2', 'haproxy', 'libatm1', 'libxen-4.4']
+  $libvirt_pkg       = ['libvirt-bin', 'libvirt0']
+  $qemu_pkg          = ['qemu-kvm', 'qemu-system-x86', 'qemu-system-common']
+  $patch_path        = '/usr/lib/python2.7/dist-packages'
+  $install_options   = ['-o', 'Dpkg::Options::=', '--force-confold', '-o', 'Dpkg::Options::=', '--force-overwrite']
 
   Exec {
     path => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
@@ -81,19 +78,18 @@ class contrail::compute::compute_override {
         explanation => 'Install qemu from dpdk-depends',
         priority    => 1200,
         label       => 'dpdk-depends-packages',
-        packages    => $qemu_pkg,
+        packages    => ['qemu', 'qemu-*'],
       } ->
-      exec {'override-qemu':
-        command => "apt-get install --yes ${keep_config_files} ${force_overwrite} ${allow_unsigned} \
-qemu-kvm qemu-system-x86 qemu-system-common",
-        unless  => 'dpkg -l | grep qemu-system-common | grep contrail',
-        require => Apt::Source['dpdk-depends-repo'],
+      package{$qemu_pkg:
+        ensure          => latest,
+        provider        => apt,
+        install_options => $install_options,
       }
       if !defined(Service['qemu-kvm']) {
         service { 'qemu-kvm':
           ensure  => running,
           enable  => true,
-          require => Exec['override-qemu'],
+          require => Package[$qemu_pkg],
         }
       }
       apt::pin { 'contrail-override-libvirt':
@@ -103,22 +99,17 @@ qemu-kvm qemu-system-x86 qemu-system-common",
         label       => 'dpdk-depends-packages',
         require     => Service['qemu-kvm'],
       } ->
-      # Install options are supported starting from puppet 3.5.1
-      #package { $libvirt_pkg:
-      #  ensure          => '2:1.2.12-0ubuntu7+contrail2',
-      #  install_options => [$keep_config_files, $force_overwrite],
-      #} ->
-      exec { 'override-libvirt':
-        command => "apt-get install --yes ${keep_config_files} ${force_overwrite} ${allow_unsigned} libvirt-bin libvirt0",
-        unless  => 'dpkg -l | grep libvirt0 | grep contrail',
-        require => Apt::Source['dpdk-depends-repo'],
+      package{ $libvirt_pkg:
+        ensure          => latest,
+        provider        => apt,
+        install_options => $install_options,
       }
       # With a new libvirt packages this init script must be stopped
       if !defined(Service['libvirtd']) {
         service { 'libvirtd':
           ensure  => stopped,
           enable  => false,
-          require => Exec['override-libvirt'],
+          require => Package[$libvirt_pkg],
         }
       }
       else {

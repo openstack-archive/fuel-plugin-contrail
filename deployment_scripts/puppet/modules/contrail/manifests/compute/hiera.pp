@@ -15,11 +15,11 @@
 class contrail::compute::hiera {
 
   # prevent to install and run open vSwitch on compute nodes
+  # add packages overrides for libvirt and qemu.
   file { '/etc/hiera/plugins/contrail.yaml':
     ensure  => file,
-    content => "---\nuse_ovs: false\n",
+    content => template('contrail/contrail_hiera.yaml.erb'),
   }
-
   if roles_include('dpdk') {
     file_line {'100-contrail-vrouter-override_ns':
         path  => '/etc/hiera.yaml',
