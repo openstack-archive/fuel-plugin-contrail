@@ -6,7 +6,7 @@ import logbook
 
 import pycontrail.client as client
 from six.moves import configparser
-from six.moves.urllib import parse
+
 
 from vapor import settings
 from vapor.helpers import clients
@@ -15,15 +15,16 @@ LOGGER = logbook.Logger(__name__)
 
 
 @pytest.fixture
-def client_contrail(session, contrail_api_endpoint):
-    with clients.ContrailClient(session, contrail_api_endpoint) as contrail:
+def client_contrail(session):
+    with clients.ContrailClient(session,
+                                settings.CONTRAIL_API_URL) as contrail:
         yield contrail
 
 
 @pytest.fixture
-def client_contrail_analytics(session, contrail_analytics_endpoint):
+def client_contrail_analytics(session):
     return clients.ContrailAnalyticsClient(session,
-                                           contrail_analytics_endpoint)
+                                           settings.CONTRAIL_ANALYTICS_URL)
 
 
 @pytest.fixture
@@ -82,14 +83,6 @@ def contrail_api_endpoint(os_faults_steps):
         contrail_node, awk_cmd.format(
             key='api_server_port', path=config_path))[0].payload['stdout']
     return 'http://{}:{}/'.format(ip.strip(), port.strip())
-
-
-@pytest.fixture(scope='module')
-def contrail_analytics_endpoint(contrail_api_endpoint):
-    """Return contrail analytics endpoint."""
-    parse_result = parse.urlparse(contrail_api_endpoint)
-    return parse_result._replace(netloc="{}:{}".format(
-        parse_result.hostname, settings.CONTRAIL_ANALYTICS_PORT)).geturl()
 
 
 @pytest.fixture(scope='module')
@@ -160,12 +153,12 @@ def contrail_services_http_introspect_ports(os_faults_steps, contrail_nodes):
 
 
 @pytest.fixture
-def contrail_api_client(session, contrail_api_endpoint):
+def contrail_api_client(session):
     """Return instance of contail client."""
     headers = {'Content-type': 'application/json; charset="UTF-8"'}
     headers.update(session.get_auth_headers())
     return client.Client(
-        url=contrail_api_endpoint, headers=headers, blocking=False)
+        url=settings.CONTRAIL_API_URL, headers=headers, blocking=False)
 
 
 @pytest.fixture

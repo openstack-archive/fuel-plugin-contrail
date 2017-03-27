@@ -238,8 +238,7 @@ def test_network_connectivity_with_policy(
     server_steps.check_ping_between_servers_via_floating(resources.servers)
 
 
-def test_change_login_and_password(session, current_project,
-                                   contrail_api_endpoint, create_user,
+def test_change_login_and_password(session, current_project, create_user,
                                    user_steps, role_steps):
     """Verify that login and password can be changed.
 
@@ -267,7 +266,7 @@ def test_change_login_and_password(session, current_project,
         'tenant_name': current_project.name
     }
     conn = client.Client(
-        url=contrail_api_endpoint, auth_params=auth_params, blocking=False)
+        url=settings.CONTRAIL_API_URL, auth_params=auth_params, blocking=False)
 
     # Check client operate
     assert_that(conn.virtual_networks_list(), is_not(empty()))
@@ -279,7 +278,7 @@ def test_change_login_and_password(session, current_project,
     # Make Contrail client with new user credentials
     auth_params['password'] = password
     conn = client.Client(
-        url=contrail_api_endpoint, auth_params=auth_params, blocking=False)
+        url=settings.CONTRAIL_API_URL, auth_params=auth_params, blocking=False)
 
     # Check client operate
     net_list = waiter.wait(

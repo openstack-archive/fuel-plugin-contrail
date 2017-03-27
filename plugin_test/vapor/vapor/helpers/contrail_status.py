@@ -3,8 +3,7 @@ import collections
 import re
 
 import attrdict
-from hamcrest import (empty, has_entries, contains_inanyorder,
-                      has_length)  # noqa: H301
+from hamcrest import (empty, has_entries, has_items, has_length)  # noqa: H301
 from stepler.third_party import waiter
 
 from vapor.helpers import asserts
@@ -118,7 +117,7 @@ def check_service_status(os_faults_steps,
         return waiter.expect_that(
             services,
             has_entries(**{
-                node: contains_inanyorder(
+                node: has_items(
                     has_entries(service=service, status=expected_status))
                 for node in nodes_fqdns
             }))

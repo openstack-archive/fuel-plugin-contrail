@@ -30,9 +30,12 @@ def test_router_table_cleanup(cirros_image, flavor, network, subnet,
     hypervisor1, = sorted_hypervisors[:1]
     server_create_args = dict(
         image=cirros_image, flavor=flavor, networks=[network])
-    computes = os_faults_steps.get_nodes(fqdns=[
-        hypervisor1.hypervisor_hostname, hypervisor2.hypervisor_hostname
-    ])
+    fqdns = [
+        os_faults_steps.get_fqdn_by_host_name(name)
+        for name in (hypervisor1.hypervisor_hostname,
+                     hypervisor2.hypervisor_hostname)
+    ]
+    computes = os_faults_steps.get_nodes(fqdns=fqdns)
 
     route_table_before = vrouter_steps.get_route_table(os_faults_steps,
                                                        computes)
