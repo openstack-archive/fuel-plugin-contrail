@@ -23,28 +23,32 @@ from vapor import settings
 
 SG_RULES = {
     'tcp_all': [{
-        'ip_protocol': 'tcp',
-        'from_port': 1,
-        'to_port': 65535,
-        'cidr': '0.0.0.0/0',
+        'direction': stepler_config.INGRESS,
+        'protocol': 'tcp',
+        'port_range_min': 1,
+        'port_range_max': 65535,
+        'remote_ip_prefix': '0.0.0.0/0',
     }],
     'tcp_ssh': [{
-        'ip_protocol': 'tcp',
-        'from_port': 22,
-        'to_port': 22,
-        'cidr': '0.0.0.0/0',
+        'direction': stepler_config.INGRESS,
+        'protocol': 'tcp',
+        'port_range_min': 22,
+        'port_range_max': 22,
+        'remote_ip_prefix': '0.0.0.0/0',
     }],
     'udp_all': [{
-        'ip_protocol': 'udp',
-        'from_port': 1,
-        'to_port': 65535,
-        'cidr': '0.0.0.0/0',
+        'direction': stepler_config.INGRESS,
+        'protocol': 'udp',
+        'port_range_min': 1,
+        'port_range_max': 65535,
+        'remote_ip_prefix': '0.0.0.0/0',
     }],
     'icmp_all': [{
-        'ip_protocol': 'icmp',
-        'from_port': -1,
-        'to_port': -1,
-        'cidr': '0.0.0.0/0',
+        'direction': stepler_config.INGRESS,
+        'protocol': 'icmp',
+        'port_range_min': None,
+        'port_range_max': None,
+        'remote_ip_prefix': '0.0.0.0/0',
     }]
 }
 
@@ -67,12 +71,15 @@ tcp_ssh_policy = policy.make_policy_entry(
 
 
 @pytest.fixture
-def security_group(create_security_group, security_group_steps):
+def security_group(neutron_create_security_group,
+                   neutron_security_group_rule_steps):
     """Fixture that returns security group with SSH allow rules."""
     group_name = next(utils.generate_ids('security-group'))
-    group = create_security_group(group_name)
+    group = neutron_create_security_group(group_name)
 
-    security_group_steps.add_group_rules(group, SG_RULES['tcp_ssh'])
+    neutron_security_group_rule_steps.add_rules_to_group(group['id'],
+                                                         SG_RULES['tcp_ssh'])
+
     return group
 
 
@@ -163,8 +170,8 @@ def connectivity_test_resources(
     ids=['tcp_ssh', 'tcp_all', 'tcp_udp_all'])
 def test_security_group_and_allow_all_policy(
         security_group, connectivity_test_resources, contrail_network_policy,
-        security_group_steps, server_steps, contrail_api_client, sg_rules,
-        checks):
+        neutron_security_group_rule_steps, server_steps, contrail_api_client,
+        sg_rules, checks):
     """Verify traffic restrictions by security group with policy.
 
     Steps:
@@ -183,7 +190,8 @@ def test_security_group_and_allow_all_policy(
     contrail_api_client.network_policy_update(contrail_network_policy)
 
     # Update security group
-    security_group_steps.add_group_rules(security_group, sg_rules)
+    neutron_security_group_rule_steps.add_rules_to_group(security_group['id'],
+                                                         sg_rules)
 
     server1_ip = server_steps.get_fixed_ip(connectivity_test_resources.server)
 
@@ -214,9 +222,9 @@ def test_security_group_and_allow_all_policy(
     ],
     ids=['tcp_all', 'tcp_port'])
 def test_allow_all_security_group_and_policies(
-        contrail_network_policy, security_group, security_group_steps,
-        connectivity_test_resources, server_steps, contrail_api_client,
-        policy_entries, checks):
+        contrail_network_policy, security_group,
+        neutron_security_group_rule_steps, connectivity_test_resources,
+        server_steps, contrail_api_client, policy_entries, checks):
     """Verify traffic restrictions by policy with security group.
 
     Steps:
@@ -233,8 +241,8 @@ def test_allow_all_security_group_and_policies(
     contrail_api_client.network_policy_update(contrail_network_policy)
 
     # Update security group
-    security_group_steps.add_group_rules(
-        security_group,
+    neutron_security_group_rule_steps.add_rules_to_group(
+        security_group['id'],
         SG_RULES['tcp_all'] + SG_RULES['udp_all'] + SG_RULES['icmp_all'])
 
     server1_ip = server_steps.get_fixed_ip(connectivity_test_resources.server)

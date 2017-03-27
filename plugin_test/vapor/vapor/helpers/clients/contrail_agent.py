@@ -71,7 +71,6 @@ class ClientContrailVRouterAgentBase(object):
                     data = data[key[0]]
                     return_data = self.get_data(data)
                 elif data['@type'] == 'struct':
-                    return_list = []
                     data = self.del_unused_key(data)
                     if len(data) == 0:
                         return ''
@@ -141,7 +140,7 @@ class ClientContrailVRouterAgentBase(object):
                     old_data = data.copy()
                     path1 = data[keys[0]]['next_batch']['@link']
                     path2 = data[keys[0]]['next_batch']['#text']
-                    path = 'Snh_%s?x=%s' % (path1,path2)
+                    path = 'Snh_%s?x=%s' % (path1, path2)
                     data = self.get_resource(path)
                     old_list = self.find_ifmap_list(old_data)
                     self.merge_ifmap_list(data, old_list)
@@ -165,6 +164,3 @@ class ContrailVRouterAgentClient(ClientContrailVRouterAgentBase):
     def get_itf_by_name(self, interface_name):
         data = self.get_path_to_dict('Snh_ItfReq?x={}'.format(interface_name))
         return data
-
-
-

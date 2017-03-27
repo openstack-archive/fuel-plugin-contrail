@@ -26,7 +26,6 @@ from vapor.helpers import agent_steps
 from vapor.helpers import asserts
 from vapor.helpers import contrail_status, policy, connectivity
 from vapor import settings
-from vapor.helpers import contrail_status, nodes_steps
 from vapor.settings import logger
 
 
@@ -501,7 +500,7 @@ def test_policy_between_vns_diff_proj(different_tenants_resources,
     """
     project1, project2 = different_tenants_resources
 
-    client, server = project1.server, project2.server
+    client = project1.server
     client_floating_ip = project1.floating_ip
     server_floating_ip = project2.floating_ip
 
@@ -529,7 +528,8 @@ def test_policy_between_vns_diff_proj(different_tenants_resources,
             timeout=settings.SECURITY_GROUP_APPLY_TIMEOUT)
 
         server_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_EGRESS_ICMP)
-        server_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_INGRESS_ICMP)
+        server_sg_entries.add_policy_rule(
+            policy.POLICY_RULE_ALLOW_INGRESS_ICMP)
         prj2_conrail_sg.security_group_entries = server_sg_entries
         contrail_api_client.security_group_update(prj2_conrail_sg)
 
@@ -627,4 +627,3 @@ def test_diff_proj_same_vn_vm_add_delete(different_tenants_resources,
                                                    s2_net_label))
 
     assert_that(s1_net_label, is_not(equal_to(s2_net_label)))
-

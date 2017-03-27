@@ -1,5 +1,4 @@
 from . import base
-import urllib
 
 
 class ContrailClient(base.ContrailBaseClient):

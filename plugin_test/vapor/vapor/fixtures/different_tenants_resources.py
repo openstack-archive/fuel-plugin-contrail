@@ -25,7 +25,8 @@ else:
 class ResourceManager(object):
     def __init__(self, stack, base_name, get_network_steps, get_subnet_steps,
                  port_steps, get_floating_ip_steps, get_server_steps,
-                 get_security_group_steps, public_network):
+                 get_neutron_security_group_steps,
+                 get_neutron_security_group_rule_steps, public_network):
         self.stack = stack
         self.base_name = base_name
         self.get_network_steps = get_network_steps
@@ -33,7 +34,10 @@ class ResourceManager(object):
         self.port_steps = port_steps
         self.get_floating_ip_steps = get_floating_ip_steps
         self.get_server_steps = get_server_steps
-        self.get_security_group_steps = get_security_group_steps
+        self.get_neutron_security_group_steps = (
+            get_neutron_security_group_steps)
+        self.get_neutron_security_group_rule_steps = (
+            get_neutron_security_group_rule_steps)
         self.public_network = public_network
 
     def _add_fin(self, steps_getter, fn_name, *args, **kwargs):
@@ -59,12 +63,12 @@ class ResourceManager(object):
 
     def _create_security_group(self):
         # Create security groups
-        security_group_steps = self.get_security_group_steps()
-        security_group = security_group_steps.create_group(self.base_name)
-        self._add_fin(self.get_security_group_steps, 'delete_group',
+        security_group_steps = self.get_neutron_security_group_steps()
+        security_group = security_group_steps.create(self.base_name)
+        self._add_fin(self.get_neutron_security_group_steps, 'delete',
                       security_group)
-        security_group_steps.add_group_rules(
-            security_group, stepler_config.SECURITY_GROUP_SSH_PING_RULES)
+        self.get_neutron_security_group_rule_steps().add_rules_to_group(
+            security_group['id'], stepler_config.SECURITY_GROUP_SSH_PING_RULES)
         return security_group
 
     def _create_server(self, image, flavor, nova_host, network, ip,
@@ -135,12 +139,12 @@ def project_2(create_user_with_project):
 
 
 @pytest.fixture
-def different_tenants_resources(request,
-        project_2, credentials, create_user_with_project, cirros_image,
-        sorted_hypervisors, get_network_steps, get_subnet_steps,
+def different_tenants_resources(
+        request, project_2, credentials, create_user_with_project,
+        cirros_image, sorted_hypervisors, get_network_steps, get_subnet_steps,
         get_server_steps, port_steps, get_floating_ip_steps, public_flavor,
-        public_network, get_security_group_steps,
-        nova_availability_zone_hosts):
+        public_network, get_neutron_security_group_steps,
+        get_neutron_security_group_rule_steps, nova_availability_zone_hosts):
     """Fixture to create network, subnet and server on each of 2 projects.
 
     Created subnets has same CIDR.
@@ -152,7 +156,9 @@ def different_tenants_resources(request,
     default_params = {
         'subnet_cidr': '10.0.0.0/24',
         'base_name': next(utils.generate_ids()),
-        'ips': ('10.0.0.11', '10.0.0.21',)
+        'ips': (
+            '10.0.0.11',
+            '10.0.0.21', )
     }
     default_params.update(getattr(request, 'param', {}))
 
@@ -168,10 +174,11 @@ def different_tenants_resources(request,
 
     with contextlib.ExitStack() as stack:
 
-        mrg = ResourceManager(stack, base_name, get_network_steps,
-                              get_subnet_steps, port_steps,
-                              get_floating_ip_steps, get_server_steps,
-                              get_security_group_steps, public_network)
+        mrg = ResourceManager(
+            stack, base_name, get_network_steps, get_subnet_steps, port_steps,
+            get_floating_ip_steps, get_server_steps,
+            get_neutron_security_group_steps,
+            get_neutron_security_group_rule_steps, public_network)
 
         projects_resources = []
 
@@ -182,8 +189,7 @@ def different_tenants_resources(request,
 
         with credentials.change(project_2):
 
-            project_resources = mrg.create(subnet_cidr, ips[1],
-                                           cirros_image, public_flavor,
-                                           host)
+            project_resources = mrg.create(subnet_cidr, ips[1], cirros_image,
+                                           public_flavor, host)
             projects_resources.append(project_resources)
             yield projects_resources
