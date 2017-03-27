@@ -27,7 +27,9 @@ KEYSTONE_CREDS = {
 
 CONTRAIL_CREDS = {'controller_addr': '192.168.1.127'}
 
-CONTRAIL_ANALYTICS_PORT = 8081
+
+CONTRAIL_API_URL = os.environ['CONTRAIL_API_URL']
+CONTRAIL_ANALYTICS_URL = os.environ['CONTRAIL_ANALYTICS_URL']
 
 NEUTRON_CONTRAIL_PLUGIN_CONFIG_PATH = (
     '/etc/neutron/plugins/opencontrail/ContrailPlugin.ini')

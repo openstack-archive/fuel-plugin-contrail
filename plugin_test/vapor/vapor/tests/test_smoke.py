@@ -191,7 +191,7 @@ def test_contrail_services_status_after_restart_master_node(os_faults_steps):
     master_node_fqdn = None
     for fqdn, services in services_statuses.items():
         for service in services:
-            if (service['name'] == 'contrail-schema' and
+            if (service['service'] == 'contrail-schema' and
                     service['status'] == contrail_status.STATUS_ACTIVE):
                 master_node_fqdn = fqdn
                 break

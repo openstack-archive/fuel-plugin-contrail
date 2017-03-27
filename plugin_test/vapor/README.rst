@@ -38,6 +38,8 @@ Fill env file
     OS_USERNAME=admin
     OS_PASSWORD=admin
     OS_TENANT_NAME=admin
+    CONTRAIL_API_URL=http://172.16.10.254:9082/
+    CONTRAIL_ANALYTICS_URL=http://172.16.10.254:9081/
     OS_AUTH_URL=http://10.109.1.7:5000/v3
 
     # os-faults config
@@ -110,6 +112,8 @@ Fill env file
     OS_USERNAME=admin
     OS_PASSWORD=admin
     OS_TENANT_NAME=admin
+    CONTRAIL_API_URL=http://172.16.10.254:9082/
+    CONTRAIL_ANALYTICS_URL=http://172.16.10.254:9081/
     OS_AUTH_URL=http://10.109.1.7:5000/v3
 
     # os-faults config
