@@ -66,14 +66,15 @@ def test_ipam_virtual_dns(
     """
     # Create DNS records
     ip = '1.2.3.4'
-    name = 'test.example.com'
+    name = 'vapor.' + contrail_dns.virtual_DNS_data.domain_name
     add_dns_record(contrail_dns, r_name=name, r_data=ip)
 
     # Add DNS to IPAM
+    contrail_ipam.set_virtual_DNS(contrail_dns)
     contrail_ipam.network_ipam_mgmt = types.IpamType(
         ipam_dns_method='virtual-dns-server',
         ipam_dns_server=types.IpamDnsAddressType(
-            virtual_dns_server_name=':'.join(contrail_dns.fq_name)))
+            virtual_dns_server_name=contrail_dns.get_fq_name_str()))
     contrail_api_client.network_ipam_update(contrail_ipam)
 
     # Create subnet

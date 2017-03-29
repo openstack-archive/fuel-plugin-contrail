@@ -13,13 +13,14 @@
 import pycontrail.types as types
 
 
-def make_policy_entry(protocol, src_ports_range, dst_ports_range):
+def make_policy_entry(protocol, src_ports_range, dst_ports_range,
+                      action='pass'):
     address = types.AddressType(virtual_network='any')
     src_port = types.PortType(
         start_port=src_ports_range[0], end_port=src_ports_range[1])
     dst_port = types.PortType(
         start_port=dst_ports_range[0], end_port=dst_ports_range[1])
-    action = types.ActionListType(simple_action='pass')
+    action = types.ActionListType(simple_action=action)
     rule = types.PolicyRuleType(
         protocol=protocol,
         direction='<>',

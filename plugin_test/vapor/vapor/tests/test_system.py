@@ -319,7 +319,8 @@ def test_admin_user_can_get_user_token_info(current_project, token_steps,
 
 
 def test_connectivity_from_server_without_floating(
-        cirros_image, flavor, net_subnet_router, security_group, server_steps):
+        cirros_image, flavor, net_subnet_router, neutron_security_group,
+        server_steps):
     """Check connectivity via external Contrail network without floating IP.
 
     Steps:
@@ -342,7 +343,7 @@ def test_connectivity_from_server_without_floating(
         image=cirros_image,
         flavor=flavor,
         networks=[network],
-        security_groups=[security_group],
+        security_groups=[neutron_security_group],
         userdata=userdata)[0]
     server_steps.check_server_log_contains_record(
         server, done, timeout=stepler_config.USERDATA_EXECUTING_TIMEOUT)

@@ -23,6 +23,7 @@ from vapor.helpers import vrouter_steps
 @pytest.mark.requires('computes_count >= 2')
 def test_router_table_cleanup(cirros_image, flavor, network, subnet,
                               current_project, server_steps,
+                              nova_availability_zone_hosts,
                               sorted_hypervisors, port_steps, os_faults_steps,
                               contrail_api_client, iface_route_table_create):
     """Check that added routes are cleaned up after servers to be deleted."""
@@ -40,11 +41,18 @@ def test_router_table_cleanup(cirros_image, flavor, network, subnet,
     route_table_before = vrouter_steps.get_route_table(os_faults_steps,
                                                        computes)
 
+    host1 = next(
+        host for host in nova_availability_zone_hosts
+        if hypervisor1.hypervisor_hostname.startswith(host))
     server1 = server_steps.create_servers(
-        availability_zone='nova:' + hypervisor1.hypervisor_hostname,
+        availability_zone='nova:' + host1,
         **server_create_args)[0]
+
+    host2 = next(
+        host for host in nova_availability_zone_hosts
+        if hypervisor2.hypervisor_hostname.startswith(host))
     server2 = server_steps.create_servers(
-        availability_zone='nova:' + hypervisor2.hypervisor_hostname,
+        availability_zone='nova:' + host2,
         **server_create_args)[0]
     port = port_steps.get_port(
         device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,

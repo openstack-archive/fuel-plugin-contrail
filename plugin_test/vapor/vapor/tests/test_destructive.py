@@ -13,10 +13,12 @@
 from hamcrest import assert_that, is_not
 import pytest
 from stepler import config as stepler_config
+from stepler.third_party import waiter
 
 from vapor import settings
 from vapor.helpers.asserts import intersects_with
 from vapor.helpers import analytic_steps
+from vapor.helpers import contrail_status
 
 pytestmark = pytest.mark.destructive
 
@@ -230,3 +232,31 @@ def test_agent_cleanup_with_control_node_stop(
     for server in servers:
         server_steps.check_ping_to_server_floating(
             server, timeout=stepler_config.PING_CALL_TIMEOUT)
+
+
+@pytest.mark.requires('contrail_control_nodes_count >= 2')
+def test_contrail_services_status_after_restart_master_node(os_faults_steps):
+    """Verify contrail services status after master node restart.
+
+    Steps:
+        #. Restart node with contrail-schema (active)
+        #. Wait some time
+        #. Check that contrail services statuses is correct
+    """
+    services_statuses = contrail_status.get_services_statuses(os_faults_steps)
+    master_node_fqdn = None
+    for fqdn, services in services_statuses.items():
+        for service in services:
+            if (service['service'] == 'contrail-schema' and
+                    service['status'] == contrail_status.STATUS_ACTIVE):
+                master_node_fqdn = fqdn
+                break
+    assert master_node_fqdn is not None, "Can't find master node"
+    master_node = os_faults_steps.get_node(fqdns=[master_node_fqdn])
+    os_faults_steps.reset_nodes(master_node)
+
+    waiter.wait(
+        contrail_status.check_services_statuses,
+        args=(os_faults_steps),
+        expected_exceptions=AssertionError,
+        timeout=settings.CONTRAIL_NODE_RESET_TIMEOUT)

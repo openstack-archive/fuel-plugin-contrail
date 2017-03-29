@@ -89,7 +89,8 @@ def contrail_api_endpoint(os_faults_steps):
 def contrail_vrouter_agent_endpoint(contrail_services_http_introspect_ports):
     """Return contrail agent endpoint."""
     service_name = 'contrail-vrouter-agent'
-    ip = contrail_services_http_introspect_ports[service_name]['ips'][0]
+    ip = contrail_services_http_introspect_ports[service_name]['nodes'][0][
+        'ip']
     port = contrail_services_http_introspect_ports[service_name]['port']
     return {'ip': ip, 'port': port}
 
@@ -128,7 +129,10 @@ def contrail_services_http_introspect_ports(os_faults_steps, contrail_nodes):
             filename = os.path.basename(path)
             service_name = os.path.splitext(filename)[0]
             if service_name in results:
-                results[service_name]['ips'].append(node_ip)
+                results[service_name]['nodes'].append({
+                    'ip': node_ip,
+                    'fqdn': node.get_fqdns()[0]
+                })
                 continue
             if service_name not in default_ports:
                 continue
@@ -148,7 +152,13 @@ def contrail_services_http_introspect_ports(os_faults_steps, contrail_nodes):
             except configparser.NoSectionError:
                 pass
             if port:
-                results[service_name] = {'port': port, 'ips': [node_ip]}
+                results[service_name] = {
+                    'port': port,
+                    'nodes': [{
+                        'ip': node_ip,
+                        'fqdn': node.get_fqdns()[0]
+                    }],
+                }
     return results
 
 

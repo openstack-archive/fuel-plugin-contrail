@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from pycontrail import exceptions
 import pycontrail.types as types
 import pytest
 
@@ -74,6 +75,11 @@ def contrail_create_subnet(contrail_api_client, contrail_default_ipam):
     yield _contrail_create_subnet
 
     for network, ipam in networks:
+        try:
+            network = contrail_api_client.virtual_network_read(id=network.uuid)
+            ipam = contrail_api_client.network_ipam_read(id=ipam.uuid)
+        except exceptions.NoIdError:
+            continue
         network.del_network_ipam(ipam)
         contrail_api_client.virtual_network_update(network)
 

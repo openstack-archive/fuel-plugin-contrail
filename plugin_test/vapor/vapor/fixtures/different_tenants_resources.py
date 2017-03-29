@@ -16,6 +16,8 @@ import six
 import stepler.config as stepler_config
 from stepler.third_party import utils
 
+from vapor.helpers import project
+
 if six.PY2:
     import contextlib2 as contextlib
 else:
@@ -121,6 +123,7 @@ class ResourceManager(object):
             'server': server,
             'port': port,
             'floating_ip': floating_ip,
+            'security_group': security_group,
         })
 
 
@@ -144,7 +147,8 @@ def different_tenants_resources(
         cirros_image, sorted_hypervisors, get_network_steps, get_subnet_steps,
         get_server_steps, port_steps, get_floating_ip_steps, public_flavor,
         public_network, get_neutron_security_group_steps,
-        get_neutron_security_group_rule_steps, nova_availability_zone_hosts):
+        get_neutron_security_group_rule_steps, nova_availability_zone_hosts,
+        get_current_project, contrail_api_client):
     """Fixture to create network, subnet and server on each of 2 projects.
 
     Created subnets has same CIDR.
@@ -185,11 +189,17 @@ def different_tenants_resources(
         project_resources = mrg.create(subnet_cidr, ips[0], cirros_image,
                                        public_flavor, host)
 
+        contrail_project = project.get_contrail_project(get_current_project(),
+                                                        contrail_api_client)
+        project_resources.contrail_project = contrail_project
         projects_resources.append(project_resources)
 
         with credentials.change(project_2):
 
             project_resources = mrg.create(subnet_cidr, ips[1], cirros_image,
                                            public_flavor, host)
+            contrail_project = project.get_contrail_project(
+                get_current_project(), contrail_api_client)
+            project_resources.contrail_project = contrail_project
             projects_resources.append(project_resources)
             yield projects_resources

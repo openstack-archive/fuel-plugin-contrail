@@ -5,6 +5,8 @@ from stepler import config as stepler_config
 
 from vapor import settings
 
+pytestmark = pytest.mark.destructive
+
 
 def restart_nodes(os_faults_steps, nodes):
     for node in nodes:

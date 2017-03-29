@@ -8,6 +8,7 @@ from stepler.third_party import waiter
 
 from vapor.helpers import asserts
 from vapor.helpers import nodes_steps
+from vapor import settings
 
 
 STATUS_ACTIVE = 'active'
@@ -84,7 +85,7 @@ def check_services_statuses(os_faults_steps):
 
             statuses = set(statuses)
             active = {x for x in statuses if x.status == STATUS_ACTIVE}
-            if service in ('contrail-svc-monitor', 'contrail-schema'):
+            if service in settings.ACTIVE_BACKUP_SERVICES:
                 backup = {x for x in statuses if x.status == STATUS_BACKUP}
                 broken = statuses - active - backup
                 collector.check(active,

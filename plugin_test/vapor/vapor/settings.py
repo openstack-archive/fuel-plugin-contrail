@@ -159,6 +159,8 @@ CONTRAIL_ANALYTIC_PROCESSES = {
     ],
 }
 
+ACTIVE_BACKUP_SERVICES = ('contrail-svc-monitor', 'contrail-schema')
+
 HEAT_TEMPLATES_PATH = os.path.join(BASE_DIR, 'heat')
 
 VROUTER_HEADLESS_MODE_CMD = r"grep -iP '^headless_mode\s*=\s*true' /etc/contrail/contrail-vrouter-agent.conf"  # noqa

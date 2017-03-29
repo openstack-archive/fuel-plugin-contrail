@@ -1,3 +1,17 @@
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+import collections
+
 import dpath.util
 import jmespath
 from hamcrest import (assert_that, is_, empty, has_key, all_of, has_length,
@@ -8,6 +22,7 @@ from six.moves import filter
 from vapor.helpers import analytic_steps
 from vapor.helpers import asserts
 from vapor.helpers.asserts import superset_of
+from vapor.helpers import contrail_status
 from vapor import settings
 
 
@@ -27,15 +42,27 @@ def test_db_purge(client_contrail_analytics):
 
 
 def test_collector_generator_connections_through_uves(
-        session, client_contrail_analytics,
+        session, client_contrail_analytics, os_faults_steps,
         contrail_services_http_introspect_ports):
     """Check collector generator connections through UVES."""
     with asserts.AssertsCollector() as collector:
-        for _, nodes in contrail_services_http_introspect_ports.items():
-            port = nodes['port']
-            for ip in nodes['ips']:
-                status = analytic_steps.get_collector_connectivity(session, ip,
-                                                                   port)
+        expected_backup_services = collections.defaultdict(set)
+        for node, services in contrail_status.get_services_statuses(
+                os_faults_steps).items():
+            for service in services:
+                if (service['service'] in settings.ACTIVE_BACKUP_SERVICES and
+                        service['status'] == 'backup'):
+                    expected_backup_services[service['service']].add(node)
+
+        for service, data in contrail_services_http_introspect_ports.items():
+            port = data['port']
+            for node in data['nodes']:
+                # Skip services with backup status
+                if node['fqdn'] in expected_backup_services[service]:
+                    continue
+
+                status = analytic_steps.get_collector_connectivity(
+                    session, node['ip'], port)
                 collector.check(status['status'], is_('Established'))
 
         for name in client_contrail_analytics.get_uves_generators():

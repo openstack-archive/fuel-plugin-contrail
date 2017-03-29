@@ -24,7 +24,7 @@ import pytest
 
 from vapor.helpers import agent_steps
 from vapor.helpers import asserts
-from vapor.helpers import contrail_status, policy, connectivity
+from vapor.helpers import contrail_status, connectivity
 from vapor import settings
 from vapor.settings import logger
 
@@ -90,8 +90,8 @@ def test_delete_vm_with_associated_vn(contrail_network, contrail_subnet,
 
 def test_two_nets_same_name(contrail_api_client, contrail_network,
                             contrail_subnet):
-    """Description: Test to validate that with the same subnet and
-        name provided, two different VNs cannot be created.
+    """Description: check creating 2 VNs with same name and parent.
+
     Test steps:
         1. Create a VN.
         2. Create a second VN with the same name and subnet as the first VN.
@@ -99,7 +99,9 @@ def test_two_nets_same_name(contrail_api_client, contrail_network,
     Pass criteria:
         There is a single VN created.
     """
-    net = contrail_types.VirtualNetwork(contrail_network.name)
+    project = contrail_api_client.project_read(id=contrail_network.parent_uuid)
+    net = contrail_types.VirtualNetwork(
+        contrail_network.name, parent_obj=project)
     assert_that(
         calling(contrail_api_client.virtual_network_create).with_args(net),
         raises(exceptions.RefsExistError))
@@ -110,6 +112,7 @@ def test_metadata_service(security_group, port_steps,
                           create_floating_ip, tiny_flavor, cirros_image,
                           server_steps):
     """Description: Test to validate metadata service
+
     Test steps:
         1. Create a VN.
         2. Launch a VM in this VN.
@@ -118,7 +121,7 @@ def test_metadata_service(security_group, port_steps,
     Pass criteria:
         The output of the metadata script should be seen in the VM.
     """
-    output_filename = 'output.txt'
+    output_filename, = utils.generate_ids('output')
     userdata = (
         u'#!/bin/sh\n'
         u'echo "TestMetadataService.'
@@ -227,7 +230,8 @@ def test_create_server_on_exhausted_subnet(cirros_image, flavor, network,
 
     assert_that(
         calling(server_steps.create_servers).with_args(**create_server_args),
-        raises(AssertionError, 'No valid host was found'))
+        raises(AssertionError, '(No valid host was found)|'
+                               '(Exceeded maximum number of retries)'))
 
 
 def test_file_transfer_with_scp(
@@ -254,10 +258,12 @@ def test_file_transfer_with_scp(
     userdata = '\n'.join([
         "#!/bin/bash -v",
         "echo '{content}' > {path}",
-        "chown {user} {path}",
+        "chown {user}:{user} {path}",
         "chmod 600 {path}",
+        "echo {done_marker}",
     ]).format(
-        content=key_content, path=key_path, user=username)
+        content=key_content, path=key_path, user=username,
+        done_marker=stepler_config.USERDATA_DONE_MARKER)
 
     ssh_opts = ('-o UserKnownHostsFile=/dev/null '
                 '-o StrictHostKeyChecking=no')
@@ -281,6 +287,12 @@ def test_file_transfer_with_scp(
             device_id=server.id)
         floating_ip = create_floating_ip(public_network, port=port)
         floating_ips.append(floating_ip)
+
+    # Wait userdata to be done
+    server_steps.check_server_log_contains_record(
+        servers[0],
+        stepler_config.USERDATA_DONE_MARKER,
+        timeout=stepler_config.USERDATA_EXECUTING_TIMEOUT)
 
     ip = server_steps.get_fixed_ip(servers[1])
     with asserts.AssertsCollector() as collector:
@@ -383,24 +395,30 @@ def test_create_server_on_network_without_subnet(
         raises(nova_exceptions.BadRequest, 'requires a subnet'))
 
 
-def test_vm_multi_intf_in_same_vn_chk_ping(network,
-                                           subnet,
-                                           cirros_image,
-                                           flavor,
-                                           security_group,
-                                           server_steps,
-                                           port_steps,
-                                           create_floating_ip,
-                                           public_network):
+def test_vm_multi_intf_in_same_vn_chk_ping(
+        network,
+        cirros_image,
+        flavor,
+        security_group,
+        server,
+        server_steps,
+        port_steps,
+        create_floating_ip,
+        public_network):
     """Test to validate that a multiple interfaces of the same VM can be
     associated to the same VN and ping is successful.
     """
-    userdata = (
-        u'#!/bin/sh\n'
-        u"/sbin/ifconfig -a\n"
-        u"/sbin/cirros-dhcpc up eth1\n")
+    server_port = port_steps.get_ports(
+        device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
+        device_id=server.id)[0]
 
-    server = server_steps.create_servers(
+    floating_ip = create_floating_ip(public_network, port=server_port)
+
+    userdata = (u'#!/bin/sh\n'
+                u"/sbin/ifconfig -a\n"
+                u"/sbin/cirros-dhcpc up eth1\n")
+
+    server2 = server_steps.create_servers(
         userdata=userdata,
         image=cirros_image,
         flavor=flavor,
@@ -409,19 +427,12 @@ def test_vm_multi_intf_in_same_vn_chk_ping(network,
         username=stepler_config.CIRROS_USERNAME,
         password=stepler_config.CIRROS_PASSWORD)[0]
 
-    server_ports = port_steps.get_ports(
-        device_owner=stepler_config.PORT_DEVICE_OWNER_SERVER,
-        device_id=server.id)
-
-    server_port = server_ports[0]
-    floating_ip = create_floating_ip(public_network, port=server_port)
-    server_steps.check_server_ip(server,
-                                 floating_ip['floating_ip_address'],
-                                 timeout=settings.FLOATING_IP_BIND_TIMEOUT)
-
-    server_steps.check_ping_between_servers_via_floating(
-        [server, server],
-        ip_types=(stepler_config.FIXED_IP,))
+    with server_steps.get_server_ssh(
+            server, floating_ip['floating_ip_address']) as server_ssh:
+        for ip in server_steps.get_ips(
+                server2, ip_type=stepler_config.FIXED_IP).keys():
+            server_steps.check_ping_for_ip(
+                ip, server_ssh, timeout=stepler_config.PING_CALL_TIMEOUT)
 
 
 @pytest.mark.parametrize('flavor', [dict(ram=128, disk=1)], indirect=True)
@@ -462,11 +473,12 @@ def test_network_in_agent_with_server_add_delete(
         id=network['id'])
     network_fq_name = contrail_network.get_fq_name_str()
 
-    nodes = contrail_services_http_introspect_ports['contrail-vrouter-agent']
-    port = nodes['port']
+    service_data = contrail_services_http_introspect_ports[
+        'contrail-vrouter-agent']
+    port = service_data['port']
     agent_networks = []
-    for ip in nodes['ips']:
-        agent_network = agent_steps.get_vna_vn(session, ip, port,
+    for node in service_data['nodes']:
+        agent_network = agent_steps.get_vna_vn(session, node['ip'], port,
                                                network_fq_name)
         if agent_network:
             agent_networks.append(agent_network)
@@ -476,8 +488,8 @@ def test_network_in_agent_with_server_add_delete(
     server_steps.delete_servers([server])
 
     agent_networks = []
-    for ip in nodes['ips']:
-        agent_network = agent_steps.get_vna_vn(session, ip, port,
+    for node in service_data['nodes']:
+        agent_network = agent_steps.get_vna_vn(session, node['ip'], port,
                                                network_fq_name)
         if agent_network:
             agent_networks.append(agent_network)
@@ -485,12 +497,10 @@ def test_network_in_agent_with_server_add_delete(
     assert_that(agent_networks, empty())
 
 
-def test_policy_between_vns_diff_proj(different_tenants_resources,
-                                      server_steps,
-                                      contrail_api_client,
-                                      create_contrail_security_group):
-    """Test to validate that policy to deny and pass under different
-    projects should behave accordingly.
+def test_policy_between_vns_diff_proj(
+        different_tenants_resources, server_steps, contrail_api_client,
+        create_network_policy, set_network_policy):
+    """Check policy to deny and pass under different projects.
 
     Test steps:
         1. Create 2 different projects.
@@ -500,41 +510,70 @@ def test_policy_between_vns_diff_proj(different_tenants_resources,
     """
     project1, project2 = different_tenants_resources
 
-    client = project1.server
-    client_floating_ip = project1.floating_ip
-    server_floating_ip = project2.floating_ip
+    project1_policy = create_network_policy(parent=project1.contrail_project)
+    project2_policy = create_network_policy(parent=project2.contrail_project)
 
-    prj1_conrail_sg = contrail_api_client.security_group_read(
-        id=project1.security_group.id)
-    prj2_conrail_sg = contrail_api_client.security_group_read(
-        id=project2.security_group.id)
+    project1_network = contrail_api_client.virtual_network_read(
+        id=project1.network['id'])
+    project2_network = contrail_api_client.virtual_network_read(
+        id=project2.network['id'])
+    set_network_policy(project1_network, project1_policy)
+    set_network_policy(project2_network, project2_policy)
 
-    client_sg_entries = prj1_conrail_sg.security_group_entries
-    server_sg_entries = prj2_conrail_sg.security_group_entries
+    # Create allow ICMP policy entries
+    src_address = contrail_types.AddressType(
+        virtual_network=project1_network.get_fq_name_str())
+    dst_address = contrail_types.AddressType(
+        virtual_network=project2_network.get_fq_name_str())
+    port = contrail_types.PortType(start_port=-1, end_port=-1)
+    pass_action = contrail_types.ActionListType(simple_action='pass')
+    allow_rule = contrail_types.PolicyRuleType(
+        protocol='icmp',
+        direction='<>',
+        src_addresses=[src_address],
+        src_ports=[port],
+        dst_addresses=[dst_address],
+        dst_ports=[port],
+        action_list=pass_action)
+    allow_icmp_policy_entries = contrail_types.PolicyEntriesType(
+        policy_rule=[allow_rule])
 
-    # Add allow policy
-    client_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_EGRESS_ICMP)
-    client_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_INGRESS_ICMP)
-    prj1_conrail_sg.security_group_entries = client_sg_entries
-    contrail_api_client.security_group_update(prj1_conrail_sg)
+    # Create deny ICMP policy entries
+    deny_action = contrail_types.ActionListType(simple_action='deny')
+    deny_rule = contrail_types.PolicyRuleType(
+        protocol='icmp',
+        direction='<>',
+        src_addresses=[src_address],
+        src_ports=[port],
+        dst_addresses=[dst_address],
+        dst_ports=[port],
+        action_list=deny_action)
+    deny_icmp_policy_entries = contrail_types.PolicyEntriesType(
+        policy_rule=[deny_rule])
+
+    project1_policy.network_policy_entries = allow_icmp_policy_entries
+    contrail_api_client.network_policy_update(project1_policy)
+
+    project2_policy.network_policy_entries = deny_icmp_policy_entries
+    contrail_api_client.network_policy_update(project2_policy)
+
+    project2_server_fixed_ip = project2.server_steps.get_fixed_ip(
+        project2.server)
 
     with server_steps.get_server_ssh(
-            client,
-            ip=client_floating_ip['floating_ip_address']) as server_ssh:
+            project1.server,
+            ip=project1.floating_ip['floating_ip_address']) as server_ssh:
         connectivity.check_icmp_connection_status(
-            server_floating_ip['floating_ip_address'],
+            project2_server_fixed_ip,
             server_ssh,
             must_available=False,
             timeout=settings.SECURITY_GROUP_APPLY_TIMEOUT)
 
-        server_sg_entries.add_policy_rule(policy.POLICY_RULE_ALLOW_EGRESS_ICMP)
-        server_sg_entries.add_policy_rule(
-            policy.POLICY_RULE_ALLOW_INGRESS_ICMP)
-        prj2_conrail_sg.security_group_entries = server_sg_entries
-        contrail_api_client.security_group_update(prj2_conrail_sg)
+        project2_policy.network_policy_entries = allow_icmp_policy_entries
+        contrail_api_client.network_policy_update(project2_policy)
 
         connectivity.check_icmp_connection_status(
-            server_floating_ip['floating_ip_address'],
+            project2_server_fixed_ip,
             server_ssh,
             timeout=settings.SECURITY_GROUP_APPLY_TIMEOUT)
 

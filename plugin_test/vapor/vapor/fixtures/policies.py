@@ -10,8 +10,8 @@ def contrail_policies_cleanup(contrail_api_client):
 
     def _get_policies_uuids():
         return {
-            net['uuid']
-            for net in contrail_api_client.network_policys_list()[
+            policy['uuid']
+            for policy in contrail_api_client.network_policys_list()[
                 'network-policys']
         }
 
@@ -24,15 +24,31 @@ def contrail_policies_cleanup(contrail_api_client):
 
 
 @pytest.fixture
-def contrail_network_policy(contrail_api_client, contrail_current_project):
-    policy_name, = utils.generate_ids()
-    policy = types.NetworkPolicy(
-        policy_name, parent_obj=contrail_current_project)
-    contrail_api_client.network_policy_create(policy)
+def create_network_policy(contrail_api_client, contrail_current_project):
+    """Fixture to create network policy."""
 
-    yield policy
+    policies = []
 
-    try:
+    def _create_network_policy(name=None, parent=None):
+        name = name or next(utils.generate_ids())
+        parent = parent or contrail_current_project
+        policy = types.NetworkPolicy(name, parent_obj=parent)
+        contrail_api_client.network_policy_create(policy)
+
+        policies.append(policy)
+
+        return policy
+
+    yield _create_network_policy
+
+    for policy in policies:
+        try:
+            policy = contrail_api_client.network_policy_read(id=policy.uuid)
+        except exceptions.NoIdError:
+            continue
         contrail_api_client.network_policy_delete(id=policy.uuid)
-    except exceptions.NoIdError:
-        pass
+
+
+@pytest.fixture
+def contrail_network_policy(create_network_policy):
+    return create_network_policy()
