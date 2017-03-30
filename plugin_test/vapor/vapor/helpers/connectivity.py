@@ -13,7 +13,7 @@
 import contextlib
 import time
 
-from hamcrest import is_
+from hamcrest import assert_that, is_, greater_than, has_value
 from stepler.third_party import ping
 from stepler.third_party import tcpdump
 from stepler.third_party import waiter
@@ -108,13 +108,14 @@ def start_port_listener(server_ssh,
 
 
 @contextlib.contextmanager
-def calc_packets_count(os_faults_steps, nodes, iface, filters):
+def calc_packets_count(os_faults_steps, nodes, iface, filters,
+                       max_packets=10000):
     """CM to calc packages count on nodes' iface.
 
     Returns dict: fqdn -> captured packets count.
     """
     tcpdump_base_path = os_faults_steps.start_tcpdump(
-        nodes, '-i {0} {1}'.format(iface, filters))
+        nodes, '-i {0} {1} -c {2}'.format(iface, filters, max_packets))
     result = {node.fqdn: 0 for node in nodes}
     yield result
     os_faults_steps.stop_tcpdump(nodes, tcpdump_base_path)
@@ -138,8 +139,20 @@ def start_iperf_pair(client_ssh, server_ssh, ip, port, udp=False, timeout=10):
 
     server_ssh.background_call(server_cmd.format(proto=proto, port=port))
 
-    if not udp:
-        time.sleep(10)
+    # if not udp:
+    time.sleep(10)
 
     client_ssh.background_call(
         client_cmd.format(proto=proto, ip=ip, port=port, time=timeout))
+
+
+def check_packets_on_iface(os_faults_steps, node, iface, filters,
+                           should_be=True):
+    with calc_packets_count(os_faults_steps, node, iface,
+                            filters) as tcp_counts:
+        time.sleep(1)
+    if should_be:
+        matcher = greater_than(0)
+    else:
+        matcher = is_(0)
+    assert_that(tcp_counts, has_value(matcher), 'Wrong packets count')

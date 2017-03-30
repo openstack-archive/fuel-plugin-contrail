@@ -40,7 +40,7 @@ def contrail_2_networks(create_network, create_subnet):
 def contrail_2_servers_different_networks(
         request,
         flavor,
-        security_group,
+        neutron_security_group,
         sorted_hypervisors,
         contrail_2_networks,
         server_steps):
@@ -91,7 +91,7 @@ def contrail_2_servers_different_networks(
             networks=[network],
             keypair=keypair,
             availability_zone='nova:{}'.format(hypervisor.service['host']),
-            security_groups=[security_group],
+            security_groups=[neutron_security_group],
             username=username,
             password=password,
             check=False)[0]

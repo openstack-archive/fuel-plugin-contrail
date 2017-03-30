@@ -310,7 +310,7 @@ def test_security_group_rules_uuid_in_contrail_and_neutron(contrail_api_client,
     ids=['ubuntu'])
 def test_add_remove_security_group_with_active_flow(
         contrail_2_servers_diff_nets_with_floating,
-        security_group,
+        neutron_security_group,
         contrail_api_client,
         contrail_network_policy,
         set_network_policy,
@@ -345,7 +345,8 @@ def test_add_remove_security_group_with_active_flow(
         set_network_policy(network, contrail_network_policy)
 
     # Add rule to group
-    contrail_sg = contrail_api_client.security_group_read(id=security_group.id)
+    contrail_sg = contrail_api_client.security_group_read(
+        id=neutron_security_group['id'])
     sg_entries = contrail_sg.security_group_entries
     rules = [
         types.PolicyRuleType(
@@ -402,52 +403,47 @@ def test_add_remove_security_group_with_active_flow(
 
         # Start TCP and UDP traffic
         connectivity.start_iperf_pair(
+            client_ssh=server2_ssh,
+            server_ssh=server1_ssh,
+            ip=ip1,
+            port=TCP_PORT,
+            timeout=60 * 1000)
+        connectivity.start_iperf_pair(
             client_ssh=server1_ssh,
             server_ssh=server2_ssh,
             ip=ip2,
             port=UDP_PORT,
             udp=True,
             timeout=60 * 1000)
-        connectivity.start_iperf_pair(
-            client_ssh=server2_ssh,
-            server_ssh=server1_ssh,
-            ip=ip1,
-            port=TCP_PORT,
-            timeout=60 * 1000)
 
         # Check that some packets are captured
-        with connectivity.calc_packets_count(os_faults_steps, computes[0],
-                                             ifaces[0],
-                                             tcp_filter) as tcp_counts:
-            with connectivity.calc_packets_count(os_faults_steps, computes[1],
-                                                 ifaces[1],
-                                                 udp_filter) as udp_counts:
-                time.sleep(1)
-        assert_that(next(iter(tcp_counts.values())), greater_than(0))
-        assert_that(next(iter(udp_counts.values())), greater_than(0))
+        connectivity.check_packets_on_iface(os_faults_steps, computes[0],
+                                            ifaces[0], tcp_filter)
+        connectivity.check_packets_on_iface(os_faults_steps, computes[1],
+                                            ifaces[1], udp_filter)
 
         # Remove security group from server1
-        server1.remove_security_group(security_group.id)
+        server1.remove_security_group(neutron_security_group['id'])
 
-        with connectivity.calc_packets_count(os_faults_steps, computes[0],
-                                             ifaces[0],
-                                             tcp_filter) as tcp_counts:
-            with connectivity.calc_packets_count(os_faults_steps, computes[1],
-                                                 ifaces[1],
-                                                 udp_filter) as udp_counts:
-                time.sleep(1)
-        assert_that(next(iter(tcp_counts.values())), equal_to(0))
-        assert_that(next(iter(udp_counts.values())), equal_to(0))
+        connectivity.check_packets_on_iface(
+            os_faults_steps,
+            computes[0],
+            ifaces[0],
+            tcp_filter,
+            should_be=False)
+        connectivity.check_packets_on_iface(
+            os_faults_steps,
+            computes[1],
+            ifaces[1],
+            udp_filter,
+            should_be=False)
 
         # Add security group from server1
-        server1.add_security_group(security_group.id)
+        server1.add_security_group(neutron_security_group['id'])
 
-        with connectivity.calc_packets_count(os_faults_steps, computes[0],
-                                             ifaces[0],
-                                             tcp_filter) as tcp_counts:
-            with connectivity.calc_packets_count(os_faults_steps, computes[1],
-                                                 ifaces[1],
-                                                 udp_filter) as udp_counts:
-                time.sleep(1)
-        assert_that(next(iter(tcp_counts.values())), greater_than(0))
-        assert_that(next(iter(udp_counts.values())), greater_than(0))
+        time.sleep(10)
+
+        connectivity.check_packets_on_iface(os_faults_steps, computes[0],
+                                            ifaces[0], tcp_filter)
+        connectivity.check_packets_on_iface(os_faults_steps, computes[1],
+                                            ifaces[1], udp_filter)
