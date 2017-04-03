@@ -73,13 +73,13 @@ class ResourceManager(object):
             security_group['id'], stepler_config.SECURITY_GROUP_SSH_PING_RULES)
         return security_group
 
-    def _create_server(self, image, flavor, nova_host, network, ip,
+    def _create_server(self, image, vapor_flavor, nova_host, network, ip,
                        security_group):
         # Create server
         server_steps = self.get_server_steps()
         server = server_steps.create_servers(
             image=image,
-            flavor=flavor,
+            flavor=vapor_flavor,
             availability_zone='nova:{}'.format(nova_host),
             nics=[{
                 'net-id': network['id'],
@@ -98,14 +98,14 @@ class ResourceManager(object):
         self._add_fin(self.get_floating_ip_steps, 'delete', floating_ip)
         return floating_ip
 
-    def create(self, subnet_cidr, server_ip, image, flavor, nova_host):
+    def create(self, subnet_cidr, server_ip, image, vapor_flavor, nova_host):
         try:
             network = self._create_network()
             self._create_subnet(network, subnet_cidr)
             security_group = self._create_security_group()
             server = self._create_server(
                 image=image,
-                flavor=flavor,
+                flavor=vapor_flavor,
                 nova_host=nova_host,
                 network=network,
                 ip=server_ip,
@@ -145,7 +145,7 @@ def project_2(create_user_with_project):
 def different_tenants_resources(
         request, project_2, credentials, create_user_with_project,
         cirros_image, sorted_hypervisors, get_network_steps, get_subnet_steps,
-        get_server_steps, port_steps, get_floating_ip_steps, public_flavor,
+        get_server_steps, port_steps, get_floating_ip_steps, public_vapor_flavor,
         public_network, get_neutron_security_group_steps,
         get_neutron_security_group_rule_steps, nova_availability_zone_hosts,
         get_current_project, contrail_api_client):
@@ -187,7 +187,7 @@ def different_tenants_resources(
         projects_resources = []
 
         project_resources = mrg.create(subnet_cidr, ips[0], cirros_image,
-                                       public_flavor, host)
+                                       public_vapor_flavor, host)
 
         contrail_project = project.get_contrail_project(get_current_project(),
                                                         contrail_api_client)
@@ -197,7 +197,7 @@ def different_tenants_resources(
         with credentials.change(project_2):
 
             project_resources = mrg.create(subnet_cidr, ips[1], cirros_image,
-                                           public_flavor, host)
+                                           public_vapor_flavor, host)
             contrail_project = project.get_contrail_project(
                 get_current_project(), contrail_api_client)
             project_resources.contrail_project = contrail_project
