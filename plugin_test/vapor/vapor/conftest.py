@@ -20,6 +20,7 @@ from vapor.fixtures.skip import *  # noqa
 from vapor.fixtures.subnets import *  # noqa
 from vapor.fixtures.system_services import *  # noqa
 from vapor.fixtures.virtual_interface import *  # noqa
+from vapor.fixtures.vapor_flavor import *  # noqa
 
 pytest_plugins = [
     'vapor.plugins.xfail',

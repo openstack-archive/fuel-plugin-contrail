@@ -189,3 +189,5 @@ SERVER_ATTR_HYPERVISOR_HOSTNAME = 'OS-EXT-SRV-ATTR:hypervisor_hostname'
 NEUTRON_SRIOV_NIC_AGENT = "neutron-sriov-nic-agent"
 
 DPDK_NEC_BIND_PATH = '/opt/contrail/bin/dpdk_nic_bind.py'
+
+DPDK = os.environ.get('DPDK')

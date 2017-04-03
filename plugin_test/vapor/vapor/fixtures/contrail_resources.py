@@ -39,7 +39,7 @@ def contrail_2_networks(create_network, create_subnet):
 @pytest.fixture
 def contrail_2_servers_different_networks(
         request,
-        flavor,
+        vapor_flavor,
         neutron_security_group,
         sorted_hypervisors,
         contrail_2_networks,
@@ -87,7 +87,7 @@ def contrail_2_servers_different_networks(
     for hypervisor, network in zip(hypervisors, contrail_2_networks.networks):
         server = server_steps.create_servers(
             image=image,
-            flavor=flavor,
+            flavor=vapor_flavor,
             networks=[network],
             keypair=keypair,
             availability_zone='nova:{}'.format(hypervisor.service['host']),
