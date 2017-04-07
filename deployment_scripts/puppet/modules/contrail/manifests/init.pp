@@ -80,8 +80,15 @@ class contrail {
   # Public SSL for Contrail WebUI
   $public_ssl_hash    = hiera_hash('public_ssl', {})
   $ssl_hash           = hiera_hash('use_ssl', {})
-  $public_ssl         = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'usage', false)
-  $public_ssl_path    = get_ssl_property($ssl_hash, $public_ssl_hash, 'horizon', 'public', 'path', [''])
+
+  if $ssl_hash['contrail'] {
+    $service_name = 'contrail'
+   } else {
+    $service_name = 'horizon'
+  }
+
+  $public_ssl         = get_ssl_property($ssl_hash, $public_ssl_hash, $service_name, 'public', 'usage', false)
+  $public_ssl_path    = get_ssl_property($ssl_hash, $public_ssl_hash, $service_name, 'public', 'path', [''])
 
   #NOTE(AKirilochkin): Modern way to get the ssl values with understandable variables names
   $public_horizon_endpoint   = get_ssl_property($ssl_hash, {}, 'horizon', 'public', 'hostname', [$mos_public_vip])
