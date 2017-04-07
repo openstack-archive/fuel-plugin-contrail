@@ -4,6 +4,7 @@ attributes:
     group: 'other'
     weight: 5
     hiera:
+      - 100-contrail-vrouter-override_ns
       - rbac_settings
     restrictions:
       - condition: "not (cluster:net_provider == 'neutron' and networking_parameters:segmentation_type != 'vlan')"
