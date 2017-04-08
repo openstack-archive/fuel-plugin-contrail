@@ -58,7 +58,7 @@ To create a virtual machine with SR-IOV device:
 
     neutron net-create \
     --provider:physical_network=<physical network from contrail settings tab> \
-    --provider: segmentation_id=<Vlan_id> <Network_Name>
+    --provider:segmentation_id=<Vlan_id> <Network_Name>
 
 #. Create a subnet::
 
@@ -68,9 +68,9 @@ To create a virtual machine with SR-IOV device:
 
     neutron port-create \
     --fixed-ip subnet_id=<subnet uuid>,ip_address=<IP address from above subnet> \
-    --name <name of port> <vn uuid> --binding:vnic_type direct
+    --name <name of port> <net uuid> --binding:vnic_type direct
 
-#. Boot the VM with the port::
+#. Boot the VM with the port (use image with VF drivers, like Ubuntu or CentOS, Cirros will not work)::
 
     nova boot \
     --flavor m1.large --image <image name> \
