@@ -1,22 +1,20 @@
-#!/usr/bin/env bash
-# OpenStack credentials:
+#!/bin/bash
 export OS_USERNAME=admin
-export OS_PASSWORD=secret
-export OS_TENANT_NAME=admin
-export OS_AUTH_URL=http://127.0.0.1:5000/v3
+export OS_PASSWORD=password
+export OS_TENANR_NAME=admin
+export OS_AUTH_URL=http://10.167.4.10:35357/v3
+export VIRTUAL_DISPLAY=1
 
-# contrail endpoints
-export CONTRAIL_API_URL=http://172.16.10.254:9100/
-export CONTRAIL_ANALYTICS_URL=http://172.16.10.254:9081/
-
-# os-faults config
 export OS_FAULTS_CLOUD_DRIVER=tcpcloud
-export OS_FAULTS_CLOUD_DRIVER_ADDRESS=192.168.10.100
-export OS_FAULTS_CLOUD_DRIVER_KEYFILE=/home/jenkins/cloud.key
+export OS_FAULTS_CLOUD_DRIVER_KEYFILE=/opt/vapor/cloud.key
+export OS_FAULTS_CLOUD_DRIVER_ADDRESS=172.16.49.66
 export OS_FAULTS_CLOUD_DRIVER_USERNAME=root
 
-export CONTRAIL_ROLES_DISTRIBUTION_YAML=roles_distribution_example.yaml
+export CONTRAIL_ROLES_DISTRIBUTION_YAML=roles_mcp10_contrail.yaml
+export CONTRAIL_API_URL=http://10.167.4.20:9100/
+export CONTRAIL_ANALYTICS_URL=http://10.167.4.30:8081/
 
-#export OS_PROJECT_DOMAIN_NAME=default
-#export OS_USER_DOMAIN_NAME=default
-#export OS_PROJECT_NAME=admin
+#export DEFAULT_FLAVOR_RAM="2048"
+#export DEFAULT_FLAVOR_CPU="2"
+#export DEFAULT_FLAVOR_DISK="20"
+#export DEFAULT_FLAVOR_METADATA='{"hw:mem_page_size":"large"}'
