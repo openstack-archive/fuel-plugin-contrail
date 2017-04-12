@@ -12,6 +12,7 @@
 
 from hamcrest import (assert_that, has_entries, has_item, only_contains,
                       is_not, empty, greater_than, has_length)
+import pytest
 
 from vapor.helpers import contrail_status
 from vapor.helpers import dpdk
@@ -66,6 +67,9 @@ def test_contrail_vrouter_dpdk_cpu_usage(os_faults_steps, computes):
         assert_that(usage, greater_than(50))
 
 
+@pytest.mark.parametrize(
+    'flavor', [dict(metadata={"hw:mem_page_size": "small"})], indirect=True)
+@pytest.mark.usefixtures('flavor')
 def test_vrouter_create_interface(request, os_faults_steps, computes):
     """Verify if vRouter creates interface after creation of a virtual machine.
 
@@ -78,7 +82,8 @@ def test_vrouter_create_interface(request, os_faults_steps, computes):
     before_ifaces = vrouter_steps.get_interface_table(os_faults_steps,
                                                       computes)
     server = request.getfixturevalue('server')
-    compute_fqdn = getattr(server, settings.SERVER_ATTR_HYPERVISOR_HOSTNAME)
+    compute = getattr(server, settings.SERVER_ATTR_HYPERVISOR_HOSTNAME)
+    compute_fqdn = os_faults_steps.get_fqdn_by_host_name(compute)
     after_ifaces = vrouter_steps.get_interface_table(os_faults_steps, computes)
     assert_that(after_ifaces[compute_fqdn],
                 has_length(greater_than(len(before_ifaces[compute_fqdn]))))

@@ -37,8 +37,10 @@ class Predicates(skip.Predicates):
     @_store_call
     def sriov_enabled(self):
         """Define whether sriov enabled."""
-        agent_steps = self._get_fixture('agent_steps')
-        sriov_device_mappings = sriov.get_sriov_device_mapping(agent_steps)
+        os_faults_steps = self._get_fixture('os_faults_steps')
+        computes = self._get_fixture('computes')
+        sriov_device_mappings = sriov.get_sriov_devices(os_faults_steps,
+                                                        computes)
         return len(sriov_device_mappings) > 0
 
     @property

@@ -57,10 +57,12 @@ def get_interface_table(os_faults_steps, nodes):
                     pairs = {key: value}
                 else:
                     pairs = line.split()
-                    if ':' not in pairs[0]:
-                        pairs = [
-                            u'{}_{}'.format(pairs[0], p) for p in pairs[1:]
-                        ]
+                    start = next(i for i, pair in enumerate(pairs)
+                                 if ':' in pair)
+                    prefix = u'_'.join(pairs[:start])
+                    pairs = [
+                        u'{}_{}'.format(prefix, p) for p in pairs[start:]
+                    ]
                     pairs = dict(x.split(':', 1) for x in pairs)
                 iface.update(pairs)
         if iface:

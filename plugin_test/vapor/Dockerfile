@@ -4,9 +4,6 @@ RUN  apt-get update -qq &&  \
 apt-get install -q -y \
     python-dev \
     libvirt-dev \
-    # xvfb \
-    # iceweasel \
-    # libav-tools \
     && \
 apt-get clean  && \
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -15,9 +12,7 @@ WORKDIR /opt/app
 
 COPY . /opt/app/
 
-ENV OSLO_PACKAGE_VERSION=1.8
-
-RUN pip install -e . -r requirements.txt
+RUN pip install . -r requirements.txt
 
 ENV OS_USERNAME=admin
 ENV OS_PASSWORD=workshop
