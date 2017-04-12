@@ -13,7 +13,7 @@
 import time
 
 import attrdict
-from hamcrest import assert_that, equal_to, greater_than  # noqa: H301
+from hamcrest import assert_that, equal_to  # noqa: H301
 from pycontrail import types
 import pytest
 from stepler import config as stepler_config

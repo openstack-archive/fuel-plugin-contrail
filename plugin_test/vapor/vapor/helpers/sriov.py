@@ -10,27 +10,29 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from vapor import settings
+from stepler import config as stepler_config
+
+from vapor.helpers import nodes_steps
 
 
-def get_sriov_device_mapping(agent_steps):
-    """Return computes with sriov neutron agents and them device mapping.
+def get_sriov_devices(os_faults_steps, computes):
+    """Return computes with sriov neutron agents and them ifaces data.
 
     Example output:
-        {'node-4.test.domain.local': {"physnet2": ["ens11f1"]}}
+        {'node-4.test.domain.local': {"ens11f1": {"sriov_numvfs": 7}}}
     """
-    agents = agent_steps.get_agents(binary=settings.NEUTRON_SRIOV_NIC_AGENT,
-                                    check=False)
+    cmd = "grep -v 0 /sys/class/net/*/device/sriov_numvfs"
+    result = os_faults_steps.execute_cmd(computes, cmd, check=False)
     mapping = {}
-    for agent in agents:
-        mapping[agent['host']] = agent['configurations']['device_mappings']
+    for node_result in result:
+        node = nodes_steps.get_node_by_result(node_result, os_faults_steps)
+        if node_result.status == stepler_config.STATUS_OK:
+            node_data = {}
+            for line in node_result.payload['stdout_lines']:
+                path, sriov_numvfs = line.split(':')
+                sriov_numvfs = int(sriov_numvfs)
+                iface = path.split('/')[4]
+                node_data[iface] = {'sriov_numvfs': sriov_numvfs}
+            mapping[node.fqdn] = node_data
+
     return mapping
-
-
-def get_sriov_numvfs(os_faults_steps, node, iface):
-    """Return numvfs value from node for iface."""
-    fqdn = os_faults_steps.get_fqdn_by_host_name(node)
-    node = os_faults_steps.get_node(fqdns=[fqdn])
-    cmd = 'cat /sys/class/net/{}/device/sriov_numvfs'.format(iface)
-    result = os_faults_steps.execute_cmd(node, cmd)
-    return int(result[0].payload['stdout'])
