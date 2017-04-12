@@ -29,7 +29,7 @@ def test_contrail_vrouter_dpdk(os_faults_steps):
         assert_that(
             compute_services,
             has_item(
-                has_entries(name='contrail-vrouter-dpdk', status='active')))
+                has_entries(service='contrail-vrouter-dpdk', status='active')))
 
 
 def test_bound_network_interfaces(os_faults_steps, computes):
