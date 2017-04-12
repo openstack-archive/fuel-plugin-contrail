@@ -147,7 +147,6 @@ CONTRAIL_ANALYTIC_PROCESSES = {
         'contrail-discovery',
         'contrail-config-nodemgr',
         'contrail-svc-monitor',
-        'ifmap',
         'contrail-api',
         'contrail-schema',
     ],
@@ -159,7 +158,9 @@ CONTRAIL_ANALYTIC_PROCESSES = {
     ],
 }
 
-ACTIVE_BACKUP_SERVICES = ('contrail-svc-monitor', 'contrail-schema')
+ACTIVE_BACKUP_SERVICES = ('contrail-svc-monitor',
+                          'contrail-schema',
+                          'contrail-device-manager')
 
 HEAT_TEMPLATES_PATH = os.path.join(BASE_DIR, 'heat')
 
