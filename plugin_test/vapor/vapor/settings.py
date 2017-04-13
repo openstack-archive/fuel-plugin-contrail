@@ -5,6 +5,9 @@ import sys
 import yaml
 import logbook
 
+from stepler import config as stepler_config
+
+
 LOG_FILENAME = './vapor.log'
 logger = logbook.Logger(__name__)
 logger.handlers.append(logbook.FileHandler(LOG_FILENAME,
@@ -193,3 +196,24 @@ DPDK_NEC_BIND_PATH = '/opt/contrail/bin/dpdk_nic_bind.py'
 
 # SR-IOV
 SRIOV_PHYSNET = 'physnet1'
+
+# Security groups
+INGRESS = 'ingress'
+EGRESS = 'egress'
+
+SECURITY_GROUP_PING_RULES = [
+    {
+        # ping IPv4
+        'direction': INGRESS,
+        'protocol': 'icmp',
+        # For ICMP neutron allows to set port range from 0 to 255.
+        # But in neutron this means ICMP type and ICMP code.
+        # So this values are valid only with contrail.
+        'port_range_min': 0,
+        'port_range_max': 255,
+        'remote_ip_prefix': '0.0.0.0/0',
+    }
+]
+
+SECURITY_GROUP_SSH_PING_RULES = (stepler_config.SECURITY_GROUP_SSH_RULES +
+                                 SECURITY_GROUP_PING_RULES)
