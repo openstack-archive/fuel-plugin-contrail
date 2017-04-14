@@ -304,6 +304,7 @@ def test_security_group_rules_uuid_in_contrail_and_neutron(contrail_api_client,
     assert_that(contrail_rules_uuids, equal_to(neutron_rules_uuids))
 
 
+@pytest.mark.requires('not dpdk_enabled')
 @pytest.mark.parametrize(
     'contrail_2_servers_different_networks', [dict(ubuntu=True)],
     indirect=True,

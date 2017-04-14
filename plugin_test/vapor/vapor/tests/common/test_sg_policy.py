@@ -223,8 +223,9 @@ def test_security_group_and_allow_all_policy(
     ids=['tcp_all', 'tcp_port'])
 def test_allow_all_security_group_and_policies(
         contrail_network_policy, security_group,
-        neutron_security_group_rule_steps, connectivity_test_resources,
-        server_steps, contrail_api_client, policy_entries, checks):
+        neutron_security_group_rule_steps, server_steps,
+        connectivity_test_resources, contrail_api_client, policy_entries,
+        checks):
     """Verify traffic restrictions by policy with security group.
 
     Steps:

@@ -56,9 +56,8 @@ def test_create_vm_bulk(net_subnet_router, tiny_flavor,
 
 
 def test_delete_vm_with_associated_vn(contrail_network, contrail_subnet,
-                                      tiny_flavor, cirros_image,
-                                      server_steps, network_steps,
-                                      contrail_api_client):
+                                      flavor, cirros_image, server_steps,
+                                      network_steps, contrail_api_client):
     """Description: Test to validate that VN cannot be deleted if
         there is a VM associated with it.
     Test steps:
@@ -69,13 +68,20 @@ def test_delete_vm_with_associated_vn(contrail_network, contrail_subnet,
         The attempt to delete VN should fail.
     """
     server_steps.create_servers(
-        image=cirros_image, flavor=tiny_flavor,
-        nics=[{'net-id': contrail_network.uuid}])
+        image=cirros_image,
+        flavor=flavor,
+        nics=[{
+            'net-id': contrail_network.uuid
+        }])
+
     net = network_steps.get_network(id=contrail_network.uuid)
 
+    neutron_client = network_steps._client._rest_client
     # Check that we can't delete this net.
-    assert_that(calling(network_steps.delete).with_args(net),
-                raises(neutron_exceptions.NetworkInUseClient))
+    assert_that(
+        calling(neutron_client.delete_network).with_args(
+            contrail_network.uuid),
+        raises(neutron_exceptions.NetworkInUseClient))
 
     # Check that network is still there
     # via contrail API
@@ -84,8 +90,8 @@ def test_delete_vm_with_associated_vn(contrail_network, contrail_subnet,
                 has_item(has_entry('uuid', contrail_network.uuid)))
 
     # via neutron API
-    assert_that(network_steps.get_network_by_name(net['name']),
-                is_not(empty()))
+    assert_that(
+        network_steps.get_network_by_name(net['name']), is_not(empty()))
 
 
 def test_two_nets_same_name(contrail_api_client, contrail_network,
@@ -234,9 +240,10 @@ def test_create_server_on_exhausted_subnet(cirros_image, flavor, network,
                                '(Exceeded maximum number of retries)'))
 
 
-def test_file_transfer_with_scp(
-        ubuntu_image, keypair, flavor, create_floating_ip, public_network,
-        network, subnet, security_group, server_steps, port_steps):
+def test_file_transfer_with_scp(ubuntu_xenial_image, keypair, flavor,
+                                create_floating_ip, public_network, network,
+                                subnet, security_group, port_steps,
+                                server_steps):
     """Validate File Transfer using scp between VMs.
 
     Steps:
@@ -262,7 +269,9 @@ def test_file_transfer_with_scp(
         "chmod 600 {path}",
         "echo {done_marker}",
     ]).format(
-        content=key_content, path=key_path, user=username,
+        content=key_content,
+        path=key_path,
+        user=username,
         done_marker=stepler_config.USERDATA_DONE_MARKER)
 
     ssh_opts = ('-o UserKnownHostsFile=/dev/null '
@@ -271,7 +280,7 @@ def test_file_transfer_with_scp(
     # Boot servers
     servers = server_steps.create_servers(
         count=2,
-        image=ubuntu_image,
+        image=ubuntu_xenial_image,
         flavor=flavor,
         networks=[network],
         security_groups=[security_group],
@@ -435,7 +444,6 @@ def test_vm_multi_intf_in_same_vn_chk_ping(
                 ip, server_ssh, timeout=stepler_config.PING_CALL_TIMEOUT)
 
 
-@pytest.mark.parametrize('flavor', [dict(ram=128, disk=1)], indirect=True)
 def test_create_multiple_servers_on_many_networks(
         cirros_image, flavor, create_network, create_subnet, server_steps):
     """Validate creation of multiple VN with multiple subnet and VMs in it.

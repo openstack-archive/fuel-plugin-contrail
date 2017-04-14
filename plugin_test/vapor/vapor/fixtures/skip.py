@@ -14,6 +14,7 @@ import pytest
 import six
 from stepler.fixtures import skip
 
+from vapor.helpers import dpdk
 from vapor.helpers import sriov
 from vapor import settings
 
@@ -42,6 +43,18 @@ class Predicates(skip.Predicates):
         sriov_device_mappings = sriov.get_sriov_devices(os_faults_steps,
                                                         computes)
         return len(sriov_device_mappings) > 0
+
+    @property
+    @_store_call
+    def dpdk_enabled(self):
+        """Define whether dpdk enabled at least on one node."""
+        os_faults_steps = self._get_fixture('os_faults_steps')
+        computes = self._get_fixture('computes')
+        dpdk_devices = dpdk.get_devices(os_faults_steps, computes)
+        for devices_groups in dpdk_devices.values():
+            if len(devices_groups[settings.DPDK_ENABLED_GROUP]) > 0:
+                return True
+        return False
 
     @property
     @_store_call

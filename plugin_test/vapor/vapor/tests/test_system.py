@@ -29,6 +29,7 @@ from vapor.helpers import policy
 from vapor import settings
 
 
+@pytest.mark.requires('not dpdk_enabled')
 def test_no_connectivity_between_vms_in_different_tenants(
         request, contrail_api_client, os_faults_steps):
     """Check no connectivity between VMs in different tenants.

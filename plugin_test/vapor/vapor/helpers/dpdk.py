@@ -21,7 +21,7 @@ from vapor import settings
 
 def get_devices(os_faults_steps, nodes):
     result = os_faults_steps.execute_cmd(
-        nodes, '{} --status'.format(settings.DPDK_NEC_BIND_PATH), check=False)
+        nodes, '{} --status'.format(settings.DPDK_NEC_BIND_CMD), check=False)
     node_statuses = {}
     for node_result in result:
         node = nodes_steps.get_node_by_result(node_result, os_faults_steps)

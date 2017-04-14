@@ -38,8 +38,7 @@ def test_bound_network_interfaces(os_faults_steps, computes):
     devices = dpdk.get_devices(os_faults_steps, computes)
     assert_that(devices.values(),
                 only_contains(
-                    has_entries('Network devices using DPDK-compatible driver',
-                                is_not(empty()))))
+                    has_entries(settings.DPDK_ENABLED_GROUP, is_not(empty()))))
 
 
 def test_huge_pages_usage(os_faults_steps, computes):
@@ -71,7 +70,7 @@ def test_contrail_vrouter_dpdk_cpu_usage(os_faults_steps, computes):
 
 
 @pytest.mark.parametrize(
-    'flavor', [dict(metadata={"hw:mem_page_size": "small"})], indirect=True)
+    'flavor', [dict(ram=1024, metadata={"hw:mem_page_size": "large"})], indirect=True)
 @pytest.mark.usefixtures('flavor')
 def test_vrouter_create_interface(request, os_faults_steps, computes):
     """Verify if vRouter creates interface after creation of a virtual machine.

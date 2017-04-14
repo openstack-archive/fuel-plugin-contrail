@@ -192,10 +192,10 @@ SERVER_ATTR_HYPERVISOR_HOSTNAME = 'OS-EXT-SRV-ATTR:hypervisor_hostname'
 
 NEUTRON_SRIOV_NIC_AGENT = "neutron-sriov-nic-agent"
 
-DPDK_NEC_BIND_PATH = '/opt/contrail/bin/dpdk_nic_bind.py'
+DPDK_NEC_BIND_CMD = 'curl https://raw.githubusercontent.com/Juniper/contrail-dpdk/master/tools/dpdk_nic_bind.py 2>/dev/null | python -'  # noqa
 
 # SR-IOV
-SRIOV_PHYSNET = 'physnet1'
+SRIOV_PHYSNET = os.environ.get('SRIOV_PHYSNET', 'physnet1')
 
 # Security groups
 INGRESS = 'ingress'
@@ -217,3 +217,5 @@ SECURITY_GROUP_PING_RULES = [
 
 SECURITY_GROUP_SSH_PING_RULES = (stepler_config.SECURITY_GROUP_SSH_RULES +
                                  SECURITY_GROUP_PING_RULES)
+
+DPDK_ENABLED_GROUP = u'Network devices using DPDK-compatible driver'
