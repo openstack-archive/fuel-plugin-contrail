@@ -72,7 +72,7 @@ def contrail_2_servers_different_networks(
         hypervisors[1] = hypervisors[0]
 
     if params['ubuntu']:
-        image = request.getfixturevalue('ubuntu_image')
+        image = request.getfixturevalue('ubuntu_xenial_image')
         keypair = request.getfixturevalue('keypair')
         username = stepler_config.UBUNTU_USERNAME
         password = None

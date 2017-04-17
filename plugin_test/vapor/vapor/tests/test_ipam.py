@@ -100,7 +100,7 @@ def test_ipam_virtual_dns(
 
 
 def test_ipam_ntp_server_setting(
-        keypair, ubuntu_image, flavor, security_group, public_network,
+        keypair, ubuntu_xenial_image, flavor, security_group, public_network,
         contrail_network, contrail_ipam, contrail_create_subnet,
         create_floating_ip, server_steps, port_steps, contrail_api_client):
     """Verify IPAM NTP server IP setting.
@@ -127,7 +127,7 @@ def test_ipam_ntp_server_setting(
 
     # Boot server
     server = server_steps.create_servers(
-        image=ubuntu_image,
+        image=ubuntu_xenial_image,
         flavor=flavor,
         security_groups=[security_group],
         nics=[{
