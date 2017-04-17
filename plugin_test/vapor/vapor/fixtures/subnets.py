@@ -13,6 +13,7 @@
 from pycontrail import exceptions
 import pycontrail.types as types
 import pytest
+from stepler import config as stepler_config
 
 
 def _get_ipam_refs(network):
@@ -35,7 +36,10 @@ def contrail_create_subnet(contrail_api_client, contrail_default_ipam):
     def _contrail_create_subnet(network,
                                 ipam=None,
                                 ip_prefix='10.0.0.0',
-                                ip_prefix_len=24):
+                                ip_prefix_len=24,
+                                dns_server_address=None):
+        dns_server_address = dns_server_address or stepler_config.GOOGLE_DNS_IP
+
         # Refresh network data
         network = contrail_api_client.virtual_network_read(id=network.uuid)
         ipam = ipam or contrail_default_ipam
@@ -57,7 +61,15 @@ def contrail_create_subnet(contrail_api_client, contrail_default_ipam):
 
         subnet_type = types.SubnetType(
             ip_prefix=ip_prefix, ip_prefix_len=ip_prefix_len)
-        ipam_subnets.append(types.IpamSubnetType(subnet=subnet_type))
+        ipam_subnets.append(
+            types.IpamSubnetType(
+                subnet=subnet_type,
+                dhcp_option_list={
+                    'dhcp_option': [{
+                        'dhcp_option_value': dns_server_address,
+                        'dhcp_option_name': '6'
+                    }]
+                }))
         vn_sub = types.VnSubnetsType(ipam_subnets=ipam_subnets)
         if update_exists:
             network.set_network_ipam(ipam, vn_sub)
