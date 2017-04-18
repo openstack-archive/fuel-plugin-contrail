@@ -196,6 +196,7 @@ DPDK_NEC_BIND_CMD = 'curl https://raw.githubusercontent.com/Juniper/contrail-dpd
 
 # SR-IOV
 SRIOV_PHYSNET = os.environ.get('SRIOV_PHYSNET', 'physnet1')
+SEGMENTATION_ID = int(os.environ.get('SEGMENTATION_ID', 2426))
 
 # Security groups
 INGRESS = 'ingress'
