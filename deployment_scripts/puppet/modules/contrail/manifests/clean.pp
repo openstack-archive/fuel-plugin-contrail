@@ -25,4 +25,9 @@ class contrail::clean {
   if !defined(Nova_config['neutron/url_timeout']) {
     nova_config { 'neutron/url_timeout' : ensure => absent }
   }
+  else {
+    Nova_config <|(title == 'neutron/url_timeout')|> {
+      ensure => absent,
+    }
+  }
 }
