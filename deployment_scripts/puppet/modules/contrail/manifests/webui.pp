@@ -14,40 +14,42 @@
 
 class contrail::webui {
 
-  apt::pin { 'contrail-nodejs-pin':
-    order    => '101',
-    packages => ['nodejs'],
-    priority => '1200',
-    label    => 'contrail',
-    before   => Package['nodejs'],
+# Resources defaults
+  Package { ensure => present }
+
+  File {
+    ensure  => present,
+    mode    => '0644',
+    owner   => 'contrail',
+    group   => 'contrail',
+    require => Package['contrail-openstack-webui'],
   }
 
 # Packages
   package { 'nodejs': } ->
+  package { 'redis-server': } ->
   package { 'contrail-web-core': } ->
   package { 'contrail-web-controller': } ->
   package { 'contrail-openstack-webui': }
 
 # Webui config files
   file { '/etc/contrail/config.global.js':
-    ensure  => present,
     content => template('contrail/config.global.js.erb'),
-    mode    => '0644',
-    owner   => 'contrail',
-    group   => 'contrail',
-    require => Package['contrail-openstack-webui'],
   }
 
   file { '/etc/contrail/contrail-webui-userauth.js':
-    ensure  => present,
     content => template('contrail/contrail-webui-userauth.js.erb'),
-    mode    => '0644',
-    owner   => 'contrail',
-    group   => 'contrail',
-    require => Package['contrail-openstack-webui'],
   }
 
 # Services
+  ## US251186: With redis-server package version 2:2.8.4-2,
+  ##           service does not start automatically upon install.
+  service { 'redis-server':
+    ensure    => running,
+    enable    => true,
+    require   => Package['redis-server'],
+  }
+
   service { 'supervisor-webui':
     ensure    => running,
     enable    => true,
@@ -55,7 +57,7 @@ class contrail::webui {
     subscribe => [
       File['/etc/contrail/contrail-webui-userauth.js'],
       File['/etc/contrail/config.global.js'],
-      Package['contrail-openstack-webui'],
       ],
   }
+
 }
