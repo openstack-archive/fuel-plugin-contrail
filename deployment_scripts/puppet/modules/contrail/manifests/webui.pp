@@ -24,6 +24,7 @@ class contrail::webui {
 
 # Packages
   package { 'nodejs': } ->
+  package { 'redis-server': } ->
   package { 'contrail-web-core': } ->
   package { 'contrail-web-controller': } ->
   package { 'contrail-openstack-webui': }
@@ -48,6 +49,14 @@ class contrail::webui {
   }
 
 # Services
+  ## US251186: With redis-server package version 2:2.8.4-2,
+  ##           service does not start automatically upon install.
+  service { 'redis-server':
+    ensure    => running,
+    enable    => true,
+    require   => Package['redis-server'],
+  }
+
   service { 'supervisor-webui':
     ensure    => running,
     enable    => true,
