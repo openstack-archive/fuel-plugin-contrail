@@ -647,7 +647,8 @@ def test_update_vm_ip(server, subnet, port_steps, server_steps):
                          [dict(ips=('10.0.0.10', '10.0.0.20'))],
                          indirect=True)
 def test_diff_proj_same_vn_vm_add_delete(different_tenants_resources,
-                                         client_contrail_vrouter_agent):
+                                         client_contrail_vrouter_agents,
+                                         os_faults_steps):
     """Test to validate that a VN and VM with the same name and same subnet
     can be created in two different projects.
 
@@ -661,7 +662,13 @@ def test_diff_proj_same_vn_vm_add_delete(different_tenants_resources,
     """
     resources = different_tenants_resources
 
-    itfs = client_contrail_vrouter_agent.get_itfs()['ItfResp'][
+    compute_host = getattr(resources[0].server,
+                           stepler_config.SERVER_ATTR_HOST)
+    compute_fqdn = os_faults_steps.get_fqdn_by_host_name(compute_host)
+
+    vrouter_agent_client = client_contrail_vrouter_agents[compute_fqdn]
+
+    itfs = vrouter_agent_client.get_itfs()['ItfResp'][
         'itf_list']
 
     s1_net_label = next(vrif['label'] for vrif in itfs

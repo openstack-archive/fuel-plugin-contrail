@@ -13,7 +13,8 @@
 import time
 
 import attrdict
-from hamcrest import assert_that, equal_to  # noqa: H301
+from hamcrest import (assert_that, equal_to, only_contains,
+                      has_entries)  # noqa: H301
 from pycontrail import types
 import pytest
 from stepler import config as stepler_config
@@ -448,3 +449,36 @@ def test_add_remove_security_group_with_active_flow(
                                             ifaces[0], tcp_filter)
         connectivity.check_packets_on_iface(os_faults_steps, computes[1],
                                             ifaces[1], udp_filter)
+
+
+def test_security_group_on_vrouter(
+        server, security_group, client_contrail_vrouter_agents,
+        os_faults_steps, neutron_create_security_group):
+    """Check that server's compute vRouter "know" about security groups.
+
+    Steps:
+        #. Create server with security group
+        #. Check that security group uuid is present on server's vRouter agent
+            /Snh_SgListReq reply
+        #. Create new security group
+        #. Add created security group to server
+        #. Check that new security group uuid is present on server's vRouter
+            agent /Snh_SgListReq reply
+    """
+    compute_host = getattr(server, stepler_config.SERVER_ATTR_HOST)
+    compute_fqdn = os_faults_steps.get_fqdn_by_host_name(compute_host)
+    vrouter_agent = client_contrail_vrouter_agents[compute_fqdn]
+
+    sg_list = vrouter_agent.get_sg_list()['SgListResp']['sg_list']
+    assert_that(
+        sg_list, only_contains(has_entries(sg_uuid=security_group['id'])))
+
+    new_security_group = neutron_create_security_group(
+        next(utils.generate_ids()))
+    server.add_security_group(new_security_group['id'])
+
+    sg_list = vrouter_agent.get_sg_list()['SgListResp']['sg_list']
+    assert_that(sg_list,
+                only_contains(
+                    has_entries(sg_uuid=security_group['id']),
+                    has_entries(sg_uuid=new_security_group['id'])))
