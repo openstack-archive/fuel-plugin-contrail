@@ -112,6 +112,7 @@ class contrail::config {
     'DEFAULTS/log_file':                  value => '/var/log/contrail/contrail-api.log';
     'DEFAULTS/log_local':                 value => '1';
     'DEFAULTS/log_level':                 value => 'SYS_NOTICE';
+    'DEFAULT/sandesh_send_rate_limit':    value => $contrail::sandesh_send_rate_limit;
     'DEFAULTS/disc_server_ip':            value => $contrail::contrail_private_vip;
     'DEFAULTS/disc_server_port':          value => '5998';
     'DEFAULTS/zk_server_ip':              value => $contrail::zk_server_ip;
@@ -144,20 +145,21 @@ class contrail::config {
   }
 
   contrail_discovery_config {
-    'DEFAULTS/zk_server_ip':          value => $contrail::contrail_mgmt_vip;
-    'DEFAULTS/zk_server_port':        value => '2181';
-    'DEFAULTS/listen_ip_addr':        value => '0.0.0.0';
-    'DEFAULTS/listen_port':           value => '9110';
-    'DEFAULTS/log_local':             value => '1';
-    'DEFAULTS/log_file':              value => '/var/log/contrail/discovery.log';
-    'DEFAULTS/log_level':             value => 'SYS_NOTICE';
-    'DEFAULTS/cassandra_server_list': value => $contrail::contrail_db_list_9160;
-    'DEFAULTS/ttl_min':               value => '300';
-    'DEFAULTS/ttl_max':               value => '1800';
-    'DEFAULTS/hc_interval':           value => '5';
-    'DEFAULTS/hc_max_miss':           value => $contrail::discovery_hc_max_miss;
-    'DEFAULTS/ttl_short':             value => '1';
-    'DNS-SERVER/policy':              value => 'fixed';
+    'DEFAULTS/zk_server_ip':           value => $contrail::contrail_mgmt_vip;
+    'DEFAULTS/zk_server_port':         value => '2181';
+    'DEFAULTS/listen_ip_addr':         value => '0.0.0.0';
+    'DEFAULTS/listen_port':            value => '9110';
+    'DEFAULTS/log_local':              value => '1';
+    'DEFAULTS/log_file':               value => '/var/log/contrail/discovery.log';
+    'DEFAULTS/log_level':              value => 'SYS_NOTICE';
+    'DEFAULT/sandesh_send_rate_limit': value => $contrail::sandesh_send_rate_limit;
+    'DEFAULTS/cassandra_server_list':  value => $contrail::contrail_db_list_9160;
+    'DEFAULTS/ttl_min':                value => '300';
+    'DEFAULTS/ttl_max':                value => '1800';
+    'DEFAULTS/hc_interval':            value => '5';
+    'DEFAULTS/hc_max_miss':            value => $contrail::discovery_hc_max_miss;
+    'DEFAULTS/ttl_short':              value => '1';
+    'DNS-SERVER/policy':               value => 'fixed';
   }
 
   contrail_discovery_ini_config {
@@ -198,27 +200,28 @@ class contrail::config {
   }
 
   contrail_schema_config {
-    'DEFAULTS/ifmap_server_ip':       value => $contrail::address;
-    'DEFAULTS/ifmap_server_port':     value => '8443';
-    'DEFAULTS/ifmap_username':        value => 'schema-transformer';
-    'DEFAULTS/ifmap_password':        value => 'schema-transformer';
-    'DEFAULTS/api_server_ip':         value => $contrail::contrail_mgmt_vip;
-    'DEFAULTS/api_server_port':       value => $contrail::api_server_port;
-    'DEFAULTS/zk_server_ip':          value => $contrail::zk_server_ip;
-    'DEFAULTS/log_file':              value => '/var/log/contrail/contrail-schema.log';
-    'DEFAULTS/cassandra_server_list': value => $contrail::contrail_db_list_9160;
-    'DEFAULTS/disc_server_ip':        value => $contrail::contrail_private_vip;
-    'DEFAULTS/disc_server_port':      value => '5998';
-    'DEFAULTS/log_local':             value => '1';
-    'DEFAULTS/log_level':             value => 'SYS_NOTICE';
-    'DEFAULTS/rabbit_server':         value => $contrail::contrail_private_vip;
-    'DEFAULTS/rabbit_port':           value => '5673';
-    'DEFAULTS/rabbit_user':           value => 'nova';
-    'DEFAULTS/rabbit_password':       value => $contrail::rabbit_password;
-    'SECURITY/use_certs':             value => false;
-    'SECURITY/keyfile':               value => '/etc/contrail/ssl/private_keys/schema_xfer_key.pem';
-    'SECURITY/certfile':              value => '/etc/contrail/ssl/certs/schema_xfer.pem';
-    'SECURITY/ca_certs':              value => '/etc/contrail/ssl/certs/ca.pem';
+    'DEFAULTS/ifmap_server_ip':        value => $contrail::address;
+    'DEFAULTS/ifmap_server_port':      value => '8443';
+    'DEFAULTS/ifmap_username':         value => 'schema-transformer';
+    'DEFAULTS/ifmap_password':         value => 'schema-transformer';
+    'DEFAULTS/api_server_ip':          value => $contrail::contrail_mgmt_vip;
+    'DEFAULTS/api_server_port':        value => $contrail::api_server_port;
+    'DEFAULTS/zk_server_ip':           value => $contrail::zk_server_ip;
+    'DEFAULTS/log_file':               value => '/var/log/contrail/contrail-schema.log';
+    'DEFAULTS/cassandra_server_list':  value => $contrail::contrail_db_list_9160;
+    'DEFAULTS/disc_server_ip':         value => $contrail::contrail_private_vip;
+    'DEFAULTS/disc_server_port':       value => '5998';
+    'DEFAULTS/log_local':              value => '1';
+    'DEFAULTS/log_level':              value => 'SYS_NOTICE';
+    'DEFAULT/sandesh_send_rate_limit': value => $contrail::sandesh_send_rate_limit;
+    'DEFAULTS/rabbit_server':          value => $contrail::contrail_private_vip;
+    'DEFAULTS/rabbit_port':            value => '5673';
+    'DEFAULTS/rabbit_user':            value => 'nova';
+    'DEFAULTS/rabbit_password':        value => $contrail::rabbit_password;
+    'SECURITY/use_certs':              value => false;
+    'SECURITY/keyfile':                value => '/etc/contrail/ssl/private_keys/schema_xfer_key.pem';
+    'SECURITY/certfile':               value => '/etc/contrail/ssl/certs/schema_xfer.pem';
+    'SECURITY/ca_certs':               value => '/etc/contrail/ssl/certs/ca.pem';
   }
 
   contrail_svc_monitor_config {
@@ -236,6 +239,7 @@ class contrail::config {
     'DEFAULTS/disc_server_port':       value => '5998';
     'DEFAULTS/log_local':              value => '1';
     'DEFAULTS/log_level':              value => 'SYS_NOTICE';
+    'DEFAULT/sandesh_send_rate_limit': value => $contrail::sandesh_send_rate_limit;
     'DEFAULTS/rabbit_server':          value => $contrail::contrail_private_vip;
     'DEFAULTS/rabbit_port':            value => '5673';
     'DEFAULTS/rabbit_user':            value => 'nova';
@@ -249,19 +253,20 @@ class contrail::config {
   }
 
   contrail_device_manager_config {
-    'DEFAULTS/api_server_ip':         value => $contrail::contrail_mgmt_vip;
-    'DEFAULTS/api_server_port':       value => $contrail::api_server_port;
-    'DEFAULTS/zk_server_ip':          value => $contrail::zk_server_ip;
-    'DEFAULTS/log_file':              value => '/var/log/contrail/contrail-device-manager.log';
-    'DEFAULTS/cassandra_server_list': value => $contrail::contrail_db_list_9160;
-    'DEFAULTS/disc_server_ip':        value => $contrail::contrail_private_vip;
-    'DEFAULTS/disc_server_port':      value => '5998';
-    'DEFAULTS/log_local':             value => '1';
-    'DEFAULTS/log_level':             value => 'SYS_NOTICE';
-    'DEFAULTS/rabbit_server':         value => $contrail::contrail_private_vip;
-    'DEFAULTS/rabbit_port':           value => '5673';
-    'DEFAULTS/rabbit_user':           value => 'nova';
-    'DEFAULTS/rabbit_password':       value => $contrail::rabbit_password;
+    'DEFAULTS/api_server_ip':          value => $contrail::contrail_mgmt_vip;
+    'DEFAULTS/api_server_port':        value => $contrail::api_server_port;
+    'DEFAULTS/zk_server_ip':           value => $contrail::zk_server_ip;
+    'DEFAULTS/log_file':               value => '/var/log/contrail/contrail-device-manager.log';
+    'DEFAULTS/cassandra_server_list':  value => $contrail::contrail_db_list_9160;
+    'DEFAULTS/disc_server_ip':         value => $contrail::contrail_private_vip;
+    'DEFAULTS/disc_server_port':       value => '5998';
+    'DEFAULTS/log_local':              value => '1';
+    'DEFAULTS/log_level':              value => 'SYS_NOTICE';
+    'DEFAULT/sandesh_send_rate_limit': value => $contrail::sandesh_send_rate_limit;
+    'DEFAULTS/rabbit_server':          value => $contrail::contrail_private_vip;
+    'DEFAULTS/rabbit_port':            value => '5673';
+    'DEFAULTS/rabbit_user':            value => 'nova';
+    'DEFAULTS/rabbit_password':        value => $contrail::rabbit_password;
   }
 
   contrail_config_nodemgr_config {

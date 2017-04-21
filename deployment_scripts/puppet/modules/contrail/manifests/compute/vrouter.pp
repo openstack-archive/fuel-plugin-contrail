@@ -133,6 +133,7 @@ class contrail::compute::vrouter {
     'DEFAULT/log_flow':                          value => $contrail::log_flow;
     'DEFAULT/use_syslog':                        value => $contrail::use_syslog;
     'DEFAULT/syslog_facility':                   value => $contrail::syslog_facility;
+    'DEFAULT/sandesh_send_rate_limit':           value => $contrail::sandesh_send_rate_limit;
     'DEFAULT/headless_mode':                     value => $contrail::headless_mode;
     'DISCOVERY/server':                          value => $contrail::contrail_private_vip;
     'DISCOVERY/max_control_nodes':               value => '2';

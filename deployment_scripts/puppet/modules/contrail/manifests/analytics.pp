@@ -67,6 +67,7 @@ class contrail::analytics {
     'DEFAULTS/log_level':                  value => 'SYS_NOTICE';
     'DEFAULTS/log_category':               value => ' ';
     'DEFAULTS/log_file':                   value => '/var/log/contrail/contrail-analytics-api.log';
+    'DEFAULT/sandesh_send_rate_limit':     value => $contrail::sandesh_send_rate_limit;
     'DEFAULTS/analytics_data_ttl':         value => '48';
     'DEFAULTS/analytics_config_audit_ttl': value => '-1';
     'DEFAULTS/analytics_statistics_ttl':   value => '-1';
@@ -89,6 +90,7 @@ class contrail::analytics {
     'DEFAULT/log_file':                   value => '/var/log/contrail/contrail-collector.log';
     'DEFAULT/log_level':                  value => 'SYS_NOTICE';
     'DEFAULT/log_local':                  value => '1';
+    'DEFAULT/sandesh_send_rate_limit':    value => $contrail::sandesh_send_rate_limit;
     'DEFAULT/syslog_port':                value => '-1';
     'DEFAULT/http_server_port':           value => '8089';
     'DEFAULT/kafka_broker_list':          value => $contrail::kafka_broker_list;
@@ -100,15 +102,16 @@ class contrail::analytics {
   }
 
   contrail_query_engine_config {
-    'DEFAULT/cassandra_server_list': value => $contrail::analytics_db_list;
-    'DEFAULT/collectors':            value => '127.0.0.1:8086';
-    'DEFAULT/hostip':                value => '$__contrail_host_ip__';
-    'DEFAULT/http_server_port':      value => '8091';
-    'DEFAULT/log_file':              value => '/var/log/contrail/contrail-query-engine.log';
-    'DEFAULT/log_level':             value => 'SYS_NOTICE';
-    'DEFAULT/log_local':             value => '1';
-    'REDIS/port':                    value => '6379';
-    'REDIS/server':                  value => '127.0.0.1';
+    'DEFAULT/cassandra_server_list':   value => $contrail::analytics_db_list;
+    'DEFAULT/collectors':              value => '127.0.0.1:8086';
+    'DEFAULT/hostip':                  value => '$__contrail_host_ip__';
+    'DEFAULT/http_server_port':        value => '8091';
+    'DEFAULT/log_file':                value => '/var/log/contrail/contrail-query-engine.log';
+    'DEFAULT/log_level':               value => 'SYS_NOTICE';
+    'DEFAULT/log_local':               value => '1';
+    'DEFAULT/sandesh_send_rate_limit': value => $contrail::sandesh_send_rate_limit;
+    'REDIS/port':                      value => '6379';
+    'REDIS/server':                    value => '127.0.0.1';
   }
 
   contrail_analytics_nodemgr_config {
