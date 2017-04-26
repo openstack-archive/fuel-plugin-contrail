@@ -14,7 +14,6 @@ contrail-db:
   - ntw01.mcp10-opencontrail.local
   - ntw02.mcp10-opencontrail.local
   - ntw03.mcp10-opencontrail.local
-contrail-analytics-db:
   - nal01.mcp10-opencontrail.local
   - nal02.mcp10-opencontrail.local
   - nal03.mcp10-opencontrail.local
