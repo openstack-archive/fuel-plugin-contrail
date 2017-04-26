@@ -10,8 +10,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
+import re
+
 from hamcrest import (assert_that, has_item, has_entry, is_not, empty,
-                      has_property, contains_inanyorder)  # noqa: H301
+                      has_property, contains_inanyorder, has_length,
+                      greater_than)  # noqa: H301
 import jmespath
 import pycontrail.types as types
 import pytest
@@ -173,5 +177,24 @@ def test_contrail_alarms_is_empty(client_contrail_analytics):
 
 
 def test_zookeeper_status(znodes_list):
-    expected_znodes_list = settings.ZOOKEEPER_NODES
-    assert_that(znodes_list, contains_inanyorder(*expected_znodes_list))
+    expected_znodes_list = set(settings.ZOOKEEPER_NODES)
+    znodes_list = set(znodes_list)
+    min_intersection = len(znodes_list) // 2
+    assert_that(znodes_list & expected_znodes_list,
+                has_length(greater_than(min_intersection)))
+
+
+def test_zookeeper_leader_followers(zoo_client):
+    """Check that only one zookeeper host has leader mode."""
+    hosts = ['{}:{}'.format(ip, port) for (ip, port) in zoo_client.hosts]
+    pattern = re.compile('Mode: (follower|leader)')
+    modes = collections.defaultdict(set)
+    for host in hosts:
+        zoo_client.set_hosts(host)
+        zoo_client.start()
+        result = zoo_client.command('stat')
+        mode = pattern.search(result).group(1)
+        modes[mode].add(host)
+        zoo_client.stop()
+    zoo_client.close()
+    assert_that(modes['leader'], has_length(1))
