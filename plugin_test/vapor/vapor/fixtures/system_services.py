@@ -16,16 +16,20 @@ import pytest
 
 
 @pytest.fixture
-def znodes_list(nodes_ips):
-    hosts_list = ""
+def zoo_client(nodes_ips):
+    hosts_list = []
     contrail_controllers_fqdns = settings.CONTRAIL_ROLES_DISTRIBUTION[
         settings.ROLE_CONTRAIL_CONTROLLER]
     for name in nodes_ips:
         if name in contrail_controllers_fqdns:
-            hosts_list += "{}:{},".format(nodes_ips[name][0],
-                                          settings.ZOOKEEPER_PORT)
-    hosts_list = hosts_list[:-1]
-    zk = client.KazooClient(hosts=hosts_list)
+            hosts_list.append("{}:{}".format(nodes_ips[name][0],
+                                             settings.ZOOKEEPER_PORT))
+    return client.KazooClient(hosts=','.join(hosts_list))
+
+
+@pytest.fixture
+def znodes_list(zoo_client):
+    zk = zoo_client
     zk.start()
     znodes_list_ = zk.get_children("/")
     zk.stop()
