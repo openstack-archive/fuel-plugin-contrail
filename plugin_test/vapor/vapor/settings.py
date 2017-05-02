@@ -221,8 +221,6 @@ SECURITY_GROUP_SSH_PING_RULES = (stepler_config.SECURITY_GROUP_SSH_RULES +
 
 DPDK_ENABLED_GROUP = u'Network devices using DPDK-compatible driver'
 
-
-
 # Service chaining
 # TODO(gdyuldin): relace with real URL
 NAT_SERVICE_IMAGE_URL = os.environ.get('NAT_SERVICE_IMAGE_URL',
@@ -230,3 +228,12 @@ NAT_SERVICE_IMAGE_URL = os.environ.get('NAT_SERVICE_IMAGE_URL',
 SERVICE_INSTANCE_CREATE_TIMEOUT = 2 * 60
 SERVICE_INSTANCE_BOOT_TIMEOUT = 10 * 60
 SERVICE_INSTANCE_BOOT_DONE_PATTERN = 'Cloud-init .+ finished'
+
+# LBAAS
+LBAAS_ONLINE_TIMEOUT = 5 * 60
+LBAAS_DELETE_TIMEOUT = 2 * 60
+
+HTTP_SERVER_CMD = (
+    'while true; do '
+    'echo -e "HTTP/1.0 200 OK\\r\\nContent-Length: $(hostname | wc -c)\\r\\n\\r\\n$(hostname)" | nc -l -p {port}; '  # noqa
+    'done')

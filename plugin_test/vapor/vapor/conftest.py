@@ -13,6 +13,7 @@ from vapor.fixtures.dns import *  # noqa
 from vapor.fixtures.images import *  # noqa
 from vapor.fixtures.instance_ip import *  # noqa
 from vapor.fixtures.ipams import *  # noqa
+from vapor.fixtures.lbaas import *  # noqa
 from vapor.fixtures.networks import *  # noqa
 from vapor.fixtures.nodes import *  # noqa
 from vapor.fixtures.policies import *  # noqa

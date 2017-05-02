@@ -70,7 +70,8 @@ def test_contrail_vrouter_dpdk_cpu_usage(os_faults_steps, computes):
 
 
 @pytest.mark.parametrize(
-    'flavor', [dict(ram=1024, metadata={"hw:mem_page_size": "large"})], indirect=True)
+    'flavor', [dict(ram=1024, metadata={"hw:mem_page_size": "large"})],
+    indirect=True)
 @pytest.mark.usefixtures('flavor')
 def test_vrouter_create_interface(request, os_faults_steps, computes):
     """Verify if vRouter creates interface after creation of a virtual machine.
