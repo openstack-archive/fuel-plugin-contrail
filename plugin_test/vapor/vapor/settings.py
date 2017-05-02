@@ -220,3 +220,13 @@ SECURITY_GROUP_SSH_PING_RULES = (stepler_config.SECURITY_GROUP_SSH_RULES +
                                  SECURITY_GROUP_PING_RULES)
 
 DPDK_ENABLED_GROUP = u'Network devices using DPDK-compatible driver'
+
+
+# LBAAS
+LBAAS_ONLINE_TIMEOUT = 5 * 60
+LBAAS_DELETE_TIMEOUT = 2 * 60
+
+HTTP_SERVER_CMD = (
+    'while true; do '
+    'echo -e "HTTP/1.0 200 OK\\r\\nContent-Length: $(hostname | wc -c)\\r\\n\\r\\n$(hostname)" | nc -l -p {port}; '  # noqa
+    'done')
