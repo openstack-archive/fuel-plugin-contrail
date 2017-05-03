@@ -93,6 +93,14 @@ class contrail::compute::vrouter {
                   "set options[. = 'vrouter']/vr_flow_entries ${contrail::vr_flow_entries}"],
       require => File['/etc/modprobe.d/vrouter.conf'],
     }
+
+     file_line {'remove vrouter':
+        path  => '/etc/init/supervisor-vrouter.conf',
+        require => Package['contrail-openstack-vrouter'],
+        line  => '    /sbin/rmmod vrouter',
+        after => 'post-stop script',
+        before => Service['supervisor-vrouter']
+    }
   }
 
   if !is_pkg_installed('contrail-openstack-vrouter') {
