@@ -190,7 +190,7 @@ class contrail {
   $patch_nova_vmware        = pick($settings['patch_nova_vmware'], false)
   $install_contrail_qemu_lv = pick($settings['install_contrail_qemu_lv'], false )
 
-  if $install_contrail_qemu_lv and $compute_dpdk_enabled {
+  if $install_contrail_qemu_lv {
     $libvirt_name = 'libvirt-bin'
   } else {
     $libvirt_name = 'libvirtd'
