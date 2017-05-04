@@ -17,6 +17,7 @@ class contrail::database {
   Package {
     ensure => installed,
   }
+
   File {
     ensure  => present,
     mode    => '0644',
@@ -31,12 +32,15 @@ class contrail::database {
   tweaks::ubuntu_service_override { 'contrail-database':
     package_name => 'contrail-openstack-database',
   }
+
   tweaks::ubuntu_service_override { 'zookeeper':
     package_name => 'zookeeper',
   }
+
   tweaks::ubuntu_service_override { 'supervisor-database':
     package_name => 'contrail-openstack-database',
   }
+
   if roles_include($contrail::contrail_db_roles) {
     $cassandra_seeds = $contrail::primary_contrail_db_ip
     $cluster_name    = 'Contrail'
@@ -62,19 +66,12 @@ class contrail::database {
     service { 'zookeeper':
       ensure    => running,
       enable    => true,
-      require   => [Package['zookeeper'],Package['contrail-openstack-database']],
+      require   => [Package['zookeeper'],Package['contrail-database-common']],
       subscribe => [
         File['/etc/zookeeper/conf/zoo.cfg'],
         File['/etc/zookeeper/conf/myid'],
         Package['zookeeper'],
         ],
-    }
-
-    package { 'kafka': } ->
-    service { 'kafka':
-      ensure    => stopped,
-      enable    => false,
-      hasstatus => false,
     }
 
   } elsif roles_include($contrail::analytics_db_roles) {
@@ -113,21 +110,17 @@ class contrail::database {
           ],
       }
 
-      package { 'zookeeper': } ->
-      service { 'zookeeper':
-        ensure => stopped,
-        enable => false,
+      # Supervisor-config
+      file { '/etc/contrail/supervisord_database.conf':
+        content => template('contrail/supervisord_database.conf.erb'),
+        before  => Service['supervisor-database'],
       }
   }
-  # Supervisor-config
-  file { '/etc/contrail/supervisord_database.conf':
-    content => template('contrail/supervisord_database.conf.erb'),
-    before  => Service['supervisor-database'],
-  }
 
-# Cassandra
+
+  # Cassandra
   package { 'cassandra': } ->
-  package { 'contrail-openstack-database': }
+  package { 'contrail-database-common': }
 
   file { $contrail::cassandra_path:
     ensure  => directory,
@@ -159,51 +152,49 @@ class contrail::database {
     }
   }
 
-# Supervisor-database
-  contrail_database_nodemgr_config {
-    'DEFAULT/hostip':             value => $contrail::address;
-    'DEFAULT/contrail_databases': value => $contrail_databases;
-    'DEFAULT/minimum_diskGB':     value => '4';
-    'DISCOVERY/server':           value => $contrail::contrail_private_vip;
-    'DISCOVERY/port':             value => '5998';
-  }
-
   service { 'contrail-database':
     ensure    => running,
     enable    => true,
-    require   => [File[$contrail::cassandra_path],Package['contrail-openstack-database']],
+    require   => [File[$contrail::cassandra_path],Package['contrail-database-common']],
     subscribe => [
       File['/etc/cassandra/cassandra.yaml'],
       File['/etc/cassandra/cassandra-env.sh'],
-      Package['contrail-openstack-database'],
+      Package['contrail-database-common'],
     ],
   }
 
-  service { 'supervisor-database':
-    ensure    => running,
-    enable    => true,
-    require   => [Service['contrail-database'],Package['contrail-openstack-database']],
-    subscribe => [File['/etc/cassandra/cassandra.yaml'],Package['contrail-openstack-database']]
+  if roles_include($contrail::analytics_db_roles) {
+
+    # Supervisor-database
+    package { 'contrail-openstack-database': }
+
+    contrail_database_nodemgr_config {
+      'DEFAULT/hostip':             value => $contrail::address;
+      'DEFAULT/contrail_databases': value => $contrail_databases;
+      'DEFAULT/minimum_diskGB':     value => '4';
+      'DISCOVERY/server':           value => $contrail::contrail_private_vip;
+      'DISCOVERY/port':             value => '5998';
+    }
+
+    service { 'supervisor-database':
+      ensure    => running,
+      enable    => true,
+      require   => [Service['contrail-database'],Package['contrail-openstack-database']],
+      subscribe => [File['/etc/cassandra/cassandra.yaml']]
+    }
+
+    notify{ 'Waiting for cassandra': } ->
+    exec { 'wait_for_cassandra':
+      provider  => 'shell',
+      command   => "nodetool status|grep ^UN|grep ${contrail::address}",
+      tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
+      try_sleep => 30,
+      require   => Service['supervisor-database'],
+    }
+
+    Package['contrail-openstack-database'] -> Contrail_database_nodemgr_config <||>
+    Contrail_database_nodemgr_config <||> ~> Service['supervisor-database']
+
   }
 
-  $cassandra_seed = $cassandra_seeds[0]
-  notify{ 'Waiting for cassandra seed node': } ->
-  exec { 'wait_for_cassandra_seed':
-    provider  => 'shell',
-    command   => "nodetool status|grep ^UN|grep ${cassandra_seed}",
-    tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
-    try_sleep => 30,
-    require   => Service['supervisor-database'],
-  }
-
-
-  notify{ 'Waiting for cassandra': } ->
-  exec { 'wait_for_cassandra':
-    provider  => 'shell',
-    command   => "nodetool status|grep ^UN|grep ${contrail::address}",
-    tries     => 10, # wait for whole cluster is up: 10 tries every 30 seconds = 5 min
-    try_sleep => 30,
-    require   => Service['supervisor-database'],
-  }
-  Contrail_database_nodemgr_config <||> ~> Service['supervisor-database']
 }
