@@ -220,3 +220,13 @@ SECURITY_GROUP_SSH_PING_RULES = (stepler_config.SECURITY_GROUP_SSH_RULES +
                                  SECURITY_GROUP_PING_RULES)
 
 DPDK_ENABLED_GROUP = u'Network devices using DPDK-compatible driver'
+
+
+
+# Service chaining
+# TODO(gdyuldin): relace with real URL
+NAT_SERVICE_IMAGE_URL = os.environ.get('NAT_SERVICE_IMAGE_URL',
+                                       '/home/jenkins/nat.qcow2')
+SERVICE_INSTANCE_CREATE_TIMEOUT = 2 * 60
+SERVICE_INSTANCE_BOOT_TIMEOUT = 10 * 60
+SERVICE_INSTANCE_BOOT_DONE_PATTERN = 'Cloud-init .+ finished'
