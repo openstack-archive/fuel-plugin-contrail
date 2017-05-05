@@ -230,3 +230,11 @@ HTTP_SERVER_CMD = (
     'while true; do '
     'echo -e "HTTP/1.0 200 OK\\r\\nContent-Length: $(hostname | wc -c)\\r\\n\\r\\n$(hostname)" | nc -l -p {port}; '  # noqa
     'done')
+
+
+# Service chaining
+# TODO(gdyuldin): relace with real URL
+NAT_SERVICE_IMAGE_URL = '/home/jenkins/nat.qcow2'
+SERVICE_INSTANCE_CREATE_TIMEOUT = 2 * 60
+SERVICE_INSTANCE_BOOT_TIMEOUT = 10 * 60
+SERVICE_INSTANCE_BOOT_DONE_PATTERN = 'Cloud-init .+ finished'
