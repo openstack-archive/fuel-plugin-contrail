@@ -234,7 +234,8 @@ HTTP_SERVER_CMD = (
 
 # Service chaining
 # TODO(gdyuldin): relace with real URL
-NAT_SERVICE_IMAGE_URL = '/home/jenkins/nat.qcow2'
+NAT_SERVICE_IMAGE_URL = os.environ.get('NAT_SERVICE_IMAGE_URL',
+                                       '/home/jenkins/nat.qcow2')
 SERVICE_INSTANCE_CREATE_TIMEOUT = 2 * 60
 SERVICE_INSTANCE_BOOT_TIMEOUT = 10 * 60
 SERVICE_INSTANCE_BOOT_DONE_PATTERN = 'Cloud-init .+ finished'
