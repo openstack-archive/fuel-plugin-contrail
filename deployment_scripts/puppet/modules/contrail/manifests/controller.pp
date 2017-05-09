@@ -301,29 +301,31 @@ class contrail::controller {
     }
 
     if $contrail::ceilometer_ha_mode {
-      service {'ceilometer-agent-central':
-        ensure     => running,
-        name       => 'p_ceilometer-agent-central',
-        enable     => true,
-        hasstatus  => true,
-        hasrestart => true,
-        provider   => 'pacemaker',
-        tag        => 'ceilometer',
+      if !defined(Service['ceilometer-agent-central']) {
+        service {'ceilometer-agent-central':
+          ensure     => running,
+          name       => 'p_ceilometer-agent-central',
+          enable     => true,
+          hasstatus  => true,
+          hasrestart => true,
+          provider   => 'pacemaker',
+          tag        => 'ceilometer',
+        }
       }
     }
     else {
       if !defined(Service['ceilometer-polling']) {
         service { 'ceilometer-polling':
-          ensure    => running,
-          enable    => true,
-          tag       => 'ceilometer',
+          ensure => running,
+          enable => true,
+          tag    => 'ceilometer',
         }
       }
       if !defined(Service['ceilometer-api']) {
         service { 'ceilometer-api':
-          ensure    => running,
-          enable    => true,
-          tag       => 'ceilometer',
+          ensure => running,
+          enable => true,
+          tag    => 'ceilometer',
         }
       }
     }
