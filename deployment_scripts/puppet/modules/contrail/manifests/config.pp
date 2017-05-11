@@ -85,6 +85,44 @@ class contrail::config {
     require => Package['openjdk-7-jre-headless'],
   }
 
+
+  $java_keystore_pass = 'mapserver'
+
+  # due to security issues, irond shouldnt use self-signed certificates
+  # irond keeps certs in jks format (java keystore). To generate it - we have to take raw private key, and certificate
+  # and generate pkcs12 key, than generate jks from pkcs12 key
+
+  if $contrail::public_ssl {
+    $pkcs12_path = '/etc/ifmap-server/keystore/aic.pkcs12'
+    $java_keystore_path = '/etc/ifmap-server/keystore/aic.jks'
+    $copied_raw_cert = '/etc/ifmap-server/keystore/contrail.pem'
+
+
+    file { $copied_raw_cert:
+      source => $contrail::public_ssl_path,
+    } ~>
+
+    exec { 'generate_pkcs12_key':
+      command     => "openssl pkcs12   -export -clcerts -in  $copied_raw_cert -inkey $copied_raw_cert  -out ${pkcs12_path}  -passout pass:${java_keystore_pass}",
+      refreshonly => true,
+      require     => Package['ifmap-server'],
+      before      => Service['supervisor-config'],
+      notify      => Service['supervisor-config'],
+    } ~>
+
+    exec { 'generate_java_keystore':
+      command     => "keytool -importkeystore -srckeystore ${pkcs12_path} -srcstoretype pkcs12 -destkeystore ${java_keystore_path} -deststoretype jks -srcstorepass ${java_keystore_pass} -deststorepass ${java_keystore_pass} -noprompt",
+      refreshonly => true,
+      require     => Package['ifmap-server'],
+      before      => Service['supervisor-config'],
+      notify      => Service['supervisor-config'],
+    }
+
+  } else {
+    $java_keystore_path = '/etc/ifmap-server/keystore/irond.jks'
+  }
+
+
 # Contrail config files
   file { '/etc/ifmap-server/publisher.properties':
     owner   => 'root',
@@ -98,6 +136,15 @@ class contrail::config {
     group   => 'root',
     content => template('contrail/basicauthusers.properties.erb'),
   }
+
+  file { '/etc/ifmap-server/ifmap.properties':
+    owner   => 'root',
+    group   => 'root',
+    content => template('contrail/ifmap.properties.erb'),
+    require => Package['ifmap-server'],
+    before  => Service['supervisor-config'],
+  }
+
 
   contrail_api_config {
     'DEFAULTS/ifmap_server_ip':           value => $contrail::address;
@@ -300,6 +347,7 @@ class contrail::config {
     subscribe => [
       File['/etc/contrail/supervisord_config.conf'],
       File['/etc/ifmap-server/basicauthusers.properties'],
+      File['/etc/ifmap-server/ifmap.properties'],
       Package['contrail-openstack-config'],
       ],
   }
