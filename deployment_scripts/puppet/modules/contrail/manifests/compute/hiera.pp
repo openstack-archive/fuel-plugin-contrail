@@ -18,6 +18,7 @@ class contrail::compute::hiera {
   # add packages overrides for libvirt and qemu.
   file { '/etc/hiera/plugins/contrail.yaml':
     ensure  => file,
+    mode    => '0640',
     content => template('contrail/contrail_hiera.yaml.erb'),
   }
   if roles_include('dpdk') {
