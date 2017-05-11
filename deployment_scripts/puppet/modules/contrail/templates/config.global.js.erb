@@ -188,11 +188,8 @@ config.webui_addresses = ['0.0.0.0'];
  * If set as false, then all http request will be redirected
  * to https, if set true, then no https request will be processed, but only http
  * request
- */<% if scope.lookupvar('contrail::public_ssl') == true %>
-config.insecure_access = true;
-<% else %>
+ */
 config.insecure_access = false;
-<% end %>
 // HTTP port for NodeJS Server.
 config.http_port = '8080';
 
@@ -279,6 +276,14 @@ config.network.L2_enable = false;
  *
  *****************************************************************************/
 config.getDomainsFromApiServer = false;
+
+<% if scope.lookupvar('contrail::public_ssl') %>
+config.server_options = {};
+config.server_options.ciphers =
+    'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+config.server_options.key_file = "<%= scope.lookupvar('contrail::public_ssl_path') %>";
+config.server_options.cert_file = "<%= scope.lookupvar('contrail::public_ssl_path') %>";
+<%end%>
 
 // Export this as a module.
 module.exports = config;
