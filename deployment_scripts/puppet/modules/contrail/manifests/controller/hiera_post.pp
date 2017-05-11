@@ -18,6 +18,7 @@ class contrail::controller::hiera_post {
   # Create predefined_networks for OSTF-nets in controller-provision.pp
   file { '/etc/hiera/plugins/contrail.yaml':
     ensure  => file,
+    mode    => '0640',
     content => template('contrail/plugins.yaml.erb'),
   }
 }
