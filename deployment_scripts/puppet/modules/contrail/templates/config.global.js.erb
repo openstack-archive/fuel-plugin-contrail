@@ -122,7 +122,7 @@ config.identityManager.ca = '';
 config.storageManager = {};
 config.storageManager.ip = '<%= scope.lookupvar('contrail::internal_cinder_endpoint') %>';
 config.storageManager.port = '8776';
-config.storageManager.authProtocol = '<%= scope.lookupvar('contrail::internal_cinder_endpoint') %>';
+config.storageManager.authProtocol = '<%= scope.lookupvar('contrail::internal_cinder_protocol') %>';
 config.storageManager.apiVersion = ['v1'];
 config.storageManager.strictSSL = false;
 config.storageManager.ca = '';
