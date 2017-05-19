@@ -134,13 +134,18 @@ class contrail::control {
     require => Package['contrail-dns'],
   }
 
+  # Service contrail-named should start after service contrail-dns, because
+  # contrail-dns generates needed configuration files for named
   service { 'contrail-named':
     ensure    => running,
-    require   => Package['contrail-dns'],
+    require   => [Package['contrail-dns'], Service['contrail-dns']],
+    hasstatus => false,
     subscribe => [
+      Service['contrail-dns'],
       Package['contrail-dns'],
       ]
   }
+
 
   service { 'supervisor-control':
     ensure    => $contrail::service_ensure,
