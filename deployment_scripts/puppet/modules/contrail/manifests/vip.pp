@@ -40,7 +40,9 @@ class contrail::vip {
     haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check', 'httplog'],
                                 'balance'        => 'roundrobin',
                                 'tcp-check'      => 'connect port 6379',
-                                'default-server' => 'error-limit 1 on-error mark-down' },
+                                'default-server' => 'error-limit 1 on-error mark-down',
+                                'http-request'   => 'add-header X-Forwarded-Proto https if { ssl_fc }',
+    },
     balancermember_options => 'check inter 2000 rise 2 fall 3',
   }
 
@@ -54,9 +56,10 @@ class contrail::vip {
     internal               => true,
     public_ssl             => $contrail::public_ssl,
     public_ssl_path        => $contrail::public_ssl_path,
-    haproxy_config_options => { 'option'  => ['nolinger', 'httplog'],
-                                'balance' => 'roundrobin',
-                                'timeout' => ['server 3m', 'client 3m'] },
+    haproxy_config_options => { 'option'         => ['nolinger', 'httplog'],
+                                'balance'        => 'roundrobin',
+                                'http-request'   => 'add-header X-Forwarded-Proto https if { ssl_fc }',
+                                'timeout'        => ['server 3m', 'client 3m'] },
     balancermember_options => 'check inter 2000 rise 2 fall 3',
   }
 
