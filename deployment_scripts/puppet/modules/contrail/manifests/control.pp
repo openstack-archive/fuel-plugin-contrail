@@ -130,12 +130,25 @@ class contrail::control {
   }
 
   service { 'contrail-dns':
-    ensure  => running,
-    require => Package['contrail-dns'],
+    ensure    => running,
+    require   => Package['contrail-dns'],
+    subscribe => Package['contrail-dns'],
+    hasstatus => false,
+    notify    => Exec['wait_for_named_configuration'],
   }
 
-  # Service contrail-named should start after service contrail-dns, because
-  # contrail-dns generates needed configuration files for named
+  # Workaround for wait until contrail-dns service generate right configuration files for
+  # contrail-named, and then start named.
+  # /usr/bin/contrail-dns uses /etc/contrail/dns/applynamedconfig.py script to generate configs.
+  exec { 'wait_for_named_configuration':
+    command     => '/usr/bin/test -f /etc/contrail/dns/contrail-named-base.conf',
+    require     => Service['contrail-dns'],
+    before      => Service['contrail-named'],
+    refreshonly => true,
+    tries       => 10,
+    try_sleep   => 5,
+  }
+
   service { 'contrail-named':
     ensure    => running,
     require   => [Package['contrail-dns'], Service['contrail-dns']],
