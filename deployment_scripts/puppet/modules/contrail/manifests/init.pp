@@ -158,6 +158,9 @@ class contrail {
   $kafka_partitions                 = pick($settings['kafka_partitions'], '30')
   $kafka_retention_hours            = pick($settings['kafka_retention_hours'], '24')
 
+  # Lbaas version
+  $lbaas_plugin_version = pick($settings['lbaas_plugin_version'], 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2')
+
   # Memcached settings
   $memcached_enabled = pick($settings['memcached_enabled'], true)
 

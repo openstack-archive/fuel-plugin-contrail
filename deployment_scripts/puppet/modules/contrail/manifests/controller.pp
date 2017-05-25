@@ -143,13 +143,13 @@ class contrail::controller {
   }
   if !defined(Neutron_config['DEFAULT/service_plugins']) {
     neutron_config {
-      'DEFAULT/service_plugins': value => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2';
+      'DEFAULT/service_plugins': value => $contrail::lbaas_plugin_version;
     }
   }
   else {
     Neutron_config<| title == 'DEFAULT/service_plugins' |> {
       ensure => present,
-      value  => 'neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2',
+      value  => $contrail::lbaas_plugin_version,
     }
   }
   if !defined(Neutron_config['DEFAULT/allow_overlapping_ips']) {
