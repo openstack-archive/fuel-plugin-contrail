@@ -111,6 +111,7 @@ class contrail::database {
       # Supervisor-config
       file { '/etc/contrail/supervisord_database.conf':
         content => template('contrail/supervisord_database.conf.erb'),
+        mode    => '0640',
         before  => Service['supervisor-database'],
       }
   }

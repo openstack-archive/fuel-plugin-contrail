@@ -163,6 +163,7 @@ class contrail::analytics {
   # Supervisor-config
   file { '/etc/contrail/supervisord_analytics.conf':
     content => template('contrail/supervisord_analytics.conf.erb'),
+    mode    => '0640',
     require => Package['contrail-analytics'],
   }
 

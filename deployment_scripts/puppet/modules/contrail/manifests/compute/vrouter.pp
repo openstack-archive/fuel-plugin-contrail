@@ -156,6 +156,7 @@ class contrail::compute::vrouter {
 
   file { '/etc/contrail/supervisord_vrouter.conf.erb':
     content => template('contrail/supervisord_vrouter.conf.erb'),
+    mode    => '0640',
     require => Class[Contrail::Package],
   }
 
