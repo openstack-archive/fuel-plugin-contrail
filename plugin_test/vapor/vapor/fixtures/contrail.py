@@ -28,12 +28,17 @@ def client_contrail_analytics(session):
 
 
 @pytest.fixture
-def client_contrail_vrouter_agent(contrail_vrouter_agent_endpoint):
-    LOGGER.debug('VRouter endpoint: {0}'.format(
-        contrail_vrouter_agent_endpoint))
-    return clients.ContrailVRouterAgentClient(
-        agent_ip=contrail_vrouter_agent_endpoint['ip'],
-        agent_port=contrail_vrouter_agent_endpoint['port'])
+def client_contrail_vrouter_agents(contrail_vrouter_agent_endpoints):
+    endpoints = contrail_vrouter_agent_endpoints
+    port = endpoints['port']
+    _clients = {}
+    for node in endpoints['nodes']:
+        LOGGER.debug('VRouter `{node}` endpoint: {ip}:{port}'.format(
+            node=node['fqdn'], ip=node['ip'], port=port))
+        _clients[node['fqdn']] = clients.ContrailVRouterAgentClient(
+            agent_ip=node['ip'], agent_port=endpoints['port'])
+
+    return _clients
 
 
 def get_nodes_fixture(cmd, scope='function'):
@@ -86,18 +91,53 @@ def contrail_api_endpoint(os_faults_steps):
 
 
 @pytest.fixture(scope='module')
-def contrail_vrouter_agent_endpoint(contrail_services_http_introspect_ports):
-    """Return contrail agent endpoint."""
+def contrail_vrouter_agent_endpoints(contrail_services_http_introspect_ports):
+    """Return contrail agent endpoints info.
+
+    Return format:
+        {
+            'port': 8100,
+            'nodes': [
+                {
+                    'ip': '1.22.3.4',
+                    'fqdn': 'cmp001.mcp.local'
+                },
+                {
+                    'ip': '1.22.3.5',
+                    'fqdn': 'cmp002.mcp.local'
+                }
+            ]
+        }
+    """
     service_name = 'contrail-vrouter-agent'
-    ip = contrail_services_http_introspect_ports[service_name]['nodes'][0][
-        'ip']
-    port = contrail_services_http_introspect_ports[service_name]['port']
-    return {'ip': ip, 'port': port}
+    return contrail_services_http_introspect_ports[service_name]
 
 
 @pytest.fixture(scope='module')
 def contrail_services_http_introspect_ports(os_faults_steps, contrail_nodes):
-    """Return contrail services ips and ports."""
+    """Return contrail services ips and ports.
+
+    Return format:
+        {
+            'contrail-vrouter-agent':{
+                'port': 8100,
+                'nodes': [
+                    {
+                        'ip': '1.22.3.4',
+                        'fqdn': 'cmp001.mcp.local'
+                    },
+                    {
+                        'ip': '1.22.3.5',
+                        'fqdn': 'cmp002.mcp.local'
+                    }
+                ]
+            },
+            'contrail-opserver': {...},
+            ....
+
+        }
+
+    """
 
     default_ports = {
         'contrail-config-nodemgr': 8100,
