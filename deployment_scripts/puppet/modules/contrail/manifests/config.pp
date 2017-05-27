@@ -323,7 +323,8 @@ class contrail::config {
 
 # Supervisor-config
   file { '/etc/contrail/supervisord_config.conf':
-    content  => template('contrail/supervisord_config.conf.erb'),
+    content => template('contrail/supervisord_config.conf.erb'),
+    mode    => '0640',
   }
 
 # Contrail services

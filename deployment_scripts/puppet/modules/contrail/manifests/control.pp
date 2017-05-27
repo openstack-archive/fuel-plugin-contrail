@@ -121,6 +121,7 @@ class contrail::control {
   # Supervisor-config
   file { '/etc/contrail/supervisord_control.conf':
     content => template('contrail/supervisord_control.conf.erb'),
+    mode    => '0640',
     require => Package['contrail-control'],
   }
 
