@@ -146,10 +146,15 @@ class contrail::compute::compute_override {
         match => 'auth_unix_rw',
         line  => 'auth_unix_rw = "none"',
       } ~>
-      service { $contrail::libvirt_name:
-        ensure => running,
-        enable => true,
+      Service[$contrail::libvirt_name]
+
+      if !defined(Service[$contrail::libvirt_name]) {
+          service { $contrail::libvirt_name:
+            ensure => running,
+            enable => true,
+          }
       }
+
       if !defined(Service['nova-compute']) {
         service { 'nova-compute':
           ensure  => running,
