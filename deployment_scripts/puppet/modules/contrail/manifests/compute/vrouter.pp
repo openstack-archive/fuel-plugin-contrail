@@ -115,7 +115,7 @@ class contrail::compute::vrouter {
   if !defined(File['/var/crashes']) {
     file { '/var/crashes':
       ensure  => directory,
-      mode    => '0777',
+      mode    => '1777',
       before  => Class['contrail::package'],
     }
   }
