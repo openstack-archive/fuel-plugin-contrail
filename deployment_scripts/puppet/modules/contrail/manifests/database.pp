@@ -145,7 +145,7 @@ class contrail::database {
   if !defined(File['/var/crashes']) {
     file { '/var/crashes':
       ensure  => directory,
-      mode    => '0777',
+      mode    => '1777',
       require => File[$contrail::cassandra_path],
       before  => File['/etc/cassandra/cassandra.yaml']
     }
