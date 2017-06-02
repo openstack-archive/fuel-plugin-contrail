@@ -130,49 +130,39 @@ class contrail::control {
     'DISCOVERY/port':   value => '5998';
   }
 
-  service { 'contrail-dns':
-    ensure    => running,
-    require   => Package['contrail-dns'],
-    subscribe => Package['contrail-dns'],
-    hasstatus => false,
-    notify    => Exec['wait_for_named_configuration'],
-  }
-
   # Workaround for wait until contrail-dns service generate right configuration files for
   # contrail-named, and then start named.
   # /usr/bin/contrail-dns uses /etc/contrail/dns/applynamedconfig.py script to generate configs.
   exec { 'wait_for_named_configuration':
     command     => '/usr/bin/test -f /etc/contrail/dns/contrail-named-base.conf',
-    require     => Service['contrail-dns'],
-    before      => Service['contrail-named'],
     refreshonly => true,
-    tries       => 10,
-    try_sleep   => 5,
+    tries       => 5,
+    try_sleep   => 10,
   }
 
   service { 'contrail-named':
     ensure    => running,
-    require   => [Package['contrail-dns'], Service['contrail-dns']],
     hasstatus => false,
-    subscribe => [
-      Service['contrail-dns'],
-      Package['contrail-dns'],
-      ]
   }
 
 
   service { 'supervisor-control':
     ensure    => $contrail::service_ensure,
     enable    => true,
-    subscribe => [Package['contrail-openstack-control'], Package['contrail-control']],
+    subscribe => [
+      Package['contrail-openstack-control'],
+      Package['contrail-control'],
+      Package['contrail-dns'],
+      ],
     require   => [
       File['/etc/contrail/supervisord_control.conf'],
       Package['contrail-openstack-control'],
-      Package['contrail-control']
+      Package['contrail-control'],
+      Package['contrail-dns'],
       ],
   }
 
   Contrail_control_config <||>  ~> Service['supervisor-control']
   Contrail_dns_config <||>      ~> Service['supervisor-control']
-  Contrail_dns_config <||>      ~> Service['contrail-dns']
+  Service['supervisor-control'] ~> Exec['wait_for_named_configuration'] ~> Service['contrail-named']
 }
