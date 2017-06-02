@@ -1,0 +1,10 @@
+Verified+1: Plugins CI <plugins.ci@mirantis.com>
+Code-Review+1: Vlad Naboichenko <vnaboychenko@mirantis.com>
+Code-Review+2: Nikita Koshikov <nkoshikov@mirantis.com>
+Workflow+1: Nikita Koshikov <nkoshikov@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 02 Jun 2017 20:45:14 +0000
+Reviewed-on: https://review.openstack.org/470395
+Project: openstack/fuel-plugin-contrail
+Branch: refs/heads/3.1
