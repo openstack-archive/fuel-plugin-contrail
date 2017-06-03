@@ -19,6 +19,7 @@ class contrail::controller::hiera_pre {
   # in openstack-network-controller.pp
   file { '/etc/hiera/plugins/contrail.yaml':
     ensure  => file,
+    mode    => '0640',
     content => 'neutron_config: { predefined_networks: [] }',
   }
 }
