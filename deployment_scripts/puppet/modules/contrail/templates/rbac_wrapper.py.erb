@@ -22,6 +22,7 @@ import time
 import yaml
 import requests
 
+
 class RbacWrapper:
 
     def __init__(self):
@@ -30,18 +31,15 @@ class RbacWrapper:
         print "RBAC Wrapper running..."
         self.__rbac_parser()
 
-
     def __rbac_parser(self):
         #   -- Main parser function --
         try:
             io_path = '/var/lib/fuel/rbac_wrapper/rbac_settings.yaml'
             content = open(io_path, "r")
-            all_roles = 8
-            admin_access = 'CRUD'
             # Port will dynamically get-fetched from manifest
             port = '<%= scope.lookupvar('contrail::api_server_port') %>'
             port = '9100'
-            confirm =  'y'
+            confirm = 'y'
             contrail_usr = '<%= scope.lookupvar('contrail::rbac_settings::user_name') %>'
             contrail_pwd = '<%= scope.lookupvar('contrail::rbac_settings::user_password') %>'
             script_path = '/var/lib/fuel/rbac_wrapper/rbac_cmd.sh'
@@ -52,49 +50,24 @@ class RbacWrapper:
                 logging.info("Not empty file")
 
             policies = yaml.load_all(open(io_path, "r"))
-            #since file content gets flushed
+            # since file content gets flushed
             for policy in policies:
-                for actions, roles in policy.items():
-                    if len(roles) > 0:
-                        logging.info('Action:%s --> roles:%s', actions, roles)
-                        access = self.__access_control(actions)
-                        permissions = ''
+                for object, permissions in policy.items():
+                    logging.info('Object:%s --> permissions:%s', object, permissions)
 
-                        logging.info('No. is %s & Roles are: %s', len(roles), roles)
-                        if len(roles) >= all_roles:
-                            roles = ['admin_contrail', 'admin', '*']
+                    #   The commands that have to be run are called
+                    #   with variables
+                    first = subprocess.Popen(['echo', confirm],
+                                             stdout=subprocess.PIPE)
+                    logging.debug('First cmd: %s', str(first))
 
-                        for role in roles:
-                            logging.debug('Role %s', role)
-                            if role in ['admin', 'admin_contrail']:
-                                access_assign = admin_access
-                            else:
-                                access_assign = access
+                    second = subprocess.check_output(['/bin/bash', script_path,
+                                                      object, permissions,
+                                                      port, contrail_usr,
+                                                      contrail_pwd],
+                                                     stdin=first.stdout)
 
-                            permissions = (permissions
-                                           + str(role) + ':'
-                                           + access_assign + ',')
-
-                            logging.debug('Permissions:%s', permissions)
-
-                        if (len(permissions) > 0):
-                            permissions = permissions.rstrip(",")
-                            logging.info('Complete Permissions:%s', permissions)
-
-                        #   The commands that have to be run are called
-                        #   with variables
-                        first = subprocess.Popen(['echo', confirm],
-                                                 stdout=subprocess.PIPE)
-                        logging.debug('First cmd: %s', str(first))
-                        second = subprocess.check_output(
-                            ['/bin/bash',
-                             script_path, actions,
-                             permissions, port,
-                             contrail_usr, contrail_pwd], stdin=first.stdout)
-                        logging.debug('Second cmd: %s', str(second))
-                    else:
-                        logging.warning('Roles are not present for action:%s',
-                                        actions)
+                    logging.debug('Second cmd: %s', str(second))
 
         # --Exceptions being handled--
         except IOError as e:
@@ -160,3 +133,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

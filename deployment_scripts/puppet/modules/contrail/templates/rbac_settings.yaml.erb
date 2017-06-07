@@ -1,33 +1,9 @@
 rbac_rules:
-  list_load_balancers:
-    - admin
-    - admin_contrail
-    - demo
-  list_load_balancer_pools:
-    - admin
-    - admin_contrail
-    - demo
-  create_load_balancers:
-    - admin
-    - admin_contrail
-  create_virtual_routers:
-    - admin
-    - admin_contrail
-  list_virtual_routers:
-    - admin
-    - admin_contrail
-    - demo
-  show_virtual_router:
-    - admin
-    - admin_contrail
-    - demo
-  update_virtual_router:
-    - admin
-    - admin_contrail
-  delete_virtual_router:
-    - admin
-    - admin_contrail
-  list_virtual_DNSs:
-    - admin
-    - admin_contrail
-    - demo
+   'access-control-list.*': 'admin:CRUD,*:R'
+   'access-control-lists.*': 'admin:CRUD,*:R'
+   'alarm.*': 'admin:CRUD,*:RCU'
+   'alarms.*': 'admin:CRUD,*:R'
+   'alias-ip.*': 'admi:CRUD,*:R'
+   'alias-ip-pool.*': 'admin:CRUD,_member_:CR,*:R'
+   'alias-ip-pools.*': 'admin:CRUD,*:R'
+   'alias-ips.*': 'admin:CRUD,*:R'
