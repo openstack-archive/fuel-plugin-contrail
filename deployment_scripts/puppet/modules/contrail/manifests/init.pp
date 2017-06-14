@@ -148,6 +148,7 @@ class contrail {
   $external                  = $settings['contrail_external']
   $route_target              = $settings['contrail_route_target']
   $gateways                  = split($settings['contrail_gateways'], ',')
+  $vrouter_thread_count      = pick($settings['vrouter_thread_count'], '4')
 
   # Kafka settings
   $kafka_log_retention_bytes        = pick($settings['kafka_log_retention_bytes'], '1073741824')
