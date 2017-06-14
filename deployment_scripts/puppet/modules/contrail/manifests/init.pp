@@ -112,6 +112,7 @@ class contrail {
   $external         = $settings['contrail_external']
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
+  $vrouter_thread_count      = pick($settings['vrouter_thread_count'], '4')
 
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']

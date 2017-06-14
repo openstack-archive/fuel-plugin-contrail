@@ -215,7 +215,7 @@ class contrail::compute::vrouter {
   } else {
     contrail_vrouter_agent_config {
       'TASK/thread_count':  value => '8';
-      'FLOWS/thread_count': value => '2';
+      'FLOWS/thread_count': value => $contrail::vrouter_thread_count;
     }
     file {'/etc/network/interfaces.d/ifcfg-vhost0':
       ensure  => present,
