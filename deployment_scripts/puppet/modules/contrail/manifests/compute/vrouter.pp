@@ -213,8 +213,23 @@ class contrail::compute::vrouter {
     }
   } else {
     contrail_vrouter_agent_config {
-      'TASK/thread_count':                   value => '8';
-      'FLOWS/thread_count':                  value => '2';
+      'TASK/thread_count':  value => '8';
+      'FLOWS/thread_count': value => $contrail::vrouter_thread_count;
+    }
+    file {'/etc/network/interfaces.d/ifcfg-vhost0':
+      ensure  => present,
+      content => template('contrail/ubuntu-ifcfg-vhost0.erb'),
+    } ~>
+    service {'supervisor-vrouter':
+      ensure     => running,
+      enable     => true,
+      hasrestart => false,
+      restart    => 'service supervisor-vrouter stop && \
+modprobe -r vrouter && \
+sync && \
+echo 3 > /proc/sys/vm/drop_caches && \
+echo 1 > /proc/sys/vm/compact_memory && \
+service supervisor-vrouter start',
     }
   }
 
