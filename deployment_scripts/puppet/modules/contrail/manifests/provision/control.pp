@@ -14,6 +14,23 @@
 
 class contrail::provision::control {
 
+  $contrail_asn_base_cmd = "python /opt/contrail/utils/provision_control.py \
+--api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port ${contrail::api_server_port} \
+--router_asn ${contrail::asnum} \
+--admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}'"
+
+  if ($contrail::gr_enable and $contrail::gr_bgp_helper_enable and $contrail::gr_xmpp_helper_enable) {
+    $contrail_asn_cmd = join([$contrail_asn_base_cmd, ' --set_graceful_restart_parameters', ' --graceful_restart_time ', $contrail::gr_timer, ' --long_lived_graceful_restart_time ', $contrail::llgr_timer, ' --end_of_rib_timeout ', $contrail::eor_timeout, ' --graceful_restart_enable', ' --graceful_restart_bgp_helper_enable', ' --graceful_restart_xmpp_helper_enable'])
+  } elsif ($contrail::gr_enable and $contrail::gr_bgp_helper_enable) {
+    $contrail_asn_cmd = join([$contrail_asn_base_cmd, ' --set_graceful_restart_parameters', ' --graceful_restart_time ', $contrail::gr_timer, ' --long_lived_graceful_restart_time ', $contrail::llgr_timer, ' --end_of_rib_timeout ', $contrail::eor_timeout, ' --graceful_restart_enable', ' --graceful_restart_bgp_helper_enable'])
+  } elsif ($contrail::gr_enable and $contrail::gr_xmpp_helper_enable) {
+    $contrail_asn_cmd = join([$contrail_asn_base_cmd, ' --set_graceful_restart_parameters', ' --graceful_restart_time ', $contrail::gr_timer, ' --long_lived_graceful_restart_time ', $contrail::llgr_timer, ' --end_of_rib_timeout ', $contrail::eor_timeout, ' --graceful_restart_enable', ' --graceful_restart_xmpp_helper_enable'])
+  } elsif $contrail::gr_enable {
+    $contrail_asn_cmd = join([$contrail_asn_base_cmd, ' --set_graceful_restart_parameters', ' --graceful_restart_time ', $contrail::gr_timer, ' --long_lived_graceful_restart_time ', $contrail::llgr_timer, ' --end_of_rib_timeout ', $contrail::eor_timeout, ' --graceful_restart_enable'])
+  } else {
+    $contrail_asn_cmd = $contrail_asn_base_cmd
+  }
+
   Exec {
     provider => 'shell',
     path     => '/usr/bin:/bin:/sbin',
@@ -55,11 +72,7 @@ then exit 1; fi'",
 
   if roles_include('primary-contrail-controller') {
     exec { 'prov_control_asn':
-      command => "python /opt/contrail/utils/provision_control.py \
---api_server_ip ${contrail::contrail_mgmt_vip} --api_server_port 8082 \
---router_asn ${contrail::asnum} \
---admin_user '${contrail::neutron_user}' --admin_tenant_name '${contrail::service_tenant}' --admin_password '${contrail::service_token}' \
-&& touch /opt/contrail/prov_control_asn-DONE",
+      command => "$contrail_asn_cmd && touch /opt/contrail/prov_control_asn-DONE",
       creates => '/opt/contrail/prov_control_asn-DONE',
       require => Exec['wait_for_api'],
       before  => Exec['prov_control_bgp'],
