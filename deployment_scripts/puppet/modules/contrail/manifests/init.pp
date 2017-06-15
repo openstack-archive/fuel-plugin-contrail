@@ -113,6 +113,12 @@ class contrail {
   $route_target     = $settings['contrail_route_target']
   $gateways         = split($settings['contrail_gateways'], ',')
   $vrouter_thread_count      = pick($settings['vrouter_thread_count'], '4')
+  $gr_enable                 = $settings['graceful_restart_enable']
+  $gr_timer                  = $settings['graceful_restart_time']
+  $llgr_timer                = $settings['long_lived_graceful_restart_time']
+  $eor_timeout               = $settings['end_of_rib_timeout']
+  $gr_bgp_helper_enable      = $settings['graceful_restart_bgp_helper_enable']
+  $gr_xmpp_helper_enable     = $settings['graceful_restart_xmpp_helper_enable']
 
   # DPDK settings
   $global_dpdk_enabled  = $settings['contrail_global_dpdk']
