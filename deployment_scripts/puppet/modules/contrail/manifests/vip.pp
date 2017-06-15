@@ -88,7 +88,8 @@ class contrail::vip {
     haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check', 'httplog'],
                                 'balance'        => 'source',
                                 'default-server' => 'error-limit 1 on-error mark-down',
-                                'mode'           => $mode },
+                                'mode'           => $mode,
+                                'http-request'   => 'add-header X-Forwarded-Proto https if { ssl_fc }'},
     balancermember_options => 'check inter 2000 rise 2 fall 3',
   }
 
