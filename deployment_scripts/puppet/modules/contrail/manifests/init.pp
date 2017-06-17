@@ -148,6 +148,11 @@ class contrail {
   $external                  = $settings['contrail_external']
   $route_target              = $settings['contrail_route_target']
   $gateways                  = split($settings['contrail_gateways'], ',')
+  $gr_enable                 = pick($settings['graceful_restart_enable'], false)
+  $gr_timer                  = pick($settings['graceful_restart_time'], 300)
+  $llgr_timer                = pick($settings['long_lived_graceful_restart_time'], 300)
+  $eor_timeout               = pick($settings['end_of_rib_timeout'], 300)
+  $gr_bgp_helper_enable      = pick($settings['graceful_restart_bgp_helper_enable'], false)
 
   # Kafka settings
   $kafka_log_retention_bytes        = pick($settings['kafka_log_retention_bytes'], '1073741824')
