@@ -119,6 +119,9 @@ class contrail {
   $auth_url           = "${keystone_protocol}://${keystone_address}:35357/v2.0"
   $keystone_insecure  = pick($settings['keystone_insecure'], true)
 
+  $bgpaas_port_start = pick($settings['bgpaas_port_start'], '50000')
+  $bgpaas_port_end   = pick($settings['bgpaas_port_end'], '50512')
+
   $neutron_ssl      = get_ssl_property($ssl_hash, {}, 'neutron', 'admin', 'usage', false)
   $neutron_protocol = get_ssl_property($ssl_hash, {}, 'neutron', 'admin', 'protocol', 'http')
   $neutron_config   = hiera_hash('neutron_config', {})
