@@ -157,6 +157,10 @@ class contrail {
   $eor_timeout               = pick($settings['end_of_rib_timeout'], 300)
   $gr_bgp_helper_enable      = pick($settings['graceful_restart_bgp_helper_enable'], false)
 
+  # BGP settings
+  $bgpaas_port_start = pick($settings['bgpaas_port_start'], '50000')
+  $bgpaas_port_end   = pick($settings['bgpaas_port_end'], '50512')
+
   # Kafka settings
   $kafka_log_retention_bytes        = pick($settings['kafka_log_retention_bytes'], '1073741824')
   $kafka_log_segment_bytes          = pick($settings['kafka_log_segment_bytes'], '1073741824')
