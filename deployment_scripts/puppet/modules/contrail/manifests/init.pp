@@ -69,6 +69,7 @@ class contrail {
 
   # Contrail-API port
   $api_server_port   = pick($settings['api_server_port'], '8082')
+  $analytics_port    = pick($settings['analytics_port'], '8081')
 
   # VIPs
   $mos_mgmt_vip   = $network_metadata['vips']['management']['ipaddr']
