@@ -263,6 +263,17 @@
   cross-depended-by:
     - name: contrail-db-primary
 
+- id: contrail-endpoints
+  type: puppet
+  version: 2.1.0
+  groups: [primary-controller]
+  requires: [contrail-keystone]
+  required_for: [deploy_end]
+  parameters:
+    puppet_manifest: puppet/manifests/contrail-endpoints.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 3600
+
 ################
 #6. Deploy other Cassandra servers
 ################
