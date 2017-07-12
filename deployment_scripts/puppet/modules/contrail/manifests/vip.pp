@@ -98,6 +98,7 @@ class contrail::vip {
     haproxy_config_options => { 'option'         => ['httplog', 'tcp-check'],
                                 'balance'        => 'source',
                                 'tcp-check'      => "connect port ${ui_backend_port}",
+                                'rspirep'        => '^(set-cookie:.*)  \1;\ Secure',
                                 'default-server' => 'error-limit 1 on-error mark-down',
                                 'mode'           => $mode },
     balancermember_options => 'check inter 2000 rise 2 fall 3',
