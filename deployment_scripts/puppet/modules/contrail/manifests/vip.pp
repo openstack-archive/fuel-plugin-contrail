@@ -87,6 +87,7 @@ class contrail::vip {
     public_ssl_path        => $contrail::public_ssl_path,
     haproxy_config_options => { 'option'         => ['nolinger', 'tcp-check', 'httplog'],
                                 'balance'        => 'source',
+                                'rspirep'        => '^(set-cookie:.*)  \1;\ Secure',
                                 'default-server' => 'error-limit 1 on-error mark-down',
                                 'mode'           => $mode,
                                 'http-request'   => 'add-header X-Forwarded-Proto https if { ssl_fc }'},
