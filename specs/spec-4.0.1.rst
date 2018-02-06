@@ -106,7 +106,7 @@ Proposed solution
 Enable caching keystone tokens for Contrail purposes. Similar to
 `OpenStack approach <http://docs.openstack.org/developer/keystonemiddleware/middlewarearchitecture.html#improving-response-time>`_
 Contrail can cache authentication responses from the keystone in memcache. This feature will be enabled by
-default and doesn't require any additional settings from Fuel UI. Kyestone middleware will use memcache
+default and doesn't require any additional settings from Fuel UI. Keystone middleware will use memcache
 servers running local Contrail config nodes.
 
 UI impact
