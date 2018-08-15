@@ -435,7 +435,7 @@ Expected results
 All steps must be completed successfully, without any errors.
 
 
-Check conection between instances in different availibility zones
+Check conection between instances in different availability zones
 -----------------------------------------------------------------
 
 
