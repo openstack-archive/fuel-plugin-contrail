@@ -19,17 +19,17 @@ parameters:
     # required: optional
   domain_limits_project_limit:
     type: number
-    description: Maximum number of projects allowed in this domian
+    description: Maximum number of projects allowed in this domain
     # operations: CRUD
     # required: optional
   domain_limits_virtual_network_limit:
     type: number
-    description: Maximum number of virtual networks allowed in this domian
+    description: Maximum number of virtual networks allowed in this domain
     # operations: CRUD
     # required: optional
   domain_limits_security_group_limit:
     type: number
-    description: Maximum number of security groups allowed in this domian
+    description: Maximum number of security groups allowed in this domain
     # operations: CRUD
     # required: optional
 
