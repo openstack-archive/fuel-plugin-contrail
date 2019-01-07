@@ -76,7 +76,7 @@ Steps
     5. Add a node with contrail-analytics + contrail-analytics-db roles
     6. Add a node with contrail-analytics + contrail-controller roles
     7. Add a node with contrail-analytics role
-    8. Add a node with with controller role
+    8. Add a node with controller role
     9. Add a node with compute + cinder roles
     10. Deploy cluster with plugin
     11. Run contrail health check tests
