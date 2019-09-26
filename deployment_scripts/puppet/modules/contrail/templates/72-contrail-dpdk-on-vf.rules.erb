@@ -1,1 +1,0 @@
-SUBSYSTEM=="net", ACTION=="add", KERNELS=="<%= @dpdk_dev_pci %>", NAME="<%= @dpdk_dev_name %>", RUN+="/bin/ip link set dev %k address <%= @dpdk_dev_mac %>"

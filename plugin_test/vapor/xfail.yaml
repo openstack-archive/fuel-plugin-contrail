@@ -1,3 +1,0 @@
-test_name: reason
-vapor/tests/common/test_sg_policy.py::another_test_name: // Without reason
-yet_more_test_name: reason2

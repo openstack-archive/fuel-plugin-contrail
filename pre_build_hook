@@ -1,6 +1,0 @@
-#!/bin/bash
-# Add here any the actions which are required before plugin build
-# like packages building, packages downloading from mirrors and so on.
-# The script should return 0 if there were no errors.
-
-set -eux

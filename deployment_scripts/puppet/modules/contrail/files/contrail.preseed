@@ -1,4 +1,0 @@
-sun-java6-plugin shared/accepted-sun-dlj-v1-1 boolean true
-sun-java6-bin shared/accepted-sun-dlj-v1-1 boolean true
-debconf shared/accepted-oracle-license-v1-1 select true
-debconf shared/accepted-oracle-license-v1-1 seen true

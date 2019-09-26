@@ -1,9 +1,0 @@
-- name: 'network:neutron:contrail'
-  label: 'Contrail'
-  description: 'Contrail SDN networking'
-  bind: !!pairs
-    - "cluster:net_provider": "neutron"
-    - "cluster:net_segment_type": "tun"
-  compatible:
-    - name: 'hypervisor:kvm'
-    - name: 'hypervisor:qemu'

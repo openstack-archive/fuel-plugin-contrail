@@ -1,4 +1,0 @@
-#!/bin/bash
-
-[ "$IFACE" != "vhost0" ] && exit 0
-. /opt/contrail/bin/if-vhost0
